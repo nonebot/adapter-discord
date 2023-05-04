@@ -24,7 +24,7 @@ async def _request(adapter: "Adapter", bot: "Bot", request: Request) -> Any:
         request.proxy = adapter.discord_config.discord_proxy
         data = await adapter.request(request)
         log(
-            "DEBUG",
+            "TRACE",
             f"API code: {data.status_code} response: {escape_tag(str(data.content))}",
         )
         if data.status_code in (200, 201, 204):
