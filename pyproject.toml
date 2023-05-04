@@ -2,13 +2,15 @@
 name = "nonebot-adapter-discord"
 version = "0.1.0"
 description = "Discord adapter for nonebot2"
-authors = ["yanyongyu <yyy@nonebot.dev>"]
+authors = ["CMHopeSunshine <277073121@qq.com>", "yanyongyu <yyy@nonebot.dev>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/nonebot/adapter-discord"
 repository = "https://github.com/nonebot/adapter-discord"
 documentation = "https://github.com/nonebot/adapter-discord"
 keywords = ["nonebot", "discord", "bot"]
+
+packages = [{ include = "nonebot" }]
 
 [tool.poetry.dependencies]
 python = "^3.8"
