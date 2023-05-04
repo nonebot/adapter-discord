@@ -94,21 +94,9 @@ class MessageSegment(BaseMessageSegment["Message"]):
                 }
             )
 
-    # @staticmethod
-    # def tts(is_tts: bool) -> "TTSSegment":
-    #     return TTSSegment(data={"tts": is_tts})
-    #
-    # @staticmethod
-    # def nonce(nonce: Union[int, str]) -> "NonceSegment":
-    #     return NonceSegment(data={"nonce": nonce})
-
     @staticmethod
     def sticker(sticker_id: SnowflakeType) -> "StickerSegment":
         return StickerSegment(data={"id": Snowflake(sticker_id)})
-
-    # @staticmethod
-    # def allowed_mentions(allowed_mentions: AllowedMention) -> "AllowedMentionsSegment":
-    #     return AllowedMentionsSegment(data={"allowed_mentions": allowed_mentions})
 
     @staticmethod
     def embed(embed: Embed) -> "EmbedSegment":
@@ -130,31 +118,31 @@ class MessageSegment(BaseMessageSegment["Message"]):
 
     @staticmethod
     def mention_user(user_id: SnowflakeType) -> "MentionUserSegment":
-        return MentionUserSegment("mention_user", {"user_id": Snowflake(user_id)})
+        return MentionUserSegment(data={"user_id": Snowflake(user_id)})
 
     @staticmethod
     def mention_role(role_id: SnowflakeType) -> "MentionRoleSegment":
-        return MentionRoleSegment("mention_role", {"role_id": Snowflake(role_id)})
+        return MentionRoleSegment(data={"role_id": Snowflake(role_id)})
 
     @staticmethod
-    def mention_channel(channel_id: SnowflakeType) -> "MentionChannel":
-        return MentionChannel("mention_channel", {"channel_id": Snowflake(channel_id)})
+    def mention_channel(channel_id: SnowflakeType) -> "MentionChannelSegment":
+        return MentionChannelSegment(data={"channel_id": Snowflake(channel_id)})
 
     @staticmethod
     def mention_everyone() -> "MentionEveryoneSegment":
-        return MentionEveryoneSegment("mention_everyone", {})
+        return MentionEveryoneSegment()
 
     @staticmethod
     def text(content: str) -> "TextSegment":
-        return TextSegment("text", data={"text": escape(content)})
+        return TextSegment(data={"text": escape(content)})
 
     @staticmethod
     def timestamp(
         timestamp: Union[int, datetime.datetime], style: Optional[TimeStampStyle] = None
-    ) -> "Timestamp":
+    ) -> "TimestampSegment":
         if isinstance(timestamp, datetime.datetime):
             timestamp = int(timestamp.timestamp())
-        return Timestamp("timestamp", data={"timestamp": timestamp, "style": style})
+        return TimestampSegment(data={"timestamp": timestamp, "style": style})
 
     @staticmethod
     @overload
@@ -245,7 +233,7 @@ class MentionUserSegment(MessageSegment):
 
 
 @dataclass
-class MentionChannel(MessageSegment):
+class MentionChannelSegment(MessageSegment):
     type: str = "mention_channel"
     data: TypedDict("MentionChannelData", {"channel_id": Snowflake}) = field(
         default_factory=dict
@@ -279,7 +267,7 @@ class MentionEveryoneSegment(MessageSegment):
 
 
 @dataclass
-class Timestamp(MessageSegment):
+class TimestampSegment(MessageSegment):
     type: str = "timestamp"
     data: TypedDict(
         "TimestampData", {"timestamp": int, "style": Optional[TimeStampStyle]}
@@ -385,7 +373,7 @@ class Message(BaseMessage[MessageSegment]):
                     data={"role_id": Snowflake(embed.group("param"))}
                 )
             elif embed.group("type") == "#":
-                yield MentionChannel(
+                yield MentionChannelSegment(
                     data={"channel_id": Snowflake(embed.group("param"))}
                 )
             elif embed.group("type") == "/":
@@ -407,11 +395,11 @@ class Message(BaseMessage[MessageSegment]):
                     len(cut := embed.group("param").split(":")) == 2
                     and cut[0].isdigit()
                 ):
-                    yield Timestamp(
+                    yield TimestampSegment(
                         data={"timestamp": int(cut[0]), "style": TimeStampStyle(cut[1])}
                     )
                 elif embed.group().isdigit():
-                    yield Timestamp(
+                    yield TimestampSegment(
                         data={"timestamp": int(embed.group()), "style": None}
                     )
                 else:
