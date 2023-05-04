@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
-    if event.message_reference is None:
+    if event.message_reference:
         return
     try:
         event.reply = await bot.get_channel_message(
@@ -106,12 +106,15 @@ async def send(
     if sticker_ids := (message["sticker"] or None):
         sticker_ids = [sticker.data["id"] for sticker in sticker_ids]
 
+    attachments = None
     files = None
-    if attachments := (message["attachment"] or None):
-        attachments = [attachment.data["attachment"] for attachment in attachments]
+    if attachments_segment := (message["attachment"] or None):
+        attachments = [
+            attachment.data["attachment"] for attachment in attachments_segment
+        ]
         files = [
             attachment.data["file"]
-            for attachment in attachments
+            for attachment in attachments_segment
             if attachment.data["file"] is not None
         ]
 

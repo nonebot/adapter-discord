@@ -1,4 +1,4 @@
-from typing import Any, Dict, Type, Union, Literal
+from typing import Any, Dict, List, Type, Union, Literal
 
 from ..utils import json_dumps
 from .model import MessageSend, ExecuteWebhookParams
@@ -10,14 +10,14 @@ def parse_data(
     model = model_class.parse_obj(data)
     payload = model.dict(exclude={"files"}, exclude_none=True)
     if model.files:
-        multipart = {"payload_json": None}
-        attachments: list[dict] = payload.pop("attachments", [])
+        multipart = {}
+        attachments: List[dict] = payload.pop("attachments", [])
         for index, file in enumerate(model.files):
             for attachment in attachments:
                 if attachment["filename"] == file.filename:
-                    attachment["id"] = str(index)
+                    attachment["id"] = index
                     break
-            multipart[f"file[{index}]"] = (file.filename, file.content)
+            multipart[f"files[{index}]"] = (file.filename, file.content)
         if attachments:
             payload["attachments"] = attachments
         multipart["payload_json"] = (None, json_dumps(payload), "application/json")
