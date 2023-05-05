@@ -18,6 +18,7 @@ from .bot import Bot
 from .config import Config, BotInfo
 from .api.handle import API_HANDLERS
 from .exception import ApiNotAvailable
+from .api.model import User, GatewayBot
 from .utils import log, decompress_data
 from .event import Event, ReadyEvent, MessageEvent, event_classes
 from .payload import (
@@ -75,9 +76,8 @@ class Adapter(BaseAdapter):
                 task.cancel()
 
     async def run_bot(self, bot_info: BotInfo) -> None:
-        bot = Bot(self, "temp", bot_info)
         try:
-            gateway_info = await bot.get_gateway_bot()
+            gateway_info = await self._get_gateway_bot(bot_info)
             if not gateway_info.url:
                 raise ValueError("Failed to get gateway url")
             ws_url = URL(gateway_info.url)
@@ -103,14 +103,14 @@ class Adapter(BaseAdapter):
 
         if bot_info.shard is not None:
             self.tasks.append(
-                asyncio.create_task(self._forward_ws(bot, ws_url, bot_info.shard))
+                asyncio.create_task(self._forward_ws(bot_info, ws_url, bot_info.shard))
             )
             return
 
         shards = gateway_info.shards or 1
         for i in range(shards):
             self.tasks.append(
-                asyncio.create_task(self._forward_ws(bot, ws_url, (i, shards)))
+                asyncio.create_task(self._forward_ws(bot_info, ws_url, (i, shards)))
             )
             await asyncio.sleep(
                 gateway_info.session_start_limit
@@ -118,9 +118,29 @@ class Adapter(BaseAdapter):
                 or 1
             )
 
-    async def _forward_ws(self, bot: Bot, ws_url: URL, shard: Tuple[int, int]) -> None:
+    async def _get_gateway_bot(self, bot_info: BotInfo) -> GatewayBot:
+        headers = {"Authorization": self.get_authorization(bot_info)}
+        request = Request(
+            headers=headers,
+            method="GET",
+            url=self.base_url / "gateway/bot",
+        )
+        resp = await self.request(request)
+        return GatewayBot.parse_raw(resp.content)
+
+    async def _get_bot_user(self, bot_info: BotInfo) -> User:
+        headers = {"Authorization": self.get_authorization(bot_info)}
+        request = Request(
+            method="GET", url=self.base_url / "users" / "@me", headers=headers
+        )
+        resp = await self.request(request)
+        return User.parse_raw(resp.content)
+
+    async def _forward_ws(
+        self, bot_info: BotInfo, ws_url: URL, shard: Tuple[int, int]
+    ) -> None:
         log("DEBUG", f"Forwarding WebSocket Connection to {escape_tag(str(ws_url))}...")
-        headers = {"Authorization": f"Bot {bot.bot_info.token}"}
+        headers = {"Authorization": self.get_authorization(bot_info)}
         params = {
             "v": self.discord_config.discord_api_version,
             "encoding": "json",
@@ -131,8 +151,12 @@ class Adapter(BaseAdapter):
             method="GET", url=ws_url, headers=headers, params=params, timeout=30.0
         )
         heartbeat_task: Optional[asyncio.Task] = None
+        bot: Optional[Bot] = None
         while True:
             try:
+                if bot is None:
+                    user = await self._get_bot_user(bot_info)
+                    bot = Bot(self, str(user.id), bot_info)
                 async with self.websocket(request) as ws:
                     ws: WebSocket
                     log(
@@ -223,7 +247,8 @@ class Adapter(BaseAdapter):
         if not isinstance(payload, HeartbeatAck):
             await ws.close(1003)  # 除了1000和1001都行
 
-    async def _heartbeat(self, ws: WebSocket, bot: Bot):
+    @staticmethod
+    async def _heartbeat(ws: WebSocket, bot: Bot):
         """心跳"""
         log("TRACE", f"Heartbeat {bot.sequence if bot.has_sequence else ''}")
         payload = Heartbeat.parse_obj(
@@ -284,6 +309,11 @@ class Adapter(BaseAdapter):
             # https://discord.com/developers/docs/topics/gateway#ready-event
             # 鉴权成功之后，后台会下发一个 Ready Event
             payload = await self.receive_payload(ws)
+            if isinstance(payload, HeartbeatAck):
+                log(
+                    "WARNING", "Received unexpected HeartbeatAck event when identifying"
+                )
+                payload = await self.receive_payload(ws)
             assert isinstance(
                 payload, Dispatch
             ), f"Received unexpected payload: {payload!r}"
@@ -294,7 +324,6 @@ class Adapter(BaseAdapter):
             ), f"Received unexpected event: {ready_event!r}"
             bot.session_id = ready_event.session_id
             bot.self_info = ready_event.user
-            bot.self_id = str(ready_event.user.id)
 
         # only connect for single shard
         if bot.self_id not in self.bots:
@@ -364,7 +393,8 @@ class Adapter(BaseAdapter):
                     f"Unknown payload from server: {escape_tag(repr(payload))}",
                 )
 
-    def get_authorization(self, bot_info: BotInfo) -> str:
+    @staticmethod
+    def get_authorization(bot_info: BotInfo) -> str:
         return f"Bot {bot_info.token}"
 
     async def receive_payload(self, ws: WebSocket) -> Payload:
