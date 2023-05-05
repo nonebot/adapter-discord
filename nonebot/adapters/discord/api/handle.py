@@ -2121,7 +2121,7 @@ async def _get_current_user_guild_member(
     request = Request(
         headers=headers,
         method="GET",
-        url=adapter.base_url / f"users/@me/guilds/{guild_id}",
+        url=adapter.base_url / f"users/@me/guilds/{guild_id}/member",
     )
     return parse_obj_as(GuildMember, await _request(adapter, bot, request))
 
