@@ -322,6 +322,7 @@ class Adapter(BaseAdapter):
             assert isinstance(
                 ready_event, ReadyEvent
             ), f"Received unexpected event: {ready_event!r}"
+            ws.request.url = URL(ready_event.resume_gateway_url)
             bot.session_id = ready_event.session_id
             bot.self_info = ready_event.user
 
