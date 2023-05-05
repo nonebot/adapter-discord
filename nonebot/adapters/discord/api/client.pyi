@@ -1165,13 +1165,13 @@ class ApiClient:
         before: Optional[SnowflakeType] = ...,
         after: Optional[SnowflakeType] = ...,
         limit: Optional[int] = ...,
-    ) -> List[Guild]:
+    ) -> List[CurrentUserGuild]:
         """https://discord.com/developers/docs/resources/user#get-current-user-guilds"""
         ...
-    async def get_current_user_guilds_member(
+    async def get_current_user_guild_member(
         self, *, guild_id: SnowflakeType
     ) -> GuildMember:
-        """https://discord.com/developers/docs/resources/user#get-current-user-guilds-member"""
+        """https://discord.com/developers/docs/resources/user#get-current-user-guild-member"""
         ...
     async def leave_guild(self, *, guild_id: SnowflakeType) -> None:
         """https://discord.com/developers/docs/resources/user#leave-guild"""

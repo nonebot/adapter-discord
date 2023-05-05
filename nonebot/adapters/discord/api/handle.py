@@ -2101,7 +2101,7 @@ async def _modify_current_user(adapter: "Adapter", bot: "Bot", **data) -> User:
 
 async def _get_current_user_guilds(
     adapter: "Adapter", bot: "Bot", **params
-) -> List[Guild]:
+) -> List[CurrentUserGuild]:
     """https://discord.com/developers/docs/resources/user#get-current-user-guilds"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2110,10 +2110,10 @@ async def _get_current_user_guilds(
         url=adapter.base_url / "users/@me/guilds",
         params=params,
     )
-    return parse_obj_as(List[Guild], await _request(adapter, bot, request))
+    return parse_obj_as(List[CurrentUserGuild], await _request(adapter, bot, request))
 
 
-async def _get_current_user_guilds_member(
+async def _get_current_user_guild_member(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
 ) -> GuildMember:
     """https://discord.com/developers/docs/resources/user#get-current-user-guilds-member"""

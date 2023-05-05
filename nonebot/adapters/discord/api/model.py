@@ -1522,15 +1522,15 @@ class Guild(BaseModel):
 
     id: Snowflake
     name: str
-    icon: Optional[str]
+    icon: Optional[str] = ...
     icon_hash: MissingOrNullable[str] = MISSING
-    splash: Optional[str]
+    splash: Optional[str] = ...
     discovery_splash: Optional[str]
     owner: Missing[bool] = MISSING
     owner_id: Snowflake
     permissions: Missing[str] = MISSING
     region: MissingOrNullable[str] = MISSING
-    afk_channel_id: Optional[Snowflake]
+    afk_channel_id: Optional[Snowflake] = ...
     afk_timeout: int
     widget_enabled: Missing[bool] = MISSING
     widget_channel_id: MissingOrNullable[Snowflake] = MISSING
@@ -1541,19 +1541,19 @@ class Guild(BaseModel):
     emojis: List[Emoji]
     features: List[GuildFeature]
     mfa_level: MFALevel
-    application_id: Optional[Snowflake]
-    system_channel_id: Optional[Snowflake]
+    application_id: Optional[Snowflake] = ...
+    system_channel_id: Optional[Snowflake] = ...
     system_channel_flags: SystemChannelFlags
-    rules_channel_id: Optional[Snowflake]
-    max_presences: Optional[int]
-    max_members: Optional[int]
-    vanity_url_code: Optional[str]
-    description: Optional[str]
-    banner: Optional[str]
+    rules_channel_id: Optional[Snowflake] = ...
+    max_presences: Optional[int] = ...
+    max_members: Optional[int] = ...
+    vanity_url_code: Optional[str] = ...
+    description: Optional[str] = ...
+    banner: Optional[str] = ...
     premium_tier: PremiumTier
-    premium_subscription_count: Optional[int]
+    premium_subscription_count: Optional[int] = ...
     preferred_locale: str
-    public_updates_channel_id: Optional[Snowflake]
+    public_updates_channel_id: Optional[Snowflake] = ...
     max_video_channel_users: Missing[int] = MISSING
     max_stage_video_channel_users: Missing[int] = MISSING
     approximate_member_count: Missing[int] = MISSING
@@ -1562,6 +1562,19 @@ class Guild(BaseModel):
     nsfw_level: GuildNSFWLevel
     stickers: Missing[List["Sticker"]] = MISSING
     premium_progress_bar_enabled: bool
+
+
+class CurrentUserGuild(BaseModel):
+    """partial guild object for Get Current User Guilds API
+
+    see https://discord.com/developers/docs/resources/user#get-current-user-guilds"""
+
+    id: Snowflake
+    name: str
+    icon: Optional[str] = ...
+    owner: Missing[bool] = MISSING
+    permissions: Missing[str] = MISSING
+    features: List[GuildFeature]
 
 
 class UnavailableGuild(BaseModel):
@@ -3305,6 +3318,7 @@ __all__ = [
     "ModifyChannelParams",
     "Emoji",
     "Guild",
+    "CurrentUserGuild",
     "UnavailableGuild",
     "GuildPreview",
     "GuildWidgetSettings",
