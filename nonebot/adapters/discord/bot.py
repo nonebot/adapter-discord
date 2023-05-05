@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
-    if event.message_reference:
+    if not event.message_reference:
         return
     try:
         event.reply = await bot.get_channel_message(

@@ -209,6 +209,10 @@ class MessageEvent(Event, MessageGet):
     def user_id(self) -> Snowflake:
         return self.author.id
 
+    @property
+    def message_id(self) -> Snowflake:
+        return self.id
+
 
 class HelloEvent(MetaEvent):
     """Hello event
