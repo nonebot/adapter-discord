@@ -124,6 +124,8 @@ class Adapter(BaseAdapter):
             headers=headers,
             method="GET",
             url=self.base_url / "gateway/bot",
+            timeout=self.discord_config.discord_api_timeout,
+            proxy=self.discord_config.discord_proxy,
         )
         resp = await self.request(request)
         return GatewayBot.parse_raw(resp.content)
@@ -131,7 +133,11 @@ class Adapter(BaseAdapter):
     async def _get_bot_user(self, bot_info: BotInfo) -> User:
         headers = {"Authorization": self.get_authorization(bot_info)}
         request = Request(
-            method="GET", url=self.base_url / "users" / "@me", headers=headers
+            method="GET",
+            url=self.base_url / "users/@me",
+            headers=headers,
+            timeout=self.discord_config.discord_api_timeout,
+            proxy=self.discord_config.discord_proxy,
         )
         resp = await self.request(request)
         return User.parse_raw(resp.content)
@@ -148,7 +154,12 @@ class Adapter(BaseAdapter):
         if self.discord_config.discord_compress:
             params["compress"] = "zlib-stream"
         request = Request(
-            method="GET", url=ws_url, headers=headers, params=params, timeout=30.0
+            method="GET",
+            url=ws_url,
+            headers=headers,
+            params=params,
+            timeout=self.discord_config.discord_api_timeout,
+            proxy=self.discord_config.discord_proxy,
         )
         heartbeat_task: Optional[asyncio.Task] = None
         bot: Optional[Bot] = None
