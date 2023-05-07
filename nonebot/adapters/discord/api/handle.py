@@ -2627,7 +2627,7 @@ API_HANDLERS = {
     "get_user": _get_user,
     "modify_current_user": _modify_current_user,
     "get_current_user_guilds": _get_current_user_guilds,
-    "get_current_user_guilds_member": _get_current_user_guilds_member,
+    "get_current_user_guild_member": _get_current_user_guild_member,
     "leave_guild": _leave_guild,
     "create_DM": _create_DM,
     "create_group_DM": _create_group_DM,
