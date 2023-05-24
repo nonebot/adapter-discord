@@ -34,26 +34,30 @@ class MessageSegment(BaseMessageSegment["Message"]):
     def get_message_class(cls) -> Type["Message"]:
         return Message
 
-    @staticmethod
-    @overload
-    def attachment(
-        file: str, description: Optional[str] = None, content: Optional[bytes] = None
-    ) -> "AttachmentSegment":
-        ...
+    # @staticmethod
+    # @overload
+    # def attachment(
+    #     file: str, 
+    #     description: Optional[str] = None, 
+    #     content: Optional[bytes] = None
+    # ) -> "AttachmentSegment":
+    #     ...
 
-    @staticmethod
-    @overload
-    def attachment(
-        file: File, description: Optional[str] = None
-    ) -> "AttachmentSegment":
-        ...
+    # @staticmethod
+    # @overload
+    # def attachment(
+    #     file: File, 
+    #     description: Optional[str] = None
+    # ) -> "AttachmentSegment":
+    #     ...
 
-    @staticmethod
-    @overload
-    def attachment(
-        file: AttachmentSend, content: Optional[bytes] = None
-    ) -> "AttachmentSegment":
-        ...
+    # @staticmethod
+    # @overload
+    # def attachment(
+    #     file: AttachmentSend, 
+    #     content: Optional[bytes] = None
+    # ) -> "AttachmentSegment":
+    #     ...
 
     @staticmethod
     def attachment(
@@ -153,27 +157,29 @@ class MessageSegment(BaseMessageSegment["Message"]):
     @overload
     def reference(
         reference: SnowflakeType,
-        channel_id: Missing[SnowflakeType] = MISSING,
-        guild_id: Missing[SnowflakeType] = MISSING,
-        fail_if_not_exists: Missing[bool] = MISSING,
+        channel_id: Optional[SnowflakeType] = None,
+        guild_id: Optional[SnowflakeType] = None,
+        fail_if_not_exists: Optional[bool] = None,
     ) -> "ReferenceSegment":
         ...
 
     @staticmethod
     def reference(
         reference: Union[SnowflakeType, MessageReference],
-        channel_id: Missing[SnowflakeType] = MISSING,
-        guild_id: Missing[SnowflakeType] = MISSING,
-        fail_if_not_exists: Missing[bool] = MISSING,
+        channel_id: Optional[SnowflakeType] = None,
+        guild_id: Optional[SnowflakeType] = None,
+        fail_if_not_exists: Optional[bool] = None,
     ):
         if isinstance(reference, MessageReference):
             _reference = reference
         else:
-            _reference = MessageReference(
-                message_id=reference,
-                channel_id=channel_id,
-                guild_id=guild_id,
-                fail_if_not_exists=fail_if_not_exists,
+            _reference = MessageReference.parse_obj(
+                {
+                    "message_id": reference,
+                    "channel_id": channel_id,
+                    "guild_id": guild_id,
+                    "fail_if_not_exists": fail_if_not_exists,
+                }
             )
 
         return ReferenceSegment(data={"reference": _reference})
@@ -183,34 +189,41 @@ class MessageSegment(BaseMessageSegment["Message"]):
         return self.type == "text"
 
 
+StickerData = TypedDict("StickerData", {"id": Snowflake})
+
+
 @dataclass
 class StickerSegment(MessageSegment):
     type: str = "sticker"
-    data: TypedDict("StickerData", {"id": Snowflake}) = field(default_factory=dict)
+    data: StickerData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
         return f"<Sticker:{self.data['id']}>"
 
 
+ComponentData = TypedDict("ComponentData", {"component": DirectComponent})
+
+
 @dataclass
 class ComponentSegment(MessageSegment):
     type: str = "component"
-    data: TypedDict("ComponentData", {"component": DirectComponent}) = field(
-        default_factory=dict
-    )
+    data: ComponentData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
         return f"<Component:{self.data['component'].type}>"
 
 
+CustomEmojiData = TypedDict(
+    "CustomEmojiData", {"name": str, "id": str, "animated": Optional[bool]}
+)
+
+
 @dataclass
 class CustomEmojiSegment(MessageSegment):
     type: str = "custom_emoji"
-    data: TypedDict(
-        "CustomEmojiData", {"name": str, "id": str, "animated": Optional[bool]}
-    ) = field(default_factory=dict)
+    data: CustomEmojiData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -220,36 +233,39 @@ class CustomEmojiSegment(MessageSegment):
             return f"<:{self.data['name']}:{self.data['id']}>"
 
 
+MentionUserData = TypedDict("MentionUserData", {"user_id": Snowflake})
+
+
 @dataclass
 class MentionUserSegment(MessageSegment):
     type: str = "mention_user"
-    data: TypedDict("MentionUserData", {"user_id": Snowflake}) = field(
-        default_factory=dict
-    )
+    data: MentionUserData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
         return f"<@{self.data['user_id']}>"
 
 
+MentionChannelData = TypedDict("MentionChannelData", {"channel_id": Snowflake})
+
+
 @dataclass
 class MentionChannelSegment(MessageSegment):
     type: str = "mention_channel"
-    data: TypedDict("MentionChannelData", {"channel_id": Snowflake}) = field(
-        default_factory=dict
-    )
+    data: MentionChannelData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
         return f"<#{self.data['channel_id']}>"
 
 
+MentionRoleData = TypedDict("MentionRoleData", {"role_id": Snowflake})
+
+
 @dataclass
 class MentionRoleSegment(MessageSegment):
     type: str = "mention_role"
-    data: TypedDict("MentionRoleData", {"role_id": Snowflake}) = field(
-        default_factory=dict
-    )
+    data: MentionRoleData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -259,19 +275,21 @@ class MentionRoleSegment(MessageSegment):
 @dataclass
 class MentionEveryoneSegment(MessageSegment):
     type: str = "mention_everyone"
-    data: TypedDict("MentionEveryoneData", {}) = field(default_factory=dict)
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
         return "@everyone"
 
 
+TimestampData = TypedDict(
+    "TimestampData", {"timestamp": int, "style": Optional[TimeStampStyle]}
+)
+
+
 @dataclass
 class TimestampSegment(MessageSegment):
     type: str = "timestamp"
-    data: TypedDict(
-        "TimestampData", {"timestamp": int, "style": Optional[TimeStampStyle]}
-    ) = field(default_factory=dict)
+    data: TimestampData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -287,44 +305,54 @@ class TimestampSegment(MessageSegment):
         )
 
 
+TextData = TypedDict("TextData", {"text": str})
+
+
 @dataclass
 class TextSegment(MessageSegment):
     type: str = "text"
-    data: TypedDict("TextData", {"text": str}) = field(default_factory=dict)
+    data: TextData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
         return escape_tag(self.data["text"])
 
 
+EmbedData = TypedDict("EmbedData", {"embed": Embed})
+
+
 @dataclass
 class EmbedSegment(MessageSegment):
     type: str = "embed"
-    data: TypedDict("EmbedMessageData", {"embed": Embed}) = field(default_factory=dict)
+    data: EmbedData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
         return f"<Embed:{self.data['embed'].type}>"
 
 
+AttachmentData = TypedDict(
+    "AttachmentData", {"attachment": AttachmentSend, "file": Optional[File]}
+)
+
+
 @dataclass
 class AttachmentSegment(MessageSegment):
     type: str = "attachment"
-    data: TypedDict(
-        "AttachmentData", {"attachment": AttachmentSend, "file": Optional[File]}
-    ) = field(default_factory=dict)
+    data: AttachmentData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
         return f"<Attachment:{self.data['attachment'].filename}>"
 
 
+ReferenceData = TypedDict("ReferenceData", {"reference": MessageReference})
+
+
 @dataclass
 class ReferenceSegment(MessageSegment):
     type: str = "reference"
-    data: TypedDict("ReferenceData", {"reference": MessageReference}) = field(
-        default_factory=dict
-    )
+    data: ReferenceData
 
     @overrides(MessageSegment)
     def __str__(self):
@@ -420,7 +448,7 @@ class Message(BaseMessage[MessageSegment]):
                     data={
                         "attachment": AttachmentSend(
                             filename=attachment.filename,
-                            description=attachment.description,
+                            description=attachment.description or None,
                         ),
                         "file": None,
                     }

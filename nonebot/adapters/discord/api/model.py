@@ -164,7 +164,7 @@ class ApplicationCommand(BaseModel):
     Values follow the same restrictions as description"""
     options: Missing[List["ApplicationCommandOption"]] = MISSING
     """Parameters for the command, max of 25"""
-    default_member_permissions: Optional[str] = ...
+    default_member_permissions: Optional[str] = Field(...)
     """Set of permissions represented as a bit set"""
     dm_permission: Missing[bool] = MISSING
     """Indicates whether the command is available in DMs with the app, only for globally-scoped commands.
@@ -283,7 +283,7 @@ class ActionRow(BaseModel):
     see https://discord.com/developers/docs/interactions/message-components#action-rows
     """
 
-    type: ComponentType = Field(ComponentType.ActionRow, const=True)
+    type: ComponentType = Field(default=ComponentType.ActionRow, const=True)
     components: List[Union["Button", "SelectMenu", "TextInput"]]
 
     # @validator("components")
@@ -314,9 +314,9 @@ class ComponentEmoji(BaseModel):
     see https://discord.com/developers/docs/interactions/message-components#button-object
     """
 
-    id: Optional[str] = ...
+    id: Optional[str] = Field(...)
     """emoji id"""
-    name: Optional[str] = ...
+    name: Optional[str] = Field(...)
     """emoji name"""
     animated: Missing[bool] = MISSING
     """whether this emoji is animated"""
@@ -333,7 +333,7 @@ class Button(BaseModel):
     see https://discord.com/developers/docs/interactions/message-components#button-object
     """
 
-    type: Literal[ComponentType.Button] = Field(ComponentType.Button, const=True)
+    type: Literal[ComponentType.Button] = Field(default=ComponentType.Button, const=True)
     """2 for a button"""
     style: ButtonStyle
     """A button style"""
@@ -461,7 +461,7 @@ class TextInput(BaseModel):
     see https://discord.com/developers/docs/interactions/message-components#text-inputs
     """
 
-    type: Literal[ComponentType.TextInput] = Field(ComponentType.TextInput, const=True)
+    type: Literal[ComponentType.TextInput] = Field(default=ComponentType.TextInput, const=True)
     """4 for a text input"""
     custom_id: str
     """Developer-defined identifier for the input; max 100 characters"""
@@ -1124,7 +1124,7 @@ class MessageGet(BaseModel):
     author: "User"
     content: str
     timestamp: datetime.datetime
-    edited_timestamp: Optional[datetime.datetime] = ...
+    edited_timestamp: Optional[datetime.datetime] = Field(...)
     tts: bool
     mention_everyone: bool
     mentions: List["User"]
@@ -1522,15 +1522,15 @@ class Guild(BaseModel):
 
     id: Snowflake
     name: str
-    icon: Optional[str] = ...
+    icon: Optional[str] = Field(...)
     icon_hash: MissingOrNullable[str] = MISSING
-    splash: Optional[str] = ...
+    splash: Optional[str] = Field(...)
     discovery_splash: Optional[str]
     owner: Missing[bool] = MISSING
     owner_id: Snowflake
     permissions: Missing[str] = MISSING
     region: MissingOrNullable[str] = MISSING
-    afk_channel_id: Optional[Snowflake] = ...
+    afk_channel_id: Optional[Snowflake] = Field(...)
     afk_timeout: int
     widget_enabled: Missing[bool] = MISSING
     widget_channel_id: MissingOrNullable[Snowflake] = MISSING
@@ -1541,19 +1541,19 @@ class Guild(BaseModel):
     emojis: List[Emoji]
     features: List[GuildFeature]
     mfa_level: MFALevel
-    application_id: Optional[Snowflake] = ...
-    system_channel_id: Optional[Snowflake] = ...
+    application_id: Optional[Snowflake] = Field(...)
+    system_channel_id: Optional[Snowflake] = Field(...)
     system_channel_flags: SystemChannelFlags
-    rules_channel_id: Optional[Snowflake] = ...
-    max_presences: Optional[int] = ...
-    max_members: Optional[int] = ...
-    vanity_url_code: Optional[str] = ...
-    description: Optional[str] = ...
-    banner: Optional[str] = ...
+    rules_channel_id: Optional[Snowflake] = Field(...)
+    max_presences: Optional[int] = Field(...)
+    max_members: Optional[int] = Field(...)
+    vanity_url_code: Optional[str] = Field(...)
+    description: Optional[str] = Field(...)
+    banner: Optional[str] = Field(...)
     premium_tier: PremiumTier
-    premium_subscription_count: Optional[int] = ...
+    premium_subscription_count: Optional[int] = Field(...)
     preferred_locale: str
-    public_updates_channel_id: Optional[Snowflake] = ...
+    public_updates_channel_id: Optional[Snowflake] = Field(...)
     max_video_channel_users: Missing[int] = MISSING
     max_stage_video_channel_users: Missing[int] = MISSING
     approximate_member_count: Missing[int] = MISSING
@@ -1571,7 +1571,7 @@ class CurrentUserGuild(BaseModel):
 
     id: Snowflake
     name: str
-    icon: Optional[str] = ...
+    icon: Optional[str] = Field(...)
     owner: Missing[bool] = MISSING
     permissions: Missing[str] = MISSING
     features: List[GuildFeature]
@@ -1981,7 +1981,7 @@ class Invite(BaseModel):
 
     code: str
     guild: Missing[Guild] = MISSING  # partial guild object
-    channel: Optional[Channel] = ...  # partial channel object
+    channel: Optional[Channel] = Field(...)  # partial channel object
     inviter: Missing["User"] = MISSING
     target_type: Missing["InviteTargetType"] = MISSING
     target_user: Missing["User"] = MISSING
@@ -2046,7 +2046,7 @@ class Sticker(BaseModel):
     id: Snowflake
     pack_id: Missing[Snowflake] = MISSING
     name: str
-    description: Optional[str] = ...
+    description: Optional[str] = Field(...)
     tags: str
     asset: Missing[str] = MISSING
     type: StickerType
@@ -2091,7 +2091,7 @@ class User(BaseModel):
     id: Snowflake
     username: str
     discriminator: str
-    avatar: Optional[str] = ...
+    avatar: Optional[str] = Field(...)
     bot: Missing[bool] = MISSING
     system: Missing[bool] = MISSING
     mfa_enabled: Missing[bool] = MISSING
@@ -2128,8 +2128,8 @@ class ApplicationRoleConnection(BaseModel):
     see https://discord.com/developers/docs/resources/user#application-role-connection-object
     """
 
-    platform_name: Optional[str] = ...
-    platform_username: Optional[str] = ...
+    platform_name: Optional[str] = Field(...)
+    platform_username: Optional[str] = Field(...)
     metadata: dict  # object
 
 
@@ -2141,7 +2141,7 @@ class VoiceState(BaseModel):
     see https://discord.com/developers/docs/resources/voice#voice-state-object"""
 
     guild_id: Missing[Snowflake] = MISSING
-    channel_id: Optional[Snowflake] = ...
+    channel_id: Optional[Snowflake] = Field(...)
     user_id: Snowflake
     member: Missing[GuildMember] = MISSING
     session_id: str
@@ -2152,7 +2152,7 @@ class VoiceState(BaseModel):
     self_stream: Missing[bool] = MISSING
     self_video: bool
     suppress: bool
-    request_to_speak_timestamp: Optional[datetime.datetime] = ...
+    request_to_speak_timestamp: Optional[datetime.datetime] = Field(...)
 
 
 class VoiceRegion(BaseModel):
@@ -2177,12 +2177,12 @@ class Webhook(BaseModel):
     id: Snowflake
     type: WebhookType
     guild_id: MissingOrNullable[Snowflake] = MISSING
-    channel_id: Optional[Snowflake] = ...
+    channel_id: Optional[Snowflake] = Field(...)
     user: Missing[User] = MISSING
-    name: Optional[str] = ...
-    avatar: Optional[str] = ...
+    name: Optional[str] = Field(...)
+    avatar: Optional[str] = Field(...)
     token: Missing[str] = MISSING
-    application_id: Optional[Snowflake] = MISSING
+    application_id: Optional[Snowflake] = Field(...)
     source_guild: MissingOrNullable[Guild] = MISSING  # partial guild object
     source_channel: MissingOrNullable[Channel] = MISSING  # partial channel object
     url: Missing[str] = MISSING
@@ -2296,7 +2296,7 @@ class UpdateVoiceState(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#update-voice-state"""
 
     guild_id: Snowflake
-    channel_id: Optional[Snowflake] = ...
+    channel_id: Optional[Snowflake] = Field(...)
     self_mute: bool
     self_deaf: bool
 
@@ -2306,7 +2306,7 @@ class UpdatePresence(BaseModel):
 
     see https://discord.com/developers/docs/topics/gateway-events#update-presence"""
 
-    since: Optional[int] = ...
+    since: Optional[int] = Field(...)
     activities: List["Activity"]
     status: UpdatePresenceStatusType
     afk: bool
@@ -2377,8 +2377,8 @@ class AutoModerationActionExecution(BaseModel):
     message_id: Missing[Snowflake] = MISSING
     alert_system_message_id: Missing[Snowflake] = MISSING
     content: str
-    matched_keyword: Optional[str] = ...
-    matched_content: Optional[str] = ...
+    matched_keyword: Optional[str] = Field(...)
+    matched_content: Optional[str] = Field(...)
 
 
 class ChannelCreate(Channel):
@@ -2515,7 +2515,7 @@ class GuildCreate(BaseModel):
     approximate_presence_count: Missing[int] = MISSING
     welcome_screen: Missing[WelcomeScreen] = MISSING
     nsfw_level: Missing[GuildNSFWLevel] = MISSING
-    stickers: Missing[List[Sticker]] = Missing
+    stickers: Missing[List[Sticker]] = MISSING
     premium_progress_bar_enabled: Missing[bool] = MISSING
     joined_at: Missing[str] = MISSING
     large: Missing[bool] = MISSING
@@ -2622,7 +2622,7 @@ class GuildMemberUpdate(BaseModel):
     roles: List[Snowflake]
     user: User
     nick: MissingOrNullable[str] = MISSING
-    joined_at: Optional[datetime.datetime] = ...
+    joined_at: Optional[datetime.datetime] = Field(...)
     premium_since: MissingOrNullable[datetime.datetime] = MISSING
     deaf: Missing[bool] = MISSING
     mute: Missing[bool] = MISSING
@@ -3107,7 +3107,7 @@ class VoiceServerUpdate(BaseModel):
 
     token: str
     guild_id: Snowflake
-    endpoint: Optional[str] = ...
+    endpoint: Optional[str] = Field(...)
 
 
 class WebhooksUpdate(BaseModel):
@@ -3199,7 +3199,7 @@ class Team(BaseModel):
 
     see https://discord.com/developers/docs/topics/teams#data-models-team-object"""
 
-    icon: Optional[str] = ...
+    icon: Optional[str] = Field(...)
     id: str
     members: List["TeamMember"]
     name: str

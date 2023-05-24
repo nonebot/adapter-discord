@@ -1,5 +1,5 @@
 from typing_extensions import TypeAlias
-from typing import Any, Dict, Union, Literal, TypeVar, final
+from typing import Any, Dict, Union, Literal, TypeVar, final, Optional
 
 T = TypeVar("T")
 
@@ -15,7 +15,7 @@ class MissingType:
     see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields
     """
 
-    _instance: "MissingType" = None
+    _instance: Optional["MissingType"] = None
 
     def __new__(cls) -> "MissingType":
         if cls._instance is None:

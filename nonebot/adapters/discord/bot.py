@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
-    if not event.message_reference:
+    if not event.message_reference or not event.message_reference.message_id:
         return
     try:
         event.reply = await bot.get_channel_message(
@@ -28,7 +28,7 @@ async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
         log("WARNING", f"Error when getting message reply info: {repr(e)}", e)
 
 
-def _check_at_me(bot: "Bot", event: MessageEvent):
+def _check_at_me(bot: "Bot", event: MessageEvent) -> None:
     if event.mentions is not None and bot.self_info.id in [
         user.id for user in event.mentions
     ]:
@@ -125,7 +125,7 @@ async def send(
         tts=tts,
         embeds=embeds,
         allowed_mentions=allowed_mentions,
-        message_reference=reference,
+        message_reference=reference,  # type: ignore
         components=components,
         sticker_ids=sticker_ids,
         files=files,

@@ -1,5 +1,5 @@
 import zlib
-from typing import AnyStr
+from typing import Union
 
 try:
     import ujson as json
@@ -23,5 +23,5 @@ json_loads = json.loads
 json_dumps = json.dumps
 
 
-def decompress_data(data: AnyStr, compress: bool) -> AnyStr:
-    return zlib.decompress(data) if compress else data
+def decompress_data(data: Union[str, bytes], compress: bool) -> Union[str, bytes]:
+    return zlib.decompress(data) if compress else data  # type: ignore

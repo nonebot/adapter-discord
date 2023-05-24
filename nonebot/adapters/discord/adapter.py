@@ -128,6 +128,8 @@ class Adapter(BaseAdapter):
             proxy=self.discord_config.discord_proxy,
         )
         resp = await self.request(request)
+        if not resp.content:
+            raise ValueError("Failed to get gateway info")
         return GatewayBot.parse_raw(resp.content)
 
     async def _get_bot_user(self, bot_info: BotInfo) -> User:
@@ -140,6 +142,8 @@ class Adapter(BaseAdapter):
             proxy=self.discord_config.discord_proxy,
         )
         resp = await self.request(request)
+        if not resp.content:
+            raise ValueError("Failed to get bot user info")
         return User.parse_raw(resp.content)
 
     async def _forward_ws(

@@ -174,7 +174,7 @@ class ApiClient:
         before: Optional[SnowflakeType] = ...,
         after: Optional[SnowflakeType] = ...,
         limit: Optional[int] = ...,
-    ) -> List[Message]:
+    ) -> List[MessageGet]:
         """get channel messages
 
         see https://discord.com/developers/docs/resources/channel#get-channel-messages
@@ -182,7 +182,7 @@ class ApiClient:
         ...
     async def get_channel_message(
         self, *, channel_id: SnowflakeType, message_id: SnowflakeType
-    ) -> Message:
+    ) -> MessageGet:
         """get channel message
 
         see https://discord.com/developers/docs/resources/channel#get-channel-message"""
@@ -202,7 +202,7 @@ class ApiClient:
         files: Optional[List[File]] = ...,
         attachments: Optional[List[AttachmentSend]] = ...,
         flags: Optional[MessageFlag] = ...,
-    ) -> Message:
+    ) -> MessageGet:
         """create message
 
         see https://discord.com/developers/docs/resources/channel#create-message
@@ -210,7 +210,7 @@ class ApiClient:
         ...
     async def crosspost_message(
         self, *, channel_id: SnowflakeType, message_id: SnowflakeType
-    ) -> Message:
+    ) -> MessageGet:
         """crosspost message
 
         see https://discord.com/developers/docs/resources/channel#crosspost-message"""
@@ -303,7 +303,7 @@ class ApiClient:
         components: Optional[List[DirectComponent]] = ...,
         files: Optional[List[File]] = ...,
         attachments: Optional[List[AttachmentSend]] = ...,
-    ) -> Message:
+    ) -> MessageGet:
         """see https://discord.com/developers/docs/resources/channel#edit-message"""
         ...
     async def delete_message(
@@ -371,7 +371,7 @@ class ApiClient:
     async def trigger_typing_indicator(self, *, channel_id: SnowflakeType) -> None:
         """https://discord.com/developers/docs/resources/channel#trigger-typing-indicator"""
         ...
-    async def get_pinned_messages(self, *, channel_id: SnowflakeType) -> List[Message]:
+    async def get_pinned_messages(self, *, channel_id: SnowflakeType) -> List[MessageGet]:
         """https://discord.com/developers/docs/resources/channel#get-pinned-messages"""
         ...
     async def pin_message(
@@ -1296,7 +1296,7 @@ class ApiClient:
         token: str,
         message_id: SnowflakeType,
         thread_id: Optional[SnowflakeType] = ...,
-    ) -> Message:
+    ) -> MessageGet:
         """https://discord.com/developers/docs/resources/webhook#get-webhook-message"""
         ...
     # async def edit_webhook_message(self) -> Message:
