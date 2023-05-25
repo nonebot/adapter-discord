@@ -1,6 +1,6 @@
 import re
 import datetime
-from dataclasses import field, dataclass
+from dataclasses import dataclass
 from typing import Type, Union, Iterable, Optional, TypedDict, overload
 
 from nonebot.typing import overrides
@@ -10,7 +10,6 @@ from nonebot.adapters import Message as BaseMessage
 from nonebot.adapters import MessageSegment as BaseMessageSegment
 
 from .utils import escape
-from .typing import MISSING, Missing
 from .api import (
     File,
     Embed,
@@ -33,31 +32,6 @@ class MessageSegment(BaseMessageSegment["Message"]):
     @overrides(BaseMessageSegment)
     def get_message_class(cls) -> Type["Message"]:
         return Message
-
-    # @staticmethod
-    # @overload
-    # def attachment(
-    #     file: str, 
-    #     description: Optional[str] = None, 
-    #     content: Optional[bytes] = None
-    # ) -> "AttachmentSegment":
-    #     ...
-
-    # @staticmethod
-    # @overload
-    # def attachment(
-    #     file: File, 
-    #     description: Optional[str] = None
-    # ) -> "AttachmentSegment":
-    #     ...
-
-    # @staticmethod
-    # @overload
-    # def attachment(
-    #     file: AttachmentSend, 
-    #     content: Optional[bytes] = None
-    # ) -> "AttachmentSegment":
-    #     ...
 
     @staticmethod
     def attachment(
@@ -189,13 +163,9 @@ class MessageSegment(BaseMessageSegment["Message"]):
         return self.type == "text"
 
 
-StickerData = TypedDict("StickerData", {"id": Snowflake})
-
-
 @dataclass
 class StickerSegment(MessageSegment):
     type: str = "sticker"
-    data: StickerData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -208,7 +178,6 @@ ComponentData = TypedDict("ComponentData", {"component": DirectComponent})
 @dataclass
 class ComponentSegment(MessageSegment):
     type: str = "component"
-    data: ComponentData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -223,7 +192,6 @@ CustomEmojiData = TypedDict(
 @dataclass
 class CustomEmojiSegment(MessageSegment):
     type: str = "custom_emoji"
-    data: CustomEmojiData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -239,7 +207,6 @@ MentionUserData = TypedDict("MentionUserData", {"user_id": Snowflake})
 @dataclass
 class MentionUserSegment(MessageSegment):
     type: str = "mention_user"
-    data: MentionUserData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -252,7 +219,6 @@ MentionChannelData = TypedDict("MentionChannelData", {"channel_id": Snowflake})
 @dataclass
 class MentionChannelSegment(MessageSegment):
     type: str = "mention_channel"
-    data: MentionChannelData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -265,7 +231,6 @@ MentionRoleData = TypedDict("MentionRoleData", {"role_id": Snowflake})
 @dataclass
 class MentionRoleSegment(MessageSegment):
     type: str = "mention_role"
-    data: MentionRoleData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -289,7 +254,6 @@ TimestampData = TypedDict(
 @dataclass
 class TimestampSegment(MessageSegment):
     type: str = "timestamp"
-    data: TimestampData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -311,7 +275,6 @@ TextData = TypedDict("TextData", {"text": str})
 @dataclass
 class TextSegment(MessageSegment):
     type: str = "text"
-    data: TextData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -324,7 +287,6 @@ EmbedData = TypedDict("EmbedData", {"embed": Embed})
 @dataclass
 class EmbedSegment(MessageSegment):
     type: str = "embed"
-    data: EmbedData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -339,7 +301,6 @@ AttachmentData = TypedDict(
 @dataclass
 class AttachmentSegment(MessageSegment):
     type: str = "attachment"
-    data: AttachmentData
 
     @overrides(MessageSegment)
     def __str__(self) -> str:
@@ -352,7 +313,6 @@ ReferenceData = TypedDict("ReferenceData", {"reference": MessageReference})
 @dataclass
 class ReferenceSegment(MessageSegment):
     type: str = "reference"
-    data: ReferenceData
 
     @overrides(MessageSegment)
     def __str__(self):
