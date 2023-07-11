@@ -11,7 +11,7 @@ from nonebot.exception import ApiNotAvailable as BaseApiNotAvailable
 
 class DiscordAdapterException(AdapterException):
     def __init__(self):
-        super().__init__("discord")
+        super().__init__("Discord")
 
 
 class NoLogException(BaseNoLogException, DiscordAdapterException):

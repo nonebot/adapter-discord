@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Union, Callable, Optional
+from typing import TYPE_CHECKING, Any, Union, Optional
 
 from nonebot.typing import overrides
 from nonebot.message import handle_event
@@ -75,73 +75,10 @@ def _check_at_me(bot: "Bot", event: MessageEvent) -> None:
         message.append(MessageSegment.text(""))
 
 
-async def send(
-    bot: "Bot",
-    event: Event,
-    message: Union[str, Message, MessageSegment],
-    mention_sender: bool = False,
-    reply_message: bool = False,
-    tts: bool = False,
-    nonce: Union[int, str, None] = None,
-    allowed_mentions: Optional[AllowedMention] = None,
-    **params: Any,
-) -> MessageGet:
-    """default message send function"""
-    if not isinstance(event, MessageEvent) or not event.channel_id or not event.id:
-        raise RuntimeError("Event cannot be replied to!")
-    message = MessageSegment.text(message) if isinstance(message, str) else message
-    message = message if isinstance(message, Message) else Message(message)
-    if mention_sender:
-        message.insert(0, MessageSegment.mention_user(event.user_id))
-    if reply_message:
-        message += MessageSegment.reference(MessageReference(message_id=event.id))
-
-    content = message.extract_content() or None
-    if embeds := (message["embed"] or None):
-        embeds = [embed.data["embed"] for embed in embeds]
-    if reference := (message["reference"] or None):
-        reference = reference[-1].data["reference"]
-    if components := (message["component"] or None):
-        components = [component.data["component"] for component in components]
-    if sticker_ids := (message["sticker"] or None):
-        sticker_ids = [sticker.data["id"] for sticker in sticker_ids]
-
-    attachments = None
-    files = None
-    if attachments_segment := (message["attachment"] or None):
-        attachments = [
-            attachment.data["attachment"] for attachment in attachments_segment
-        ]
-        files = [
-            attachment.data["file"]
-            for attachment in attachments_segment
-            if attachment.data["file"] is not None
-        ]
-
-    return await bot.create_message(
-        channel_id=event.channel_id,
-        content=content,
-        nonce=nonce,
-        tts=tts,
-        embeds=embeds,
-        allowed_mentions=allowed_mentions,
-        message_reference=reference,  # type: ignore
-        components=components,
-        sticker_ids=sticker_ids,
-        files=files,
-        attachments=attachments,
-        **params,
-    )
-
-
 class Bot(BaseBot, ApiClient):
     """
     Discord 协议 Bot 适配。
     """
-
-    send_handler: Callable[
-        ["Bot", Event, Union[str, Message, MessageSegment]], Any
-    ] = send
 
     @overrides(BaseBot)
     def __init__(self, adapter: "Adapter", self_id: str, bot_info: BotInfo):
@@ -231,4 +168,48 @@ class Bot(BaseBot, ApiClient):
         Returns:
             message model
         """
-        return await self.__class__.send_handler(self, event, message, **params)
+        if not isinstance(event, MessageEvent) or not event.channel_id or not event.id:
+            raise RuntimeError("Event cannot be replied to!")
+        message = MessageSegment.text(message) if isinstance(message, str) else message
+        message = message if isinstance(message, Message) else Message(message)
+        if mention_sender:
+            message.insert(0, MessageSegment.mention_user(event.user_id))
+        if reply_message:
+            message += MessageSegment.reference(MessageReference(message_id=event.id))
+
+        content = message.extract_content() or None
+        if embeds := (message["embed"] or None):
+            embeds = [embed.data["embed"] for embed in embeds]
+        if reference := (message["reference"] or None):
+            reference = reference[-1].data["reference"]
+        if components := (message["component"] or None):
+            components = [component.data["component"] for component in components]
+        if sticker_ids := (message["sticker"] or None):
+            sticker_ids = [sticker.data["id"] for sticker in sticker_ids]
+
+        attachments = None
+        files = None
+        if attachments_segment := (message["attachment"] or None):
+            attachments = [
+                attachment.data["attachment"] for attachment in attachments_segment
+            ]
+            files = [
+                attachment.data["file"]
+                for attachment in attachments_segment
+                if attachment.data["file"] is not None
+            ]
+
+        return await self.create_message(
+            channel_id=event.channel_id,
+            content=content,
+            nonce=nonce,
+            tts=tts,
+            embeds=embeds,
+            allowed_mentions=allowed_mentions,
+            message_reference=reference,  # type: ignore
+            components=components,
+            sticker_ids=sticker_ids,
+            files=files,
+            attachments=attachments,
+            **params,
+        )
