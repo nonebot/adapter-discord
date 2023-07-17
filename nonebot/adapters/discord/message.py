@@ -1,9 +1,9 @@
 import re
 import datetime
 from dataclasses import dataclass
+from typing_extensions import override
 from typing import Type, Union, Iterable, Optional, TypedDict, overload
 
-from nonebot.typing import overrides
 from nonebot.utils import escape_tag
 
 from nonebot.adapters import Message as BaseMessage
@@ -29,7 +29,7 @@ from .api import (
 
 class MessageSegment(BaseMessageSegment["Message"]):
     @classmethod
-    @overrides(BaseMessageSegment)
+    @override
     def get_message_class(cls) -> Type["Message"]:
         return Message
 
@@ -158,7 +158,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
 
         return ReferenceSegment(data={"reference": _reference})
 
-    @overrides(BaseMessageSegment)
+    @override
     def is_text(self) -> bool:
         return self.type == "text"
 
@@ -167,7 +167,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
 class StickerSegment(MessageSegment):
     type: str = "sticker"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self) -> str:
         return f"<Sticker:{self.data['id']}>"
 
@@ -179,7 +179,7 @@ ComponentData = TypedDict("ComponentData", {"component": DirectComponent})
 class ComponentSegment(MessageSegment):
     type: str = "component"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self) -> str:
         return f"<Component:{self.data['component'].type}>"
 
@@ -193,7 +193,7 @@ CustomEmojiData = TypedDict(
 class CustomEmojiSegment(MessageSegment):
     type: str = "custom_emoji"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self) -> str:
         if self.data.get("animated"):
             return f"<a:{self.data['name']}:{self.data['id']}>"
@@ -208,7 +208,7 @@ MentionUserData = TypedDict("MentionUserData", {"user_id": Snowflake})
 class MentionUserSegment(MessageSegment):
     type: str = "mention_user"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self) -> str:
         return f"<@{self.data['user_id']}>"
 
@@ -220,7 +220,7 @@ MentionChannelData = TypedDict("MentionChannelData", {"channel_id": Snowflake})
 class MentionChannelSegment(MessageSegment):
     type: str = "mention_channel"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self) -> str:
         return f"<#{self.data['channel_id']}>"
 
@@ -232,7 +232,7 @@ MentionRoleData = TypedDict("MentionRoleData", {"role_id": Snowflake})
 class MentionRoleSegment(MessageSegment):
     type: str = "mention_role"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self) -> str:
         return f"<@&{self.data['role_id']}>"
 
@@ -241,7 +241,7 @@ class MentionRoleSegment(MessageSegment):
 class MentionEveryoneSegment(MessageSegment):
     type: str = "mention_everyone"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self) -> str:
         return "@everyone"
 
@@ -255,7 +255,7 @@ TimestampData = TypedDict(
 class TimestampSegment(MessageSegment):
     type: str = "timestamp"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self) -> str:
         style = self.data.get("style")
         return (
@@ -276,7 +276,7 @@ TextData = TypedDict("TextData", {"text": str})
 class TextSegment(MessageSegment):
     type: str = "text"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self) -> str:
         return escape_tag(self.data["text"])
 
@@ -288,7 +288,7 @@ EmbedData = TypedDict("EmbedData", {"embed": Embed})
 class EmbedSegment(MessageSegment):
     type: str = "embed"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self) -> str:
         return f"<Embed:{self.data['embed'].type}>"
 
@@ -302,7 +302,7 @@ AttachmentData = TypedDict(
 class AttachmentSegment(MessageSegment):
     type: str = "attachment"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self) -> str:
         return f"<Attachment:{self.data['attachment'].filename}>"
 
@@ -314,18 +314,18 @@ ReferenceData = TypedDict("ReferenceData", {"reference": MessageReference})
 class ReferenceSegment(MessageSegment):
     type: str = "reference"
 
-    @overrides(MessageSegment)
+    @override
     def __str__(self):
         return f"<Reference:{self.data['reference'].message_id}>"
 
 
 class Message(BaseMessage[MessageSegment]):
     @classmethod
-    @overrides(BaseMessage)
+    @override
     def get_segment_class(cls) -> Type[MessageSegment]:
         return MessageSegment
 
-    @overrides(BaseMessage)
+    @override
     def __add__(
         self, other: Union[str, MessageSegment, Iterable[MessageSegment]]
     ) -> "Message":
@@ -333,7 +333,7 @@ class Message(BaseMessage[MessageSegment]):
             MessageSegment.text(other) if isinstance(other, str) else other
         )
 
-    @overrides(BaseMessage)
+    @override
     def __radd__(
         self, other: Union[str, MessageSegment, Iterable[MessageSegment]]
     ) -> "Message":
@@ -342,7 +342,7 @@ class Message(BaseMessage[MessageSegment]):
         )
 
     @staticmethod
-    @overrides(BaseMessage)
+    @override
     def _construct(msg: str) -> Iterable[MessageSegment]:
         text_begin = 0
         for embed in re.finditer(

@@ -1,7 +1,7 @@
 from enum import Enum
+from typing_extensions import override
 from typing import Dict, List, Type, Optional
 
-from nonebot.typing import overrides
 from nonebot.utils import escape_tag
 
 from nonebot.adapters import Event as BaseEvent
@@ -127,27 +127,27 @@ class Event(BaseEvent):
     def get_type(self) -> str:
         return "unknown"  # temp
 
-    @overrides(BaseEvent)
+    @override
     def get_event_name(self) -> str:
         return self.__type__
 
-    @overrides(BaseEvent)
+    @override
     def get_event_description(self) -> str:
         return escape_tag(str(self.dict()))
 
-    @overrides(BaseEvent)
+    @override
     def get_message(self) -> Message:
         raise ValueError("Event has no message!")
 
-    @overrides(BaseEvent)
+    @override
     def get_user_id(self) -> str:
         raise ValueError("Event has no context!")
 
-    @overrides(BaseEvent)
+    @override
     def get_session_id(self) -> str:
         raise ValueError("Event has no context!")
 
-    @overrides(BaseEvent)
+    @override
     def is_tome(self) -> bool:
         return False
 
@@ -155,7 +155,7 @@ class Event(BaseEvent):
 class MetaEvent(Event):
     """Meta event"""
 
-    @overrides(BaseEvent)
+    @override
     def get_type(self) -> str:
         return "meta_event"
 
@@ -163,7 +163,7 @@ class MetaEvent(Event):
 class NoticeEvent(Event):
     """Notice event"""
 
-    @overrides(BaseEvent)
+    @override
     def get_type(self) -> str:
         return "notice"
 
@@ -171,7 +171,7 @@ class NoticeEvent(Event):
 class RequestEvent(Event):
     """Request event"""
 
-    @overrides(BaseEvent)
+    @override
     def get_type(self) -> str:
         return "request"
 
@@ -183,25 +183,25 @@ class MessageEvent(Event, MessageGet):
 
     reply: Optional[MessageGet] = None
 
-    @overrides(BaseEvent)
+    @override
     def get_type(self) -> str:
         return "message"
 
-    @overrides(Event)
+    @override
     def get_user_id(self) -> str:
         return str(self.author.id)
 
-    @overrides(Event)
+    @override
     def get_session_id(self) -> str:
         return str(self.author.id)
 
-    @overrides(Event)
+    @override
     def get_message(self) -> Message:
         if not hasattr(self, "_message"):
             setattr(self, "_message", Message.from_guild_message(self))
         return getattr(self, "_message")
 
-    @overrides(Event)
+    @override
     def is_tome(self) -> bool:
         return self.to_me
 

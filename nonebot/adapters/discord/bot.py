@@ -1,6 +1,6 @@
+from typing_extensions import override
 from typing import TYPE_CHECKING, Any, Union, Optional
 
-from nonebot.typing import overrides
 from nonebot.message import handle_event
 
 from nonebot.adapters import Bot as BaseBot
@@ -80,7 +80,7 @@ class Bot(BaseBot, ApiClient):
     Discord 协议 Bot 适配。
     """
 
-    @overrides(BaseBot)
+    @override
     def __init__(self, adapter: "Adapter", self_id: str, bot_info: BotInfo):
         super().__init__(adapter, self_id)
         self.adapter = adapter
@@ -89,7 +89,7 @@ class Bot(BaseBot, ApiClient):
         self._self_info: Optional[User] = None
         self._sequence: Optional[int] = None
 
-    @overrides(BaseBot)
+    @override
     def __repr__(self) -> str:
         return f"Bot(type={self.type!r}, self_id={self.self_id!r})"
 
@@ -141,7 +141,7 @@ class Bot(BaseBot, ApiClient):
             _check_at_me(self, event)
         await handle_event(self, event)
 
-    @overrides(BaseBot)
+    @override
     async def send(
         self,
         event: Event,
