@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import datetime
 import re
-from typing import Iterable, Optional, Type, TypedDict, Union, overload
+from typing import Any, Dict, Iterable, Optional, Type, TypedDict, Union, overload
 from typing_extensions import override
 
 from nonebot.adapters import (
@@ -453,3 +453,39 @@ class Message(BaseMessage[MessageSegment]):
                 "timestamp",
             )
         )
+
+
+def parse_message(message: Union[Message, MessageSegment, str]) -> Dict[str, Any]:
+    message = MessageSegment.text(message) if isinstance(message, str) else message
+    message = message if isinstance(message, Message) else Message(message)
+
+    content = message.extract_content() or None
+    if embeds := (message["embed"] or None):
+        embeds = [embed.data["embed"] for embed in embeds]
+    if reference := (message["reference"] or None):
+        reference = reference[-1].data["reference"]
+    if components := (message["component"] or None):
+        components = [component.data["component"] for component in components]
+    if sticker_ids := (message["sticker"] or None):
+        sticker_ids = [sticker.data["id"] for sticker in sticker_ids]
+
+    attachments = None
+    files = None
+    if attachments_segment := (message["attachment"] or None):
+        attachments = [
+            attachment.data["attachment"] for attachment in attachments_segment
+        ]
+        files = [
+            attachment.data["file"]
+            for attachment in attachments_segment
+            if attachment.data["file"] is not None
+        ]
+    return {
+        "content": content,
+        "embeds": embeds,
+        "message_reference": reference,
+        "components": components,
+        "sticker_ids": sticker_ids,
+        "files": files,
+        "attachments": attachments,
+    }
