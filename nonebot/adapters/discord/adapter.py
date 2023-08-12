@@ -1,38 +1,38 @@
-import sys
-import json
 import asyncio
 import contextlib
-from typing_extensions import override
+import json
+import sys
 
 # from pathlib import Path
-from typing import Any, List, Tuple, Optional
-
-from pydantic import parse_raw_as
-from nonebot.utils import escape_tag
-from nonebot.exception import WebSocketClosed
-from nonebot.drivers import URL, Driver, Request, WebSocket, ForwardDriver
+from typing import Any, List, Optional, Tuple
+from typing_extensions import override
 
 from nonebot.adapters import Adapter as BaseAdapter
+from nonebot.drivers import URL, Driver, ForwardDriver, Request, WebSocket
+from nonebot.exception import WebSocketClosed
+from nonebot.utils import escape_tag
 
-from .bot import Bot
-from .config import Config, BotInfo
+from pydantic import parse_raw_as
+
 from .api.handle import API_HANDLERS
+from .api.model import GatewayBot, User
+from .bot import Bot
+from .config import BotInfo, Config
+from .event import Event, MessageEvent, ReadyEvent, event_classes
 from .exception import ApiNotAvailable
-from .api.model import User, GatewayBot
-from .utils import log, decompress_data
-from .event import Event, ReadyEvent, MessageEvent, event_classes
 from .payload import (
-    Hello,
-    Resume,
-    Payload,
     Dispatch,
-    Identify,
     Heartbeat,
-    Reconnect,
-    PayloadType,
     HeartbeatAck,
+    Hello,
+    Identify,
     InvalidSession,
+    Payload,
+    PayloadType,
+    Reconnect,
+    Resume,
 )
+from .utils import decompress_data, log
 
 RECONNECT_INTERVAL = 3.0
 
@@ -44,7 +44,7 @@ class Adapter(BaseAdapter):
         self.discord_config: Config = Config(**self.config.dict())
         self.tasks: List[asyncio.Task] = []
         self.base_url: URL = URL(
-            f"https://discord.com/api/v{self.discord_config.discord_api_version}"
+            f"https://discord.com/api/v{self.discord_config.discord_api_version}",
         )
         self.setup()
 
@@ -56,8 +56,11 @@ class Adapter(BaseAdapter):
     def setup(self) -> None:
         if not isinstance(self.driver, ForwardDriver):
             raise RuntimeError(
-                f"Current driver {self.config.driver} doesn't support forward connections!"
-                "Discord Adapter need a ForwardDriver to work."
+                (
+                    f"Current driver {self.config.driver} "
+                    "doesn't support forward connections!"
+                    "Discord Adapter need a ForwardDriver to work."
+                ),
             )
         self.driver.on_startup(self.startup)
         self.driver.on_shutdown(self.shutdown)
@@ -95,27 +98,29 @@ class Adapter(BaseAdapter):
         if remain and remain <= 0:
             log(
                 "ERROR",
-                "<r><bg #f8bbd0>Failed to establish connection to QQ Guild "
-                "because of session start limit.</bg #f8bbd0></r>\n"
-                f"{escape_tag(str(gateway_info))}",
+                (
+                    "<r><bg #f8bbd0>Failed to establish connection to QQ Guild "
+                    "because of session start limit.</bg #f8bbd0></r>\n"
+                    f"{escape_tag(str(gateway_info))}"
+                ),
             )
             return
 
         if bot_info.shard is not None:
             self.tasks.append(
-                asyncio.create_task(self._forward_ws(bot_info, ws_url, bot_info.shard))
+                asyncio.create_task(self._forward_ws(bot_info, ws_url, bot_info.shard)),
             )
             return
 
         shards = gateway_info.shards or 1
         for i in range(shards):
             self.tasks.append(
-                asyncio.create_task(self._forward_ws(bot_info, ws_url, (i, shards)))
+                asyncio.create_task(self._forward_ws(bot_info, ws_url, (i, shards))),
             )
             await asyncio.sleep(
                 gateway_info.session_start_limit
                 and gateway_info.session_start_limit.max_concurrency
-                or 1
+                or 1,
             )
 
     async def _get_gateway_bot(self, bot_info: BotInfo) -> GatewayBot:
@@ -147,7 +152,10 @@ class Adapter(BaseAdapter):
         return User.parse_raw(resp.content)
 
     async def _forward_ws(
-        self, bot_info: BotInfo, ws_url: URL, shard: Tuple[int, int]
+        self,
+        bot_info: BotInfo,
+        ws_url: URL,
+        shard: Tuple[int, int],
     ) -> None:
         log("DEBUG", f"Forwarding WebSocket Connection to {escape_tag(str(ws_url))}...")
         headers = {"Authorization": self.get_authorization(bot_info)}
@@ -173,10 +181,12 @@ class Adapter(BaseAdapter):
                     user = await self._get_bot_user(bot_info)
                     bot = Bot(self, str(user.id), bot_info)
                 async with self.websocket(request) as ws:
-                    ws: WebSocket
                     log(
                         "DEBUG",
-                        f"WebSocket Connection to {escape_tag(str(ws_url))} established",
+                        (
+                            "WebSocket Connection to"
+                            f" {escape_tag(str(ws_url))} established"
+                        ),
                     )
                     try:
                         # 接收hello事件
@@ -196,7 +206,7 @@ class Adapter(BaseAdapter):
 
                         # 开启心跳
                         heartbeat_task = asyncio.create_task(
-                            self._heartbeat_task(ws, bot, heartbeat_interval)
+                            self._heartbeat_task(ws, bot, heartbeat_interval),
                         )
 
                         # 进行identify和resume
@@ -216,8 +226,11 @@ class Adapter(BaseAdapter):
                     except Exception as e:
                         log(
                             "ERROR",
-                            "<r><bg #f8bbd0>Error while process data from websocket "
-                            f"{escape_tag(str(ws_url))}. Trying to reconnect...</bg #f8bbd0></r>",
+                            (
+                                "<r><bg #f8bbd0>Error while process data from"
+                                f" websocket {escape_tag(str(ws_url))}. Trying to"
+                                " reconnect...</bg #f8bbd0></r>"
+                            ),
                             e,
                         )
                     finally:
@@ -229,8 +242,11 @@ class Adapter(BaseAdapter):
             except Exception as e:
                 log(
                     "ERROR",
-                    "<r><bg #f8bbd0>Error while setup websocket to "
-                    f"{escape_tag(str(ws_url))}. Trying to reconnect...</bg #f8bbd0></r>",
+                    (
+                        "<r><bg #f8bbd0>Error while setup websocket to "
+                        f"{escape_tag(str(ws_url))}. "
+                        "Trying to reconnect...</bg #f8bbd0></r>"
+                    ),
                     e,
                 )
                 await asyncio.sleep(RECONNECT_INTERVAL)
@@ -243,14 +259,18 @@ class Adapter(BaseAdapter):
         try:
             payload = await self.receive_payload(ws)
             assert isinstance(
-                payload, Hello
+                payload,
+                Hello,
             ), f"Received unexpected payload: {payload!r}"
             log("DEBUG", f"Received hello: {payload}")
             return payload.data.heartbeat_interval
         except Exception as e:
             log(
                 "ERROR",
-                "<r><bg #f8bbd0>Error while receiving server hello event</bg #f8bbd0></r>",
+                (
+                    "<r><bg #f8bbd0>Error while receiving "
+                    "server hello event</bg #f8bbd0></r>"
+                ),
                 e,
             )
 
@@ -267,7 +287,7 @@ class Adapter(BaseAdapter):
         """心跳"""
         log("TRACE", f"Heartbeat {bot.sequence if bot.has_sequence else ''}")
         payload = Heartbeat.parse_obj(
-            {"data": bot.sequence if bot.has_sequence else None}
+            {"data": bot.sequence if bot.has_sequence else None},
         )
         with contextlib.suppress(Exception):
             await ws.send(json.dumps(payload.dict()))
@@ -294,7 +314,7 @@ class Adapter(BaseAdapter):
                             "device": "NoneBot2",
                         },
                     },
-                }
+                },
             )
         else:
             payload = Resume.parse_obj(
@@ -303,8 +323,8 @@ class Adapter(BaseAdapter):
                         "token": self.get_authorization(bot.bot_info),
                         "session_id": bot.session_id,
                         "seq": bot.sequence,
-                    }
-                }
+                    },
+                },
             )
 
         try:
@@ -317,7 +337,7 @@ class Adapter(BaseAdapter):
                 + " event</bg #f8bbd0></r>",
                 e,
             )
-            return
+            return None
 
         ready_event = None
         if not bot.ready:
@@ -330,12 +350,14 @@ class Adapter(BaseAdapter):
                 )
                 payload = await self.receive_payload(ws)
             assert isinstance(
-                payload, Dispatch
+                payload,
+                Dispatch,
             ), f"Received unexpected payload: {payload!r}"
             bot.sequence = payload.sequence
             ready_event = self.payload_to_event(payload)
             assert isinstance(
-                ready_event, ReadyEvent
+                ready_event,
+                ReadyEvent,
             ), f"Received unexpected event: {ready_event!r}"
             ws.request.url = URL(ready_event.resume_gateway_url)
             bot.session_id = ready_event.session_id

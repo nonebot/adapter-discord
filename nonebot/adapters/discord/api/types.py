@@ -1,4 +1,58 @@
 from enum import Enum, IntEnum, IntFlag
+from typing import Any, Dict, Literal, TypeVar, Union, final
+from typing_extensions import TypeAlias
+
+T = TypeVar("T")
+
+
+@final
+class Unset(Enum):
+    _UNSET = "<UNSET>"
+
+    def __repr__(self) -> str:
+        return "<UNSET>"
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
+    def __bool__(self) -> Literal[False]:
+        return False
+
+    def __copy__(self):
+        return self._UNSET
+
+    def __deepcopy__(self, memo: Dict[int, Any]):
+        return self._UNSET
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls._validate
+
+    @classmethod
+    def _validate(cls, value: Any):
+        if value is not cls._UNSET:
+            raise ValueError(f"{value!r} is not UNSET")
+        return value
+
+
+UNSET = Unset._UNSET
+"""UNSET means that the field maybe not given in the data.
+
+see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
+
+Missing: TypeAlias = Union[Literal[UNSET], T]
+"""Missing means that the field maybe not given in the data.
+
+Missing[T] equal to Union[UNSET, T].
+
+example: Missing[int] == Union[UNSET, int]"""
+
+MissingOrNullable: TypeAlias = Union[Literal[UNSET], T, None]
+"""MissingOrNullable means that the field maybe not given in the data or value is None.
+
+MissingOrNullable[T] equal to Union[UNSET, T, None].
+
+example: MissingOrNullable[int] == Union[UNSET, int, None]"""
 
 
 class StrEnum(str, Enum):
@@ -112,25 +166,28 @@ class ApplicationFlag(IntFlag):
     APPLICATION_AUTO_MODERATION_RULE_CREATE_BADGE = 1 << 6
     """Indicates if an app uses the Auto Moderation API"""
     GATEWAY_PRESENCE = 1 << 12
-    """Intent required for bots in 100 or more servers to receive presence_update events"""
+    """Intent required for bots in 100 or more servers
+    to receive presence_update events"""
     GATEWAY_PRESENCE_LIMITED = 1 << 13
-    """Intent required for bots in under 100 servers to receive presence_update events, 
+    """Intent required for bots in under 100 servers to receive presence_update events,
     found on the Bot page in your app's settings"""
     GATEWAY_GUILD_MEMBERS = 1 << 14
-    """Intent required for bots in 100 or more servers to receive member-related events like guild_member_add. 
+    """Intent required for bots in 100 or more servers to
+    receive member-related events like guild_member_add.
     See the list of member-related events under GUILD_MEMBERS"""
     GATEWAY_GUILD_MEMBERS_LIMITED = 1 << 15
-    """Intent required for bots in under 100 servers to receive member-related events 
-    like guild_member_add, found on the Bot page in your app's settings. 
+    """Intent required for bots in under 100 servers to receive member-related events
+    like guild_member_add, found on the Bot page in your app's settings.
     See the list of member-related events under GUILD_MEMBERS"""
     VERIFICATION_PENDING_GUILD_LIMIT = 1 << 16
     """Indicates unusual growth of an app that prevents verification"""
     EMBEDDED = 1 << 17
-    """Indicates if an app is embedded within the Discord client (currently unavailable publicly)"""
+    """Indicates if an app is embedded within the
+    Discord client (currently unavailable publicly)"""
     GATEWAY_MESSAGE_CONTENT = 1 << 18
     """Intent required for bots in 100 or more servers to receive message content"""
     GATEWAY_MESSAGE_CONTENT_LIMITED = 1 << 19
-    """Intent required for bots in under 100 servers to receive message content, 
+    """Intent required for bots in under 100 servers to receive message content,
     found on the Bot page in your app's settings"""
     APPLICATION_COMMAND_BADGE = 1 << 23
     """Indicates if an app has registered global application commands"""
@@ -143,21 +200,29 @@ class ApplicationRoleConnectionMetadataType(IntEnum):
     """
 
     INTEGER_LESS_THAN_OR_EQUAL = 1
-    """the metadata value (integer) is less than or equal to the guild's configured value (integer)"""
+    """the metadata value (integer) is less than or equal
+    to the guild's configured value (integer)"""
     INTEGER_GREATER_THAN_OR_EQUAL = 2
-    """the metadata value (integer) is greater than or equal to the guild's configured value (integer)"""
+    """the metadata value (integer) is greater than or equal
+    to the guild's configured value (integer)"""
     INTEGER_EQUAL = 3
-    """the metadata value (integer) is equal to the guild's configured value (integer)"""
+    """the metadata value (integer) is equal to the
+    guild's configured value (integer)"""
     INTEGER_NOT_EQUAL = 4
-    """	the metadata value (integer) is not equal to the guild's configured value (integer)"""
+    """	the metadata value (integer) is not equal to the
+    guild's configured value (integer)"""
     DATETIME_LESS_THAN_OR_EQUAL = 5
-    """	the metadata value (ISO8601 string) is less than or equal to the guild's configured value (integer; days before current date)"""
+    """	the metadata value (ISO8601 string) is less than or equal
+    to the guild's configured value (integer; days before current date)"""
     DATETIME_GREATER_THAN_OR_EQUAL = 6
-    """the metadata value (ISO8601 string) is greater than or equal to the guild's configured value (integer; days before current date)"""
+    """the metadata value (ISO8601 string) is greater than or equal
+    to the guild's configured value (integer; days before current date)"""
     BOOLEAN_EQUAL = 7
-    """the metadata value (integer) is equal to the guild's configured value (integer; 1)"""
+    """the metadata value (integer) is equal to the
+    guild's configured value (integer; 1)"""
     BOOLEAN_NOT_EQUAL = 8
-    """the metadata value (integer) is not equal to the guild's configured value (integer; 1)"""
+    """the metadata value (integer) is not equal to the
+    guild's configured value (integer; 1)"""
 
 
 class AllowedMentionType(StrEnum):
@@ -243,13 +308,14 @@ class AutoModerationActionType(IntEnum):
     """
 
     BLOCK_MESSAGE = 1
-    """blocks a member's message and prevents it from being posted. 
-    A custom explanation can be specified and shown to members whenever their message is blocked."""
+    """blocks a member's message and prevents it from being posted.
+    A custom explanation can be specified and shown to
+    members whenever their message is blocked."""
     SEND_ALERT_MESSAGE = 2
     """logs user content to a specified channel"""
     TIMEOUT = 3
     """timeout user for a specified duration.
-    A TIMEOUT action can only be set up for KEYWORD and MENTION_SPAM rules. 
+    A TIMEOUT action can only be set up for KEYWORD and MENTION_SPAM rules.
     The MODERATE_MEMBERS permission is required to use the TIMEOUT action type."""
 
 
@@ -290,7 +356,8 @@ class ChannelFlags(IntFlag):
     PINNED = 1 << 1
     """this thread is pinned to the top of its parent GUILD_FORUM channel"""
     REQUIRE_TAG = 1 << 4
-    """whether a tag is required to be specified when creating a thread in a GUILD_FORUM channel. 
+    """whether a tag is required to be specified
+    when creating a thread in a GUILD_FORUM channel.
     Tags are specified in the applied_tags field."""
 
 
@@ -311,14 +378,15 @@ class ChannelType(IntEnum):
     GUILD_CATEGORY = 4
     """an organizational category that contains up to 50 channels"""
     GUILD_ANNOUNCEMENT = 5
-    """a channel that users can follow and crosspost into their own server (formerly news channels)"""
+    """a channel that users can follow and crosspost
+    into their own server (formerly news channels)"""
     ANNOUNCEMENT_THREAD = 10
     """a temporary sub-channel within a GUILD_ANNOUNCEMENT channel"""
     PUBLIC_THREAD = 11
     """a temporary sub-channel within a GUILD_TEXT or GUILD_FORUM channel"""
     PRIVATE_THREAD = 12
-    """a temporary sub-channel within a GUILD_TEXT channel that is only viewable by those 
-    invited and those with the MANAGE_THREADS permission"""
+    """a temporary sub-channel within a GUILD_TEXT channel that is only viewable by
+    those invited and those with the MANAGE_THREADS permission"""
     GUILD_STAGE_VOICE = 13
     """a voice channel for hosting events with an audience"""
     GUILD_DIRECTORY = 14
@@ -386,7 +454,8 @@ class DefaultMessageNotificationLevel(IntEnum):
     ALL_MESSAGES = 0
     """members will receive notifications for all messages by default"""
     ONLY_MENTIONS = 1
-    """members will receive notifications only for messages that @mention them by default"""
+    """members will receive notifications only for messages
+    that @mention them by default"""
 
 
 class EmbedTypes(StrEnum):
@@ -455,7 +524,7 @@ class GuildFeature(StrEnum):
     BANNER = "BANNER"
     """guild has access to set a guild banner image"""
     COMMUNITY = "COMMUNITY"
-    """guild can enable welcome screen, Membership Screening, 
+    """guild can enable welcome screen, Membership Screening,
     stage channels and discovery, and receives community updates"""
     CREATOR_MONETIZABLE_PROVISIONAL = "CREATOR_MONETIZABLE_PROVISIONAL"
     """guild has enabled monetization"""
@@ -480,7 +549,8 @@ class GuildFeature(StrEnum):
     PARTNERED = "PARTNERED"
     """guild is partnered"""
     PREVIEW_ENABLED = "PREVIEW_ENABLED"
-    """guild can be previewed before joining via Membership Screening or the directory"""
+    """guild can be previewed before joining via
+    Membership Screening or the directory"""
     ROLE_ICONS = "ROLE_ICONS"
     """guild is able to set role icons"""
     ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE = (
@@ -496,7 +566,8 @@ class GuildFeature(StrEnum):
     VERIFIED = "VERIFIED"
     """guild is verified"""
     VIP_REGIONS = "VIP_REGIONS"
-    """guild has access to set 384kbps bitrate in voice (previously VIP voice servers)"""
+    """guild has access to set 384kbps bitrate in voice
+    (previously VIP voice servers)"""
     WELCOME_SCREEN_ENABLED = "WELCOME_SCREEN_ENABLED"
     """	guild has enabled the welcome screen"""
 
@@ -599,7 +670,7 @@ class InteractionCallbackType(IntEnum):
     DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5
     """ACK an interaction and edit a response later, the user sees a loading state"""
     DEFERRED_UPDATE_MESSAGE = 6
-    """for components, ACK an interaction and edit the original message later; 
+    """for components, ACK an interaction and edit the original message later;
     the user does not see a loading state"""
     UPDATE_MESSAGE = 7
     """for components, edit the message the component was attached to.
@@ -656,7 +727,8 @@ class MessageFlag(IntFlag):
     CROSSPOSTED = 1 << 0
     """this message has been published to subscribed channels (via Channel Following)"""
     IS_CROSSPOST = 1 << 1
-    """this message originated from a message in another channel (via Channel Following)"""
+    """this message originated from a message in
+    another channel (via Channel Following)"""
     SUPPRESS_EMBEDS = 1 << 2
     """do not include any embeds when serializing this message"""
     SOURCE_MESSAGE_DELETED = 1 << 3
@@ -1034,12 +1106,16 @@ class WebhookType(IntEnum):
     Incoming = 1
     """	Incoming Webhooks can post messages to channels with a generated token"""
     Channel_Follower = 2
-    """	Channel Follower Webhooks are internal webhooks used with Channel Following to post new messages into channels"""
+    """	Channel Follower Webhooks are internal webhooks used with Channel
+    Following to post new messages into channels"""
     Application = 3
     """Application webhooks are webhooks used with Interactions"""
 
 
 __all__ = [
+    "UNSET",
+    "Missing",
+    "MissingOrNullable",
     "ActivityAssetImage",
     "ActivityFlags",
     "ActivityType",

@@ -1,15 +1,14 @@
+from typing import TYPE_CHECKING, Any, Optional, Union
 from typing_extensions import override
-from typing import TYPE_CHECKING, Any, Union, Optional
-
-from nonebot.message import handle_event
 
 from nonebot.adapters import Bot as BaseBot
+from nonebot.message import handle_event
 
-from .utils import log
+from .api import AllowedMention, ApiClient, MessageGet, MessageReference, User
 from .config import BotInfo
 from .event import Event, MessageEvent
 from .message import Message, MessageSegment
-from .api import User, ApiClient, MessageGet, AllowedMention, MessageReference
+from .utils import log
 
 if TYPE_CHECKING:
     from .adapter import Adapter

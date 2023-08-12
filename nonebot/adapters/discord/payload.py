@@ -1,16 +1,17 @@
 from enum import IntEnum
-from typing_extensions import Literal, Annotated
-from typing import TYPE_CHECKING, Any, Union, Optional
+from typing import TYPE_CHECKING, Any, Optional, Union
+from typing_extensions import Annotated, Literal
 
-from pydantic import Extra, Field, BaseModel
+from pydantic import BaseModel, Extra, Field
 
-from .api.model import Hello as HelloData
-from .utils import json_dumps, json_loads
-from .api.model import Resume as ResumeData
-from .api.model import Identify as IdentifyData
+from .api.model import (
+    Hello as HelloData,
+    Identify as IdentifyData,
+    Resume as ResumeData,
+)
 
 if TYPE_CHECKING:
-    from pydantic.typing import DictStrAny, MappingIntStrAny, AbstractSetIntStr
+    from pydantic.typing import AbstractSetIntStr, DictStrAny, MappingIntStrAny
 
 
 class Opcode(IntEnum):
@@ -28,8 +29,6 @@ class Payload(BaseModel):
     class Config:
         extra = Extra.allow
         allow_population_by_field_name = True
-        json_loads = json_loads
-        json_dumps = json_dumps
 
     def dict(
         self,

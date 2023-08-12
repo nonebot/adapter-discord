@@ -1,30 +1,31 @@
-import re
-import datetime
 from dataclasses import dataclass
+import datetime
+import re
+from typing import Iterable, Optional, Type, TypedDict, Union, overload
 from typing_extensions import override
-from typing import Type, Union, Iterable, Optional, TypedDict, overload
 
+from nonebot.adapters import (
+    Message as BaseMessage,
+    MessageSegment as BaseMessageSegment,
+)
 from nonebot.utils import escape_tag
 
-from nonebot.adapters import Message as BaseMessage
-from nonebot.adapters import MessageSegment as BaseMessageSegment
-
-from .utils import escape
 from .api import (
-    File,
-    Embed,
-    Button,
     ActionRow,
-    Component,
-    Snowflake,
-    MessageGet,
-    SelectMenu,
-    SnowflakeType,
     AttachmentSend,
-    TimeStampStyle,
+    Button,
+    Component,
     DirectComponent,
+    Embed,
+    File,
+    MessageGet,
     MessageReference,
+    SelectMenu,
+    Snowflake,
+    SnowflakeType,
+    TimeStampStyle,
 )
+from .utils import escape
 
 
 class MessageSegment(BaseMessageSegment["Message"]):
@@ -83,8 +84,10 @@ class MessageSegment(BaseMessageSegment["Message"]):
     @staticmethod
     def component(component: Component):
         if isinstance(component, (Button, SelectMenu)):
-            component = ActionRow(components=[component])
-        return ComponentSegment(data={"component": component})
+            component_ = ActionRow(components=[component])
+        else:
+            component_ = component
+        return ComponentSegment(data={"component": component_})
 
     @staticmethod
     def custom_emoji(
@@ -172,7 +175,8 @@ class StickerSegment(MessageSegment):
         return f"<Sticker:{self.data['id']}>"
 
 
-ComponentData = TypedDict("ComponentData", {"component": DirectComponent})
+class ComponentData(TypedDict):
+    component: DirectComponent
 
 
 @dataclass
@@ -184,9 +188,10 @@ class ComponentSegment(MessageSegment):
         return f"<Component:{self.data['component'].type}>"
 
 
-CustomEmojiData = TypedDict(
-    "CustomEmojiData", {"name": str, "id": str, "animated": Optional[bool]}
-)
+class CustomEmojiData(TypedDict):
+    name: str
+    id: str
+    animated: Optional[bool]
 
 
 @dataclass
@@ -201,7 +206,8 @@ class CustomEmojiSegment(MessageSegment):
             return f"<:{self.data['name']}:{self.data['id']}>"
 
 
-MentionUserData = TypedDict("MentionUserData", {"user_id": Snowflake})
+class MentionUserData(TypedDict):
+    user_id: Snowflake
 
 
 @dataclass
@@ -213,7 +219,8 @@ class MentionUserSegment(MessageSegment):
         return f"<@{self.data['user_id']}>"
 
 
-MentionChannelData = TypedDict("MentionChannelData", {"channel_id": Snowflake})
+class MentionChannelData(TypedDict):
+    channel_id: Snowflake
 
 
 @dataclass
@@ -225,7 +232,8 @@ class MentionChannelSegment(MessageSegment):
         return f"<#{self.data['channel_id']}>"
 
 
-MentionRoleData = TypedDict("MentionRoleData", {"role_id": Snowflake})
+class MentionRoleData(TypedDict):
+    role_id: Snowflake
 
 
 @dataclass
@@ -246,9 +254,9 @@ class MentionEveryoneSegment(MessageSegment):
         return "@everyone"
 
 
-TimestampData = TypedDict(
-    "TimestampData", {"timestamp": int, "style": Optional[TimeStampStyle]}
-)
+class TimestampData(TypedDict):
+    timestamp: int
+    style: Optional[TimeStampStyle]
 
 
 @dataclass
@@ -269,7 +277,8 @@ class TimestampSegment(MessageSegment):
         )
 
 
-TextData = TypedDict("TextData", {"text": str})
+class TextData(TypedDict):
+    text: str
 
 
 @dataclass
@@ -281,7 +290,8 @@ class TextSegment(MessageSegment):
         return escape_tag(self.data["text"])
 
 
-EmbedData = TypedDict("EmbedData", {"embed": Embed})
+class EmbedData(TypedDict):
+    embed: Embed
 
 
 @dataclass
@@ -293,9 +303,9 @@ class EmbedSegment(MessageSegment):
         return f"<Embed:{self.data['embed'].type}>"
 
 
-AttachmentData = TypedDict(
-    "AttachmentData", {"attachment": AttachmentSend, "file": Optional[File]}
-)
+class AttachmentData(TypedDict):
+    attachment: AttachmentSend
+    file: Optional[File]
 
 
 @dataclass
@@ -307,7 +317,8 @@ class AttachmentSegment(MessageSegment):
         return f"<Attachment:{self.data['attachment'].filename}>"
 
 
-ReferenceData = TypedDict("ReferenceData", {"reference": MessageReference})
+class ReferenceData(TypedDict):
+    reference: MessageReference
 
 
 @dataclass
@@ -329,7 +340,7 @@ class Message(BaseMessage[MessageSegment]):
     def __add__(
         self, other: Union[str, MessageSegment, Iterable[MessageSegment]]
     ) -> "Message":
-        return super(Message, self).__add__(
+        return super().__add__(
             MessageSegment.text(other) if isinstance(other, str) else other
         )
 
@@ -337,7 +348,7 @@ class Message(BaseMessage[MessageSegment]):
     def __radd__(
         self, other: Union[str, MessageSegment, Iterable[MessageSegment]]
     ) -> "Message":
-        return super(Message, self).__radd__(
+        return super().__radd__(
             MessageSegment.text(other) if isinstance(other, str) else other
         )
 
@@ -408,7 +419,11 @@ class Message(BaseMessage[MessageSegment]):
                     data={
                         "attachment": AttachmentSend(
                             filename=attachment.filename,
-                            description=attachment.description or None,
+                            description=(
+                                attachment.description
+                                if isinstance(attachment.description, str)
+                                else None
+                            ),
                         ),
                         "file": None,
                     }

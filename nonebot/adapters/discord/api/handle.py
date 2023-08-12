@@ -1,16 +1,17 @@
-from urllib.parse import quote
 from typing import TYPE_CHECKING, Dict, List, Literal, Optional
+from urllib.parse import quote
+
+from nonebot.drivers import Request
 
 from pydantic import parse_obj_as
-from nonebot.drivers import Request
 
 from .model import *
 from .request import _request
 from .utils import parse_data, parse_forum_thread_message
 
 if TYPE_CHECKING:
-    from ..bot import Bot
     from ..adapter import Adapter
+    from ..bot import Bot
 
 
 # Application Role Connection Metadata
@@ -392,7 +393,7 @@ async def _delete_user_reaction(
         headers=headers,
         method="DELETE",
         url=adapter.base_url
-        / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/{user_id}",
+        / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/{user_id}",  # noqa: E501
     )
     await _request(adapter, bot, request)
 
@@ -2498,8 +2499,12 @@ async def _get_current_authorization_information(
 
 
 API_HANDLERS = {
-    "get_application_role_connection_metadata_records": _get_application_role_connection_metadata_records,
-    "update_application_role_connection_metadata_records": _update_application_role_connection_metadata_records,
+    "get_application_role_connection_metadata_records": (
+        _get_application_role_connection_metadata_records
+    ),  # noqa: E501
+    "update_application_role_connection_metadata_records": (
+        _update_application_role_connection_metadata_records
+    ),  # noqa: E501
     "get_guild_audit_log": _get_guild_audit_log,
     "list_auto_moderation_rules_for_guild": _list_auto_moderation_rules_for_guild,
     "get_auto_moderation_rule": _get_auto_moderation_rule,

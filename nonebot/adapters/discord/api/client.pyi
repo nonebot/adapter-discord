@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, List, Union, Literal, Optional
+from typing import Dict, List, Literal, Optional, Union
 
 from .model import *
 from .types import *
@@ -371,7 +371,9 @@ class ApiClient:
     async def trigger_typing_indicator(self, *, channel_id: SnowflakeType) -> None:
         """https://discord.com/developers/docs/resources/channel#trigger-typing-indicator"""
         ...
-    async def get_pinned_messages(self, *, channel_id: SnowflakeType) -> List[MessageGet]:
+    async def get_pinned_messages(
+        self, *, channel_id: SnowflakeType
+    ) -> List[MessageGet]:
         """https://discord.com/developers/docs/resources/channel#get-pinned-messages"""
         ...
     async def pin_message(

@@ -1,7 +1,7 @@
-from typing import Any, Dict, List, Type, Union, Literal
+import json
+from typing import Any, Dict, List, Literal, Type, Union
 
-from ..utils import json_dumps
-from .model import MessageSend, ExecuteWebhookParams
+from .model import ExecuteWebhookParams, MessageSend
 
 
 def parse_data(
@@ -20,7 +20,7 @@ def parse_data(
             multipart[f"files[{index}]"] = (file.filename, file.content)
         if attachments:
             payload["attachments"] = attachments
-        multipart["payload_json"] = (None, json_dumps(payload), "application/json")
+        multipart["payload_json"] = (None, json.dumps(payload), "application/json")
         return {"files": multipart}
     else:
         return {"json": payload}
@@ -50,7 +50,7 @@ def parse_forum_thread_message(
             multipart[f"file[{index}]"] = (file.filename, file.content)
         if attachments:
             payload["attachments"] = attachments
-        multipart["payload_json"] = (None, json_dumps(payload), "application/json")
+        multipart["payload_json"] = (None, json.dumps(payload), "application/json")
         return {"files": multipart}
     else:
         return {"json": payload}

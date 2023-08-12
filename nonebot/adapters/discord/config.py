@@ -1,6 +1,6 @@
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
-from pydantic import Extra, Field, BaseModel
+from pydantic import BaseModel, Extra, Field
 
 
 class Intents(BaseModel):

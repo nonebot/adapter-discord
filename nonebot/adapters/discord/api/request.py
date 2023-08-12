@@ -1,21 +1,22 @@
+import json
 from typing import TYPE_CHECKING, Any
 
 from nonebot.drivers import Request
 from nonebot.utils import escape_tag
 
-from ..utils import log, json_loads, decompress_data
 from ..exception import (
     ActionFailed,
-    NetworkError,
     ApiNotAvailable,
+    DiscordAdapterException,
+    NetworkError,
     RateLimitException,
     UnauthorizedException,
-    DiscordAdapterException,
 )
+from ..utils import decompress_data, log
 
 if TYPE_CHECKING:
-    from ..bot import Bot
     from ..adapter import Adapter
+    from ..bot import Bot
 
 
 async def _request(adapter: "Adapter", bot: "Bot", request: Request) -> Any:
@@ -28,7 +29,7 @@ async def _request(adapter: "Adapter", bot: "Bot", request: Request) -> Any:
             f"API code: {data.status_code} response: {escape_tag(str(data.content))}",
         )
         if data.status_code in (200, 201, 204):
-            return data.content and json_loads(
+            return data.content and json.loads(
                 decompress_data(data.content, adapter.discord_config.discord_compress)
             )
         elif data.status_code in (401, 403):

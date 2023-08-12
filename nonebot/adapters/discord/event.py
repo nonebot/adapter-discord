@@ -1,14 +1,13 @@
 from enum import Enum
+from typing import Dict, List, Optional, Type
 from typing_extensions import override
-from typing import Dict, List, Type, Optional
-
-from nonebot.utils import escape_tag
 
 from nonebot.adapters import Event as BaseEvent
+from nonebot.utils import escape_tag
 
 from .api.model import *
+from .api.types import UNSET, Missing
 from .message import Message
-from .typing import MISSING, Missing
 
 
 class EventType(str, Enum):
@@ -630,7 +629,7 @@ class InviteDeleteEvent(NoticeEvent):
 
     __type__ = EventType.INVITE_DELETE
     channel_id: Snowflake
-    guild_id: Missing[Snowflake] = MISSING
+    guild_id: Missing[Snowflake] = UNSET
     code: str
 
 
@@ -794,11 +793,15 @@ event_classes: Dict[str, Type[Event]] = {
     EventType.RESUMED.value: ResumedEvent,
     EventType.RECONNECT.value: ReconnectEvent,
     EventType.INVALID_SESSION.value: InvalidSessionEvent,
-    EventType.APPLICATION_COMMAND_PERMISSIONS_UPDATE.value: ApplicationCommandPermissionsUpdateEvent,
+    EventType.APPLICATION_COMMAND_PERMISSIONS_UPDATE.value: (
+        ApplicationCommandPermissionsUpdateEvent
+    ),
     EventType.AUTO_MODERATION_RULE_CREATE.value: AutoModerationRuleCreateEvent,
     EventType.AUTO_MODERATION_RULE_UPDATE.value: AutoModerationRuleUpdateEvent,
     EventType.AUTO_MODERATION_RULE_DELETE.value: AutoModerationRuleDeleteEvent,
-    EventType.AUTO_MODERATION_ACTION_EXECUTION.value: AutoModerationActionExecutionEvent,
+    EventType.AUTO_MODERATION_ACTION_EXECUTION.value: (
+        AutoModerationActionExecutionEvent
+    ),
     EventType.CHANNEL_CREATE.value: ChannelCreateEvent,
     EventType.CHANNEL_UPDATE.value: ChannelUpdateEvent,
     EventType.CHANNEL_DELETE.value: ChannelDeleteEvent,
@@ -829,7 +832,9 @@ event_classes: Dict[str, Type[Event]] = {
     EventType.GUILD_SCHEDULED_EVENT_UPDATE.value: GuildScheduledEventUpdateEvent,
     EventType.GUILD_SCHEDULED_EVENT_DELETE.value: GuildScheduledEventDeleteEvent,
     EventType.GUILD_SCHEDULED_EVENT_USER_ADD.value: GuildScheduledEventUserAddEvent,
-    EventType.GUILD_SCHEDULED_EVENT_USER_REMOVE.value: GuildScheduledEventUserRemoveEvent,
+    EventType.GUILD_SCHEDULED_EVENT_USER_REMOVE.value: (
+        GuildScheduledEventUserRemoveEvent
+    ),  # noqa: E501
     EventType.INTEGRATION_CREATE.value: IntegrationCreateEvent,
     EventType.INTEGRATION_UPDATE.value: IntegrationUpdateEvent,
     EventType.INTEGRATION_DELETE.value: IntegrationDeleteEvent,
