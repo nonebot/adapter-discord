@@ -14,10 +14,10 @@ _✨ Discord 协议适配 ✨_
 
 本适配器仍在开发中。
 
-目前请通过`pip install git+https://github.com/CMHopeSunshine/adapter-discord.git@dev` 安装。
+可通过 `pip install git+https://github.com/CMHopeSunshine/adapter-discord.git@dev` 安装开发中版本。
 
-由于Discord文档存在部分表述不清的地方，并且结构复杂，有很多`partial object`，
-给开发带来了很大的困难，因此欢迎大家帮忙测试，提出issue，感谢。
+由于 [Discord 文档](https://discord.com/developers/docs/intro)存在部分表述不清的地方，并且结构复杂，存在很多 `partial object`，
+需要更多实际测试以找出问题，欢迎提出 ISSUE 反馈。
 
 ## 配置
 
@@ -95,7 +95,9 @@ DISCORD_PROXY='http://127.0.0.1:6666'
 
 ### 注册适配器
 
-参考[adapter](https://v2.nonebot.dev/docs/advanced/adapter)注册本适配器，例如：
+> 使用 nb-cli 脚手架安装时可跳过本部分
+
+参考 [adapter](https://v2.nonebot.dev/docs/advanced/adapter) 在 bot.py 注册本适配器，例如：
 
 ```python
 import nonebot
