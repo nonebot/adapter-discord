@@ -11,6 +11,7 @@ from nonebot.adapters import (
 from nonebot.utils import escape_tag
 
 from .api import (
+    UNSET,
     ActionRow,
     AttachmentSend,
     Button,
@@ -150,13 +151,11 @@ class MessageSegment(BaseMessageSegment["Message"]):
         if isinstance(reference, MessageReference):
             _reference = reference
         else:
-            _reference = MessageReference.parse_obj(
-                {
-                    "message_id": reference,
-                    "channel_id": channel_id,
-                    "guild_id": guild_id,
-                    "fail_if_not_exists": fail_if_not_exists,
-                }
+            _reference = MessageReference(
+                message_id=Snowflake(reference) if reference else UNSET,
+                channel_id=Snowflake(channel_id) if channel_id else UNSET,
+                guild_id=Snowflake(guild_id) if guild_id else UNSET,
+                fail_if_not_exists=fail_if_not_exists or UNSET,
             )
 
         return ReferenceSegment(data={"reference": _reference})
