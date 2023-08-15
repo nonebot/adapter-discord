@@ -1,9 +1,11 @@
 from enum import Enum
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Literal, Optional, Type, Union
 from typing_extensions import override
 
 from nonebot.adapters import Event as BaseEvent
 from nonebot.utils import escape_tag
+
+from pydantic import Field
 
 from .api.model import *
 from .api.types import UNSET, Missing
@@ -123,12 +125,9 @@ class Event(BaseEvent):
 
     __type__: EventType
 
-    def get_type(self) -> str:
-        return "unknown"  # temp
-
     @override
     def get_event_name(self) -> str:
-        return self.__type__
+        return self.__class__.__name__
 
     @override
     def get_event_description(self) -> str:
@@ -642,6 +641,15 @@ class MessageCreateEvent(MessageEvent, MessageCreate):
     __type__ = EventType.MESSAGE_CREATE
 
 
+class GuildMessageCreateEvent(MessageCreateEvent):
+    guild_id: Snowflake
+
+
+class DirectMessageCreateEvent(MessageCreateEvent):
+    to_me: bool = True
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+
+
 class MessageUpdateEvent(NoticeEvent, MessageUpdate):
     """Message Update Event
 
@@ -649,6 +657,14 @@ class MessageUpdateEvent(NoticeEvent, MessageUpdate):
     """
 
     __type__ = EventType.MESSAGE_UPDATE
+
+
+class GuildMessageUpdateEvent(MessageUpdateEvent):
+    guild_id: Snowflake
+
+
+class DirectMessageUpdateEvent(MessageUpdateEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
 
 
 class MessageDeleteEvent(NoticeEvent, MessageDelete):
@@ -660,6 +676,14 @@ class MessageDeleteEvent(NoticeEvent, MessageDelete):
     __type__ = EventType.MESSAGE_DELETE
 
 
+class GuildMessageDeleteEvent(MessageDeleteEvent):
+    guild_id: Snowflake
+
+
+class DirectMessageDeleteEvent(MessageDeleteEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+
+
 class MessageDeleteBulkEvent(NoticeEvent, MessageDeleteBulk):
     """Message Delete Bulk Event
 
@@ -667,6 +691,14 @@ class MessageDeleteBulkEvent(NoticeEvent, MessageDeleteBulk):
     """
 
     __type__ = EventType.MESSAGE_DELETE
+
+
+class GuildMessageDeleteBulkEvent(MessageDeleteBulkEvent):
+    guild_id: Snowflake
+
+
+class DirectMessageDeleteBulkEvent(MessageDeleteBulkEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
 
 
 class MessageReactionAddEvent(NoticeEvent, MessageReactionAdd):
@@ -679,6 +711,14 @@ class MessageReactionAddEvent(NoticeEvent, MessageReactionAdd):
     __type__ = EventType.MESSAGE_REACTION_ADD
 
 
+class GuildMessageReactionAddEvent(MessageReactionAddEvent):
+    guild_id: Snowflake
+
+
+class DirectMessageReactionAddEvent(MessageReactionAddEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+
+
 class MessageReactionRemoveEvent(NoticeEvent, MessageReactionRemove):
     """Message Reaction Remove Event
 
@@ -686,6 +726,14 @@ class MessageReactionRemoveEvent(NoticeEvent, MessageReactionRemove):
     """
 
     __type__ = EventType.MESSAGE_REACTION_REMOVE
+
+
+class GuildMessageReactionRemoveEvent(MessageReactionRemoveEvent):
+    guild_id: Snowflake
+
+
+class DirectMessageReactionRemoveEvent(MessageReactionRemoveEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
 
 
 class MessageReactionRemoveAllEvent(NoticeEvent, MessageReactionRemoveAll):
@@ -697,6 +745,14 @@ class MessageReactionRemoveAllEvent(NoticeEvent, MessageReactionRemoveAll):
     __type__ = EventType.MESSAGE_REACTION_REMOVE_ALL
 
 
+class GuildMessageReactionRemoveAllEvent(MessageReactionRemoveAllEvent):
+    guild_id: Snowflake
+
+
+class DirectMessageReactionRemoveAllEvent(MessageReactionRemoveAllEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+
+
 class MessageReactionRemoveEmojiEvent(NoticeEvent, MessageReactionRemoveEmoji):
     """Message Reaction Remove Emoji Event
 
@@ -704,6 +760,14 @@ class MessageReactionRemoveEmojiEvent(NoticeEvent, MessageReactionRemoveEmoji):
     """
 
     __type__ = EventType.MESSAGE_REACTION_REMOVE_EMOJI
+
+
+class GuildMessageReactionRemoveEmojiEvent(MessageReactionRemoveEmojiEvent):
+    guild_id: Snowflake
+
+
+class DirectMessageReactionRemoveEmojiEvent(MessageReactionRemoveEmojiEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
 
 
 class PresenceUpdateEvent(NoticeEvent, PresenceUpdate):
@@ -749,6 +813,16 @@ class TypingStartEvent(NoticeEvent, TypingStart):
     """
 
     __type__ = EventType.TYPING_START
+
+
+class GuildTypingStartEvent(TypingStartEvent):
+    guild_id: Snowflake
+    member: GuildMember
+
+
+class DirectTypingStartEvent(TypingStartEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+    member: Literal[UNSET] = Field(UNSET, exclude=True)
 
 
 class UserUpdateEvent(NoticeEvent, UserUpdate):
@@ -834,26 +908,54 @@ event_classes: Dict[str, Type[Event]] = {
     EventType.GUILD_SCHEDULED_EVENT_USER_ADD.value: GuildScheduledEventUserAddEvent,
     EventType.GUILD_SCHEDULED_EVENT_USER_REMOVE.value: (
         GuildScheduledEventUserRemoveEvent
-    ),  # noqa: E501
+    ),
     EventType.INTEGRATION_CREATE.value: IntegrationCreateEvent,
     EventType.INTEGRATION_UPDATE.value: IntegrationUpdateEvent,
     EventType.INTEGRATION_DELETE.value: IntegrationDeleteEvent,
     EventType.INTERACTION_CREATE.value: InteractionCreateEvent,
     EventType.INVITE_CREATE.value: InviteCreateEvent,
     EventType.INVITE_DELETE.value: InviteDeleteEvent,
-    EventType.MESSAGE_CREATE.value: MessageCreateEvent,
-    EventType.MESSAGE_UPDATE.value: MessageUpdateEvent,
-    EventType.MESSAGE_DELETE.value: MessageDeleteEvent,
-    EventType.MESSAGE_DELETE_BULK.value: MessageDeleteBulkEvent,
-    EventType.MESSAGE_REACTION_ADD.value: MessageReactionAddEvent,
-    EventType.MESSAGE_REACTION_REMOVE: MessageReactionRemoveEvent,
-    EventType.MESSAGE_REACTION_REMOVE_ALL: MessageReactionRemoveAllEvent,
-    EventType.MESSAGE_REACTION_REMOVE_EMOJI: MessageReactionRemoveEmojiEvent,
+    EventType.MESSAGE_CREATE.value: Union[
+        GuildMessageCreateEvent, DirectMessageCreateEvent, MessageCreateEvent
+    ],
+    EventType.MESSAGE_UPDATE.value: Union[
+        GuildMessageUpdateEvent, DirectMessageUpdateEvent, MessageUpdateEvent
+    ],
+    EventType.MESSAGE_DELETE.value: Union[
+        GuildMessageDeleteEvent, DirectMessageDeleteEvent, MessageDeleteEvent
+    ],
+    EventType.MESSAGE_DELETE_BULK.value: Union[
+        GuildMessageDeleteBulkEvent,
+        DirectMessageDeleteBulkEvent,
+        MessageDeleteBulkEvent,
+    ],
+    EventType.MESSAGE_REACTION_ADD.value: Union[
+        GuildMessageReactionAddEvent,
+        DirectMessageReactionAddEvent,
+        MessageReactionAddEvent,
+    ],
+    EventType.MESSAGE_REACTION_REMOVE: Union[
+        GuildMessageReactionRemoveEvent,
+        DirectMessageReactionRemoveEvent,
+        MessageReactionRemoveEvent,
+    ],
+    EventType.MESSAGE_REACTION_REMOVE_ALL: Union[
+        GuildMessageReactionRemoveAllEvent,
+        DirectMessageReactionRemoveAllEvent,
+        MessageReactionRemoveAllEvent,
+    ],
+    EventType.MESSAGE_REACTION_REMOVE_EMOJI: Union[
+        GuildMessageReactionRemoveEmojiEvent,
+        DirectMessageReactionRemoveEmojiEvent,
+        MessageReactionRemoveEmojiEvent,
+    ],
     EventType.PRESENCE_UPDATE.value: PresenceUpdateEvent,
     EventType.STAGE_INSTANCE_CREATE.value: StageInstanceCreateEvent,
     EventType.STAGE_INSTANCE_UPDATE.value: StageInstanceUpdateEvent,
     EventType.STAGE_INSTANCE_DELETE.value: StageInstanceDeleteEvent,
-    EventType.TYPING_START.value: TypingStartEvent,
+    EventType.TYPING_START.value: Union[
+        GuildTypingStartEvent, DirectTypingStartEvent, TypingStartEvent
+    ],
     EventType.USER_UPDATE.value: UserUpdateEvent,
     EventType.VOICE_STATE_UPDATE.value: VoiceStateUpdateEvent,
     EventType.VOICE_SERVER_UPDATE.value: VoiceServerUpdateEvent,
@@ -920,18 +1022,36 @@ __all__ = [
     "InviteCreateEvent",
     "InviteDeleteEvent",
     "MessageCreateEvent",
+    "GuildMessageCreateEvent",
+    "DirectMessageCreateEvent",
     "MessageUpdateEvent",
+    "GuildMessageUpdateEvent",
+    "DirectMessageUpdateEvent",
     "MessageDeleteEvent",
+    "GuildMessageDeleteEvent",
+    "DirectMessageDeleteEvent",
     "MessageDeleteBulkEvent",
+    "GuildMessageDeleteBulkEvent",
+    "DirectMessageDeleteBulkEvent",
     "MessageReactionAddEvent",
+    "GuildMessageReactionAddEvent",
+    "DirectMessageReactionAddEvent",
     "MessageReactionRemoveEvent",
+    "GuildMessageReactionRemoveEvent",
+    "DirectMessageReactionRemoveEvent",
     "MessageReactionRemoveAllEvent",
+    "GuildMessageReactionRemoveAllEvent",
+    "DirectMessageReactionRemoveAllEvent",
     "MessageReactionRemoveEmojiEvent",
+    "GuildMessageReactionRemoveEmojiEvent",
+    "DirectMessageReactionRemoveEmojiEvent",
     "PresenceUpdateEvent",
     "StageInstanceCreateEvent",
     "StageInstanceUpdateEvent",
     "StageInstanceDeleteEvent",
     "TypingStartEvent",
+    "GuildTypingStartEvent",
+    "DirectTypingStartEvent",
     "UserUpdateEvent",
     "VoiceStateUpdateEvent",
     "VoiceServerUpdateEvent",

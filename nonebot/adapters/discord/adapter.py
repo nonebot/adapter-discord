@@ -2,8 +2,6 @@ import asyncio
 import contextlib
 import json
 import sys
-
-# from pathlib import Path
 from typing import Any, List, Optional, Tuple
 from typing_extensions import override
 
@@ -12,7 +10,7 @@ from nonebot.drivers import URL, Driver, ForwardDriver, Request, WebSocket
 from nonebot.exception import WebSocketClosed
 from nonebot.utils import escape_tag
 
-from pydantic import parse_raw_as
+from pydantic import parse_obj_as, parse_raw_as
 
 from .api.handle import API_HANDLERS
 from .api.model import GatewayBot, User
@@ -448,14 +446,10 @@ class Adapter(BaseAdapter):
                 "WARNING",
                 f"Unknown payload type: {payload.type}, detail: {repr(payload)}",
             )
-            # (Path() / f"{payload.type}-{payload.sequence}.json").write_text(
-            #     json.dumps(payload.dict(), indent=4, ensure_ascii=False),
-            #     encoding="utf-8",
-            # )
             event = Event.parse_obj(payload.data)
             event.__type__ = payload.type  # type: ignore
             return event
-        return EventClass.parse_obj(payload.data)
+        return parse_obj_as(EventClass, payload.data)
 
     @override
     async def _call_api(self, bot: Bot, api: str, **data: Any) -> Any:

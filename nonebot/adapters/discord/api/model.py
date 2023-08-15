@@ -2777,49 +2777,6 @@ class InviteDelete(BaseModel):
     code: str
 
 
-# class MessageCreate(BaseModel):
-#     """Message Create Event Fields
-#
-#     Sent when a message is created. The inner payload is a message object
-#
-#     see https://discord.com/developers/docs/topics/gateway-events#message-create
-#     """
-#     id: Snowflake
-#     channel_id: Snowflake
-#     author: Missing[User] = UNSET
-#     content: Missing[str] = UNSET
-#     timestamp: Missing[str] = UNSET
-#     edited_timestamp: MissingOrNullable[str] = UNSET
-#     tts: Missing[bool] = UNSET
-#     mention_everyone: Missing[bool] = UNSET
-#     mentions: Missing[List[User]] = UNSET
-#     mention_roles: Missing[List[str]] = UNSET
-#     mention_channels: Missing[List[ChannelMention]] = UNSET
-#     attachments: Missing[List[Attachment]] = UNSET
-#     embeds: Missing[List[Embed]] = UNSET
-#     reactions: Missing[List[Reaction]] = UNSET
-#     nonce: Missing[Union[int, str]] = UNSET
-#     pinned: Missing[bool] = UNSET
-#     webhook_id: Missing[Snowflake] = UNSET
-#     type_: Missing[MessageType] = UNSET
-#     activity: Missing[MessageActivity] = UNSET
-#     application: Missing[Application] = UNSET
-#     application_id: Missing[Snowflake] = UNSET
-#     message_reference: Missing[MessageReference] = UNSET
-#     flags: Missing[MessageFlag] = UNSET
-#     referenced_message: MissingOrNullable["Message"] = UNSET
-#     interaction: Missing[MessageInteraction] = UNSET
-#     thread: Missing[Channel] = UNSET
-#     components: Missing[List[Component]] = UNSET
-#     sticker_items: Missing[List[StickerItem]] = UNSET
-#     stickers: Missing[List[Sticker]] = UNSET
-#     position: Missing[int] = UNSET
-#     role_subscription_data: Missing[RoleSubscriptionData] = UNSET
-#     guild_id: Missing[str] = UNSET
-#     member: Missing[GuildMember] = UNSET
-#     mentions: List[User]
-
-
 class MessageCreate(MessageGet):
     """Message Create Event Fields
 
