@@ -1,4 +1,13 @@
-from typing import TYPE_CHECKING, Dict, List, Literal, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    List,
+    Literal,
+    Optional,
+)
 from urllib.parse import quote
 
 from nonebot.drivers import Request
@@ -14,8 +23,375 @@ if TYPE_CHECKING:
     from ..bot import Bot
 
 
+# Application Commands
+# see https://discord.com/developers/docs/interactions/application-commands
+
+
+async def _get_global_application_commands(
+    adapter: "Adapter", bot: "Bot", application_id: SnowflakeType, **params
+) -> List[ApplicationCommand]:
+    """Fetch a global command for your application.
+    Returns an application command object.
+
+    see https://discord.com/developers/docs/interactions/application-commands#get-global-application-command
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"applications/{application_id}/commands",
+        params=params,
+    )
+    return parse_obj_as(List[ApplicationCommand], await _request(adapter, bot, request))
+
+
+async def _create_global_application_command(
+    adapter: "Adapter", bot: "Bot", application_id: SnowflakeType, **data
+) -> ApplicationCommand:
+    """Create a new global command.
+    Returns 201 if a command with the same name does not already exist,
+    or a 200 if it does (in which case the previous command will be overwritten).
+    Both responses include an application command object.
+
+    see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="POST",
+        url=adapter.base_url / f"applications/{application_id}/commands",
+        json=data,
+    )
+    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+
+
+async def _get_global_application_command(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    command_id: SnowflakeType,
+) -> ApplicationCommand:
+    """Fetch a global command for your application.
+    Returns an application command object.
+
+    see https://discord.com/developers/docs/interactions/application-commands#get-global-application-command
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"applications/{application_id}/command/{command_id}",
+    )
+    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+
+
+async def _edit_global_application_command(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    command_id: SnowflakeType,
+    **data,
+):
+    """Edit a global command. Returns 200 and an application command object.
+    All fields are optional, but any fields provided will entirely overwrite
+    the existing values of those fields.
+
+    see https://discord.com/developers/docs/interactions/application-commands#edit-global-application-command
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="PATCH",
+        url=adapter.base_url / f"applications/{application_id}/command/{command_id}",
+        json=data,
+    )
+    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+
+
+async def _delete_global_application_command(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    command_id: SnowflakeType,
+):
+    """Deletes a global command. Returns 204 No Content on success.
+
+    see https://discord.com/developers/docs/interactions/application-commands#delete-global-application-command
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="DELETE",
+        url=adapter.base_url / f"applications/{application_id}/commands/{command_id}",
+    )
+    await _request(adapter, bot, request)
+
+
+async def _bulk_overwrite_global_application_commands(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    commands: List[ApplicationCommand],
+) -> List[ApplicationCommand]:
+    """Takes a list of application commands,
+    overwriting the existing global command list for this application.
+    Returns 200 and a list of application command objects.
+    Commands that do not already exist will count toward
+    daily application command create limits.
+
+    see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="PUT",
+        url=adapter.base_url / f"applications/{application_id}/commands",
+        json=[command.dict(exclude_unset=True) for command in commands],
+    )
+    return parse_obj_as(List[ApplicationCommand], await _request(adapter, bot, request))
+
+
+async def _get_guild_application_commands(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    guild_id: SnowflakeType,
+    **params,
+) -> List[ApplicationCommand]:
+    """Fetch all of the guild commands for your application for a specific guild.
+    Returns an array of application command objects.
+
+    see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-commands
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url
+        / f"applications/{application_id}/guilds/{guild_id}/commands",
+        params=params,
+    )
+    return parse_obj_as(List[ApplicationCommand], await _request(adapter, bot, request))
+
+
+async def _create_guild_application_command(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    guild_id: SnowflakeType,
+    **data,
+) -> ApplicationCommand:
+    """Create a new guild command.
+    New guild commands will be available in the guild immediately.
+    Returns 201 if a command with the same name does not already exist,
+    or a 200 if it does (in which case the previous command will be overwritten).
+    Both responses include an application command object.
+
+    see https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="POST",
+        url=adapter.base_url
+        / f"applications/{application_id}/guilds/{guild_id}/commands",
+        json=data,
+    )
+    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+
+
+async def _get_guild_application_command(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    guild_id: SnowflakeType,
+    command_id: SnowflakeType,
+) -> ApplicationCommand:
+    """Fetch a guild command for your application.
+    Returns an application command object.
+
+    see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url
+        / f"applications/{application_id}/guilds/{guild_id}/command/{command_id}",
+    )
+    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+
+
+async def _edit_guild_application_command(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    guild_id: SnowflakeType,
+    command_id: SnowflakeType,
+    **data,
+):
+    """Edit a guild command.
+    Updates for guild commands will be available immediately.
+    Returns 200 and an application command object.
+    All fields are optional,
+    but any fields provided will entirely overwrite the existing values of those fields.
+
+    see https://discord.com/developers/docs/interactions/application-commands#edit-guild-application-command
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="PATCH",
+        url=adapter.base_url
+        / f"applications/{application_id}/guilds/{guild_id}/command/{command_id}",
+        json=data,
+    )
+    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+
+
+async def _delete_guild_application_command(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    guild_id: SnowflakeType,
+    command_id: SnowflakeType,
+):
+    """Delete a guild command. Returns 204 No Content on success.
+
+    see https://discord.com/developers/docs/interactions/application-commands#delete-guild-application-command
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="DELETE",
+        url=adapter.base_url
+        / f"applications/{application_id}/guilds/{guild_id}/command/{command_id}",
+    )
+    await _request(adapter, bot, request)
+
+
+async def _bulk_overwrite_guild_application_commands(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    guild_id: SnowflakeType,
+    commands: List[ApplicationCommand],
+) -> List[ApplicationCommand]:
+    """Takes a list of application commands,
+    overwriting the existing command list for this application for the targeted guild.
+    Returns 200 and a list of application command objects.
+
+    see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-guild-application-commands
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="PUT",
+        url=adapter.base_url
+        / f"applications/{application_id}/guilds/{guild_id}/commands",
+        json=[command.dict(exclude_unset=True) for command in commands],
+    )
+    return parse_obj_as(List[ApplicationCommand], await _request(adapter, bot, request))
+
+
+async def _get_guild_application_command_permissions(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    guild_id: SnowflakeType,
+) -> List[GuildApplicationCommandPermissions]:
+    """
+    Fetches permissions for all commands for your application in a guild.
+    Returns an array of guild application command permissions objects.
+
+    see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command-permissions
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url
+        / f"applications/{application_id}/guilds/{guild_id}/commands/permissions",
+    )
+    return parse_obj_as(
+        List[GuildApplicationCommandPermissions], await _request(adapter, bot, request)
+    )
+
+
+async def _get_application_command_permissions(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    guild_id: SnowflakeType,
+    command_id: SnowflakeType,
+) -> GuildApplicationCommandPermissions:
+    """
+    Fetches permissions for a specific command for your application in a guild.
+    Returns a guild application command permissions object.
+
+    see https://discord.com/developers/docs/interactions/application-commands#get-application-command-permissions
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url
+        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",  # noqa: E501
+    )
+    return parse_obj_as(
+        GuildApplicationCommandPermissions, await _request(adapter, bot, request)
+    )
+
+
+async def _edit_application_command_permissions(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    guild_id: SnowflakeType,
+    command_id: SnowflakeType,
+    permissions: List[ApplicationCommandPermissions],
+) -> GuildApplicationCommandPermissions:
+    """
+    Edits command permissions for a specific command for your application in a guild
+    and returns a guild application command permissions object.
+    Fires an Application Command Permissions Update Gateway event.
+
+    You can add up to 100 permission overwrites for a command.
+
+    see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command-permissions
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="PUT",
+        url=adapter.base_url
+        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",  # noqa: E501
+        json=[permission.dict(exclude_unset=True) for permission in permissions],
+    )
+    return parse_obj_as(
+        GuildApplicationCommandPermissions, await _request(adapter, bot, request)
+    )
+
+
 # Application Role Connection Metadata
 # see https://discord.com/developers/docs/resources/application-role-connection-metadata
+
+
+async def _get_current_application(
+    adapter: "Adapter",
+    bot: "Bot",
+) -> Application:
+    """Returns the application object associated with the requesting bot user.
+
+    see https://discord.com/developers/docs/resources/application#get-current-application
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / "applications/@me",
+    )
+    return parse_obj_as(Application, await _request(adapter, bot, request))
 
 
 async def _get_application_role_connection_metadata_records(
@@ -2498,13 +2874,35 @@ async def _get_current_authorization_information(
     return parse_obj_as(AuthorizationResponse, await _request(adapter, bot, request))
 
 
-API_HANDLERS = {
+API_HANDLERS: Dict[str, Callable[..., Awaitable[Any]]] = {
+    "get_global_application_commands": _get_global_application_commands,
+    "create_global_application_command": _create_global_application_command,
+    "get_global_application_command": _get_global_application_command,
+    "edit_global_application_command": _edit_global_application_command,
+    "delete_global_application_command": _delete_global_application_command,
+    "bulk_overwrite_global_application_commands": (
+        _bulk_overwrite_global_application_commands
+    ),
+    "get_guild_application_commands": _get_guild_application_commands,
+    "create_guild_application_command": _create_guild_application_command,
+    "get_guild_application_command": _get_guild_application_command,
+    "edit_guild_application_command": _edit_guild_application_command,
+    "delete_guild_application_command": _delete_guild_application_command,
+    "bulk_overwrite_guild_application_commands": (
+        _bulk_overwrite_guild_application_commands
+    ),
+    "get_guild_application_command_permissions": (
+        _get_guild_application_command_permissions
+    ),
+    "get_application_command_permissions": _get_application_command_permissions,
+    "edit_application_command_permissions": _edit_application_command_permissions,
+    "get_current_application": _get_current_application,
     "get_application_role_connection_metadata_records": (
         _get_application_role_connection_metadata_records
-    ),  # noqa: E501
+    ),
     "update_application_role_connection_metadata_records": (
         _update_application_role_connection_metadata_records
-    ),  # noqa: E501
+    ),
     "get_guild_audit_log": _get_guild_audit_log,
     "list_auto_moderation_rules_for_guild": _list_auto_moderation_rules_for_guild,
     "get_auto_moderation_rule": _get_auto_moderation_rule,

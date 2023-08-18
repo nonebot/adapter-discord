@@ -5,6 +5,133 @@ from .model import *
 from .types import *
 
 class ApiClient:
+    async def get_global_application_commands(
+        self, *, application_id: SnowflakeType, with_localizations: Optional[bool] = ...
+    ) -> List[ApplicationCommand]: ...
+    async def create_global_application_command(
+        self,
+        *,
+        application_id: SnowflakeType,
+        name: str,
+        name_localizations: Optional[Dict[str, str]] = ...,
+        description: Optional[str] = ...,
+        description_localizations: Optional[Dict[str, str]] = ...,
+        options: Optional[List[ApplicationCommandOption]] = ...,
+        default_member_permissions: Optional[str] = ...,
+        dm_permission: Optional[bool] = ...,
+        default_permission: Optional[bool] = ...,
+        type: Optional[ApplicationCommandType] = ...,
+        nsfw: Optional[bool] = ...,
+    ) -> ApplicationCommand: ...
+    async def get_global_application_command(
+        self, *, application_id: SnowflakeType, command_id: SnowflakeType
+    ) -> ApplicationCommand: ...
+    async def edit_global_application_command(
+        self,
+        *,
+        application_id: SnowflakeType,
+        command_id: SnowflakeType,
+        name: Optional[str] = ...,
+        name_localizations: Optional[Dict[str, str]] = ...,
+        description: Optional[str] = ...,
+        description_localizations: Optional[Dict[str, str]] = ...,
+        options: Optional[List[ApplicationCommandOption]] = ...,
+        default_member_permissions: Optional[str] = ...,
+        dm_permission: Optional[bool] = ...,
+        default_permission: Optional[bool] = ...,
+        nsfw: Optional[bool] = ...,
+    ) -> ApplicationCommand: ...
+    async def _delete_global_application_command(
+        self,
+        *,
+        application_id: SnowflakeType,
+        command_id: SnowflakeType,
+    ) -> None: ...
+    async def bulk_overwrite_global_application_commands(
+        self, *, application_id: SnowflakeType, commands: List[ApplicationCommand]
+    ) -> List[ApplicationCommand]: ...
+    async def get_guild_application_commands(
+        self,
+        *,
+        application_id: SnowflakeType,
+        guild_id: SnowflakeType,
+        with_localizations: Optional[bool] = ...,
+    ) -> List[ApplicationCommand]: ...
+    async def create_guild_application_command(
+        self,
+        *,
+        application_id: SnowflakeType,
+        guild_id: SnowflakeType,
+        name: str,
+        name_localizations: Optional[Dict[str, str]] = ...,
+        description: Optional[str] = ...,
+        description_localizations: Optional[Dict[str, str]] = ...,
+        options: Optional[List[ApplicationCommandOption]] = ...,
+        default_member_permissions: Optional[str] = ...,
+        default_permission: Optional[bool] = ...,
+        type: Optional[ApplicationCommandType] = ...,
+        nsfw: Optional[bool] = ...,
+    ) -> ApplicationCommand: ...
+    async def get_guild_application_command(
+        self,
+        *,
+        application_id: SnowflakeType,
+        guild_id: SnowflakeType,
+        command_id: SnowflakeType,
+    ) -> ApplicationCommand: ...
+    async def edit_guild_application_command(
+        self,
+        *,
+        application_id: SnowflakeType,
+        guild_id: SnowflakeType,
+        command_id: SnowflakeType,
+        name: Optional[str] = ...,
+        name_localizations: Optional[Dict[str, str]] = ...,
+        description: Optional[str] = ...,
+        description_localizations: Optional[Dict[str, str]] = ...,
+        options: Optional[List[ApplicationCommandOption]] = ...,
+        default_member_permissions: Optional[str] = ...,
+        default_permission: Optional[bool] = ...,
+        nsfw: Optional[bool] = ...,
+    ) -> ApplicationCommand: ...
+    async def delete_guild_application_command(
+        self,
+        *,
+        application_id: SnowflakeType,
+        guild_id: SnowflakeType,
+        command_id: SnowflakeType,
+    ) -> None: ...
+    async def bulk_overwrite_guild_application_commands(
+        self,
+        *,
+        application_id: SnowflakeType,
+        guild_id: SnowflakeType,
+        commands: List[ApplicationCommand],
+    ) -> List[ApplicationCommand]: ...
+    async def get_guild_application_command_permissions(
+        self,
+        *,
+        application_id: SnowflakeType,
+        guild_id: SnowflakeType,
+    ) -> GuildApplicationCommandPermissions: ...
+    async def get_application_command_permissions(
+        self,
+        *,
+        application_id: SnowflakeType,
+        guild_id: SnowflakeType,
+        command_id: SnowflakeType,
+    ) -> GuildApplicationCommandPermissions: ...
+    async def edit_application_command_permissions(
+        self,
+        *,
+        application_id: SnowflakeType,
+        guild_id: SnowflakeType,
+        command_id: SnowflakeType,
+        permissions: List[ApplicationCommandPermissions],
+    ) -> GuildApplicationCommandPermissions: ...
+    async def get_current_application(
+        self, *, application_id: SnowflakeType
+    ) -> Application: ...
     async def get_application_role_connection_metadata_records(
         self, *, application_id: SnowflakeType
     ) -> List[ApplicationRoleConnectionMetadata]:

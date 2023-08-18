@@ -9,6 +9,7 @@ from .api import (
     ApiClient,
     MessageGet,
     MessageReference,
+    Snowflake,
     SnowflakeType,
     User,
 )
@@ -90,7 +91,8 @@ class Bot(BaseBot, ApiClient):
     def __init__(self, adapter: "Adapter", self_id: str, bot_info: BotInfo):
         super().__init__(adapter, self_id)
         self.adapter = adapter
-        self.bot_info: BotInfo = bot_info
+        self._bot_info: BotInfo = bot_info
+        self._application_id: Snowflake = Snowflake(self_id)
         self._session_id: Optional[str] = None
         self._self_info: Optional[User] = None
         self._sequence: Optional[int] = None
@@ -102,6 +104,14 @@ class Bot(BaseBot, ApiClient):
     @property
     def ready(self) -> bool:
         return self._session_id is not None
+
+    @property
+    def bot_info(self) -> BotInfo:
+        return self._bot_info
+
+    @property
+    def application_id(self) -> Snowflake:
+        return self._application_id
 
     @property
     def session_id(self) -> str:
