@@ -10,11 +10,12 @@ _✨ Discord 协议适配 ✨_
 
 </div>
 
-## 说明
+## 安装
 
-本适配器仍在开发中。
+通过 `pip install nonebot-adapter-discord` 安装本适配器。
 
-可通过 `pip install git+https://github.com/CMHopeSunshine/adapter-discord.git@dev` 安装开发中版本。
+
+可通过 `pip install git+https://github.com/nonebot/adapter-discord.git@master` 安装开发中版本。
 
 由于 [Discord 文档](https://discord.com/developers/docs/intro)存在部分表述不清的地方，并且结构复杂，存在很多 `partial object`，
 需要更多实际测试以找出问题，欢迎提出 ISSUE 反馈。
