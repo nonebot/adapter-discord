@@ -6,7 +6,6 @@ from nonebot.utils import escape_tag
 
 from ..exception import (
     ActionFailed,
-    ApiNotAvailable,
     DiscordAdapterException,
     NetworkError,
     RateLimitException,
@@ -34,8 +33,6 @@ async def _request(adapter: "Adapter", bot: "Bot", request: Request) -> Any:
             )
         elif data.status_code in (401, 403):
             raise UnauthorizedException(data)
-        elif data.status_code in (404, 405):
-            raise ApiNotAvailable
         elif data.status_code == 429:
             raise RateLimitException(data)
         else:

@@ -5,10 +5,12 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Dict,
+    Generic,
     List,
     Literal,
     Optional,
     Tuple,
+    TypeVar,
     Union,
     final,
 )
@@ -17,11 +19,14 @@ from pydantic import (
     BaseModel as PydanticBaseModel,
     Field,
 )
+from pydantic.generics import GenericModel
 
 from .types import *
 
 if TYPE_CHECKING:
     from pydantic.typing import AbstractSetIntStr, DictStrAny, MappingIntStrAny
+
+T = TypeVar("T", str, int, float)
 
 
 class BaseModel(PydanticBaseModel):
@@ -154,16 +159,16 @@ class ApplicationCommand(BaseModel):
     """Guild ID of the command, if not global"""
     name: str
     """Name of command, 1-32 characters"""
-    name_localizations: Missing[Dict[str, str]] = UNSET
+    name_localizations: MissingOrNullable[Dict[str, str]] = UNSET
     """Localization dictionary for name field.
     Values follow the same restrictions as name"""
-    description: str
+    description: Missing[str] = UNSET
     """Description for CHAT_INPUT commands, 1-100 characters.
     Empty string for USER and MESSAGE commands"""
-    description_localizations: Missing[Dict[str, str]] = UNSET
+    description_localizations: MissingOrNullable[Dict[str, str]] = UNSET
     """Localization dictionary for description field.
     Values follow the same restrictions as description"""
-    options: Missing[List["ApplicationCommandOption"]] = UNSET
+    options: MissingOrNullable[List["ApplicationCommandOption"]] = UNSET
     """Parameters for the command, max of 25"""
     default_member_permissions: Optional[str] = Field(...)
     """Set of permissions represented as a bit set"""
@@ -180,7 +185,28 @@ class ApplicationCommand(BaseModel):
     """Autoincrementing version identifier updated during substantial record changes"""
 
 
-class ApplicationCommandOption(BaseModel):
+class ApplicationCommandCreate(BaseModel):
+    type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
+    name: str
+    name_localizations: Optional[Dict[str, str]] = None
+    description: Optional[str] = None
+    description_localizations: Optional[Dict[str, str]] = None
+    options: Optional[List["AnyCommandOption"]] = None
+    default_member_permissions: Optional[str] = None
+    dm_permission: Optional[bool] = None
+    default_permission: Optional[bool] = None
+    nsfw: Optional[bool] = None
+
+
+class CommandOptionBase(BaseModel):
+    type: ApplicationCommandOptionType
+    name: str
+    name_localizations: Optional[Dict[str, str]] = None
+    description: str
+    description_localizations: Optional[Dict[str, str]] = None
+
+
+class ApplicationCommandOption(CommandOptionBase):
     """Application Command Option
 
     Required options must be listed before optional options
@@ -192,12 +218,12 @@ class ApplicationCommandOption(BaseModel):
     """Type of option"""
     name: str
     """1-32 character name"""
-    name_localizations: Missing[Dict[str, str]] = UNSET
+    name_localizations: MissingOrNullable[Dict[str, str]] = UNSET
     """Localization dictionary for the name field.
     Values follow the same restrictions as name"""
-    description: str
+    description: Missing[str] = UNSET
     """1-100 character description"""
-    description_localizations: Missing[Dict[str, str]] = UNSET
+    description_localizations: MissingOrNullable[Dict[str, str]] = UNSET
     """Localization dictionary for the description field.
     Values follow the same restrictions as description"""
     required: Missing[bool] = UNSET
@@ -205,7 +231,7 @@ class ApplicationCommandOption(BaseModel):
     choices: Missing[List["ApplicationCommandOptionChoice"]] = UNSET
     """Choices for STRING, INTEGER,
     and NUMBER types for the user to pick from, max 25"""
-    options: Missing[List["ApplicationCommandOption"]] = UNSET
+    options: MissingOrNullable[List["ApplicationCommandOption"]] = UNSET
     """If the option is a subcommand or subcommand group type,
     these nested options will be the parameters"""
     channel_types: Missing[List[ChannelType]] = UNSET
@@ -226,6 +252,129 @@ class ApplicationCommandOption(BaseModel):
     this STRING, INTEGER, or NUMBER type option"""
 
 
+class OptionChoice(GenericModel, Generic[T]):
+    name: str
+    name_localizations: Optional[Dict[str, str]] = None
+    value: T
+
+
+class SubCommandOption(CommandOptionBase):
+    type: Literal[ApplicationCommandOptionType.SUB_COMMAND] = Field(
+        ApplicationCommandOptionType.SUB_COMMAND, init=False
+    )
+    options: Optional[
+        List[
+            Union[
+                "IntegerOption",
+                "StringOption",
+                "BooleanOption",
+                "UserOption",
+                "ChannelOption",
+                "RoleOption",
+                "MentionableOption",
+                "NumberOption",
+                "AttachmentOption",
+            ]
+        ]
+    ] = None
+
+
+class SubCommandGroupOption(CommandOptionBase):
+    type: Literal[ApplicationCommandOptionType.SUB_COMMAND_GROUP] = Field(
+        ApplicationCommandOptionType.SUB_COMMAND_GROUP, init=False
+    )
+    options: Optional[List[SubCommandOption]] = None
+
+
+class IntegerOption(CommandOptionBase):
+    type: Literal[ApplicationCommandOptionType.INTEGER] = Field(
+        ApplicationCommandOptionType.INTEGER, init=False
+    )
+    choices: Optional[List[OptionChoice[int]]] = None
+    min_value: Optional[int] = None
+    max_value: Optional[int] = None
+    autocomplete: Optional[bool] = None
+    required: bool = False
+
+
+class StringOption(CommandOptionBase):
+    type: Literal[ApplicationCommandOptionType.STRING] = Field(
+        ApplicationCommandOptionType.STRING, init=False
+    )
+    choices: Optional[List[OptionChoice[str]]] = None
+    min_length: Optional[int] = None
+    max_length: Optional[int] = None
+    autocomplete: Optional[bool] = None
+    required: bool = False
+
+
+class BooleanOption(CommandOptionBase):
+    type: Literal[ApplicationCommandOptionType.BOOLEAN] = Field(
+        ApplicationCommandOptionType.BOOLEAN, init=False
+    )
+    required: bool = False
+
+
+class UserOption(CommandOptionBase):
+    type: Literal[ApplicationCommandOptionType.USER] = Field(
+        ApplicationCommandOptionType.USER, init=False
+    )
+    required: bool = False
+
+
+class ChannelOption(CommandOptionBase):
+    type: Literal[ApplicationCommandOptionType.CHANNEL] = Field(
+        ApplicationCommandOptionType.CHANNEL, init=False
+    )
+    channel_types: Optional[List[ChannelType]] = None
+    required: bool = False
+
+
+class RoleOption(CommandOptionBase):
+    type: Literal[ApplicationCommandOptionType.ROLE] = Field(
+        ApplicationCommandOptionType.ROLE, init=False
+    )
+    required: bool = False
+
+
+class MentionableOption(CommandOptionBase):
+    type: Literal[ApplicationCommandOptionType.MENTIONABLE] = Field(
+        ApplicationCommandOptionType.MENTIONABLE, init=False
+    )
+    required: bool = False
+
+
+class NumberOption(CommandOptionBase):
+    type: Literal[ApplicationCommandOptionType.NUMBER] = Field(
+        ApplicationCommandOptionType.NUMBER, init=False
+    )
+    choices: Optional[List[OptionChoice[float]]] = None
+    min_value: Optional[float] = None
+    required: bool = False
+
+
+class AttachmentOption(CommandOptionBase):
+    type: Literal[ApplicationCommandOptionType.ATTACHMENT] = Field(
+        ApplicationCommandOptionType.ATTACHMENT, init=False
+    )
+    required: bool = False
+
+
+AnyCommandOption = Union[
+    SubCommandGroupOption,
+    SubCommandOption,
+    IntegerOption,
+    StringOption,
+    UserOption,
+    ChannelOption,
+    RoleOption,
+    MentionableOption,
+    NumberOption,
+    BooleanOption,
+    AttachmentOption,
+]
+
+
 class ApplicationCommandOptionChoice(BaseModel):
     """Application Command Option Choice
 
@@ -237,7 +386,7 @@ class ApplicationCommandOptionChoice(BaseModel):
 
     name: str
     """1-100 character choice name"""
-    name_localizations: Missing[Dict[str, str]] = UNSET
+    name_localizations: MissingOrNullable[Dict[str, str]] = UNSET
     """Localization dictionary for the name field.
     Values follow the same restrictions as name"""
     value: Union[str, int, float]
@@ -561,20 +710,6 @@ The following tables detail the inner data payload for each interaction type.
 see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data"""
 
 
-class ResolvedDataChannel(BaseModel):
-    """Partial Channel for Resolved Data
-
-    see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
-    """
-
-    id: Snowflake
-    name: str
-    type: ChannelType
-    permissions: str
-    thread_metadata: Missing["ThreadMetadata"] = UNSET
-    parent_id: Missing[Snowflake] = UNSET
-
-
 class ResolvedData(BaseModel):
     """Resolved Data
 
@@ -586,11 +721,11 @@ class ResolvedData(BaseModel):
 
     users: Missing[Dict[Snowflake, "User"]] = UNSET
     """the ids and User objects"""
-    members: Missing[Dict[Snowflake, "ResolvedDataGuildMember"]] = UNSET
+    members: Missing[Dict[Snowflake, "GuildMember"]] = UNSET
     """the ids and partial Member objects"""
     roles: Missing[Dict[Snowflake, "Role"]] = UNSET
     """the ids and Role objects"""
-    channels: Missing[Dict[Snowflake, "ResolvedDataChannel"]] = UNSET
+    channels: Missing[Dict[Snowflake, "Channel"]] = UNSET
     """the ids and partial Channel objects"""
     messages: Missing[Dict[Snowflake, "MessageGet"]] = UNSET
     """the ids and partial Message objects"""
@@ -658,22 +793,24 @@ class InteractionCallbackMessage(BaseModel):
     see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages
     """
 
-    tts: Missing[bool] = UNSET
+    tts: Optional[bool] = None
     """is the response TTS"""
-    content: Missing[str] = UNSET
+    content: Optional[str] = None
     """message content"""
-    embeds: Missing[List["Embed"]] = UNSET
+    embeds: Optional[List["Embed"]] = None
     """supports up to 10 embeds"""
-    allowed_mentions: Missing["AllowedMention"] = UNSET
+    allowed_mentions: Optional["AllowedMention"] = None
     """allowed mentions object"""
-    flags: Missing[MessageFlag] = UNSET
+    flags: Optional[MessageFlag] = None
     """message flags combined as a bitfield
     (only SUPPRESS_EMBEDS and EPHEMERAL can be set)"""
-    components: Missing[List[Component]] = UNSET
+    components: Optional[List[Component]] = None
     """message components"""
-    attachments: Missing[List["AttachmentSend"]] = UNSET
+    attachments: Optional[List["AttachmentSend"]] = None
     """attachment objects with filename and description.
     See Uploading Files for details."""
+
+    files: Optional[List["File"]] = None
 
 
 class InteractionCallbackAutocomplete(BaseModel):
@@ -1644,22 +1781,12 @@ class GuildMember(BaseModel):
     roles: List[Snowflake]
     joined_at: datetime.datetime
     premium_since: MissingOrNullable[datetime.datetime] = UNSET
-    deaf: bool
-    mute: bool
+    deaf: Missing[bool] = UNSET
+    mute: Missing[bool] = UNSET
     flags: GuildMemberFlags
     pending: Missing[bool] = UNSET
     permissions: Missing[str] = UNSET
     communication_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
-
-
-class ResolvedDataGuildMember(GuildMember):
-    """Partial Guild Member for Resolved Data
-
-    see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
-    """
-
-    deaf: Missing[bool] = UNSET
-    mute: Missing[bool] = UNSET
 
 
 class Integration(BaseModel):
@@ -2201,17 +2328,17 @@ class ExecuteWebhookParams(BaseModel):
 
     see https://discord.com/developers/docs/resources/webhook#execute-webhook"""
 
-    content: Optional[str]
-    username: Optional[str]
-    avatar_url: Optional[str]
-    tts: Optional[bool]
-    embeds: Optional[List[Embed]]
-    allowed_mentions: Optional[AllowedMention]
-    components: Optional[List[DirectComponent]]
-    files: Optional[List[File]]
-    attachments: Optional[List[AttachmentSend]]
-    flags: Optional[MessageFlag]
-    thread_name: Optional[str]
+    content: Optional[str] = None
+    username: Optional[str] = None
+    avatar_url: Optional[str] = None
+    tts: Optional[bool] = None
+    embeds: Optional[List[Embed]] = None
+    allowed_mentions: Optional[AllowedMention] = None
+    components: Optional[List[DirectComponent]] = None
+    files: Optional[List[File]] = None
+    attachments: Optional[List[AttachmentSend]] = None
+    flags: Optional[MessageFlag] = None
+    thread_name: Optional[str] = None
 
 
 # gateway
@@ -3216,6 +3343,21 @@ __all__ = [
     "Snowflake",
     "SnowflakeType",
     "ApplicationCommand",
+    "ApplicationCommandCreate",
+    "CommandOptionBase",
+    "OptionChoice",
+    "SubCommandOption",
+    "SubCommandGroupOption",
+    "IntegerOption",
+    "StringOption",
+    "BooleanOption",
+    "UserOption",
+    "ChannelOption",
+    "RoleOption",
+    "MentionableOption",
+    "NumberOption",
+    "AttachmentOption",
+    "AnyCommandOption",
     "ApplicationCommandOption",
     "ApplicationCommandOptionChoice",
     "GuildApplicationCommandPermissions",
@@ -3234,7 +3376,6 @@ __all__ = [
     "MessageComponentData",
     "ModalSubmitData",
     "InteractionData",
-    "ResolvedDataChannel",
     "ResolvedData",
     "ApplicationCommandInteractionDataOption",
     "MessageInteraction",
@@ -3292,7 +3433,6 @@ __all__ = [
     "GuildWidgetSettings",
     "GuildWidget",
     "GuildMember",
-    "ResolvedDataGuildMember",
     "Integration",
     "IntegrationAccount",
     "IntegrationApplication",

@@ -15,6 +15,7 @@ from pydantic import parse_obj_as, parse_raw_as
 from .api.handle import API_HANDLERS
 from .api.model import GatewayBot, User
 from .bot import Bot
+from .commands import sync_application_command
 from .config import BotInfo, Config
 from .event import Event, MessageEvent, ReadyEvent, event_classes
 from .exception import ApiNotAvailable
@@ -62,9 +63,10 @@ class Adapter(BaseAdapter):
             )
         self.driver.on_startup(self.startup)
         self.driver.on_shutdown(self.shutdown)
+        self.driver.on_bot_connect(sync_application_command)
 
     async def startup(self) -> None:
-        log("DEBUG", "Discord Adapter is starting up...")
+        log("INFO", "Discord Adapter is starting up...")
 
         log("DEBUG", f"Discord api base url: <y>{escape_tag(str(self.base_url))}</y>")
 

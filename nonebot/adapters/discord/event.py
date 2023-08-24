@@ -8,7 +8,7 @@ from nonebot.utils import escape_tag
 from pydantic import Field
 
 from .api.model import *
-from .api.types import UNSET, Missing
+from .api.types import UNSET, InteractionType, Missing
 from .message import Message
 
 
@@ -613,6 +613,32 @@ class InteractionCreateEvent(NoticeEvent, InteractionCreate):
     __type__ = EventType.INTERACTION_CREATE
 
 
+class PingInteractionEvent(InteractionCreateEvent):
+    type: Literal[InteractionType.PING]
+    data: Literal[UNSET] = UNSET
+
+
+class ApplicationCommandInteractionEvent(InteractionCreateEvent):
+    type: Literal[InteractionType.APPLICATION_COMMAND]
+    data: ApplicationCommandData
+
+
+class ApplicationCommandAutoCompleteInteractionEvent(InteractionCreateEvent):
+    type: Literal[InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE]
+    data: ApplicationCommandData
+
+
+class MessageComponentInteractionEvent(InteractionCreateEvent):
+    type: Literal[InteractionType.MESSAGE_COMPONENT]
+    data: MessageComponentData
+    message: MessageGet
+
+
+class ModalSubmitInteractionEvent(InteractionCreateEvent):
+    type: Literal[InteractionType.MODAL_SUBMIT]
+    data: ModalSubmitData
+
+
 class InviteCreateEvent(NoticeEvent, InviteCreate):
     """Invite create event
 
@@ -912,7 +938,14 @@ event_classes: Dict[str, Type[Event]] = {
     EventType.INTEGRATION_CREATE.value: IntegrationCreateEvent,
     EventType.INTEGRATION_UPDATE.value: IntegrationUpdateEvent,
     EventType.INTEGRATION_DELETE.value: IntegrationDeleteEvent,
-    EventType.INTERACTION_CREATE.value: InteractionCreateEvent,
+    EventType.INTERACTION_CREATE.value: Union[
+        PingInteractionEvent,
+        ApplicationCommandInteractionEvent,
+        ApplicationCommandAutoCompleteInteractionEvent,
+        MessageComponentInteractionEvent,
+        ModalSubmitInteractionEvent,
+        InteractionCreateEvent,
+    ],
     EventType.INVITE_CREATE.value: InviteCreateEvent,
     EventType.INVITE_DELETE.value: InviteDeleteEvent,
     EventType.MESSAGE_CREATE.value: Union[
@@ -1019,6 +1052,11 @@ __all__ = [
     "IntegrationUpdateEvent",
     "IntegrationDeleteEvent",
     "InteractionCreateEvent",
+    "PingInteractionEvent",
+    "ApplicationCommandInteractionEvent",
+    "ApplicationCommandAutoCompleteInteractionEvent",
+    "MessageComponentInteractionEvent",
+    "ModalSubmitInteractionEvent",
     "InviteCreateEvent",
     "InviteDeleteEvent",
     "MessageCreateEvent",

@@ -1,6 +1,8 @@
-from typing import List, Optional, Tuple
+from typing import Dict, List, Literal, Optional, Tuple, Union
 
 from pydantic import BaseModel, Extra, Field
+
+from .api import Snowflake
 
 
 class Intents(BaseModel):
@@ -52,6 +54,9 @@ class BotInfo(BaseModel):
     token: str
     shard: Optional[Tuple[int, int]] = None
     intent: Intents = Field(default_factory=Intents)
+    application_commands: Dict[str, List[Union[Snowflake, Literal["*"]]]] = Field(
+        default_factory=dict
+    )
 
 
 class Config(BaseModel, extra=Extra.ignore):

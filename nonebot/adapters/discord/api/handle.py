@@ -16,7 +16,7 @@ from pydantic import parse_obj_as
 
 from .model import *
 from .request import _request
-from .utils import parse_data, parse_forum_thread_message
+from .utils import parse_data, parse_forum_thread_message, parse_interaction_response
 
 if TYPE_CHECKING:
     from ..adapter import Adapter
@@ -131,7 +131,7 @@ async def _bulk_overwrite_global_application_commands(
     adapter: "Adapter",
     bot: "Bot",
     application_id: SnowflakeType,
-    commands: List[ApplicationCommand],
+    commands: List[ApplicationCommandCreate],
 ) -> List[ApplicationCommand]:
     """Takes a list of application commands,
     overwriting the existing global command list for this application.
@@ -275,7 +275,7 @@ async def _bulk_overwrite_guild_application_commands(
     bot: "Bot",
     application_id: SnowflakeType,
     guild_id: SnowflakeType,
-    commands: List[ApplicationCommand],
+    commands: List[ApplicationCommandCreate],
 ) -> List[ApplicationCommand]:
     """Takes a list of application commands,
     overwriting the existing command list for this application for the targeted guild.
@@ -371,6 +371,163 @@ async def _edit_application_command_permissions(
     return parse_obj_as(
         GuildApplicationCommandPermissions, await _request(adapter, bot, request)
     )
+
+
+# Receiving and Responding
+# see https://discord.com/developers/docs/interactions/receiving-and-responding
+
+
+async def _create_interaction_response(
+    adapter: "Adapter",
+    bot: "Bot",
+    interaction_id: SnowflakeType,
+    interaction_token: str,
+    response: InteractionResponse,
+) -> None:
+    params = parse_interaction_response(response)
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="POST",
+        url=adapter.base_url
+        / f"interactions/{interaction_id}/{interaction_token}/callback",
+        **params,
+    )
+    await _request(adapter, bot, request)
+
+
+async def _get_origin_interaction_response(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    interaction_token: str,
+) -> MessageGet:
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url
+        / f"webhooks/{application_id}/{interaction_token}/messages/@original",
+    )
+    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+
+
+async def _edit_origin_interaction_response(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    interaction_token: str,
+    **data,
+) -> MessageGet:
+    params = {}
+    if data.get("thread_id"):
+        params["thread_id"] = data.pop("thread_id")
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="PATCH",
+        url=adapter.base_url
+        / f"webhooks/{application_id}/{interaction_token}/messages/@original",
+        params=params,
+        json=data,
+    )
+    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+
+
+async def _delete_origin_interaction_response(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    interaction_token: str,
+    **data,
+) -> None:
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="DELETE",
+        url=adapter.base_url
+        / f"webhooks/{application_id}/{interaction_token}/messages/@original",
+        json=data,
+    )
+    await _request(adapter, bot, request)
+
+
+async def _create_followup_message(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    interaction_token: str,
+    **data,
+) -> MessageGet:
+    data = parse_data(data, ExecuteWebhookParams)
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="POST",
+        url=adapter.base_url / f"webhooks/{application_id}/{interaction_token}",
+        **data,
+    )
+    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+
+
+async def _get_followup_message(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    interaction_token: str,
+    message_id: SnowflakeType,
+    **params,
+) -> MessageGet:
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url
+        / f"webhooks/{application_id}/{interaction_token}/messages/{message_id}",
+        params=params,
+    )
+    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+
+
+async def _edit_followup_message(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    interaction_token: str,
+    message_id: SnowflakeType,
+    **data,
+):
+    params = {}
+    if data.get("thread_id"):
+        params["thread_id"] = data.pop("thread_id")
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    data = parse_data(data, ExecuteWebhookParams)
+    request = Request(
+        headers=headers,
+        method="PATCH",
+        url=adapter.base_url
+        / f"webhooks/{application_id}/{interaction_token}/messages/{message_id}",
+        params=params,
+        **data,
+    )
+    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+
+
+async def _delete_followup_message(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    interaction_token: str,
+    message_id: SnowflakeType,
+):
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="DELETE",
+        url=adapter.base_url
+        / f"webhooks/{application_id}/{interaction_token}/messages/{message_id}",
+    )
+    await _request(adapter, bot, request)
 
 
 # Application Role Connection Metadata
@@ -488,8 +645,8 @@ async def _create_auto_moderation_rule(
     see https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
     """
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     data = CreateAndModifyAutoModerationRuleParams.parse_obj(data).dict(
         exclude_none=True
     )
@@ -514,8 +671,8 @@ async def _modify_auto_moderation_rule(
     see https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
     """
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     data = CreateAndModifyAutoModerationRuleParams.parse_obj(data).dict(
         exclude_none=True
     )
@@ -572,8 +729,8 @@ async def _modify_DM(
 
     see https://discord.com/developers/docs/resources/channel#modify-channel"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -590,8 +747,8 @@ async def _modify_channel(
 
     see https://discord.com/developers/docs/resources/channel#modify-channel"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     data = ModifyChannelParams.parse_obj(data).dict(exclude_unset=True)
     request = Request(
         headers=headers,
@@ -609,8 +766,8 @@ async def _modify_thread(
 
     see https://discord.com/developers/docs/resources/channel#modify-channel"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -885,8 +1042,8 @@ async def _bulk_delete_message(
 ):
     """https://discord.com/developers/docs/resources/channel#bulk-delete-messages"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="POST",
@@ -933,8 +1090,8 @@ async def _create_channel_invite(
 ) -> Invite:
     """https://discord.com/developers/docs/resources/channel#create-channel-invite"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="POST",
@@ -1081,8 +1238,8 @@ async def _start_thread_from_message(
 ) -> Channel:
     """https://discord.com/developers/docs/resources/channel#start-thread-with-message"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="POST",
@@ -1097,8 +1254,8 @@ async def _start_thread_without_message(
 ) -> Channel:
     """https://discord.com/developers/docs/resources/channel#start-thread-without-message"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="POST",
@@ -1114,8 +1271,8 @@ async def _start_thread_in_forum_channel(
     """https://discord.com/developers/docs/resources/channel#start-thread-in-forum-channel"""
     params = parse_forum_thread_message(data)
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="POST",
@@ -1285,8 +1442,8 @@ async def _create_guild_emoji(
 ) -> Emoji:
     """https://discord.com/developers/docs/resources/emoji#create-guild-emoji"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="POST",
@@ -1305,8 +1462,8 @@ async def _modify_guild_emoji(
 ) -> Emoji:
     """https://discord.com/developers/docs/resources/emoji#modify-guild-emoji"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -1377,8 +1534,8 @@ async def _modify_guild(
 ) -> Guild:
     """https://discord.com/developers/docs/resources/guild#modify-guild"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     data = ModifyGuildParams.parse_obj(data).dict(exclude_unset=True)
     request = Request(
         headers=headers,
@@ -1420,8 +1577,8 @@ async def _create_guild_channel(
 ) -> Channel:
     """https://discord.com/developers/docs/resources/guild#create-guild-channel"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     data = CreateGuildChannelParams.parse_obj(data).dict(exclude_unset=True)
     request = Request(
         headers=headers,
@@ -1529,8 +1686,8 @@ async def _modify_guild_member(
 ) -> GuildMember:
     """https://discord.com/developers/docs/resources/guild#modify-guild-member"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -1545,8 +1702,8 @@ async def _modify_current_member(
 ) -> GuildMember:
     """https://discord.com/developers/docs/resources/guild#modify-current-member"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -1561,8 +1718,8 @@ async def _modify_current_user_nick(
 ) -> GuildMember:
     """https://discord.com/developers/docs/resources/guild#modify-current-user-nick"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -1667,8 +1824,8 @@ async def _create_guild_ban(
 ) -> None:
     """https://discord.com/developers/docs/resources/guild#create-guild-ban"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PUT",
@@ -1715,8 +1872,8 @@ async def _create_guild_role(
 ) -> Role:
     """https://discord.com/developers/docs/resources/guild#create-guild-role"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="POST",
@@ -1731,8 +1888,8 @@ async def _modify_guild_role_positions(
 ) -> List[Role]:
     """https://discord.com/developers/docs/resources/guild#modify-guild-role-positions"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -1751,8 +1908,8 @@ async def _modify_guild_role(
 ) -> Role:
     """https://discord.com/developers/docs/resources/guild#modify-guild-role"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -1767,8 +1924,8 @@ async def _modify_guild_MFA_level(
 ) -> None:
     """https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -1818,8 +1975,8 @@ async def _begin_guild_prune(
 ) -> Dict[Literal["pruned"], int]:
     """https://discord.com/developers/docs/resources/guild#begin-guild-prune"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="POST",
@@ -1905,8 +2062,8 @@ async def _modify_guild_widget(
 ) -> GuildWidget:
     """https://discord.com/developers/docs/resources/guild#modify-guild-widget"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -1974,8 +2131,8 @@ async def _modify_guild_welcome_screen(
 ) -> WelcomeScreen:
     """https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     data = ModifyGuildWelcomeScreenParams.parse_obj(data).dict(exclude_unset=True)
     request = Request(
         headers=headers,
@@ -2052,8 +2209,8 @@ async def _create_guild_schedule_event(
 ) -> GuildScheduledEvent:
     """https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     data = CreateGuildScheduledEventParams.parse_obj(data).dict(exclude_none=True)
     request = Request(
         headers=headers,
@@ -2091,8 +2248,8 @@ async def _modify_guild_scheduled_event(
 ) -> GuildScheduledEvent:
     """https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     data = ModifyGuildScheduledEventParams.parse_obj(data).dict(exclude_unset=True)
     request = Request(
         headers=headers,
@@ -2264,8 +2421,8 @@ async def _create_stage_instance(
 ) -> StageInstance:
     """https://discord.com/developers/docs/resources/stage-instance#create-stage-instance"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="POST",
@@ -2293,8 +2450,8 @@ async def _modify_stage_instance(
 ) -> StageInstance:
     """https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -2412,8 +2569,8 @@ async def _modify_guild_sticker(
 ) -> Sticker:
     """https://discord.com/developers/docs/resources/sticker#modify-guild-sticker"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -2605,8 +2762,8 @@ async def _create_webhook(
 ) -> Webhook:
     """https://discord.com/developers/docs/resources/webhook#create-webhook"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="POST",
@@ -2671,8 +2828,8 @@ async def _modify_webhook(
 ) -> Webhook:
     """https://discord.com/developers/docs/resources/webhook#modify-webhook"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    if reason := data.pop("reason"):
-        headers["X-Audit-Log-Reason"] = reason
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="PATCH",
@@ -2725,13 +2882,13 @@ async def _delete_webhook_with_token(
 
 async def _execute_webhook(
     adapter: "Adapter", bot: "Bot", webhook_id: SnowflakeType, token: str, **data
-) -> None:
+) -> Optional[MessageGet]:
     """https://discord.com/developers/docs/resources/webhook#execute-webhook"""
     params = {}
-    if wait := data.pop("wait"):
-        params["wait"] = wait
-    if thread_id := data.pop("thread_id"):
-        params["thread_id"] = thread_id
+    if data.get("wait"):
+        params["wait"] = data.pop("wait")
+    if data.get("thread_id"):
+        params["thread_id"] = data.pop("thread_id")
     data = parse_data(data, ExecuteWebhookParams)
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2741,7 +2898,10 @@ async def _execute_webhook(
         params=params,
         **data,
     )
-    await _request(adapter, bot, request)
+    resp = await _request(adapter, bot, request)
+    if resp:
+        return parse_obj_as(MessageGet, resp)
+    return resp
 
 
 async def _execute_slack_compatible_webhook(
@@ -2794,8 +2954,8 @@ async def _get_webhook_message(
 async def _edit_webhook_message(adapter: "Adapter", bot: "Bot", **data) -> MessageGet:
     """https://discord.com/developers/docs/resources/webhook#edit-webhook-message"""
     params = {}
-    if thread_id := data.pop("thread_id"):
-        params["thread_id"] = thread_id
+    if data.get("thread_id"):
+        params["thread_id"] = data.pop("thread_id")
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     data = parse_data(data, ExecuteWebhookParams)
     request = Request(
@@ -2896,6 +3056,14 @@ API_HANDLERS: Dict[str, Callable[..., Awaitable[Any]]] = {
     ),
     "get_application_command_permissions": _get_application_command_permissions,
     "edit_application_command_permissions": _edit_application_command_permissions,
+    "create_interaction_response": _create_interaction_response,
+    "get_origin_interaction_response": _get_origin_interaction_response,
+    "edit_origin_interaction_response": _edit_origin_interaction_response,
+    "delete_origin_interaction_response": _delete_origin_interaction_response,
+    "create_followup_message": _create_followup_message,
+    "get_followup_message": _get_followup_message,
+    "edit_followup_message": _edit_followup_message,
+    "delete_followup_message": _delete_followup_message,
     "get_current_application": _get_current_application,
     "get_application_role_connection_metadata_records": (
         _get_application_role_connection_metadata_records

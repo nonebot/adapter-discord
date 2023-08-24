@@ -1,7 +1,12 @@
 import json
 from typing import Any, Dict, List, Literal, Type, Union
 
-from .model import ExecuteWebhookParams, MessageSend
+from .model import (
+    ExecuteWebhookParams,
+    InteractionCallbackMessage,
+    InteractionResponse,
+    MessageSend,
+)
 
 
 def parse_data(
@@ -54,3 +59,29 @@ def parse_forum_thread_message(
         return {"files": multipart}
     else:
         return {"json": payload}
+
+
+def parse_interaction_response(
+    response: InteractionResponse,
+) -> Dict[Literal["files", "json"], Any]:
+    payload: Dict[str, Any] = response.dict(exclude_none=True)
+    if response.data and isinstance(response.data, InteractionCallbackMessage):
+        payload["data"] = response.data.dict(exclude={"files"}, exclude_none=True)
+        if response.data.files:
+            multipart: Dict[str, Any] = {}
+            attachments: List[dict] = payload["data"].pop("attachments", [])
+            for index, file in enumerate(response.data.files):
+                for attachment in attachments:
+                    if attachment["filename"] == file.filename:
+                        attachment["id"] = index
+                        break
+                multipart[f"files[{index}]"] = (file.filename, file.content)
+            if attachments:
+                payload["data"]["attachments"] = attachments
+            multipart["payload_json"] = (
+                None,
+                json.dumps(payload),
+                "application/json",
+            )
+            return {"files": multipart}
+    return {"json": payload}

@@ -481,11 +481,15 @@ def parse_message(message: Union[Message, MessageSegment, str]) -> Dict[str, Any
             if attachment.data["file"] is not None
         ]
     return {
-        "content": content,
-        "embeds": embeds,
-        "message_reference": reference,
-        "components": components,
-        "sticker_ids": sticker_ids,
-        "files": files,
-        "attachments": attachments,
+        k: v
+        for k, v in {
+            "content": content,
+            "embeds": embeds,
+            "message_reference": reference,
+            "components": components,
+            "sticker_ids": sticker_ids,
+            "files": files,
+            "attachments": attachments,
+        }.items()
+        if v is not None
     }

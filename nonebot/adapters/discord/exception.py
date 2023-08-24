@@ -33,7 +33,7 @@ class ActionFailed(BaseActionFailed, DiscordAdapterException):
 
     def __repr__(self) -> str:
         return (
-            f"<ActionFailed: {self.status_code}, code={self.code}, "
+            f"<{self.__class__.__name__}: {self.status_code}, code={self.code}, "
             f"message={self.message}, data={self.data}, errors={self.errors}>"
         )
 

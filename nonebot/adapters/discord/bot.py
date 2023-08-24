@@ -7,6 +7,9 @@ from nonebot.message import handle_event
 from .api import (
     AllowedMention,
     ApiClient,
+    InteractionCallbackMessage,
+    InteractionCallbackType,
+    InteractionResponse,
     MessageGet,
     MessageReference,
     Snowflake,
@@ -14,7 +17,7 @@ from .api import (
     User,
 )
 from .config import BotInfo
-from .event import Event, MessageEvent
+from .event import Event, InteractionCreateEvent, MessageEvent
 from .message import Message, MessageSegment, parse_message
 from .utils import log
 
@@ -180,13 +183,11 @@ class Bot(BaseBot, ApiClient):
         self,
         event: Event,
         message: Union[str, Message, MessageSegment],
-        mention_sender: bool = False,
-        reply_message: bool = False,
         tts: bool = False,
         nonce: Union[int, str, None] = None,
         allowed_mentions: Optional[AllowedMention] = None,
         **params: Any,
-    ) -> MessageGet:
+    ) -> Optional[MessageGet]:
         """send message.
 
         Args:
@@ -202,13 +203,27 @@ class Bot(BaseBot, ApiClient):
         Returns:
             message model
         """
+        message = MessageSegment.text(message) if isinstance(message, str) else message
+        if isinstance(event, InteractionCreateEvent):
+            message_data = parse_message(message)
+            response = InteractionResponse(
+                type=InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
+                data=InteractionCallbackMessage(
+                    tts=tts, allowed_mentions=allowed_mentions, **message_data
+                ),
+            )
+            return await self.create_interaction_response(
+                interaction_id=event.id,
+                interaction_token=event.token,
+                response=response,
+            )
+
         if not isinstance(event, MessageEvent) or not event.channel_id or not event.id:
             raise RuntimeError("Event cannot be replied to!")
-        message = MessageSegment.text(message) if isinstance(message, str) else message
         message = message if isinstance(message, Message) else Message(message)
-        if mention_sender:
+        if (params.get("mention_sender") or params.get("at_sender")) is True:
             message.insert(0, MessageSegment.mention_user(event.user_id))
-        if reply_message:
+        if params.get("reply_message") is True:
             message += MessageSegment.reference(MessageReference(message_id=event.id))
 
         message_data = parse_message(message)
