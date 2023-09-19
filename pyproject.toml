@@ -32,7 +32,7 @@ target-version = ["py38", "py39", "py310", "py311"]
 
 [tool.ruff]
 select = ["E", "W", "F", "I", "UP", "C", "T", "PYI", "PT", "Q"]
-ignore = ["E402", "F403", "F405", "C901", "PYI021"]
+ignore = ["E402", "F403", "F405", "C901", "PYI021", "PYI048"]
 line-length = 88
 target-version = "py38"
 ignore-init-module-imports = true
