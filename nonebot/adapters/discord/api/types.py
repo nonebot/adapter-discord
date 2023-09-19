@@ -569,7 +569,8 @@ class GuildFeature(StrEnum):
     """guild has access to set 384kbps bitrate in voice
     (previously VIP voice servers)"""
     WELCOME_SCREEN_ENABLED = "WELCOME_SCREEN_ENABLED"
-    """	guild has enabled the welcome screen"""
+    """guild has enabled the welcome screen"""
+    SOUNDBOARD = "SOUNDBOARD"
 
 
 class GuildMemberFlags(IntFlag):
