@@ -7,24 +7,24 @@ from .api import Snowflake
 
 class Intents(BaseModel):
     guilds: bool = True
-    guild_members: bool = True
+    guild_members: bool = False
     guild_moderation: bool = True
     guild_emojis_and_stickers: bool = True
-    guild_integrations: bool = False
-    guild_webhooks: bool = False
+    guild_integrations: bool = True
+    guild_webhooks: bool = True
     guild_invites: bool = True
-    guild_voice_states: bool = False
-    guild_presences: bool = True
+    guild_voice_states: bool = True
+    guild_presences: bool = False
     guild_messages: bool = True
     guild_message_reactions: bool = True
     guild_message_typing: bool = True
     direct_messages: bool = True
     direct_message_reactions: bool = True
     direct_message_typing: bool = True
-    message_content: bool = True
-    guild_scheduled_events: bool = False
-    auto_moderation_configuration: bool = False
-    auto_moderation_execution: bool = False
+    message_content: bool = False
+    guild_scheduled_events: bool = True
+    auto_moderation_configuration: bool = True
+    auto_moderation_execution: bool = True
 
     def to_int(self):
         return (
