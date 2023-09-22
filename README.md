@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://v2.nonebot.dev/"><img src="https://v2.nonebot.dev/logo.png" width="200" height="200" alt="nonebot-adapter-discord"></a>
+  <a href="https://nonebot.dev/"><img src="https://raw.githubusercontent.com/nonebot/adapter-discord/master/assets/logo.png" width="200" height="200" alt="nonebot-adapter-discord"></a>
 </p>
 
 <div align="center">
@@ -12,8 +12,9 @@ _✨ Discord 协议适配 ✨_
 
 ## 安装
 
-通过 `pip install nonebot-adapter-discord` 安装本适配器。
+通过 `nb adapter install nonebot-adapter-discord` 安装本适配器。
 
+或在 `nb create` 创建项目时选择 `Discord` 适配器。
 
 可通过 `pip install git+https://github.com/nonebot/adapter-discord.git@master` 安装开发中版本。
 
@@ -46,10 +47,14 @@ DISCORD_BOTS='
     "intent": {
       "guild_messages": true,
       "direct_messages": true
-    }
+    },
+    "application_commands": {"*": ["*"]}
   }
 ]
 '
+
+# application_commands的{"*": ["*"]}代表将全部应用命令注册为全局应用命令
+# {"admin": ["123", "456"]}则代表将admin命令注册为id是123、456服务器的局部命令，其余命令不注册
 ```
 
 ### DISCORD_COMPRESS
@@ -92,30 +97,7 @@ DISCORD_HANDLE_SELF_MESSAGE=True
 DISCORD_PROXY='http://127.0.0.1:6666'
 ```
 
-## 使用
-
-### 注册适配器
-
-> 使用 nb-cli 脚手架安装时可跳过本部分
-
-参考 [adapter](https://v2.nonebot.dev/docs/advanced/adapter) 在 bot.py 注册本适配器，例如：
-
-```python
-import nonebot
-from nonebot.adapters.discord import Adapter as DiscordAdapter
-
-nonebot.init()
-
-driver = nonebot.get_driver()
-driver.register_adapter(DiscordAdapter)
-
-nonebot.load_from_toml("pyproject.toml")
-
-if __name__ == "__main__":
-    nonebot.run()
-```
-
-### 编写插件
+## 插件示例
 
 以下是一个简单的插件示例，展示各种消息段：
 
@@ -188,4 +170,91 @@ async def ready(bot: Bot, event: MessageEvent, msg: Message = CommandArg()):
     else:
         # 发送一个文本消息
         await matcher.finish(MessageSegment.text(msg))
+```
+
+以下是一个 Discord 斜杠命令的插件示例：
+
+```python
+import asyncio
+from typing import Optional
+
+from nonebot.adapters.discord.api import (
+    IntegerOption,
+    NumberOption,
+    StringOption,
+    SubCommandOption,
+    User,
+    UserOption,
+)
+from nonebot.adapters.discord.commands import (
+    CommandOption,
+    on_slash_command,
+)
+
+matcher = on_slash_command(
+    name="permission",
+    description="权限管理",
+    options=[
+        SubCommandOption(
+            name="add",
+            description="添加",
+            options=[
+                StringOption(
+                    name="plugin",
+                    description="插件名",
+                    required=True,
+                ),
+                IntegerOption(
+                    name="priority",
+                    description="优先级",
+                    required=False,
+                ),
+            ],
+        ),
+        SubCommandOption(
+            name="remove",
+            description="移除",
+            options=[
+                StringOption(name="plugin", description="插件名", required=True),
+                NumberOption(name="time", description="时长", required=False),
+            ],
+        ),
+        SubCommandOption(
+            name="ban",
+            description="禁用",
+            options=[
+                UserOption(name="user", description="用户", required=False),
+            ],
+        ),
+    ],
+)
+
+
+@matcher.handle_sub_command("add")
+async def handle_user_add(
+    plugin: CommandOption[str], priority: CommandOption[Optional[int]]
+):
+    await matcher.send_deferred_response()
+    await asyncio.sleep(2)
+    await matcher.edit_response(f"你添加了插件 {plugin}，优先级 {priority}")
+    await asyncio.sleep(2)
+    fm = await matcher.send_followup_msg(
+        f"你添加了插件 {plugin}，优先级 {priority} (新消息)"
+    )
+    await asyncio.sleep(2)
+    await matcher.edit_followup_msg(
+        fm.id, f"你添加了插件 {plugin}，优先级 {priority} (新消息修改后)"
+    )
+
+
+@matcher.handle_sub_command("remove")
+async def handle_user_remove(
+    plugin: CommandOption[str], time: CommandOption[Optional[float]]
+):
+    await matcher.send(f"你移除了插件 {plugin}，时长 {time}")
+
+
+@matcher.handle_sub_command("ban")
+async def handle_admin_ban(user: CommandOption[User]):
+    await matcher.finish(f"你禁用了用户 {user.username}")
 ```
