@@ -44,11 +44,11 @@ class OptionParam(Param):
         cls, param: inspect.Parameter, allow_types: Tuple[Type[Param], ...]
     ) -> Optional["OptionParam"]:
         if isinstance(param.default, CommandOptionType):
-            return cls(Required, key=param.default.key or param.name)
+            return cls(Required, key=param.default.key or param.name, validate=True)
         elif get_origin(param.annotation) is Annotated:
             for arg in get_args(param.annotation):
                 if isinstance(arg, CommandOptionType):
-                    return cls(Required, key=arg.key or param.name)
+                    return cls(Required, key=arg.key or param.name, validate=True)
 
     async def _solve(
         self, event: ApplicationCommandInteractionEvent, **kwargs: Any
