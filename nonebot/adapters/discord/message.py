@@ -116,7 +116,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
 
     @staticmethod
     def text(content: str) -> "TextSegment":
-        return TextSegment(data={"text": escape(content)})
+        return TextSegment(data={"text": content})
 
     @staticmethod
     def timestamp(
