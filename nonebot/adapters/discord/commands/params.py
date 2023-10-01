@@ -1,11 +1,12 @@
 import inspect
 from typing import Any, Optional, Tuple, Type, TypeVar
+from typing_extensions import Annotated
 
 from nonebot.dependencies import Param
 from nonebot.params import Depends
+
 from pydantic.fields import Required
 from pydantic.typing import get_args, get_origin
-from typing_extensions import Annotated
 
 from ..api import (
     ApplicationCommandOptionType,
