@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-adapter-discord"
-version = "0.1.0beta2"
+version = "0.1.0beta3"
 description = "Discord adapter for nonebot2"
 authors = ["CMHopeSunshine <277073121@qq.com>", "yanyongyu <yyy@nonebot.dev>"]
 license = "MIT"
