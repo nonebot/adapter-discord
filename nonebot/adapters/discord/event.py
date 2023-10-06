@@ -265,9 +265,9 @@ class ApplicationCommandPermissionsUpdateEvent(NoticeEvent):
     """
 
     __type__ = EventType.APPLICATION_COMMAND_PERMISSIONS_UPDATE
-    id: str
-    application_id: str
-    guild_id: str
+    id: Snowflake
+    application_id: Snowflake
+    guild_id: Snowflake
     permissions: List[ApplicationCommandPermissions]
 
 
