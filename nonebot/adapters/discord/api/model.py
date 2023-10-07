@@ -2820,7 +2820,7 @@ class GuildScheduledEventUpdate(GuildScheduledEvent):
     """
 
 
-class GuildScheduledEventDelete(BaseModel):
+class GuildScheduledEventDelete(GuildScheduledEvent):
     """Guild Scheduled Event Delete Event Fields
 
     see https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-delete
