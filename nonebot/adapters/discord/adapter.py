@@ -55,11 +55,9 @@ class Adapter(BaseAdapter):
     def setup(self) -> None:
         if not isinstance(self.driver, ForwardDriver):
             raise RuntimeError(
-                (
-                    f"Current driver {self.config.driver} "
-                    "doesn't support forward connections!"
-                    "Discord Adapter need a ForwardDriver to work."
-                ),
+                f"Current driver {self.config.driver} "
+                "doesn't support forward connections!"
+                "Discord Adapter need a ForwardDriver to work.",
             )
         self.driver.on_startup(self.startup)
         self.driver.on_shutdown(self.shutdown)
@@ -98,11 +96,9 @@ class Adapter(BaseAdapter):
         if remain and remain <= 0:
             log(
                 "ERROR",
-                (
-                    "<r><bg #f8bbd0>Failed to establish connection to QQ Guild "
-                    "because of session start limit.</bg #f8bbd0></r>\n"
-                    f"{escape_tag(str(gateway_info))}"
-                ),
+                "<r><bg #f8bbd0>Failed to establish connection to QQ Guild "
+                "because of session start limit.</bg #f8bbd0></r>\n"
+                f"{escape_tag(str(gateway_info))}",
             )
             return
 
@@ -183,10 +179,8 @@ class Adapter(BaseAdapter):
                 async with self.websocket(request) as ws:
                     log(
                         "DEBUG",
-                        (
-                            "WebSocket Connection to"
-                            f" {escape_tag(str(ws_url))} established"
-                        ),
+                        "WebSocket Connection to"
+                        f" {escape_tag(str(ws_url))} established",
                     )
                     try:
                         # 接收hello事件
@@ -226,11 +220,9 @@ class Adapter(BaseAdapter):
                     except Exception as e:
                         log(
                             "ERROR",
-                            (
-                                "<r><bg #f8bbd0>Error while process data from"
-                                f" websocket {escape_tag(str(ws_url))}. Trying to"
-                                " reconnect...</bg #f8bbd0></r>"
-                            ),
+                            "<r><bg #f8bbd0>Error while process data from"
+                            f" websocket {escape_tag(str(ws_url))}. Trying to"
+                            " reconnect...</bg #f8bbd0></r>",
                             e,
                         )
                     finally:
@@ -242,11 +234,9 @@ class Adapter(BaseAdapter):
             except Exception as e:
                 log(
                     "ERROR",
-                    (
-                        "<r><bg #f8bbd0>Error while setup websocket to "
-                        f"{escape_tag(str(ws_url))}. "
-                        "Trying to reconnect...</bg #f8bbd0></r>"
-                    ),
+                    "<r><bg #f8bbd0>Error while setup websocket to "
+                    f"{escape_tag(str(ws_url))}. "
+                    "Trying to reconnect...</bg #f8bbd0></r>",
                     e,
                 )
                 await asyncio.sleep(RECONNECT_INTERVAL)
@@ -267,10 +257,8 @@ class Adapter(BaseAdapter):
         except Exception as e:
             log(
                 "ERROR",
-                (
-                    "<r><bg #f8bbd0>Error while receiving "
-                    "server hello event</bg #f8bbd0></r>"
-                ),
+                "<r><bg #f8bbd0>Error while receiving "
+                "server hello event</bg #f8bbd0></r>",
                 e,
             )
 
