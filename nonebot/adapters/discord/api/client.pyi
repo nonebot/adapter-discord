@@ -1204,8 +1204,9 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        style: Literal["shield", "banner1", "banner2", "banner3", "banner4"]
-        | None = ...,
+        style: (
+            Literal["shield", "banner1", "banner2", "banner3", "banner4"] | None
+        ) = ...,
     ) -> str:
         """https://discord.com/developers/docs/resources/guild#get-guild-widget-image"""
         ...
