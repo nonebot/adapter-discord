@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Literal, Optional, Type, Union
 from typing_extensions import override
@@ -124,6 +125,11 @@ class Event(BaseEvent):
     """Event"""
 
     __type__: EventType
+    timestamp: datetime = Field(default_factory=datetime.now)
+
+    @property
+    def time(self) -> datetime:
+        return self.timestamp
 
     @override
     def get_event_name(self) -> str:
@@ -179,7 +185,15 @@ class MessageEvent(Event, MessageGet):
 
     to_me: bool = False
 
-    reply: Optional[MessageGet] = None
+    reply: Optional[Message] = None
+
+    @property
+    def message(self) -> Message:
+        return self.get_message()
+
+    @property
+    def origin_message(self) -> Message:
+        return getattr(self, "_origin_message", self.get_message())
 
     @override
     def get_type(self) -> str:
@@ -197,6 +211,7 @@ class MessageEvent(Event, MessageGet):
     def get_message(self) -> Message:
         if not hasattr(self, "_message"):
             setattr(self, "_message", Message.from_guild_message(self))
+            setattr(self, "_origin_message", Message.from_guild_message(self))
         return getattr(self, "_message")
 
     @override

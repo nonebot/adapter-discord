@@ -29,10 +29,11 @@ async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
     if not event.message_reference or not event.message_reference.message_id:
         return
     try:
-        event.reply = await bot.get_channel_message(
+        msg = await bot.get_channel_message(
             channel_id=event.channel_id, message_id=event.message_reference.message_id
         )
-        if event.reply.author.id == bot.self_info.id:
+        event.reply = Message.from_guild_message(msg)
+        if msg.author.id == bot.self_info.id:
             event.to_me = True
     except Exception as e:
         log("WARNING", f"Error when getting message reply info: {repr(e)}", e)
@@ -89,6 +90,8 @@ class Bot(BaseBot, ApiClient):
     """
     Discord 协议 Bot 适配。
     """
+
+    adapter: "Adapter"
 
     @override
     def __init__(self, adapter: "Adapter", self_id: str, bot_info: BotInfo):
@@ -186,6 +189,9 @@ class Bot(BaseBot, ApiClient):
         tts: bool = False,
         nonce: Union[int, str, None] = None,
         allowed_mentions: Optional[AllowedMention] = None,
+        mention_sender: Optional[bool] = None,
+        at_sender: Optional[bool] = None,
+        reply_message: bool = False,
         **params: Any,
     ) -> Optional[MessageGet]:
         """send message.
@@ -221,9 +227,9 @@ class Bot(BaseBot, ApiClient):
         if not isinstance(event, MessageEvent) or not event.channel_id or not event.id:
             raise RuntimeError("Event cannot be replied to!")
         message = message if isinstance(message, Message) else Message(message)
-        if (params.get("mention_sender") or params.get("at_sender")) is True:
+        if mention_sender or at_sender:
             message.insert(0, MessageSegment.mention_user(event.user_id))
-        if params.get("reply_message") is True:
+        if reply_message:
             message += MessageSegment.reference(MessageReference(message_id=event.id))
 
         message_data = parse_message(message)

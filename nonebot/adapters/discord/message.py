@@ -1,14 +1,24 @@
 from dataclasses import dataclass
 import datetime
 import re
-from typing import Any, Dict, Iterable, Optional, Type, TypedDict, Union, overload
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    Literal,
+    Optional,
+    Type,
+    TypedDict,
+    Union,
+    overload,
+)
 from typing_extensions import override
 
 from nonebot.adapters import (
     Message as BaseMessage,
     MessageSegment as BaseMessageSegment,
 )
-from nonebot.utils import escape_tag
 
 from .api import (
     UNSET,
@@ -26,7 +36,7 @@ from .api import (
     SnowflakeType,
     TimeStampStyle,
 )
-from .utils import escape
+from .utils import escape, unescape
 
 
 class MessageSegment(BaseMessageSegment["Message"]):
@@ -57,30 +67,32 @@ class MessageSegment(BaseMessageSegment["Message"]):
             raise TypeError("file must be str, File or AttachmentSend")
         if _content is None:
             return AttachmentSegment(
-                data={
+                "attachment",
+                {
                     "attachment": AttachmentSend(
                         filename=_filename, description=_description
                     ),
                     "file": None,
-                }
+                },
             )
         else:
             return AttachmentSegment(
-                data={
+                "attachment",
+                {
                     "attachment": AttachmentSend(
                         filename=_filename, description=_description
                     ),
                     "file": File(filename=_filename, content=_content),
-                }
+                },
             )
 
     @staticmethod
     def sticker(sticker_id: SnowflakeType) -> "StickerSegment":
-        return StickerSegment(data={"id": Snowflake(sticker_id)})
+        return StickerSegment("sticker", {"id": Snowflake(sticker_id)})
 
     @staticmethod
     def embed(embed: Embed) -> "EmbedSegment":
-        return EmbedSegment(data={"embed": embed})
+        return EmbedSegment("embed", {"embed": embed})
 
     @staticmethod
     def component(component: Component):
@@ -88,35 +100,37 @@ class MessageSegment(BaseMessageSegment["Message"]):
             component_ = ActionRow(components=[component])
         else:
             component_ = component
-        return ComponentSegment(data={"component": component_})
+        return ComponentSegment("component", {"component": component_})
 
     @staticmethod
     def custom_emoji(
         name: str, emoji_id: str, animated: Optional[bool] = None
     ) -> "CustomEmojiSegment":
         return CustomEmojiSegment(
-            data={"name": name, "id": emoji_id, "animated": animated}
+            "custom_emoji", {"name": name, "id": emoji_id, "animated": animated}
         )
 
     @staticmethod
     def mention_user(user_id: SnowflakeType) -> "MentionUserSegment":
-        return MentionUserSegment(data={"user_id": Snowflake(user_id)})
+        return MentionUserSegment("mention_user", {"user_id": Snowflake(user_id)})
 
     @staticmethod
     def mention_role(role_id: SnowflakeType) -> "MentionRoleSegment":
-        return MentionRoleSegment(data={"role_id": Snowflake(role_id)})
+        return MentionRoleSegment("mention_role", {"role_id": Snowflake(role_id)})
 
     @staticmethod
     def mention_channel(channel_id: SnowflakeType) -> "MentionChannelSegment":
-        return MentionChannelSegment(data={"channel_id": Snowflake(channel_id)})
+        return MentionChannelSegment(
+            "mention_channel", {"channel_id": Snowflake(channel_id)}
+        )
 
     @staticmethod
     def mention_everyone() -> "MentionEveryoneSegment":
-        return MentionEveryoneSegment()
+        return MentionEveryoneSegment("mention_everyone")
 
     @staticmethod
     def text(content: str) -> "TextSegment":
-        return TextSegment(data={"text": content})
+        return TextSegment("text", {"text": content})
 
     @staticmethod
     def timestamp(
@@ -124,11 +138,12 @@ class MessageSegment(BaseMessageSegment["Message"]):
     ) -> "TimestampSegment":
         if isinstance(timestamp, datetime.datetime):
             timestamp = int(timestamp.timestamp())
-        return TimestampSegment(data={"timestamp": timestamp, "style": style})
+        return TimestampSegment("timestamp", {"timestamp": timestamp, "style": style})
 
     @staticmethod
     @overload
-    def reference(reference: MessageReference) -> "ReferenceSegment": ...
+    def reference(reference: MessageReference) -> "ReferenceSegment":
+        ...
 
     @staticmethod
     @overload
@@ -137,7 +152,8 @@ class MessageSegment(BaseMessageSegment["Message"]):
         channel_id: Optional[SnowflakeType] = None,
         guild_id: Optional[SnowflakeType] = None,
         fail_if_not_exists: Optional[bool] = None,
-    ) -> "ReferenceSegment": ...
+    ) -> "ReferenceSegment":
+        ...
 
     @staticmethod
     def reference(
@@ -156,16 +172,22 @@ class MessageSegment(BaseMessageSegment["Message"]):
                 fail_if_not_exists=fail_if_not_exists or UNSET,
             )
 
-        return ReferenceSegment(data={"reference": _reference})
+        return ReferenceSegment("reference", {"reference": _reference})
 
     @override
     def is_text(self) -> bool:
         return self.type == "text"
 
 
+class StickerData(TypedDict):
+    id: Snowflake
+
+
 @dataclass
 class StickerSegment(MessageSegment):
-    type: str = "sticker"
+    if TYPE_CHECKING:
+        type: Literal["sticker"]
+        data: StickerData
 
     @override
     def __str__(self) -> str:
@@ -178,7 +200,9 @@ class ComponentData(TypedDict):
 
 @dataclass
 class ComponentSegment(MessageSegment):
-    type: str = "component"
+    if TYPE_CHECKING:
+        type: Literal["component"]
+        data: ComponentData
 
     @override
     def __str__(self) -> str:
@@ -193,7 +217,9 @@ class CustomEmojiData(TypedDict):
 
 @dataclass
 class CustomEmojiSegment(MessageSegment):
-    type: str = "custom_emoji"
+    if TYPE_CHECKING:
+        type: Literal["custom_emoji"]
+        data: CustomEmojiData
 
     @override
     def __str__(self) -> str:
@@ -209,7 +235,9 @@ class MentionUserData(TypedDict):
 
 @dataclass
 class MentionUserSegment(MessageSegment):
-    type: str = "mention_user"
+    if TYPE_CHECKING:
+        type: Literal["mention_user"]
+        data: MentionUserData
 
     @override
     def __str__(self) -> str:
@@ -222,7 +250,9 @@ class MentionChannelData(TypedDict):
 
 @dataclass
 class MentionChannelSegment(MessageSegment):
-    type: str = "mention_channel"
+    if TYPE_CHECKING:
+        type: Literal["mention_channel"]
+        data: MentionChannelData
 
     @override
     def __str__(self) -> str:
@@ -235,7 +265,9 @@ class MentionRoleData(TypedDict):
 
 @dataclass
 class MentionRoleSegment(MessageSegment):
-    type: str = "mention_role"
+    if TYPE_CHECKING:
+        type: Literal["mention_role"]
+        data: MentionRoleData
 
     @override
     def __str__(self) -> str:
@@ -244,7 +276,8 @@ class MentionRoleSegment(MessageSegment):
 
 @dataclass
 class MentionEveryoneSegment(MessageSegment):
-    type: str = "mention_everyone"
+    if TYPE_CHECKING:
+        type: Literal["mention_everyone"]
 
     @override
     def __str__(self) -> str:
@@ -258,7 +291,9 @@ class TimestampData(TypedDict):
 
 @dataclass
 class TimestampSegment(MessageSegment):
-    type: str = "timestamp"
+    if TYPE_CHECKING:
+        type: Literal["timestamp"]
+        data: TimestampData
 
     @override
     def __str__(self) -> str:
@@ -280,11 +315,13 @@ class TextData(TypedDict):
 
 @dataclass
 class TextSegment(MessageSegment):
-    type: str = "text"
+    if TYPE_CHECKING:
+        type: Literal["text"]
+        data: TextData
 
     @override
     def __str__(self) -> str:
-        return escape_tag(self.data["text"])
+        return escape(self.data["text"])
 
 
 class EmbedData(TypedDict):
@@ -293,7 +330,9 @@ class EmbedData(TypedDict):
 
 @dataclass
 class EmbedSegment(MessageSegment):
-    type: str = "embed"
+    if TYPE_CHECKING:
+        type: Literal["embed"]
+        data: EmbedData
 
     @override
     def __str__(self) -> str:
@@ -307,7 +346,9 @@ class AttachmentData(TypedDict):
 
 @dataclass
 class AttachmentSegment(MessageSegment):
-    type: str = "attachment"
+    if TYPE_CHECKING:
+        type: Literal["attachment"]
+        data: AttachmentData
 
     @override
     def __str__(self) -> str:
@@ -320,7 +361,9 @@ class ReferenceData(TypedDict):
 
 @dataclass
 class ReferenceSegment(MessageSegment):
-    type: str = "reference"
+    if TYPE_CHECKING:
+        type: Literal["reference"]
+        data: ReferenceData
 
     @override
     def __str__(self):
@@ -358,50 +401,36 @@ class Message(BaseMessage[MessageSegment]):
             msg,
         ):
             if content := msg[text_begin : embed.pos + embed.start()]:
-                yield TextSegment(data={"text": escape(content)})
+                yield MessageSegment.text(unescape(content))
             text_begin = embed.pos + embed.end()
             if embed.group("type") in ("@!", "@"):
-                yield MentionUserSegment(
-                    data={"user_id": Snowflake(embed.group("param"))}
-                )
+                yield MessageSegment.mention_user(Snowflake(embed.group("param")))
             elif embed.group("type") == "@&":
-                yield MentionRoleSegment(
-                    data={"role_id": Snowflake(embed.group("param"))}
-                )
+                yield MessageSegment.mention_role(Snowflake(embed.group("param")))
             elif embed.group("type") == "#":
-                yield MentionChannelSegment(
-                    data={"channel_id": Snowflake(embed.group("param"))}
-                )
+                yield MessageSegment.mention_channel(Snowflake(embed.group("param")))
             elif embed.group("type") == "/":
                 # TODO: slash command
                 pass
             elif embed.group("type") in (":", "a:"):
                 if len(cut := embed.group("param").split(":")) == 2:
-                    yield CustomEmojiSegment(
-                        data={
-                            "name": cut[0],
-                            "id": cut[1],
-                            "animated": embed.group("type") == "a:",
-                        }
+                    yield MessageSegment.custom_emoji(
+                        cut[0], cut[1], embed.group("type") == "a:"
                     )
                 else:
-                    yield TextSegment(data={"text": escape(embed.group())})
+                    yield MessageSegment.text(unescape(embed.group()))
             else:
                 if (
                     len(cut := embed.group("param").split(":")) == 2
                     and cut[0].isdigit()
                 ):
-                    yield TimestampSegment(
-                        data={"timestamp": int(cut[0]), "style": TimeStampStyle(cut[1])}
-                    )
+                    yield MessageSegment.timestamp(int(cut[0]), TimeStampStyle(cut[1]))
                 elif embed.group().isdigit():
-                    yield TimestampSegment(
-                        data={"timestamp": int(embed.group()), "style": None}
-                    )
+                    yield MessageSegment.timestamp(int(embed.group()))
                 else:
-                    yield TextSegment(data={"text": escape(embed.group())})
+                    yield MessageSegment.text(unescape(embed.group()))
         if content := msg[text_begin:]:
-            yield TextSegment(data={"text": escape(content)})
+            yield MessageSegment.text(unescape(content))
 
     @classmethod
     def from_guild_message(cls, message: MessageGet) -> "Message":
@@ -412,27 +441,23 @@ class Message(BaseMessage[MessageSegment]):
             msg.extend(Message(message.content))
         if message.attachments:
             msg.extend(
-                AttachmentSegment(
-                    data={
-                        "attachment": AttachmentSend(
-                            filename=attachment.filename,
-                            description=(
-                                attachment.description
-                                if isinstance(attachment.description, str)
-                                else None
-                            ),
+                MessageSegment.attachment(
+                    AttachmentSend(
+                        filename=attachment.filename,
+                        description=(
+                            attachment.description
+                            if isinstance(attachment.description, str)
+                            else None
                         ),
-                        "file": None,
-                    }
+                    )
                 )
                 for attachment in message.attachments
             )
         if message.embeds:
-            msg.extend(EmbedSegment(data={"embed": embed}) for embed in message.embeds)
+            msg.extend(MessageSegment.embed(embed) for embed in message.embeds)
         if message.components:
             msg.extend(
-                ComponentSegment(data={"component": component})
-                for component in message.components
+                MessageSegment.component(component) for component in message.components
             )
         return msg
 
