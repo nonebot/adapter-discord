@@ -32,7 +32,7 @@ async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
         msg = await bot.get_channel_message(
             channel_id=event.channel_id, message_id=event.message_reference.message_id
         )
-        event.reply = Message.from_guild_message(msg)
+        event.reply = msg
         if msg.author.id == bot.self_info.id:
             event.to_me = True
     except Exception as e:

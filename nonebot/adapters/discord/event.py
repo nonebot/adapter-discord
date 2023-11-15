@@ -185,7 +185,7 @@ class MessageEvent(Event, MessageGet):
 
     to_me: bool = False
 
-    reply: Optional[Message] = None
+    reply: Optional[MessageGet] = None
 
     @property
     def message(self) -> Message:
