@@ -1452,7 +1452,6 @@ class ApiClient:
     #                                reason: Optional[str] = ...) -> Sticker:
     #     """https://discord.com/developers/docs/resources/sticker#create-guild-sticker"""
     #     ...
-
     async def modify_guild_sticker(
         self,
         *,

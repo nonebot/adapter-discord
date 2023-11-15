@@ -9,9 +9,9 @@ if TYPE_CHECKING:
 
 _application_command_storage: Dict[str, "ApplicationCommandConfig"] = {}
 
-OPTION_KEY: Literal["_discord_application_command_options"] = (
+OPTION_KEY: Literal[
     "_discord_application_command_options"
-)
+] = "_discord_application_command_options"
 
 
 async def sync_application_command(bot: Bot):
