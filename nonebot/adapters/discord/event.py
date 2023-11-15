@@ -192,8 +192,8 @@ class MessageEvent(Event, MessageGet):
         return self.get_message()
 
     @property
-    def origin_message(self) -> Message:
-        return getattr(self, "_origin_message", self.get_message())
+    def original_message(self) -> Message:
+        return getattr(self, "_original_message", self.get_message())
 
     @override
     def get_type(self) -> str:
@@ -211,7 +211,7 @@ class MessageEvent(Event, MessageGet):
     def get_message(self) -> Message:
         if not hasattr(self, "_message"):
             setattr(self, "_message", Message.from_guild_message(self))
-            setattr(self, "_origin_message", Message.from_guild_message(self))
+            setattr(self, "_original_message", Message.from_guild_message(self))
         return getattr(self, "_message")
 
     @override
