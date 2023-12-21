@@ -18,6 +18,7 @@ from .api import (
 )
 from .config import BotInfo
 from .event import Event, InteractionCreateEvent, MessageEvent
+from .exception import ActionFailed
 from .message import Message, MessageSegment, parse_message
 from .utils import log
 
@@ -193,7 +194,7 @@ class Bot(BaseBot, ApiClient):
         at_sender: Optional[bool] = None,
         reply_message: bool = False,
         **params: Any,
-    ) -> Optional[MessageGet]:
+    ) -> MessageGet:
         """send message.
 
         Args:
@@ -218,10 +219,21 @@ class Bot(BaseBot, ApiClient):
                     tts=tts, allowed_mentions=allowed_mentions, **message_data
                 ),
             )
-            return await self.create_interaction_response(
-                interaction_id=event.id,
+            try:
+                await self.create_interaction_response(
+                    interaction_id=event.id,
+                    interaction_token=event.token,
+                    response=response,
+                )
+            except ActionFailed:
+                return await self.create_followup_message(
+                    application_id=event.application_id,
+                    interaction_token=event.token,
+                    **message_data,
+                )
+            return await self.get_origin_interaction_response(
+                application_id=event.application_id,
                 interaction_token=event.token,
-                response=response,
             )
 
         if not isinstance(event, MessageEvent) or not event.channel_id or not event.id:

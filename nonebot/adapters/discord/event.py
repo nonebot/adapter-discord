@@ -193,7 +193,7 @@ class MessageEvent(Event, MessageGet):
 
     @property
     def original_message(self) -> Message:
-        return getattr(self, "_original_message", self.get_message())
+        return getattr(self, "_original_message", self.get_message())  # type: ignore
 
     @override
     def get_type(self) -> str:

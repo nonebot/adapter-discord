@@ -105,7 +105,7 @@ class ApplicationCommandMatcher(Matcher):
         ):
             raise ValueError("Invalid event or bot")
         return await bot.get_origin_interaction_response(
-            application_id=bot.application_id,
+            application_id=event.application_id,
             interaction_token=event.token,
         )
 
@@ -127,7 +127,7 @@ class ApplicationCommandMatcher(Matcher):
             _message = message
         message_data = parse_message(_message)
         await bot.edit_origin_interaction_response(
-            application_id=bot.application_id,
+            application_id=event.application_id,
             interaction_token=event.token,
             **message_data,
         )
@@ -141,7 +141,7 @@ class ApplicationCommandMatcher(Matcher):
         ):
             raise ValueError("Invalid event or bot")
         await bot.delete_origin_interaction_response(
-            application_id=bot.application_id,
+            application_id=event.application_id,
             interaction_token=event.token,
         )
 
@@ -166,7 +166,7 @@ class ApplicationCommandMatcher(Matcher):
         if flags:
             message_data["flags"] = int(flags)
         return await bot.create_followup_message(
-            application_id=bot.application_id,
+            application_id=event.application_id,
             interaction_token=event.token,
             **message_data,
         )
@@ -180,7 +180,7 @@ class ApplicationCommandMatcher(Matcher):
         ):
             raise ValueError("Invalid event or bot")
         return await bot.get_followup_message(
-            application_id=bot.application_id,
+            application_id=event.application_id,
             interaction_token=event.token,
             message_id=message_id,
         )
@@ -204,7 +204,7 @@ class ApplicationCommandMatcher(Matcher):
             _message = message
         message_data = parse_message(_message)
         return await bot.edit_followup_message(
-            application_id=bot.application_id,
+            application_id=event.application_id,
             interaction_token=event.token,
             message_id=message_id,
             **message_data,
@@ -219,7 +219,7 @@ class ApplicationCommandMatcher(Matcher):
         ):
             raise ValueError("Invalid event or bot")
         await bot.delete_followup_message(
-            application_id=bot.application_id,
+            application_id=event.application_id,
             interaction_token=event.token,
             message_id=message_id,
         )
