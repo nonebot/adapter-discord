@@ -252,10 +252,6 @@ class ResumedEvent(MetaEvent):
 
     __type__ = EventType.RESUMED
 
-    token: str
-    session_id: str
-    seq: int
-
 
 class ReconnectEvent(MetaEvent):
     """Reconnect event
