@@ -32,7 +32,7 @@ def parse_data(
 
 
 def parse_forum_thread_message(
-    data: Dict[str, Any]
+    data: Dict[str, Any],
 ) -> Dict[Literal["files", "json"], Any]:
     model = MessageSend.parse_obj(data)
     payload: Dict[str, Any] = {}
