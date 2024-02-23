@@ -15,45 +15,78 @@ from typing import (
     final,
 )
 
+from nonebot.compat import PYDANTIC_V2
+
 from pydantic import (
     BaseModel as PydanticBaseModel,
     Field,
 )
 from pydantic.generics import GenericModel
 
+if PYDANTIC_V2:
+    from pydantic_core import CoreSchema, core_schema
+
 from .types import *
 
 if TYPE_CHECKING:
-    from pydantic.typing import AbstractSetIntStr, DictStrAny, MappingIntStrAny
+    if PYDANTIC_V2:
+        from pydantic.main import IncEx
+    else:
+        from pydantic.typing import AbstractSetIntStr, DictStrAny, MappingIntStrAny
 
 T = TypeVar("T", str, int, float)
 
 
 class BaseModel(PydanticBaseModel):
-    def dict(
-        self,
-        *,
-        include: Optional[Union["AbstractSetIntStr", "MappingIntStrAny"]] = None,
-        exclude: Optional[Union["AbstractSetIntStr", "MappingIntStrAny"]] = None,
-        by_alias: bool = False,
-        skip_defaults: Optional[bool] = None,
-        exclude_unset: bool = False,
-        exclude_defaults: bool = False,
-        exclude_none: bool = False,
-    ) -> "DictStrAny":
-        data = super().dict(
-            include=include,
-            exclude=exclude,
-            by_alias=by_alias,
-            skip_defaults=skip_defaults,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
-        )
-        # exclude UNSET
-        if exclude_unset or exclude_none:
-            data = {key: value for key, value in data.items() if value is not UNSET}
-        return data
+    if PYDANTIC_V2:
+
+        def model_dump(
+            self,
+            *,
+            include: "IncEx" = None,
+            exclude: "IncEx" = None,
+            by_alias: bool = False,
+            exclude_unset: bool = False,
+            exclude_defaults: bool = False,
+            exclude_none: bool = False,
+        ) -> Dict[str, Any]:
+            data = super().model_dump(
+                include=include,
+                exclude=exclude,
+                by_alias=by_alias,
+                exclude_unset=exclude_unset,
+                exclude_defaults=exclude_defaults,
+                exclude_none=exclude_none,
+            )
+            # exclude UNSET
+            if exclude_unset or exclude_none:
+                data = {key: value for key, value in data.items() if value is not UNSET}
+            return data
+
+    else:
+
+        def dict(
+            self,
+            *,
+            include: Optional[Union["AbstractSetIntStr", "MappingIntStrAny"]] = None,
+            exclude: Optional[Union["AbstractSetIntStr", "MappingIntStrAny"]] = None,
+            by_alias: bool = False,
+            exclude_unset: bool = False,
+            exclude_defaults: bool = False,
+            exclude_none: bool = False,
+        ) -> "DictStrAny":
+            data = super().dict(
+                include=include,
+                exclude=exclude,
+                by_alias=by_alias,
+                exclude_unset=exclude_unset,
+                exclude_defaults=exclude_defaults,
+                exclude_none=exclude_none,
+            )
+            # exclude UNSET
+            if exclude_unset or exclude_none:
+                data = {key: value for key, value in data.items() if value is not UNSET}
+            return data
 
 
 @final
@@ -66,17 +99,33 @@ class Snowflake(int):
 
     __slots__ = ()
 
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
+    if PYDANTIC_V2:
 
-    @classmethod
-    def validate(cls, value: Any):
-        if isinstance(value, str) and value.isdigit():
-            value = int(value)
-        if not isinstance(value, int):
-            raise TypeError(f"{value!r} is not int or str of int")
-        return cls(value)
+        @classmethod
+        def __get_pydantic_core_schema__(cls, source, handler) -> CoreSchema:
+            return core_schema.with_info_plain_validator_function(cls.validate)
+
+        @classmethod
+        def validate(cls, value: Any, _):
+            if isinstance(value, str) and value.isdigit():
+                value = int(value)
+            if not isinstance(value, int):
+                raise TypeError(f"{value!r} is not int or str of int")
+            return cls(value)
+
+    else:
+
+        @classmethod
+        def __get_validators__(cls):
+            yield cls.validate
+
+        @classmethod
+        def validate(cls, value: Any):
+            if isinstance(value, str) and value.isdigit():
+                value = int(value)
+            if not isinstance(value, int):
+                raise TypeError(f"{value!r} is not int or str of int")
+            return cls(value)
 
     @property
     def timestamp(self) -> int:
@@ -445,7 +494,7 @@ class ActionRow(BaseModel):
     see https://discord.com/developers/docs/interactions/message-components#action-rows
     """
 
-    type: ComponentType = Field(default=ComponentType.ActionRow, const=True)
+    type: ComponentType = Field(default=ComponentType.ActionRow)
     components: List[Union["Button", "SelectMenu", "TextInput"]]
 
 
@@ -474,9 +523,7 @@ class Button(BaseModel):
     see https://discord.com/developers/docs/interactions/message-components#button-object
     """
 
-    type: Literal[ComponentType.Button] = Field(
-        default=ComponentType.Button, const=True
-    )
+    type: Literal[ComponentType.Button] = Field(default=ComponentType.Button)
     """2 for a button"""
     style: ButtonStyle
     """A button style"""
@@ -577,9 +624,7 @@ class TextInput(BaseModel):
     see https://discord.com/developers/docs/interactions/message-components#text-inputs
     """
 
-    type: Literal[ComponentType.TextInput] = Field(
-        default=ComponentType.TextInput, const=True
-    )
+    type: Literal[ComponentType.TextInput] = Field(default=ComponentType.TextInput)
     """4 for a text input"""
     custom_id: str
     """Developer-defined identifier for the input; max 100 characters"""

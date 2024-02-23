@@ -10,7 +10,7 @@ from typing import (
 )
 from urllib.parse import quote
 
-from nonebot.compat import type_validate_python
+from nonebot.compat import model_dump, type_validate_python
 from nonebot.drivers import Request
 
 from .model import *
@@ -145,7 +145,7 @@ async def _bulk_overwrite_global_application_commands(
         headers=headers,
         method="PUT",
         url=adapter.base_url / f"applications/{application_id}/commands",
-        json=[command.dict(exclude_unset=True) for command in commands],
+        json=[model_dump(command, exclude_unset=True) for command in commands],
     )
     return type_validate_python(List[ApplicationCommand], await _request(adapter, bot, request))
 
@@ -288,7 +288,7 @@ async def _bulk_overwrite_guild_application_commands(
         method="PUT",
         url=adapter.base_url
         / f"applications/{application_id}/guilds/{guild_id}/commands",
-        json=[command.dict(exclude_unset=True) for command in commands],
+        json=[model_dump(command, exclude_unset=True) for command in commands],
     )
     return type_validate_python(List[ApplicationCommand], await _request(adapter, bot, request))
 
@@ -365,7 +365,7 @@ async def _edit_application_command_permissions(
         method="PUT",
         url=adapter.base_url
         / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",  # noqa: E501
-        json=[permission.dict(exclude_unset=True) for permission in permissions],
+        json=[model_dump(permission, exclude_unset=True) for permission in permissions],
     )
     return type_validate_python(
         GuildApplicationCommandPermissions, await _request(adapter, bot, request)
@@ -646,8 +646,9 @@ async def _create_auto_moderation_rule(
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
-    data = CreateAndModifyAutoModerationRuleParams.parse_obj(data).dict(
-        exclude_none=True
+    data = model_dump(
+        type_validate_python(CreateAndModifyAutoModerationRuleParams, data),
+        exclude_none=True,
     )
     request = Request(
         headers=headers,
@@ -672,8 +673,9 @@ async def _modify_auto_moderation_rule(
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
-    data = CreateAndModifyAutoModerationRuleParams.parse_obj(data).dict(
-        exclude_none=True
+    data = model_dump(
+        type_validate_python(CreateAndModifyAutoModerationRuleParams, data),
+        exclude_none=True,
     )
     request = Request(
         headers=headers,
@@ -748,7 +750,9 @@ async def _modify_channel(
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
-    data = ModifyChannelParams.parse_obj(data).dict(exclude_unset=True)
+    data = model_dump(
+        type_validate_python(ModifyChannelParams, data), exclude_unset=True
+    )
     request = Request(
         headers=headers,
         method="PATCH",
@@ -1493,7 +1497,7 @@ async def _delete_guild_emoji(
 
 async def _create_guild(adapter: "Adapter", bot: "Bot", **data) -> Guild:
     """https://discord.com/developers/docs/resources/guild#create-guild"""
-    data = CreateGuildParams.parse_obj(data).dict(exclude_unset=True)
+    data = model_dump(type_validate_python(CreateGuildParams, data), exclude_unset=True)
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers, method="POST", url=adapter.base_url / "guilds", json=data
@@ -1535,7 +1539,7 @@ async def _modify_guild(
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
-    data = ModifyGuildParams.parse_obj(data).dict(exclude_unset=True)
+    data = model_dump(type_validate_python(ModifyGuildParams, data), exclude_unset=True)
     request = Request(
         headers=headers,
         method="PATCH",
@@ -1578,7 +1582,9 @@ async def _create_guild_channel(
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
-    data = CreateGuildChannelParams.parse_obj(data).dict(exclude_unset=True)
+    data = model_dump(
+        type_validate_python(CreateGuildChannelParams, data), exclude_unset=True
+    )
     request = Request(
         headers=headers,
         method="POST",
@@ -2132,7 +2138,9 @@ async def _modify_guild_welcome_screen(
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
-    data = ModifyGuildWelcomeScreenParams.parse_obj(data).dict(exclude_unset=True)
+    data = model_dump(
+        type_validate_python(ModifyGuildWelcomeScreenParams, data), exclude_unset=True
+    )
     request = Request(
         headers=headers,
         method="PATCH",
@@ -2210,7 +2218,9 @@ async def _create_guild_schedule_event(
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
-    data = CreateGuildScheduledEventParams.parse_obj(data).dict(exclude_none=True)
+    data = model_dump(
+        type_validate_python(CreateGuildScheduledEventParams, data), exclude_none=True
+    )
     request = Request(
         headers=headers,
         method="POST",
@@ -2249,7 +2259,9 @@ async def _modify_guild_scheduled_event(
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
-    data = ModifyGuildScheduledEventParams.parse_obj(data).dict(exclude_unset=True)
+    data = model_dump(
+        type_validate_python(ModifyGuildScheduledEventParams, data), exclude_unset=True
+    )
     request = Request(
         headers=headers,
         method="PATCH",
@@ -2731,7 +2743,7 @@ async def _update_user_application_role_connection(
     if "metadata" in data and isinstance(
         data["metadata"], ApplicationRoleConnectionMetadata
     ):
-        data["metadata"] = data["metadata"].dict(exclude_unset=True)
+        data["metadata"] = model_dump(data["metadata"], exclude_unset=True)
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,

@@ -6,7 +6,7 @@ from typing import Any, List, Optional, Tuple
 from typing_extensions import override
 
 from nonebot.adapters import Adapter as BaseAdapter
-from nonebot.compat import type_validate_python
+from nonebot.compat import model_dump, type_validate_python
 from nonebot.drivers import URL, Driver, ForwardDriver, Request, WebSocket
 from nonebot.exception import WebSocketClosed
 from nonebot.plugin import get_plugin_config
@@ -131,7 +131,7 @@ class Adapter(BaseAdapter):
         resp = await self.request(request)
         if not resp.content:
             raise ValueError("Failed to get gateway info")
-        return GatewayBot.parse_raw(resp.content)
+        return type_validate_python(GatewayBot, json.loads(resp.content))
 
     async def _get_bot_user(self, bot_info: BotInfo) -> User:
         headers = {"Authorization": self.get_authorization(bot_info)}
@@ -145,7 +145,7 @@ class Adapter(BaseAdapter):
         resp = await self.request(request)
         if not resp.content:
             raise ValueError("Failed to get bot user info")
-        return User.parse_raw(resp.content)
+        return type_validate_python(User, json.loads(resp.content))
 
     async def _forward_ws(
         self,
@@ -274,11 +274,12 @@ class Adapter(BaseAdapter):
     async def _heartbeat(ws: WebSocket, bot: Bot):
         """心跳"""
         log("TRACE", f"Heartbeat {bot.sequence if bot.has_sequence else ''}")
-        payload = Heartbeat.parse_obj(
+        payload = type_validate_python(
+            Heartbeat,
             {"data": bot.sequence if bot.has_sequence else None},
         )
         with contextlib.suppress(Exception):
-            await ws.send(json.dumps(payload.dict()))
+            await ws.send(json.dumps(model_dump(payload)))
 
     async def _heartbeat_task(self, ws: WebSocket, bot: Bot, heartbeat_interval: int):
         """心跳任务"""
@@ -289,7 +290,8 @@ class Adapter(BaseAdapter):
     async def _authenticate(self, bot: Bot, ws: WebSocket, shard: Tuple[int, int]):
         """鉴权连接"""
         if not bot.ready:
-            payload = Identify.parse_obj(
+            payload = type_validate_python(
+                Identify,
                 {
                     "data": {
                         "token": self.get_authorization(bot.bot_info),
@@ -305,7 +307,8 @@ class Adapter(BaseAdapter):
                 },
             )
         else:
-            payload = Resume.parse_obj(
+            payload = type_validate_python(
+                Resume,
                 {
                     "data": {
                         "token": self.get_authorization(bot.bot_info),
@@ -316,7 +319,7 @@ class Adapter(BaseAdapter):
             )
 
         try:
-            await ws.send(json.dumps(payload.dict(exclude_none=True)))
+            await ws.send(json.dumps(model_dump(payload, exclude_none=True)))
         except Exception as e:
             log(
                 "ERROR",
@@ -378,7 +381,7 @@ class Adapter(BaseAdapter):
                     event = self.payload_to_event(payload)
                 except Exception as e:
                     # (Path() / f"{payload.type}-{payload.sequence}.json").write_text(
-                    #     json.dumps(payload.dict(), indent=4, ensure_ascii=False),
+                    #     json.dumps(model_dump(payload), indent=4, ensure_ascii=False),
                     #     encoding="utf-8",
                     # )
                     log(
@@ -436,7 +439,7 @@ class Adapter(BaseAdapter):
                 "WARNING",
                 f"Unknown payload type: {payload.type}, detail: {repr(payload)}",
             )
-            event = Event.parse_obj(payload.data)
+            event = type_validate_python(Event, payload.data)
             event.__type__ = payload.type  # type: ignore
             return event
         return type_validate_python(EventClass, payload.data)
