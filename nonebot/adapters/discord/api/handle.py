@@ -41,7 +41,9 @@ async def _get_global_application_commands(
         url=adapter.base_url / f"applications/{application_id}/commands",
         params=params,
     )
-    return type_validate_python(List[ApplicationCommand], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[ApplicationCommand], await _request(adapter, bot, request)
+    )
 
 
 async def _create_global_application_command(
@@ -61,7 +63,9 @@ async def _create_global_application_command(
         url=adapter.base_url / f"applications/{application_id}/commands",
         json=data,
     )
-    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(
+        ApplicationCommand, await _request(adapter, bot, request)
+    )
 
 
 async def _get_global_application_command(
@@ -81,7 +85,9 @@ async def _get_global_application_command(
         method="GET",
         url=adapter.base_url / f"applications/{application_id}/command/{command_id}",
     )
-    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(
+        ApplicationCommand, await _request(adapter, bot, request)
+    )
 
 
 async def _edit_global_application_command(
@@ -104,7 +110,9 @@ async def _edit_global_application_command(
         url=adapter.base_url / f"applications/{application_id}/command/{command_id}",
         json=data,
     )
-    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(
+        ApplicationCommand, await _request(adapter, bot, request)
+    )
 
 
 async def _delete_global_application_command(
@@ -147,7 +155,9 @@ async def _bulk_overwrite_global_application_commands(
         url=adapter.base_url / f"applications/{application_id}/commands",
         json=[model_dump(command, exclude_unset=True) for command in commands],
     )
-    return type_validate_python(List[ApplicationCommand], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[ApplicationCommand], await _request(adapter, bot, request)
+    )
 
 
 async def _get_guild_application_commands(
@@ -170,7 +180,9 @@ async def _get_guild_application_commands(
         / f"applications/{application_id}/guilds/{guild_id}/commands",
         params=params,
     )
-    return type_validate_python(List[ApplicationCommand], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[ApplicationCommand], await _request(adapter, bot, request)
+    )
 
 
 async def _create_guild_application_command(
@@ -196,7 +208,9 @@ async def _create_guild_application_command(
         / f"applications/{application_id}/guilds/{guild_id}/commands",
         json=data,
     )
-    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(
+        ApplicationCommand, await _request(adapter, bot, request)
+    )
 
 
 async def _get_guild_application_command(
@@ -218,7 +232,9 @@ async def _get_guild_application_command(
         url=adapter.base_url
         / f"applications/{application_id}/guilds/{guild_id}/command/{command_id}",
     )
-    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(
+        ApplicationCommand, await _request(adapter, bot, request)
+    )
 
 
 async def _edit_guild_application_command(
@@ -245,7 +261,9 @@ async def _edit_guild_application_command(
         / f"applications/{application_id}/guilds/{guild_id}/command/{command_id}",
         json=data,
     )
-    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(
+        ApplicationCommand, await _request(adapter, bot, request)
+    )
 
 
 async def _delete_guild_application_command(
@@ -290,7 +308,9 @@ async def _bulk_overwrite_guild_application_commands(
         / f"applications/{application_id}/guilds/{guild_id}/commands",
         json=[model_dump(command, exclude_unset=True) for command in commands],
     )
-    return type_validate_python(List[ApplicationCommand], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[ApplicationCommand], await _request(adapter, bot, request)
+    )
 
 
 async def _get_guild_application_command_permissions(
@@ -617,7 +637,9 @@ async def _list_auto_moderation_rules_for_guild(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/auto-moderation/rules",
     )
-    return type_validate_python(List[AutoModerationRule], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[AutoModerationRule], await _request(adapter, bot, request)
+    )
 
 
 async def _get_auto_moderation_rule(
@@ -633,7 +655,9 @@ async def _get_auto_moderation_rule(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/auto-moderation/rules/{rule_id}",
     )
-    return type_validate_python(AutoModerationRule, await _request(adapter, bot, request))
+    return type_validate_python(
+        AutoModerationRule, await _request(adapter, bot, request)
+    )
 
 
 async def _create_auto_moderation_rule(
@@ -656,7 +680,9 @@ async def _create_auto_moderation_rule(
         url=adapter.base_url / f"guilds/{guild_id}/auto-moderation/rules",
         json=data,
     )
-    return type_validate_python(AutoModerationRule, await _request(adapter, bot, request))
+    return type_validate_python(
+        AutoModerationRule, await _request(adapter, bot, request)
+    )
 
 
 async def _modify_auto_moderation_rule(
@@ -683,7 +709,9 @@ async def _modify_auto_moderation_rule(
         url=adapter.base_url / f"guilds/{guild_id}/auto-moderation/rules/{rule_id}",
         json=data,
     )
-    return type_validate_python(AutoModerationRule, await _request(adapter, bot, request))
+    return type_validate_python(
+        AutoModerationRule, await _request(adapter, bot, request)
+    )
 
 
 async def _delete_auto_moderation_rule(
@@ -1362,7 +1390,9 @@ async def _list_thread_members(
         url=adapter.base_url / f"channels/{channel_id}/thread-members",
         params=params,
     )
-    return type_validate_python(List[ThreadMember], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[ThreadMember], await _request(adapter, bot, request)
+    )
 
 
 async def _list_public_archived_threads(
@@ -1378,7 +1408,9 @@ async def _list_public_archived_threads(
         url=adapter.base_url / f"channels/{channel_id}/threads/archived/public",
         params=params,
     )
-    return type_validate_python(ArchivedThreadsResponse, await _request(adapter, bot, request))
+    return type_validate_python(
+        ArchivedThreadsResponse, await _request(adapter, bot, request)
+    )
 
 
 async def _list_private_archived_threads(
@@ -1394,7 +1426,9 @@ async def _list_private_archived_threads(
         url=adapter.base_url / f"channels/{channel_id}/threads/archived/private",
         params=params,
     )
-    return type_validate_python(ArchivedThreadsResponse, await _request(adapter, bot, request))
+    return type_validate_python(
+        ArchivedThreadsResponse, await _request(adapter, bot, request)
+    )
 
 
 async def _list_joined_private_archived_threads(
@@ -1411,7 +1445,9 @@ async def _list_joined_private_archived_threads(
         / f"channels/{channel_id}/users/@me/threads/archived/private",
         params=params,
     )
-    return type_validate_python(ArchivedThreadsResponse, await _request(adapter, bot, request))
+    return type_validate_python(
+        ArchivedThreadsResponse, await _request(adapter, bot, request)
+    )
 
 
 async def _list_guild_emojis(
@@ -1647,7 +1683,9 @@ async def _list_guild_members(
         url=adapter.base_url / f"guilds/{guild_id}/members",
         params=params,
     )
-    return type_validate_python(List[GuildMember], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[GuildMember], await _request(adapter, bot, request)
+    )
 
 
 async def _search_guild_members(
@@ -1661,7 +1699,9 @@ async def _search_guild_members(
         url=adapter.base_url / f"guilds/{guild_id}/members/search",
         params=params,
     )
-    return type_validate_python(List[GuildMember], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[GuildMember], await _request(adapter, bot, request)
+    )
 
 
 async def _add_guild_member(
@@ -2001,7 +2041,9 @@ async def _get_guild_voice_regions(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/regions",
     )
-    return type_validate_python(List[VoiceRegion], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[VoiceRegion], await _request(adapter, bot, request)
+    )
 
 
 async def _get_guild_invites(
@@ -2027,7 +2069,9 @@ async def _get_guild_integrations(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/integrations",
     )
-    return type_validate_python(List[Integration], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[Integration], await _request(adapter, bot, request)
+    )
 
 
 async def _delete_guild_integration(
@@ -2059,7 +2103,9 @@ async def _get_guild_widget_settings(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/widget",
     )
-    return type_validate_python(GuildWidgetSettings, await _request(adapter, bot, request))
+    return type_validate_python(
+        GuildWidgetSettings, await _request(adapter, bot, request)
+    )
 
 
 async def _modify_guild_widget(
@@ -2227,7 +2273,9 @@ async def _create_guild_schedule_event(
         url=adapter.base_url / f"guilds/{guild_id}/scheduled-events",
         json=data,
     )
-    return type_validate_python(GuildScheduledEvent, await _request(adapter, bot, request))
+    return type_validate_python(
+        GuildScheduledEvent, await _request(adapter, bot, request)
+    )
 
 
 async def _get_guild_scheduled_event(
@@ -2245,7 +2293,9 @@ async def _get_guild_scheduled_event(
         url=adapter.base_url / f"guilds/{guild_id}/scheduled-events/{event_id}",
         params=params,
     )
-    return type_validate_python(GuildScheduledEvent, await _request(adapter, bot, request))
+    return type_validate_python(
+        GuildScheduledEvent, await _request(adapter, bot, request)
+    )
 
 
 async def _modify_guild_scheduled_event(
@@ -2268,7 +2318,9 @@ async def _modify_guild_scheduled_event(
         url=adapter.base_url / f"guilds/{guild_id}/scheduled-events/{event_id}",
         json=data,
     )
-    return type_validate_python(GuildScheduledEvent, await _request(adapter, bot, request))
+    return type_validate_python(
+        GuildScheduledEvent, await _request(adapter, bot, request)
+    )
 
 
 async def _delete_guild_scheduled_event(
@@ -2341,7 +2393,9 @@ async def _get_guild_templates(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/templates",
     )
-    return type_validate_python(List[GuildTemplate], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[GuildTemplate], await _request(adapter, bot, request)
+    )
 
 
 async def _create_guild_template(
@@ -2453,7 +2507,9 @@ async def _get_stage_instance(
         method="GET",
         url=adapter.base_url / f"stage-instances/{channel_id}",
     )
-    return type_validate_python(Optional[StageInstance], await _request(adapter, bot, request))
+    return type_validate_python(
+        Optional[StageInstance], await _request(adapter, bot, request)
+    )
 
 
 async def _modify_stage_instance(
@@ -2513,7 +2569,9 @@ async def _list_nitro_sticker_packs(
         method="GET",
         url=adapter.base_url / "sticker-packs",
     )
-    return type_validate_python(List[StickerPack], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[StickerPack], await _request(adapter, bot, request)
+    )
 
 
 async def _list_guild_stickers(
@@ -2655,7 +2713,9 @@ async def _get_current_user_guilds(
         url=adapter.base_url / "users/@me/guilds",
         params=params,
     )
-    return type_validate_python(List[CurrentUserGuild], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[CurrentUserGuild], await _request(adapter, bot, request)
+    )
 
 
 async def _get_current_user_guild_member(
@@ -2765,7 +2825,9 @@ async def _list_voice_regions(adapter: "Adapter", bot: "Bot") -> List[VoiceRegio
         method="GET",
         url=adapter.base_url / "voice/regions",
     )
-    return type_validate_python(List[VoiceRegion], await _request(adapter, bot, request))
+    return type_validate_python(
+        List[VoiceRegion], await _request(adapter, bot, request)
+    )
 
 
 async def _create_webhook(
@@ -3042,7 +3104,9 @@ async def _get_current_authorization_information(
         method="GET",
         url=adapter.base_url / "oauth2/@me",
     )
-    return type_validate_python(AuthorizationResponse, await _request(adapter, bot, request))
+    return type_validate_python(
+        AuthorizationResponse, await _request(adapter, bot, request)
+    )
 
 
 API_HANDLERS: Dict[str, Callable[..., Awaitable[Any]]] = {

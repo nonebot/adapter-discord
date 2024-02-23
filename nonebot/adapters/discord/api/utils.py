@@ -68,7 +68,9 @@ def parse_interaction_response(
 ) -> Dict[Literal["files", "json"], Any]:
     payload: Dict[str, Any] = model_dump(response, exclude_none=True)
     if response.data and isinstance(response.data, InteractionCallbackMessage):
-        payload["data"] = model_dump(response.data, exclude={"files"}, exclude_none=True)
+        payload["data"] = model_dump(
+            response.data, exclude={"files"}, exclude_none=True
+        )
         if response.data.files:
             multipart: Dict[str, Any] = {}
             attachments: List[dict] = payload["data"].pop("attachments", [])
