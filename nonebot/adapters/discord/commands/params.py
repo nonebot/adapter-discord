@@ -33,7 +33,6 @@ class CommandOptionType:
 
 
 class OptionParam(Param):
-
     def __init__(self, *args, key: str, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.key = key

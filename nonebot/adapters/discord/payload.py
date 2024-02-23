@@ -1,8 +1,10 @@
 from enum import IntEnum
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Union
 from typing_extensions import Annotated, Literal
 
-from pydantic import BaseModel, Extra, Field
+from nonebot.compat import PYDANTIC_V2, ConfigDict
+
+from pydantic import BaseModel, Field
 
 from .api.model import (
     Hello as HelloData,
@@ -11,7 +13,10 @@ from .api.model import (
 )
 
 if TYPE_CHECKING:
-    from pydantic.typing import AbstractSetIntStr, DictStrAny, MappingIntStrAny
+    if PYDANTIC_V2:
+        from pydantic.main import IncEx
+    else:
+        from pydantic.typing import AbstractSetIntStr, DictStrAny, MappingIntStrAny
 
 
 class Opcode(IntEnum):
@@ -26,30 +31,51 @@ class Opcode(IntEnum):
 
 
 class Payload(BaseModel):
-    class Config:
-        extra = Extra.allow
-        allow_population_by_field_name = True
+    if PYDANTIC_V2:
+        model_config = ConfigDict(extra="allow", populate_by_name=True)
 
-    def dict(
-        self,
-        *,
-        include: Union["AbstractSetIntStr", "MappingIntStrAny", None] = None,
-        exclude: Union["AbstractSetIntStr", "MappingIntStrAny", None] = None,
-        skip_defaults: Optional[bool] = None,
-        exclude_unset: bool = False,
-        exclude_defaults: bool = False,
-        exclude_none: bool = False,
-        **kwargs: Any,
-    ) -> "DictStrAny":
-        return super().dict(
-            include=include,
-            exclude=exclude,
-            by_alias=True,
-            skip_defaults=skip_defaults,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
-        )
+        def model_dump(
+            self,
+            *,
+            include: "IncEx" = None,
+            exclude: "IncEx" = None,
+            exclude_unset: bool = False,
+            exclude_defaults: bool = False,
+            exclude_none: bool = False,
+        ) -> Dict[str, Any]:
+            return super().model_dump(
+                include=include,
+                exclude=exclude,
+                by_alias=True,
+                exclude_unset=exclude_unset,
+                exclude_defaults=exclude_defaults,
+                exclude_none=exclude_none,
+            )
+
+    else:
+
+        class Config(ConfigDict):
+            extra = "allow"
+            allow_population_by_field_name = True
+
+        def dict(
+            self,
+            *,
+            include: Union["AbstractSetIntStr", "MappingIntStrAny", None] = None,
+            exclude: Union["AbstractSetIntStr", "MappingIntStrAny", None] = None,
+            exclude_unset: bool = False,
+            exclude_defaults: bool = False,
+            exclude_none: bool = False,
+            **kwargs: Any,
+        ) -> "DictStrAny":
+            return super().dict(
+                include=include,
+                exclude=exclude,
+                by_alias=True,
+                exclude_unset=exclude_unset,
+                exclude_defaults=exclude_defaults,
+                exclude_none=exclude_none,
+            )
 
 
 class Dispatch(Payload):

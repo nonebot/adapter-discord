@@ -1,6 +1,8 @@
 from collections import defaultdict
 from typing import TYPE_CHECKING, Dict, List, Literal
 
+from nonebot.compat import model_dump
+
 from ..api import ApplicationCommandCreate, Snowflake
 from ..bot import Bot
 
@@ -21,7 +23,7 @@ async def sync_application_command(bot: Bot):
         if "*" in bot.bot_info.application_commands["*"]:
             commands_global = [
                 ApplicationCommandCreate(
-                    **a.dict(exclude={"guild_ids"}, exclude_none=True)
+                    **model_dump(a, exclude={"guild_ids"}, exclude_none=True)
                 )
                 for a in _application_command_storage.values()
             ]
@@ -33,7 +35,9 @@ async def sync_application_command(bot: Bot):
                 for guild in command.guild_ids:
                     commands_guild[guild].append(
                         ApplicationCommandCreate(
-                            **command.dict(exclude={"guild_ids"}, exclude_none=True)
+                            **model_dump(
+                                command, exclude={"guild_ids"}, exclude_none=True
+                            )
                         )
                     )
     else:
@@ -43,7 +47,9 @@ async def sync_application_command(bot: Bot):
                 if "*" in config:
                     commands_global.append(
                         ApplicationCommandCreate(
-                            **command.dict(exclude={"guild_ids"}, exclude_none=True)
+                            **model_dump(
+                                command, exclude={"guild_ids"}, exclude_none=True
+                            )
                         )
                     )
                 else:
@@ -51,7 +57,9 @@ async def sync_application_command(bot: Bot):
                     for guild in command.guild_ids:
                         commands_guild[guild].append(
                             ApplicationCommandCreate(
-                                **command.dict(exclude={"guild_ids"}, exclude_none=True)
+                                **model_dump(
+                                    command, exclude={"guild_ids"}, exclude_none=True
+                                )
                             )
                         )
     if commands_global:

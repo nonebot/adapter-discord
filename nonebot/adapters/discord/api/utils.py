@@ -1,7 +1,7 @@
 import json
 from typing import Any, Dict, List, Literal, Type, Union
 
-from nonebot.compat import type_validate_python
+from nonebot.compat import model_dump, type_validate_python
 
 from .model import (
     ExecuteWebhookParams,
@@ -15,7 +15,7 @@ def parse_data(
     data: Dict[str, Any], model_class: Type[Union[MessageSend, ExecuteWebhookParams]]
 ) -> Dict[Literal["files", "json"], Any]:
     model = type_validate_python(model_class, data)
-    payload: Dict[str, Any] = model.dict(exclude={"files"}, exclude_none=True)
+    payload: Dict[str, Any] = model_dump(model, exclude={"files"}, exclude_none=True)
     if model.files:
         multipart: Dict[str, Any] = {}
         attachments: List[dict] = payload.pop("attachments", [])
@@ -36,9 +36,9 @@ def parse_data(
 def parse_forum_thread_message(
     data: Dict[str, Any]
 ) -> Dict[Literal["files", "json"], Any]:
-    model = type(MessageSend, data)
+    model = type_validate_python(MessageSend, data)
     payload: Dict[str, Any] = {}
-    content: Dict[str, Any] = model.dict(exclude={"files"}, exclude_none=True)
+    content: Dict[str, Any] = model_dump(model, exclude={"files"}, exclude_none=True)
     if auto_archive_duration := data.pop("auto_archive_duration"):
         payload["auto_archive_duration"] = auto_archive_duration
     if rate_limit_per_user := data.pop("rate_limit_per_user"):
@@ -66,9 +66,11 @@ def parse_forum_thread_message(
 def parse_interaction_response(
     response: InteractionResponse,
 ) -> Dict[Literal["files", "json"], Any]:
-    payload: Dict[str, Any] = response.dict(exclude_none=True)
+    payload: Dict[str, Any] = model_dump(response, exclude_none=True)
     if response.data and isinstance(response.data, InteractionCallbackMessage):
-        payload["data"] = response.data.dict(exclude={"files"}, exclude_none=True)
+        payload["data"] = model_dump(
+            response.data, exclude={"files"}, exclude_none=True
+        )
         if response.data.files:
             multipart: Dict[str, Any] = {}
             attachments: List[dict] = payload["data"].pop("attachments", [])

@@ -4,6 +4,7 @@ from typing import Dict, List, Literal, Optional, Type, Union
 from typing_extensions import override
 
 from nonebot.adapters import Event as BaseEvent
+from nonebot.compat import model_dump
 from nonebot.utils import escape_tag
 
 from pydantic import Field
@@ -137,7 +138,7 @@ class Event(BaseEvent):
 
     @override
     def get_event_description(self) -> str:
-        return escape_tag(str(self.dict()))
+        return escape_tag(str(model_dump(self)))
 
     @override
     def get_message(self) -> Message:

@@ -348,7 +348,7 @@ def on_slash_command(
         nsfw=nsfw,
     )
     _application_command_storage[internal_id or name] = config
-    matcher: type[SlashCommandMatcher] = SlashCommandMatcher.new(
+    matcher: Type[SlashCommandMatcher] = SlashCommandMatcher.new(
         "notice",
         Rule() & rule,
         Permission() | permission,
@@ -411,7 +411,7 @@ def on_user_command(
         nsfw=nsfw,
     )
     _application_command_storage[internal_id or name] = config
-    matcher: type[UserMessageCommandMatcher] = UserMessageCommandMatcher.new(
+    matcher: Type[UserMessageCommandMatcher] = UserMessageCommandMatcher.new(
         "notice",
         Rule() & rule,
         Permission() | permission,
@@ -474,7 +474,7 @@ def on_message_command(
         nsfw=nsfw,
     )
     _application_command_storage[internal_id or name] = config
-    matcher: type[UserMessageCommandMatcher] = UserMessageCommandMatcher.new(
+    matcher: Type[UserMessageCommandMatcher] = UserMessageCommandMatcher.new(
         "notice",
         Rule() & rule,
         Permission() | permission,
