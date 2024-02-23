@@ -34,7 +34,7 @@ def parse_data(
 
 
 def parse_forum_thread_message(
-    data: Dict[str, Any]
+    data: Dict[str, Any],
 ) -> Dict[Literal["files", "json"], Any]:
     model = type_validate_python(MessageSend, data)
     payload: Dict[str, Any] = {}
