@@ -1,12 +1,9 @@
 import inspect
 from typing import Any, Optional, Tuple, Type, TypeVar
-from typing_extensions import Annotated
+from typing_extensions import Annotated, get_args, get_origin, override
 
 from nonebot.dependencies import Param
 from nonebot.params import Depends
-
-from pydantic.fields import Required
-from pydantic.typing import get_args, get_origin
 
 from ..api import (
     ApplicationCommandOptionType,
@@ -36,20 +33,27 @@ class CommandOptionType:
 
 
 class OptionParam(Param):
+
+    def __init__(self, *args, key: str, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.key = key
+
     def __repr__(self) -> str:
         return f"OptionParam(key={self.extra['key']!r})"
 
     @classmethod
+    @override
     def _check_param(
         cls, param: inspect.Parameter, allow_types: Tuple[Type[Param], ...]
     ) -> Optional["OptionParam"]:
         if isinstance(param.default, CommandOptionType):
-            return cls(Required, key=param.default.key or param.name, validate=True)
+            return cls(key=param.default.key or param.name, validate=True)
         elif get_origin(param.annotation) is Annotated:
             for arg in get_args(param.annotation):
                 if isinstance(arg, CommandOptionType):
-                    return cls(Required, key=arg.key or param.name, validate=True)
+                    return cls(key=arg.key or param.name, validate=True)
 
+    @override
     async def _solve(
         self, event: ApplicationCommandInteractionEvent, **kwargs: Any
     ) -> Any:
@@ -64,7 +68,7 @@ class OptionParam(Param):
                 options = options[0].options
             if options:
                 for option in options:
-                    if option.name == self.extra["key"]:
+                    if option.name == self.key:
                         if (
                             option.type
                             in (

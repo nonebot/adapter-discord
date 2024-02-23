@@ -1,6 +1,6 @@
 from typing import Dict, List, Literal, Optional, Tuple, Union
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Field
 
 from .api import Snowflake
 
@@ -59,7 +59,7 @@ class BotInfo(BaseModel):
     )
 
 
-class Config(BaseModel, extra=Extra.ignore):
+class Config(BaseModel):
     discord_bots: List[BotInfo] = Field(default_factory=list)
     discord_compress: bool = False
     discord_api_version: int = 10

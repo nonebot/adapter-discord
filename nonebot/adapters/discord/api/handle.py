@@ -10,9 +10,8 @@ from typing import (
 )
 from urllib.parse import quote
 
+from nonebot.compat import type_validate_python
 from nonebot.drivers import Request
-
-from pydantic import parse_obj_as
 
 from .model import *
 from .request import _request
@@ -42,7 +41,7 @@ async def _get_global_application_commands(
         url=adapter.base_url / f"applications/{application_id}/commands",
         params=params,
     )
-    return parse_obj_as(List[ApplicationCommand], await _request(adapter, bot, request))
+    return type_validate_python(List[ApplicationCommand], await _request(adapter, bot, request))
 
 
 async def _create_global_application_command(
@@ -62,7 +61,7 @@ async def _create_global_application_command(
         url=adapter.base_url / f"applications/{application_id}/commands",
         json=data,
     )
-    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
 
 
 async def _get_global_application_command(
@@ -82,7 +81,7 @@ async def _get_global_application_command(
         method="GET",
         url=adapter.base_url / f"applications/{application_id}/command/{command_id}",
     )
-    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
 
 
 async def _edit_global_application_command(
@@ -105,7 +104,7 @@ async def _edit_global_application_command(
         url=adapter.base_url / f"applications/{application_id}/command/{command_id}",
         json=data,
     )
-    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
 
 
 async def _delete_global_application_command(
@@ -148,7 +147,7 @@ async def _bulk_overwrite_global_application_commands(
         url=adapter.base_url / f"applications/{application_id}/commands",
         json=[command.dict(exclude_unset=True) for command in commands],
     )
-    return parse_obj_as(List[ApplicationCommand], await _request(adapter, bot, request))
+    return type_validate_python(List[ApplicationCommand], await _request(adapter, bot, request))
 
 
 async def _get_guild_application_commands(
@@ -171,7 +170,7 @@ async def _get_guild_application_commands(
         / f"applications/{application_id}/guilds/{guild_id}/commands",
         params=params,
     )
-    return parse_obj_as(List[ApplicationCommand], await _request(adapter, bot, request))
+    return type_validate_python(List[ApplicationCommand], await _request(adapter, bot, request))
 
 
 async def _create_guild_application_command(
@@ -197,7 +196,7 @@ async def _create_guild_application_command(
         / f"applications/{application_id}/guilds/{guild_id}/commands",
         json=data,
     )
-    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
 
 
 async def _get_guild_application_command(
@@ -219,7 +218,7 @@ async def _get_guild_application_command(
         url=adapter.base_url
         / f"applications/{application_id}/guilds/{guild_id}/command/{command_id}",
     )
-    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
 
 
 async def _edit_guild_application_command(
@@ -246,7 +245,7 @@ async def _edit_guild_application_command(
         / f"applications/{application_id}/guilds/{guild_id}/command/{command_id}",
         json=data,
     )
-    return parse_obj_as(ApplicationCommand, await _request(adapter, bot, request))
+    return type_validate_python(ApplicationCommand, await _request(adapter, bot, request))
 
 
 async def _delete_guild_application_command(
@@ -291,7 +290,7 @@ async def _bulk_overwrite_guild_application_commands(
         / f"applications/{application_id}/guilds/{guild_id}/commands",
         json=[command.dict(exclude_unset=True) for command in commands],
     )
-    return parse_obj_as(List[ApplicationCommand], await _request(adapter, bot, request))
+    return type_validate_python(List[ApplicationCommand], await _request(adapter, bot, request))
 
 
 async def _get_guild_application_command_permissions(
@@ -313,7 +312,7 @@ async def _get_guild_application_command_permissions(
         url=adapter.base_url
         / f"applications/{application_id}/guilds/{guild_id}/commands/permissions",
     )
-    return parse_obj_as(
+    return type_validate_python(
         List[GuildApplicationCommandPermissions], await _request(adapter, bot, request)
     )
 
@@ -338,7 +337,7 @@ async def _get_application_command_permissions(
         url=adapter.base_url
         / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",  # noqa: E501
     )
-    return parse_obj_as(
+    return type_validate_python(
         GuildApplicationCommandPermissions, await _request(adapter, bot, request)
     )
 
@@ -368,7 +367,7 @@ async def _edit_application_command_permissions(
         / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",  # noqa: E501
         json=[permission.dict(exclude_unset=True) for permission in permissions],
     )
-    return parse_obj_as(
+    return type_validate_python(
         GuildApplicationCommandPermissions, await _request(adapter, bot, request)
     )
 
@@ -409,7 +408,7 @@ async def _get_origin_interaction_response(
         url=adapter.base_url
         / f"webhooks/{application_id}/{interaction_token}/messages/@original",
     )
-    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
 async def _edit_origin_interaction_response(
@@ -431,7 +430,7 @@ async def _edit_origin_interaction_response(
         params=params,
         json=data,
     )
-    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
 async def _delete_origin_interaction_response(
@@ -467,7 +466,7 @@ async def _create_followup_message(
         url=adapter.base_url / f"webhooks/{application_id}/{interaction_token}",
         **data,
     )
-    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
 async def _get_followup_message(
@@ -486,7 +485,7 @@ async def _get_followup_message(
         / f"webhooks/{application_id}/{interaction_token}/messages/{message_id}",
         params=params,
     )
-    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
 async def _edit_followup_message(
@@ -510,7 +509,7 @@ async def _edit_followup_message(
         params=params,
         **data,
     )
-    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
 async def _delete_followup_message(
@@ -548,7 +547,7 @@ async def _get_current_application(
         method="GET",
         url=adapter.base_url / "applications/@me",
     )
-    return parse_obj_as(Application, await _request(adapter, bot, request))
+    return type_validate_python(Application, await _request(adapter, bot, request))
 
 
 async def _get_application_role_connection_metadata_records(
@@ -565,7 +564,7 @@ async def _get_application_role_connection_metadata_records(
         url=adapter.base_url
         / f"applications/{application_id}/role-connections/metadata",
     )
-    return parse_obj_as(
+    return type_validate_python(
         List[ApplicationRoleConnectionMetadata], await _request(adapter, bot, request)
     )
 
@@ -584,7 +583,7 @@ async def _update_application_role_connection_metadata_records(
         url=adapter.base_url
         / f"applications/{application_id}/role-connections/metadata",
     )
-    return parse_obj_as(
+    return type_validate_python(
         List[ApplicationRoleConnectionMetadata], await _request(adapter, bot, request)
     )
 
@@ -602,7 +601,7 @@ async def _get_guild_audit_log(
         url=adapter.base_url / f"guilds/{guild_id}/audit-logs",
         params=data,
     )
-    return parse_obj_as(AuditLog, await _request(adapter, bot, request))
+    return type_validate_python(AuditLog, await _request(adapter, bot, request))
 
 
 async def _list_auto_moderation_rules_for_guild(
@@ -618,7 +617,7 @@ async def _list_auto_moderation_rules_for_guild(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/auto-moderation/rules",
     )
-    return parse_obj_as(List[AutoModerationRule], await _request(adapter, bot, request))
+    return type_validate_python(List[AutoModerationRule], await _request(adapter, bot, request))
 
 
 async def _get_auto_moderation_rule(
@@ -634,7 +633,7 @@ async def _get_auto_moderation_rule(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/auto-moderation/rules/{rule_id}",
     )
-    return parse_obj_as(AutoModerationRule, await _request(adapter, bot, request))
+    return type_validate_python(AutoModerationRule, await _request(adapter, bot, request))
 
 
 async def _create_auto_moderation_rule(
@@ -656,7 +655,7 @@ async def _create_auto_moderation_rule(
         url=adapter.base_url / f"guilds/{guild_id}/auto-moderation/rules",
         json=data,
     )
-    return parse_obj_as(AutoModerationRule, await _request(adapter, bot, request))
+    return type_validate_python(AutoModerationRule, await _request(adapter, bot, request))
 
 
 async def _modify_auto_moderation_rule(
@@ -682,7 +681,7 @@ async def _modify_auto_moderation_rule(
         url=adapter.base_url / f"guilds/{guild_id}/auto-moderation/rules/{rule_id}",
         json=data,
     )
-    return parse_obj_as(AutoModerationRule, await _request(adapter, bot, request))
+    return type_validate_python(AutoModerationRule, await _request(adapter, bot, request))
 
 
 async def _delete_auto_moderation_rule(
@@ -719,7 +718,7 @@ async def _get_channel(
         method="GET",
         url=adapter.base_url / f"channels/{channel_id}",
     )
-    return parse_obj_as(Channel, await _request(adapter, bot, request))
+    return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
 async def _modify_DM(
@@ -737,7 +736,7 @@ async def _modify_DM(
         url=adapter.base_url / f"channels/{channel_id}",
         json=data,
     )
-    return parse_obj_as(Channel, await _request(adapter, bot, request))
+    return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
 async def _modify_channel(
@@ -756,7 +755,7 @@ async def _modify_channel(
         url=adapter.base_url / f"channels/{channel_id}",
         json=data,
     )
-    return parse_obj_as(Channel, await _request(adapter, bot, request))
+    return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
 async def _modify_thread(
@@ -774,7 +773,7 @@ async def _modify_thread(
         url=adapter.base_url / f"channels/{channel_id}",
         json=data,
     )
-    return parse_obj_as(Channel, await _request(adapter, bot, request))
+    return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
 async def _delete_channel(
@@ -794,7 +793,7 @@ async def _delete_channel(
         method="DELETE",
         url=adapter.base_url / f"channels/{channel_id}",
     )
-    return parse_obj_as(Channel, await _request(adapter, bot, request))
+    return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
 async def _get_channel_messages(
@@ -810,7 +809,7 @@ async def _get_channel_messages(
         url=adapter.base_url / f"channels/{channel_id}/messages",
         params=data,
     )
-    return parse_obj_as(List[MessageGet], await _request(adapter, bot, request))
+    return type_validate_python(List[MessageGet], await _request(adapter, bot, request))
 
 
 async def _get_channel_message(
@@ -825,7 +824,7 @@ async def _get_channel_message(
         method="GET",
         url=adapter.base_url / f"channels/{channel_id}/messages/{message_id}",
     )
-    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
 async def _create_message(
@@ -843,7 +842,7 @@ async def _create_message(
         url=adapter.base_url / f"channels/{channel_id}/messages",
         **params,
     )
-    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
 async def _crosspost_message(
@@ -858,7 +857,7 @@ async def _crosspost_message(
         method="POST",
         url=adapter.base_url / f"channels/{channel_id}/messages/{message_id}/crosspost",
     )
-    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
 async def _create_reaction(
@@ -953,7 +952,7 @@ async def _get_reactions(
         / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}",
         params=params,
     )
-    return parse_obj_as(List[User], await _request(adapter, bot, request))
+    return type_validate_python(List[User], await _request(adapter, bot, request))
 
 
 async def _delete_all_reactions(
@@ -1015,7 +1014,7 @@ async def _edit_message(
         url=adapter.base_url / f"channels/{channel_id}/messages/{message_id}",
         **params,
     )
-    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
 async def _delete_message(
@@ -1082,7 +1081,7 @@ async def _get_channel_invites(
         method="GET",
         url=adapter.base_url / f"channels/{channel_id}/invites",
     )
-    return parse_obj_as(List[Invite], await _request(adapter, bot, request))
+    return type_validate_python(List[Invite], await _request(adapter, bot, request))
 
 
 async def _create_channel_invite(
@@ -1098,7 +1097,7 @@ async def _create_channel_invite(
         url=adapter.base_url / f"channels/{channel_id}/invites",
         json=data,
     )
-    return parse_obj_as(Invite, await _request(adapter, bot, request))
+    return type_validate_python(Invite, await _request(adapter, bot, request))
 
 
 async def _delete_channel_permission(
@@ -1131,7 +1130,7 @@ async def _follow_announcement_channel(
         url=adapter.base_url / f"channels/{channel_id}/followers",
         json=data,
     )
-    return parse_obj_as(FollowedChannel, await _request(adapter, bot, request))
+    return type_validate_python(FollowedChannel, await _request(adapter, bot, request))
 
 
 async def _trigger_typing_indicator(
@@ -1157,7 +1156,7 @@ async def _get_pinned_messages(
         method="GET",
         url=adapter.base_url / f"channels/{channel_id}/pins",
     )
-    return parse_obj_as(List[MessageGet], await _request(adapter, bot, request))
+    return type_validate_python(List[MessageGet], await _request(adapter, bot, request))
 
 
 async def _pin_message(
@@ -1246,7 +1245,7 @@ async def _start_thread_from_message(
         url=adapter.base_url / f"channels/{channel_id}/messages/{message_id}/threads",
         json=data,
     )
-    return parse_obj_as(Channel, await _request(adapter, bot, request))
+    return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
 async def _start_thread_without_message(
@@ -1262,7 +1261,7 @@ async def _start_thread_without_message(
         url=adapter.base_url / f"channels/{channel_id}/threads",
         json=data,
     )
-    return parse_obj_as(Channel, await _request(adapter, bot, request))
+    return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
 async def _start_thread_in_forum_channel(
@@ -1279,7 +1278,7 @@ async def _start_thread_in_forum_channel(
         url=adapter.base_url / f"channels/{channel_id}/threads",
         **params,
     )
-    return parse_obj_as(Channel, await _request(adapter, bot, request))
+    return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
 async def _join_thread(adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType):
@@ -1345,7 +1344,7 @@ async def _get_thread_member(
         url=adapter.base_url / f"channels/{channel_id}/thread-members/{user_id}",
         params=params,
     )
-    return parse_obj_as(ThreadMember, await _request(adapter, bot, request))
+    return type_validate_python(ThreadMember, await _request(adapter, bot, request))
 
 
 async def _list_thread_members(
@@ -1359,7 +1358,7 @@ async def _list_thread_members(
         url=adapter.base_url / f"channels/{channel_id}/thread-members",
         params=params,
     )
-    return parse_obj_as(List[ThreadMember], await _request(adapter, bot, request))
+    return type_validate_python(List[ThreadMember], await _request(adapter, bot, request))
 
 
 async def _list_public_archived_threads(
@@ -1375,7 +1374,7 @@ async def _list_public_archived_threads(
         url=adapter.base_url / f"channels/{channel_id}/threads/archived/public",
         params=params,
     )
-    return parse_obj_as(ArchivedThreadsResponse, await _request(adapter, bot, request))
+    return type_validate_python(ArchivedThreadsResponse, await _request(adapter, bot, request))
 
 
 async def _list_private_archived_threads(
@@ -1391,7 +1390,7 @@ async def _list_private_archived_threads(
         url=adapter.base_url / f"channels/{channel_id}/threads/archived/private",
         params=params,
     )
-    return parse_obj_as(ArchivedThreadsResponse, await _request(adapter, bot, request))
+    return type_validate_python(ArchivedThreadsResponse, await _request(adapter, bot, request))
 
 
 async def _list_joined_private_archived_threads(
@@ -1408,7 +1407,7 @@ async def _list_joined_private_archived_threads(
         / f"channels/{channel_id}/users/@me/threads/archived/private",
         params=params,
     )
-    return parse_obj_as(ArchivedThreadsResponse, await _request(adapter, bot, request))
+    return type_validate_python(ArchivedThreadsResponse, await _request(adapter, bot, request))
 
 
 async def _list_guild_emojis(
@@ -1421,7 +1420,7 @@ async def _list_guild_emojis(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/emojis",
     )
-    return parse_obj_as(List[Emoji], await _request(adapter, bot, request))
+    return type_validate_python(List[Emoji], await _request(adapter, bot, request))
 
 
 async def _get_guild_emoji(
@@ -1434,7 +1433,7 @@ async def _get_guild_emoji(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/emojis/{emoji_id}",
     )
-    return parse_obj_as(Emoji, await _request(adapter, bot, request))
+    return type_validate_python(Emoji, await _request(adapter, bot, request))
 
 
 async def _create_guild_emoji(
@@ -1450,7 +1449,7 @@ async def _create_guild_emoji(
         url=adapter.base_url / f"guilds/{guild_id}/emojis",
         json=data,
     )
-    return parse_obj_as(Emoji, await _request(adapter, bot, request))
+    return type_validate_python(Emoji, await _request(adapter, bot, request))
 
 
 async def _modify_guild_emoji(
@@ -1470,7 +1469,7 @@ async def _modify_guild_emoji(
         url=adapter.base_url / f"guilds/{guild_id}/emojis/{emoji_id}",
         json=data,
     )
-    return parse_obj_as(Emoji, await _request(adapter, bot, request))
+    return type_validate_python(Emoji, await _request(adapter, bot, request))
 
 
 async def _delete_guild_emoji(
@@ -1499,7 +1498,7 @@ async def _create_guild(adapter: "Adapter", bot: "Bot", **data) -> Guild:
     request = Request(
         headers=headers, method="POST", url=adapter.base_url / "guilds", json=data
     )
-    return parse_obj_as(Guild, await _request(adapter, bot, request))
+    return type_validate_python(Guild, await _request(adapter, bot, request))
 
 
 async def _get_guild(
@@ -1513,7 +1512,7 @@ async def _get_guild(
         url=adapter.base_url / f"guilds/{guild_id}",
         params=params,
     )
-    return parse_obj_as(Guild, await _request(adapter, bot, request))
+    return type_validate_python(Guild, await _request(adapter, bot, request))
 
 
 async def _get_guild_preview(
@@ -1526,7 +1525,7 @@ async def _get_guild_preview(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/preview",
     )
-    return parse_obj_as(GuildPreview, await _request(adapter, bot, request))
+    return type_validate_python(GuildPreview, await _request(adapter, bot, request))
 
 
 async def _modify_guild(
@@ -1543,7 +1542,7 @@ async def _modify_guild(
         url=adapter.base_url / f"guilds/{guild_id}/preview",
         json=data,
     )
-    return parse_obj_as(Guild, await _request(adapter, bot, request))
+    return type_validate_python(Guild, await _request(adapter, bot, request))
 
 
 async def _delete_guild(
@@ -1569,7 +1568,7 @@ async def _get_guild_channels(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/channels",
     )
-    return parse_obj_as(List[Channel], await _request(adapter, bot, request))
+    return type_validate_python(List[Channel], await _request(adapter, bot, request))
 
 
 async def _create_guild_channel(
@@ -1586,7 +1585,7 @@ async def _create_guild_channel(
         url=adapter.base_url / f"guilds/{guild_id}/channels",
         json=data,
     )
-    return parse_obj_as(Channel, await _request(adapter, bot, request))
+    return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
 async def _modify_guild_channel_positions(
@@ -1600,7 +1599,7 @@ async def _modify_guild_channel_positions(
         url=adapter.base_url / f"guilds/{guild_id}/channels",
         json=data,
     )
-    return parse_obj_as(Guild, await _request(adapter, bot, request))
+    return type_validate_python(Guild, await _request(adapter, bot, request))
 
 
 async def _list_active_guild_threads(
@@ -1613,7 +1612,7 @@ async def _list_active_guild_threads(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/threads/active",
     )
-    return parse_obj_as(
+    return type_validate_python(
         ListActiveGuildThreadsResponse, await _request(adapter, bot, request)
     )
 
@@ -1628,7 +1627,7 @@ async def _get_guild_member(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/members/{user_id}",
     )
-    return parse_obj_as(GuildMember, await _request(adapter, bot, request))
+    return type_validate_python(GuildMember, await _request(adapter, bot, request))
 
 
 async def _list_guild_members(
@@ -1642,7 +1641,7 @@ async def _list_guild_members(
         url=adapter.base_url / f"guilds/{guild_id}/members",
         params=params,
     )
-    return parse_obj_as(List[GuildMember], await _request(adapter, bot, request))
+    return type_validate_python(List[GuildMember], await _request(adapter, bot, request))
 
 
 async def _search_guild_members(
@@ -1656,7 +1655,7 @@ async def _search_guild_members(
         url=adapter.base_url / f"guilds/{guild_id}/members/search",
         params=params,
     )
-    return parse_obj_as(List[GuildMember], await _request(adapter, bot, request))
+    return type_validate_python(List[GuildMember], await _request(adapter, bot, request))
 
 
 async def _add_guild_member(
@@ -1674,7 +1673,7 @@ async def _add_guild_member(
         url=adapter.base_url / f"guilds/{guild_id}/members/{user_id}",
         json=data,
     )
-    return parse_obj_as(GuildMember, await _request(adapter, bot, request))
+    return type_validate_python(GuildMember, await _request(adapter, bot, request))
 
 
 async def _modify_guild_member(
@@ -1694,7 +1693,7 @@ async def _modify_guild_member(
         url=adapter.base_url / f"guilds/{guild_id}/members/{user_id}",
         json=data,
     )
-    return parse_obj_as(GuildMember, await _request(adapter, bot, request))
+    return type_validate_python(GuildMember, await _request(adapter, bot, request))
 
 
 async def _modify_current_member(
@@ -1710,7 +1709,7 @@ async def _modify_current_member(
         url=adapter.base_url / f"guilds/{guild_id}/members/@me",
         json=data,
     )
-    return parse_obj_as(GuildMember, await _request(adapter, bot, request))
+    return type_validate_python(GuildMember, await _request(adapter, bot, request))
 
 
 async def _modify_current_user_nick(
@@ -1726,7 +1725,7 @@ async def _modify_current_user_nick(
         url=adapter.base_url / f"guilds/{guild_id}/members/@me/nick",
         json=data,
     )
-    return parse_obj_as(GuildMember, await _request(adapter, bot, request))
+    return type_validate_python(GuildMember, await _request(adapter, bot, request))
 
 
 async def _add_guild_member_role(
@@ -1799,7 +1798,7 @@ async def _get_guild_bans(
         url=adapter.base_url / f"guilds/{guild_id}/bans",
         params=params,
     )
-    return parse_obj_as(List[Ban], await _request(adapter, bot, request))
+    return type_validate_python(List[Ban], await _request(adapter, bot, request))
 
 
 async def _get_guild_ban(
@@ -1812,7 +1811,7 @@ async def _get_guild_ban(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/bans/{user_id}",
     )
-    return parse_obj_as(Ban, await _request(adapter, bot, request))
+    return type_validate_python(Ban, await _request(adapter, bot, request))
 
 
 async def _create_guild_ban(
@@ -1864,7 +1863,7 @@ async def _get_guild_roles(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/roles",
     )
-    return parse_obj_as(List[Role], await _request(adapter, bot, request))
+    return type_validate_python(List[Role], await _request(adapter, bot, request))
 
 
 async def _create_guild_role(
@@ -1880,7 +1879,7 @@ async def _create_guild_role(
         url=adapter.base_url / f"guilds/{guild_id}/roles",
         json=data,
     )
-    return parse_obj_as(Role, await _request(adapter, bot, request))
+    return type_validate_python(Role, await _request(adapter, bot, request))
 
 
 async def _modify_guild_role_positions(
@@ -1896,7 +1895,7 @@ async def _modify_guild_role_positions(
         url=adapter.base_url / f"guilds/{guild_id}/roles",
         json=data,
     )
-    return parse_obj_as(List[Role], await _request(adapter, bot, request))
+    return type_validate_python(List[Role], await _request(adapter, bot, request))
 
 
 async def _modify_guild_role(
@@ -1916,7 +1915,7 @@ async def _modify_guild_role(
         url=adapter.base_url / f"guilds/{guild_id}/roles/{role_id}",
         json=data,
     )
-    return parse_obj_as(Role, await _request(adapter, bot, request))
+    return type_validate_python(Role, await _request(adapter, bot, request))
 
 
 async def _modify_guild_MFA_level(
@@ -1996,7 +1995,7 @@ async def _get_guild_voice_regions(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/regions",
     )
-    return parse_obj_as(List[VoiceRegion], await _request(adapter, bot, request))
+    return type_validate_python(List[VoiceRegion], await _request(adapter, bot, request))
 
 
 async def _get_guild_invites(
@@ -2009,7 +2008,7 @@ async def _get_guild_invites(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/invites",
     )
-    return parse_obj_as(List[Invite], await _request(adapter, bot, request))
+    return type_validate_python(List[Invite], await _request(adapter, bot, request))
 
 
 async def _get_guild_integrations(
@@ -2022,7 +2021,7 @@ async def _get_guild_integrations(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/integrations",
     )
-    return parse_obj_as(List[Integration], await _request(adapter, bot, request))
+    return type_validate_python(List[Integration], await _request(adapter, bot, request))
 
 
 async def _delete_guild_integration(
@@ -2054,7 +2053,7 @@ async def _get_guild_widget_settings(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/widget",
     )
-    return parse_obj_as(GuildWidgetSettings, await _request(adapter, bot, request))
+    return type_validate_python(GuildWidgetSettings, await _request(adapter, bot, request))
 
 
 async def _modify_guild_widget(
@@ -2070,7 +2069,7 @@ async def _modify_guild_widget(
         url=adapter.base_url / f"guilds/{guild_id}/widget",
         json=data,
     )
-    return parse_obj_as(GuildWidget, await _request(adapter, bot, request))
+    return type_validate_python(GuildWidget, await _request(adapter, bot, request))
 
 
 async def _get_guild_widget(
@@ -2083,7 +2082,7 @@ async def _get_guild_widget(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/widget.json",
     )
-    return parse_obj_as(GuildWidget, await _request(adapter, bot, request))
+    return type_validate_python(GuildWidget, await _request(adapter, bot, request))
 
 
 async def _get_guild_vanity_url(
@@ -2096,7 +2095,7 @@ async def _get_guild_vanity_url(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/vanity-url",
     )
-    return parse_obj_as(Invite, await _request(adapter, bot, request))
+    return type_validate_python(Invite, await _request(adapter, bot, request))
 
 
 async def _get_guild_widget_image(
@@ -2123,7 +2122,7 @@ async def _get_guild_welcome_screen(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/welcome-screen",
     )
-    return parse_obj_as(WelcomeScreen, await _request(adapter, bot, request))
+    return type_validate_python(WelcomeScreen, await _request(adapter, bot, request))
 
 
 async def _modify_guild_welcome_screen(
@@ -2140,7 +2139,7 @@ async def _modify_guild_welcome_screen(
         url=adapter.base_url / f"guilds/{guild_id}/welcome-screen",
         json=data,
     )
-    return parse_obj_as(WelcomeScreen, await _request(adapter, bot, request))
+    return type_validate_python(WelcomeScreen, await _request(adapter, bot, request))
 
 
 async def _get_guild_onboarding(
@@ -2153,7 +2152,7 @@ async def _get_guild_onboarding(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/onboarding",
     )
-    return parse_obj_as(GuildOnboarding, await _request(adapter, bot, request))
+    return type_validate_python(GuildOnboarding, await _request(adapter, bot, request))
 
 
 async def _modify_current_user_voice_state(
@@ -2199,7 +2198,7 @@ async def _list_scheduled_events_for_guild(
         url=adapter.base_url / f"guilds/{guild_id}/scheduled-events",
         params=params,
     )
-    return parse_obj_as(
+    return type_validate_python(
         List[GuildScheduledEvent], await _request(adapter, bot, request)
     )
 
@@ -2218,7 +2217,7 @@ async def _create_guild_schedule_event(
         url=adapter.base_url / f"guilds/{guild_id}/scheduled-events",
         json=data,
     )
-    return parse_obj_as(GuildScheduledEvent, await _request(adapter, bot, request))
+    return type_validate_python(GuildScheduledEvent, await _request(adapter, bot, request))
 
 
 async def _get_guild_scheduled_event(
@@ -2236,7 +2235,7 @@ async def _get_guild_scheduled_event(
         url=adapter.base_url / f"guilds/{guild_id}/scheduled-events/{event_id}",
         params=params,
     )
-    return parse_obj_as(GuildScheduledEvent, await _request(adapter, bot, request))
+    return type_validate_python(GuildScheduledEvent, await _request(adapter, bot, request))
 
 
 async def _modify_guild_scheduled_event(
@@ -2257,7 +2256,7 @@ async def _modify_guild_scheduled_event(
         url=adapter.base_url / f"guilds/{guild_id}/scheduled-events/{event_id}",
         json=data,
     )
-    return parse_obj_as(GuildScheduledEvent, await _request(adapter, bot, request))
+    return type_validate_python(GuildScheduledEvent, await _request(adapter, bot, request))
 
 
 async def _delete_guild_scheduled_event(
@@ -2288,7 +2287,7 @@ async def _get_guild_scheduled_event_users(
         url=adapter.base_url / f"guilds/{guild_id}/scheduled-events/{event_id}/users",
         params=params,
     )
-    return parse_obj_as(
+    return type_validate_python(
         List[GuildScheduledEventUser], await _request(adapter, bot, request)
     )
 
@@ -2303,7 +2302,7 @@ async def _get_guild_template(
         method="GET",
         url=adapter.base_url / f"guilds/templates/{template_code}",
     )
-    return parse_obj_as(GuildTemplate, await _request(adapter, bot, request))
+    return type_validate_python(GuildTemplate, await _request(adapter, bot, request))
 
 
 async def _create_guild_from_guild_template(
@@ -2317,7 +2316,7 @@ async def _create_guild_from_guild_template(
         url=adapter.base_url / f"guilds/templates/{template_code}",
         json=data,
     )
-    return parse_obj_as(Guild, await _request(adapter, bot, request))
+    return type_validate_python(Guild, await _request(adapter, bot, request))
 
 
 async def _get_guild_templates(
@@ -2330,7 +2329,7 @@ async def _get_guild_templates(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/templates",
     )
-    return parse_obj_as(List[GuildTemplate], await _request(adapter, bot, request))
+    return type_validate_python(List[GuildTemplate], await _request(adapter, bot, request))
 
 
 async def _create_guild_template(
@@ -2344,7 +2343,7 @@ async def _create_guild_template(
         url=adapter.base_url / f"guilds/{guild_id}/templates",
         json=data,
     )
-    return parse_obj_as(GuildTemplate, await _request(adapter, bot, request))
+    return type_validate_python(GuildTemplate, await _request(adapter, bot, request))
 
 
 async def _sync_guild_template(
@@ -2357,7 +2356,7 @@ async def _sync_guild_template(
         method="PUT",
         url=adapter.base_url / f"guilds/{guild_id}/templates/{template_code}",
     )
-    return parse_obj_as(GuildTemplate, await _request(adapter, bot, request))
+    return type_validate_python(GuildTemplate, await _request(adapter, bot, request))
 
 
 async def _modify_guild_template(
@@ -2371,7 +2370,7 @@ async def _modify_guild_template(
         url=adapter.base_url / f"guilds/{guild_id}/templates/{template_code}",
         json=data,
     )
-    return parse_obj_as(GuildTemplate, await _request(adapter, bot, request))
+    return type_validate_python(GuildTemplate, await _request(adapter, bot, request))
 
 
 async def _delete_guild_template(
@@ -2398,7 +2397,7 @@ async def _get_invite(
         url=adapter.base_url / f"invites/{invite_code}",
         params=params,
     )
-    return parse_obj_as(Invite, await _request(adapter, bot, request))
+    return type_validate_python(Invite, await _request(adapter, bot, request))
 
 
 async def _delete_invite(
@@ -2413,7 +2412,7 @@ async def _delete_invite(
         method="DELETE",
         url=adapter.base_url / f"invites/{invite_code}",
     )
-    return parse_obj_as(Invite, await _request(adapter, bot, request))
+    return type_validate_python(Invite, await _request(adapter, bot, request))
 
 
 async def _create_stage_instance(
@@ -2429,7 +2428,7 @@ async def _create_stage_instance(
         url=adapter.base_url / "stage-instances",
         json=data,
     )
-    return parse_obj_as(StageInstance, await _request(adapter, bot, request))
+    return type_validate_python(StageInstance, await _request(adapter, bot, request))
 
 
 async def _get_stage_instance(
@@ -2442,7 +2441,7 @@ async def _get_stage_instance(
         method="GET",
         url=adapter.base_url / f"stage-instances/{channel_id}",
     )
-    return parse_obj_as(Optional[StageInstance], await _request(adapter, bot, request))
+    return type_validate_python(Optional[StageInstance], await _request(adapter, bot, request))
 
 
 async def _modify_stage_instance(
@@ -2458,7 +2457,7 @@ async def _modify_stage_instance(
         url=adapter.base_url / f"stage-instances/{channel_id}",
         json=data,
     )
-    return parse_obj_as(StageInstance, await _request(adapter, bot, request))
+    return type_validate_python(StageInstance, await _request(adapter, bot, request))
 
 
 async def _delete_stage_instance(
@@ -2489,7 +2488,7 @@ async def _get_sticker(
         method="GET",
         url=adapter.base_url / f"stickers/{sticker_id}",
     )
-    return parse_obj_as(Sticker, await _request(adapter, bot, request))
+    return type_validate_python(Sticker, await _request(adapter, bot, request))
 
 
 async def _list_nitro_sticker_packs(
@@ -2502,7 +2501,7 @@ async def _list_nitro_sticker_packs(
         method="GET",
         url=adapter.base_url / "sticker-packs",
     )
-    return parse_obj_as(List[StickerPack], await _request(adapter, bot, request))
+    return type_validate_python(List[StickerPack], await _request(adapter, bot, request))
 
 
 async def _list_guild_stickers(
@@ -2515,7 +2514,7 @@ async def _list_guild_stickers(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/stickers",
     )
-    return parse_obj_as(List[Sticker], await _request(adapter, bot, request))
+    return type_validate_python(List[Sticker], await _request(adapter, bot, request))
 
 
 async def _get_guild_sticker(
@@ -2528,7 +2527,7 @@ async def _get_guild_sticker(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/stickers/{sticker_id}",
     )
-    return parse_obj_as(Sticker, await _request(adapter, bot, request))
+    return type_validate_python(Sticker, await _request(adapter, bot, request))
 
 
 async def _create_guild_sticker(
@@ -2557,7 +2556,7 @@ async def _create_guild_sticker(
         json={"name": name, "description": description, "tags": tags},
         files=form,
     )
-    return parse_obj_as(Sticker, await _request(adapter, bot, request))
+    return type_validate_python(Sticker, await _request(adapter, bot, request))
 
 
 async def _modify_guild_sticker(
@@ -2577,7 +2576,7 @@ async def _modify_guild_sticker(
         url=adapter.base_url / f"guilds/{guild_id}/stickers/{sticker_id}",
         json=data,
     )
-    return parse_obj_as(Sticker, await _request(adapter, bot, request))
+    return type_validate_python(Sticker, await _request(adapter, bot, request))
 
 
 async def _delete_guild_sticker(
@@ -2607,7 +2606,7 @@ async def _get_current_user(adapter: "Adapter", bot: "Bot") -> User:
         method="GET",
         url=adapter.base_url / "users/@me",
     )
-    return parse_obj_as(User, await _request(adapter, bot, request))
+    return type_validate_python(User, await _request(adapter, bot, request))
 
 
 async def _get_user(adapter: "Adapter", bot: "Bot", user_id: SnowflakeType) -> User:
@@ -2618,7 +2617,7 @@ async def _get_user(adapter: "Adapter", bot: "Bot", user_id: SnowflakeType) -> U
         method="GET",
         url=adapter.base_url / f"users/{user_id}",
     )
-    return parse_obj_as(User, await _request(adapter, bot, request))
+    return type_validate_python(User, await _request(adapter, bot, request))
 
 
 async def _modify_current_user(adapter: "Adapter", bot: "Bot", **data) -> User:
@@ -2630,7 +2629,7 @@ async def _modify_current_user(adapter: "Adapter", bot: "Bot", **data) -> User:
         url=adapter.base_url / "users/@me",
         json=data,
     )
-    return parse_obj_as(User, await _request(adapter, bot, request))
+    return type_validate_python(User, await _request(adapter, bot, request))
 
 
 async def _get_current_user_guilds(
@@ -2644,7 +2643,7 @@ async def _get_current_user_guilds(
         url=adapter.base_url / "users/@me/guilds",
         params=params,
     )
-    return parse_obj_as(List[CurrentUserGuild], await _request(adapter, bot, request))
+    return type_validate_python(List[CurrentUserGuild], await _request(adapter, bot, request))
 
 
 async def _get_current_user_guild_member(
@@ -2657,7 +2656,7 @@ async def _get_current_user_guild_member(
         method="GET",
         url=adapter.base_url / f"users/@me/guilds/{guild_id}/member",
     )
-    return parse_obj_as(GuildMember, await _request(adapter, bot, request))
+    return type_validate_python(GuildMember, await _request(adapter, bot, request))
 
 
 async def _leave_guild(adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType) -> None:
@@ -2680,7 +2679,7 @@ async def _create_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:
         url=adapter.base_url / "users/@me/channels",
         json=data,
     )
-    return parse_obj_as(Channel, await _request(adapter, bot, request))
+    return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
 async def _create_group_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:
@@ -2692,7 +2691,7 @@ async def _create_group_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:
         url=adapter.base_url / "users/@me/channels",
         json=data,
     )
-    return parse_obj_as(Channel, await _request(adapter, bot, request))
+    return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
 async def _get_user_connections(
@@ -2706,7 +2705,7 @@ async def _get_user_connections(
         method="GET",
         url=adapter.base_url / "users/@me/connections",
     )
-    return parse_obj_as(List[Connection], await _request(adapter, bot, request))
+    return type_validate_python(List[Connection], await _request(adapter, bot, request))
 
 
 async def _get_user_application_role_connection(
@@ -2720,7 +2719,7 @@ async def _get_user_application_role_connection(
         url=adapter.base_url
         / f"users/@me/applications/{application_id}/role-connection",
     )
-    return parse_obj_as(
+    return type_validate_python(
         ApplicationRoleConnection, await _request(adapter, bot, request)
     )
 
@@ -2741,7 +2740,7 @@ async def _update_user_application_role_connection(
         / f"users/@me/applications/{application_id}/role-connection",
         json=data,
     )
-    return parse_obj_as(
+    return type_validate_python(
         ApplicationRoleConnection, await _request(adapter, bot, request)
     )
 
@@ -2754,7 +2753,7 @@ async def _list_voice_regions(adapter: "Adapter", bot: "Bot") -> List[VoiceRegio
         method="GET",
         url=adapter.base_url / "voice/regions",
     )
-    return parse_obj_as(List[VoiceRegion], await _request(adapter, bot, request))
+    return type_validate_python(List[VoiceRegion], await _request(adapter, bot, request))
 
 
 async def _create_webhook(
@@ -2770,7 +2769,7 @@ async def _create_webhook(
         url=adapter.base_url / f"channels/{channel_id}/webhooks",
         json=data,
     )
-    return parse_obj_as(Webhook, await _request(adapter, bot, request))
+    return type_validate_python(Webhook, await _request(adapter, bot, request))
 
 
 async def _get_channel_webhooks(
@@ -2783,7 +2782,7 @@ async def _get_channel_webhooks(
         method="GET",
         url=adapter.base_url / f"channels/{channel_id}/webhooks",
     )
-    return parse_obj_as(List[Webhook], await _request(adapter, bot, request))
+    return type_validate_python(List[Webhook], await _request(adapter, bot, request))
 
 
 async def _get_guild_webhooks(
@@ -2796,7 +2795,7 @@ async def _get_guild_webhooks(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/webhooks",
     )
-    return parse_obj_as(List[Webhook], await _request(adapter, bot, request))
+    return type_validate_python(List[Webhook], await _request(adapter, bot, request))
 
 
 async def _get_webhook(
@@ -2809,7 +2808,7 @@ async def _get_webhook(
         method="GET",
         url=adapter.base_url / f"webhooks/{webhook_id}",
     )
-    return parse_obj_as(Webhook, await _request(adapter, bot, request))
+    return type_validate_python(Webhook, await _request(adapter, bot, request))
 
 
 async def _get_webhook_with_token(
@@ -2820,7 +2819,7 @@ async def _get_webhook_with_token(
         method="GET",
         url=adapter.base_url / f"webhooks/{webhook_id}/{token}",
     )
-    return parse_obj_as(Webhook, await _request(adapter, bot, request))
+    return type_validate_python(Webhook, await _request(adapter, bot, request))
 
 
 async def _modify_webhook(
@@ -2836,7 +2835,7 @@ async def _modify_webhook(
         url=adapter.base_url / f"webhooks/{webhook_id}",
         json=data,
     )
-    return parse_obj_as(Webhook, await _request(adapter, bot, request))
+    return type_validate_python(Webhook, await _request(adapter, bot, request))
 
 
 async def _modify_webhook_with_token(
@@ -2848,7 +2847,7 @@ async def _modify_webhook_with_token(
         url=adapter.base_url / f"webhooks/{webhook_id}/{token}",
         json=data,
     )
-    return parse_obj_as(Webhook, await _request(adapter, bot, request))
+    return type_validate_python(Webhook, await _request(adapter, bot, request))
 
 
 async def _delete_webhook(
@@ -2900,7 +2899,7 @@ async def _execute_webhook(
     )
     resp = await _request(adapter, bot, request)
     if resp:
-        return parse_obj_as(MessageGet, resp)
+        return type_validate_python(MessageGet, resp)
     return resp
 
 
@@ -2948,7 +2947,7 @@ async def _get_webhook_message(
         url=adapter.base_url / f"webhooks/{webhook_id}/{token}/messages/{message_id}",
         params=params,
     )
-    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
 async def _edit_webhook_message(adapter: "Adapter", bot: "Bot", **data) -> MessageGet:
@@ -2965,7 +2964,7 @@ async def _edit_webhook_message(adapter: "Adapter", bot: "Bot", **data) -> Messa
         params=params,
         **data,
     )
-    return parse_obj_as(MessageGet, await _request(adapter, bot, request))
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
 async def _delete_webhook_message(
@@ -2995,7 +2994,7 @@ async def _get_gateway(adapter: "Adapter", bot: "Bot") -> Gateway:
         method="GET",
         url=adapter.base_url / "gateway",
     )
-    return parse_obj_as(Gateway, await _request(adapter, bot, request))
+    return type_validate_python(Gateway, await _request(adapter, bot, request))
 
 
 async def _get_gateway_bot(adapter: "Adapter", bot: "Bot") -> GatewayBot:
@@ -3005,7 +3004,7 @@ async def _get_gateway_bot(adapter: "Adapter", bot: "Bot") -> GatewayBot:
         method="GET",
         url=adapter.base_url / "gateway/bot",
     )
-    return parse_obj_as(GatewayBot, await _request(adapter, bot, request))
+    return type_validate_python(GatewayBot, await _request(adapter, bot, request))
 
 
 async def _get_current_bot_application_information(
@@ -3018,7 +3017,7 @@ async def _get_current_bot_application_information(
         method="GET",
         url=adapter.base_url / "oauth2/applications/@me",
     )
-    return parse_obj_as(Application, await _request(adapter, bot, request))
+    return type_validate_python(Application, await _request(adapter, bot, request))
 
 
 async def _get_current_authorization_information(
@@ -3031,7 +3030,7 @@ async def _get_current_authorization_information(
         method="GET",
         url=adapter.base_url / "oauth2/@me",
     )
-    return parse_obj_as(AuthorizationResponse, await _request(adapter, bot, request))
+    return type_validate_python(AuthorizationResponse, await _request(adapter, bot, request))
 
 
 API_HANDLERS: Dict[str, Callable[..., Awaitable[Any]]] = {

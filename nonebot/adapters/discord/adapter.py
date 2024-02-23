@@ -6,11 +6,11 @@ from typing import Any, List, Optional, Tuple
 from typing_extensions import override
 
 from nonebot.adapters import Adapter as BaseAdapter
+from nonebot.compat import type_validate_python
 from nonebot.drivers import URL, Driver, ForwardDriver, Request, WebSocket
 from nonebot.exception import WebSocketClosed
+from nonebot.plugin import get_plugin_config
 from nonebot.utils import escape_tag
-
-from pydantic import parse_obj_as, parse_raw_as
 
 from .api.handle import API_HANDLERS
 from .api.model import GatewayBot, User
@@ -40,7 +40,7 @@ class Adapter(BaseAdapter):
     @override
     def __init__(self, driver: Driver, **kwargs: Any):
         super().__init__(driver, **kwargs)
-        self.discord_config: Config = Config(**self.config.dict())
+        self.discord_config: Config = get_plugin_config(Config)
         self.tasks: List[asyncio.Task] = []
         self.base_url: URL = URL(
             f"https://discord.com/api/v{self.discord_config.discord_api_version}",
@@ -426,7 +426,7 @@ class Adapter(BaseAdapter):
     async def receive_payload(self, ws: WebSocket) -> Payload:
         data = await ws.receive()
         data = decompress_data(data, self.discord_config.discord_compress)
-        return parse_raw_as(PayloadType, data)
+        return type_validate_python(PayloadType, json.loads(data))
 
     @classmethod
     def payload_to_event(cls, payload: Dispatch) -> Event:
@@ -439,7 +439,7 @@ class Adapter(BaseAdapter):
             event = Event.parse_obj(payload.data)
             event.__type__ = payload.type  # type: ignore
             return event
-        return parse_obj_as(EventClass, payload.data)
+        return type_validate_python(EventClass, payload.data)
 
     @override
     async def _call_api(self, bot: Bot, api: str, **data: Any) -> Any:

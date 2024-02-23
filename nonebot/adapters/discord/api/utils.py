@@ -1,6 +1,8 @@
 import json
 from typing import Any, Dict, List, Literal, Type, Union
 
+from nonebot.compat import type_validate_python
+
 from .model import (
     ExecuteWebhookParams,
     InteractionCallbackMessage,
@@ -12,7 +14,7 @@ from .model import (
 def parse_data(
     data: Dict[str, Any], model_class: Type[Union[MessageSend, ExecuteWebhookParams]]
 ) -> Dict[Literal["files", "json"], Any]:
-    model = model_class.parse_obj(data)
+    model = type_validate_python(model_class, data)
     payload: Dict[str, Any] = model.dict(exclude={"files"}, exclude_none=True)
     if model.files:
         multipart: Dict[str, Any] = {}
@@ -34,7 +36,7 @@ def parse_data(
 def parse_forum_thread_message(
     data: Dict[str, Any]
 ) -> Dict[Literal["files", "json"], Any]:
-    model = MessageSend.parse_obj(data)
+    model = type(MessageSend, data)
     payload: Dict[str, Any] = {}
     content: Dict[str, Any] = model.dict(exclude={"files"}, exclude_none=True)
     if auto_archive_duration := data.pop("auto_archive_duration"):
