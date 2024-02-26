@@ -2959,7 +2959,7 @@ async def _execute_webhook(
     """https://discord.com/developers/docs/resources/webhook#execute-webhook"""
     params = {}
     if data.get("wait"):
-        params["wait"] = data.pop("wait")
+        params["wait"] = str(data.pop("wait"))
     if data.get("thread_id"):
         params["thread_id"] = data.pop("thread_id")
     data = parse_data(data, ExecuteWebhookParams)
