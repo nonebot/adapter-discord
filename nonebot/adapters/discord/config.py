@@ -54,7 +54,7 @@ class BotInfo(BaseModel):
     token: str
     shard: Optional[Tuple[int, int]] = None
     intent: Intents = Field(default_factory=Intents)
-    application_commands: Dict[str, List[Union[Snowflake, Literal["*"]]]] = Field(
+    application_commands: Dict[str, List[Union[Literal["*"], Snowflake]]] = Field(
         default_factory=dict
     )
 
