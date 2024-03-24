@@ -103,10 +103,10 @@ class Snowflake(int):
 
         @classmethod
         def __get_pydantic_core_schema__(cls, source, handler) -> CoreSchema:
-            return core_schema.with_info_plain_validator_function(cls.validate)
+            return core_schema.with_info_plain_validator_function(cls.validate)  # type: ignore
 
         @classmethod
-        def validate(cls, value: Any, _):
+        def validate(cls, value: Any, _):  # type: ignore
             if isinstance(value, str) and value.isdigit():
                 value = int(value)
             if not isinstance(value, int):

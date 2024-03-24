@@ -438,7 +438,7 @@ class Message(BaseMessage[MessageSegment]):
         if message.mention_everyone:
             msg.append(MessageSegment.mention_everyone())
         if message.content:
-            msg.extend(Message(message.content))
+            msg.append(MessageSegment.text(message.content))
         if message.attachments:
             msg.extend(
                 MessageSegment.attachment(

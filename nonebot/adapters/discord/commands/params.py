@@ -38,7 +38,7 @@ class OptionParam(Param):
         self.key = key
 
     def __repr__(self) -> str:
-        return f"OptionParam(key={self.extra['key']!r})"
+        return f"OptionParam(key={self.key!r})"
 
     @classmethod
     @override

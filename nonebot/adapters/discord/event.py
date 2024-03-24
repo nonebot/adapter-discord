@@ -1005,7 +1005,7 @@ event_classes: Dict[str, Type[Event]] = {
     EventType.VOICE_STATE_UPDATE.value: VoiceStateUpdateEvent,
     EventType.VOICE_SERVER_UPDATE.value: VoiceServerUpdateEvent,
     EventType.WEBHOOKS_UPDATE.value: WebhooksUpdateEvent,
-}
+}  # type: ignore
 
 __all__ = [
     "EventType",

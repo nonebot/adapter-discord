@@ -2508,7 +2508,8 @@ async def _get_stage_instance(
         url=adapter.base_url / f"stage-instances/{channel_id}",
     )
     return type_validate_python(
-        Optional[StageInstance], await _request(adapter, bot, request)
+        Optional[StageInstance],
+        await _request(adapter, bot, request),  # type: ignore
     )
 
 
@@ -3300,4 +3301,4 @@ API_HANDLERS: Dict[str, Callable[..., Awaitable[Any]]] = {
     "get_gateway_bot": _get_gateway_bot,
     "get_current_bot_application_information": _get_current_bot_application_information,
     "get_current_authorization_information": _get_current_authorization_information,
-}
+}  # type: ignore

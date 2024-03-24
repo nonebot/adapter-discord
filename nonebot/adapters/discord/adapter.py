@@ -429,7 +429,7 @@ class Adapter(BaseAdapter):
     async def receive_payload(self, ws: WebSocket) -> Payload:
         data = await ws.receive()
         data = decompress_data(data, self.discord_config.discord_compress)
-        return type_validate_python(PayloadType, json.loads(data))
+        return type_validate_python(PayloadType, json.loads(data))  # type: ignore
 
     @classmethod
     def payload_to_event(cls, payload: Dispatch) -> Event:
