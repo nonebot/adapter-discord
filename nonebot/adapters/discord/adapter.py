@@ -6,7 +6,7 @@ from typing import Any, List, Optional, Tuple
 from typing_extensions import override
 
 from nonebot.adapters import Adapter as BaseAdapter
-from nonebot.compat import model_dump, type_validate_python
+from nonebot.compat import type_validate_json, type_validate_python
 from nonebot.drivers import URL, Driver, ForwardDriver, Request, WebSocket
 from nonebot.exception import WebSocketClosed
 from nonebot.plugin import get_plugin_config
@@ -31,7 +31,7 @@ from .payload import (
     Reconnect,
     Resume,
 )
-from .utils import decompress_data, log
+from .utils import decompress_data, log, model_dump
 
 RECONNECT_INTERVAL = 3.0
 
@@ -131,7 +131,7 @@ class Adapter(BaseAdapter):
         resp = await self.request(request)
         if not resp.content:
             raise ValueError("Failed to get gateway info")
-        return type_validate_python(GatewayBot, json.loads(resp.content))
+        return type_validate_json(GatewayBot, resp.content)
 
     async def _get_bot_user(self, bot_info: BotInfo) -> User:
         headers = {"Authorization": self.get_authorization(bot_info)}
@@ -145,7 +145,7 @@ class Adapter(BaseAdapter):
         resp = await self.request(request)
         if not resp.content:
             raise ValueError("Failed to get bot user info")
-        return type_validate_python(User, json.loads(resp.content))
+        return type_validate_json(User, resp.content)
 
     async def _forward_ws(
         self,
@@ -229,7 +229,8 @@ class Adapter(BaseAdapter):
                         if heartbeat_task:
                             heartbeat_task.cancel()
                             heartbeat_task = None
-                        self.bot_disconnect(bot)
+                        if bot.self_id in self.bots:
+                            self.bot_disconnect(bot)
 
             except Exception as e:
                 log(
@@ -279,7 +280,7 @@ class Adapter(BaseAdapter):
             {"data": bot.sequence if bot.has_sequence else None},
         )
         with contextlib.suppress(Exception):
-            await ws.send(json.dumps(model_dump(payload)))
+            await ws.send(json.dumps(model_dump(payload, by_alias=True)))
 
     async def _heartbeat_task(self, ws: WebSocket, bot: Bot, heartbeat_interval: int):
         """心跳任务"""
@@ -319,7 +320,9 @@ class Adapter(BaseAdapter):
             )
 
         try:
-            await ws.send(json.dumps(model_dump(payload, exclude_none=True)))
+            await ws.send(
+                json.dumps(model_dump(payload, by_alias=True, exclude_none=True))
+            )
         except Exception as e:
             log(
                 "ERROR",
@@ -429,7 +432,7 @@ class Adapter(BaseAdapter):
     async def receive_payload(self, ws: WebSocket) -> Payload:
         data = await ws.receive()
         data = decompress_data(data, self.discord_config.discord_compress)
-        return type_validate_python(PayloadType, json.loads(data))  # type: ignore
+        return type_validate_json(PayloadType, data)  # type: ignore
 
     @classmethod
     def payload_to_event(cls, payload: Dispatch) -> Event:

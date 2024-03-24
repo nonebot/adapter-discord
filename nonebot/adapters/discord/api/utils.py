@@ -1,7 +1,7 @@
 import json
 from typing import Any, Dict, List, Literal, Type, Union
 
-from nonebot.compat import model_dump, type_validate_python
+from nonebot.compat import type_validate_python
 
 from .model import (
     ExecuteWebhookParams,
@@ -9,6 +9,7 @@ from .model import (
     InteractionResponse,
     MessageSend,
 )
+from ..utils import model_dump
 
 
 def parse_data(

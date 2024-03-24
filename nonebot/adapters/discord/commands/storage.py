@@ -1,10 +1,9 @@
 from collections import defaultdict
 from typing import TYPE_CHECKING, Dict, List, Literal
 
-from nonebot.compat import model_dump
-
 from ..api import ApplicationCommandCreate, Snowflake
 from ..bot import Bot
+from ..utils import model_dump
 
 if TYPE_CHECKING:
     from .matcher import ApplicationCommandConfig

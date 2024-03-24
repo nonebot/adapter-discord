@@ -10,12 +10,13 @@ from typing import (
 )
 from urllib.parse import quote
 
-from nonebot.compat import model_dump, type_validate_python
+from nonebot.compat import type_validate_python
 from nonebot.drivers import Request
 
 from .model import *
 from .request import _request
 from .utils import parse_data, parse_forum_thread_message, parse_interaction_response
+from ..utils import model_dump
 
 if TYPE_CHECKING:
     from ..adapter import Adapter
@@ -2508,8 +2509,8 @@ async def _get_stage_instance(
         url=adapter.base_url / f"stage-instances/{channel_id}",
     )
     return type_validate_python(
-        Optional[StageInstance],
-        await _request(adapter, bot, request),  # type: ignore
+        Optional[StageInstance],  # type: ignore
+        await _request(adapter, bot, request),
     )
 
 
