@@ -584,7 +584,9 @@ class GuildFeature(StrEnum):
     """Guild is permanently removed from Discovery by Discord"""
     ENABLED_DISCOVERABLE_BEFORE = "ENABLED_DISCOVERABLE_BEFORE"
     """Given to servers that have enabled Discovery at any point"""
-    ENABLED_MODERATION_EXPERIENCE_FOR_NON_COMMUNITY = "ENABLED_MODERATION_EXPERIENCE_FOR_NON_COMMUNITY"
+    ENABLED_MODERATION_EXPERIENCE_FOR_NON_COMMUNITY = (
+        "ENABLED_MODERATION_EXPERIENCE_FOR_NON_COMMUNITY"
+    )
     """Moves the member list from the guild settings to the member tab for non-community guilds"""
     EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT = "EXPOSED_TO_ACTIVITIES_WTP_EXPERIMENT"
     """Given to guilds previously in the 2021-11_activities_baseline_engagement_bundle experiment overrides"""
@@ -614,7 +616,9 @@ class GuildFeature(StrEnum):
     GUILD_PRODUCTS_ALLOW_ARCHIVED_FILE = "GUILD_PRODUCTS_ALLOW_ARCHIVED_FILE"
     GUILD_ROLE_SUBSCRIPTIONS = "GUILD_ROLE_SUBSCRIPTIONS"
     """Given to guilds previously in the 2021-06_guild_role_subscriptions experiment overrides"""
-    GUILD_ROLE_SUBSCRIPTION_PURCHASE_FEEDBACK_LOOP = "GUILD_ROLE_SUBSCRIPTION_PURCHASE_FEEDBACK_LOOP"
+    GUILD_ROLE_SUBSCRIPTION_PURCHASE_FEEDBACK_LOOP = (
+        "GUILD_ROLE_SUBSCRIPTION_PURCHASE_FEEDBACK_LOOP"
+    )
     """Given to guilds previously in the 2022-05_mobile_web_role_subscription_purchase_page experiment overrides"""
     GUILD_ROLE_SUBSCRIPTION_TIER_TEMPLATE = "GUILD_ROLE_SUBSCRIPTION_TIER_TEMPLATE"
     GUILD_ROLE_SUBSCRIPTION_TRIALS = "GUILD_ROLE_SUBSCRIPTION_TRIALS"
@@ -646,7 +650,9 @@ class GuildFeature(StrEnum):
     MEMBER_VERIFICATION_GATE_ENABLED = "MEMBER_VERIFICATION_GATE_ENABLED"
     """guild has enabled Membership Screening"""
     MEMBER_VERIFICATION_MANUAL_APPROVAL = "MEMBER_VERIFICATION_MANUAL_APPROVAL"
-    MOBILE_WEB_ROLE_SUBSCRIPTION_PURCHASE_PAGE = "MOBILE_WEB_ROLE_SUBSCRIPTION_PURCHASE_PAGE"
+    MOBILE_WEB_ROLE_SUBSCRIPTION_PURCHASE_PAGE = (
+        "MOBILE_WEB_ROLE_SUBSCRIPTION_PURCHASE_PAGE"
+    )
     """Given to guilds previously in the 2022-05_mobile_web_role_subscription_purchase_page experiment overrides"""
     MONETIZATION_ENABLED = "MONETIZATION_ENABLED"
     """Allows the server to set a team in dev portal to receive role subscription payouts"""
