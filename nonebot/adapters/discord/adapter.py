@@ -59,7 +59,7 @@ class Adapter(BaseAdapter):
                 "doesn't support forward connections!"
                 "Discord Adapter need a ForwardDriver to work.",
             )
-        self.driver.on_startup(self.startup)
+        self.on_ready(self.startup)
         self.driver.on_shutdown(self.shutdown)
         self.driver.on_bot_connect(sync_application_command)
 
