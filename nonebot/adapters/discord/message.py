@@ -142,8 +142,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
 
     @staticmethod
     @overload
-    def reference(reference: MessageReference) -> "ReferenceSegment":
-        ...
+    def reference(reference: MessageReference) -> "ReferenceSegment": ...
 
     @staticmethod
     @overload
@@ -152,8 +151,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
         channel_id: Optional[SnowflakeType] = None,
         guild_id: Optional[SnowflakeType] = None,
         fail_if_not_exists: Optional[bool] = None,
-    ) -> "ReferenceSegment":
-        ...
+    ) -> "ReferenceSegment": ...
 
     @staticmethod
     def reference(
