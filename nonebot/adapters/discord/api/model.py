@@ -2218,6 +2218,7 @@ class User(BaseModel):
     id: Snowflake
     username: str
     discriminator: str
+    global_name: Optional[str]
     avatar: Optional[str] = Field(...)
     bot: Missing[bool] = UNSET
     system: Missing[bool] = UNSET
@@ -2230,6 +2231,7 @@ class User(BaseModel):
     flags: Missing[int] = UNSET
     premium_type: Missing[PremiumType] = UNSET
     public_flags: Missing[UserFlags] = UNSET
+    avatar_decoration: MissingOrNullable[str] = UNSET
 
 
 class Connection(BaseModel):
