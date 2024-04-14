@@ -624,6 +624,12 @@ class InteractionCreateEvent(NoticeEvent, InteractionCreate):
 
     __type__ = EventType.INTERACTION_CREATE
 
+    @override
+    def get_user_id(self) -> str:
+        if not self.user:
+            raise ValueError("Event has no context!")
+        return str(self.user.id)
+
 
 class PingInteractionEvent(InteractionCreateEvent):
     type: Literal[InteractionType.PING]
