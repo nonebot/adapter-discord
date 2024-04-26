@@ -395,7 +395,7 @@ class Message(BaseMessage[MessageSegment]):
     def _construct(msg: str) -> Iterable[MessageSegment]:
         text_begin = 0
         for embed in re.finditer(
-            r"<(?P<type>(@!|@&|@|#|/|:|a:|t:))(?P<param>[^<]]+?)>",
+            r"<(?P<type>(@!|@&|@|#|/|:|a:|t:))(?P<param>[^<]+?)>",
             msg,
         ):
             if content := msg[text_begin : embed.pos + embed.start()]:
