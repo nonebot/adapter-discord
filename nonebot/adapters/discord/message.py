@@ -36,7 +36,7 @@ from .api import (
     SnowflakeType,
     TimeStampStyle,
 )
-from .utils import escape, unescape
+from .utils import unescape
 
 
 class MessageSegment(BaseMessageSegment["Message"]):
@@ -319,7 +319,7 @@ class TextSegment(MessageSegment):
 
     @override
     def __str__(self) -> str:
-        return escape(self.data["text"])
+        return self.data["text"]
 
 
 class EmbedData(TypedDict):
@@ -395,7 +395,7 @@ class Message(BaseMessage[MessageSegment]):
     def _construct(msg: str) -> Iterable[MessageSegment]:
         text_begin = 0
         for embed in re.finditer(
-            r"<(?P<type>(@!|@&|@|#|/|:|a:|t:))?(?P<param>.+?)>",
+            r"<(?P<type>(@!|@&|@|#|/|:|a:|t:))(?P<param>[^<]+?)>",
             msg,
         ):
             if content := msg[text_begin : embed.pos + embed.start()]:
@@ -436,7 +436,7 @@ class Message(BaseMessage[MessageSegment]):
         if message.mention_everyone:
             msg.append(MessageSegment.mention_everyone())
         if message.content:
-            msg.append(MessageSegment.text(message.content))
+            msg.extend(Message(message.content))
         if message.attachments:
             msg.extend(
                 MessageSegment.attachment(
