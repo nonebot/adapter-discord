@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Set, Union
+from typing import Any, Optional, Union
 import zlib
 
 from nonebot.compat import model_dump as model_dump_
@@ -25,13 +25,13 @@ def exclude_unset_data(data: Any) -> Any:
 
 def model_dump(
     model: BaseModel,
-    include: Optional[Set[str]] = None,
-    exclude: Optional[Set[str]] = None,
+    include: Optional[set[str]] = None,
+    exclude: Optional[set[str]] = None,
     by_alias: bool = False,
     exclude_unset: bool = False,
     exclude_defaults: bool = False,
     exclude_none: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     data = model_dump_(
         model,
         include=include,

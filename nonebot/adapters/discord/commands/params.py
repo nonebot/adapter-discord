@@ -1,6 +1,6 @@
 import inspect
-from typing import Any, Optional, Tuple, Type, TypeVar
-from typing_extensions import Annotated, get_args, get_origin, override
+from typing import Annotated, Any, Optional, TypeVar
+from typing_extensions import get_args, get_origin, override
 
 from nonebot.dependencies import Param
 from nonebot.params import Depends
@@ -43,7 +43,7 @@ class OptionParam(Param):
     @classmethod
     @override
     def _check_param(
-        cls, param: inspect.Parameter, allow_types: Tuple[Type[Param], ...]
+        cls, param: inspect.Parameter, allow_types: tuple[type[Param], ...]
     ) -> Optional["OptionParam"]:
         if isinstance(param.default, CommandOptionType):
             return cls(key=param.default.key or param.name, validate=True)

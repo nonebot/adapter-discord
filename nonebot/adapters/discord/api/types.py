@@ -1,5 +1,5 @@
 from enum import Enum, IntEnum, IntFlag
-from typing import Any, Dict, Literal, TypeVar, Union, final
+from typing import Any, Literal, TypeVar, Union, final
 from typing_extensions import TypeAlias
 
 T = TypeVar("T")
@@ -21,7 +21,7 @@ class Unset(Enum):
     def __copy__(self):
         return self._UNSET
 
-    def __deepcopy__(self, memo: Dict[int, Any]):
+    def __deepcopy__(self, memo: dict[int, Any]):
         return self._UNSET
 
     @classmethod

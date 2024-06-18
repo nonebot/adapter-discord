@@ -1,10 +1,8 @@
+from collections.abc import Awaitable
 from typing import (
     TYPE_CHECKING,
     Any,
-    Awaitable,
     Callable,
-    Dict,
-    List,
     Literal,
     Optional,
 )
@@ -29,7 +27,7 @@ if TYPE_CHECKING:
 
 async def _get_global_application_commands(
     adapter: "Adapter", bot: "Bot", application_id: SnowflakeType, **params
-) -> List[ApplicationCommand]:
+) -> list[ApplicationCommand]:
     """Fetch a global command for your application.
     Returns an application command object.
 
@@ -43,7 +41,7 @@ async def _get_global_application_commands(
         params=params,
     )
     return type_validate_python(
-        List[ApplicationCommand], await _request(adapter, bot, request)
+        list[ApplicationCommand], await _request(adapter, bot, request)
     )
 
 
@@ -139,8 +137,8 @@ async def _bulk_overwrite_global_application_commands(
     adapter: "Adapter",
     bot: "Bot",
     application_id: SnowflakeType,
-    commands: List[ApplicationCommandCreate],
-) -> List[ApplicationCommand]:
+    commands: list[ApplicationCommandCreate],
+) -> list[ApplicationCommand]:
     """Takes a list of application commands,
     overwriting the existing global command list for this application.
     Returns 200 and a list of application command objects.
@@ -157,7 +155,7 @@ async def _bulk_overwrite_global_application_commands(
         json=[model_dump(command, exclude_unset=True) for command in commands],
     )
     return type_validate_python(
-        List[ApplicationCommand], await _request(adapter, bot, request)
+        list[ApplicationCommand], await _request(adapter, bot, request)
     )
 
 
@@ -167,7 +165,7 @@ async def _get_guild_application_commands(
     application_id: SnowflakeType,
     guild_id: SnowflakeType,
     **params,
-) -> List[ApplicationCommand]:
+) -> list[ApplicationCommand]:
     """Fetch all of the guild commands for your application for a specific guild.
     Returns an array of application command objects.
 
@@ -182,7 +180,7 @@ async def _get_guild_application_commands(
         params=params,
     )
     return type_validate_python(
-        List[ApplicationCommand], await _request(adapter, bot, request)
+        list[ApplicationCommand], await _request(adapter, bot, request)
     )
 
 
@@ -293,8 +291,8 @@ async def _bulk_overwrite_guild_application_commands(
     bot: "Bot",
     application_id: SnowflakeType,
     guild_id: SnowflakeType,
-    commands: List[ApplicationCommandCreate],
-) -> List[ApplicationCommand]:
+    commands: list[ApplicationCommandCreate],
+) -> list[ApplicationCommand]:
     """Takes a list of application commands,
     overwriting the existing command list for this application for the targeted guild.
     Returns 200 and a list of application command objects.
@@ -310,7 +308,7 @@ async def _bulk_overwrite_guild_application_commands(
         json=[model_dump(command, exclude_unset=True) for command in commands],
     )
     return type_validate_python(
-        List[ApplicationCommand], await _request(adapter, bot, request)
+        list[ApplicationCommand], await _request(adapter, bot, request)
     )
 
 
@@ -319,7 +317,7 @@ async def _get_guild_application_command_permissions(
     bot: "Bot",
     application_id: SnowflakeType,
     guild_id: SnowflakeType,
-) -> List[GuildApplicationCommandPermissions]:
+) -> list[GuildApplicationCommandPermissions]:
     """
     Fetches permissions for all commands for your application in a guild.
     Returns an array of guild application command permissions objects.
@@ -334,7 +332,7 @@ async def _get_guild_application_command_permissions(
         / f"applications/{application_id}/guilds/{guild_id}/commands/permissions",
     )
     return type_validate_python(
-        List[GuildApplicationCommandPermissions], await _request(adapter, bot, request)
+        list[GuildApplicationCommandPermissions], await _request(adapter, bot, request)
     )
 
 
@@ -369,7 +367,7 @@ async def _edit_application_command_permissions(
     application_id: SnowflakeType,
     guild_id: SnowflakeType,
     command_id: SnowflakeType,
-    permissions: List[ApplicationCommandPermissions],
+    permissions: list[ApplicationCommandPermissions],
 ) -> GuildApplicationCommandPermissions:
     """
     Edits command permissions for a specific command for your application in a guild
@@ -573,7 +571,7 @@ async def _get_current_application(
 
 async def _get_application_role_connection_metadata_records(
     adapter: "Adapter", bot: "Bot", application_id: SnowflakeType
-) -> List[ApplicationRoleConnectionMetadata]:
+) -> list[ApplicationRoleConnectionMetadata]:
     """get application role connection metadata records
 
     see https://discord.com/developers/docs/resources/application-role-connection-metadata#get-application-role-connection-metadata-records
@@ -586,13 +584,13 @@ async def _get_application_role_connection_metadata_records(
         / f"applications/{application_id}/role-connections/metadata",
     )
     return type_validate_python(
-        List[ApplicationRoleConnectionMetadata], await _request(adapter, bot, request)
+        list[ApplicationRoleConnectionMetadata], await _request(adapter, bot, request)
     )
 
 
 async def _update_application_role_connection_metadata_records(
     adapter: "Adapter", bot: "Bot", application_id: SnowflakeType
-) -> List[ApplicationRoleConnectionMetadata]:
+) -> list[ApplicationRoleConnectionMetadata]:
     """get application role connection metadata records
 
     see https://discord.com/developers/docs/resources/application-role-connection-metadata#get-application-role-connection-metadata-records
@@ -605,7 +603,7 @@ async def _update_application_role_connection_metadata_records(
         / f"applications/{application_id}/role-connections/metadata",
     )
     return type_validate_python(
-        List[ApplicationRoleConnectionMetadata], await _request(adapter, bot, request)
+        list[ApplicationRoleConnectionMetadata], await _request(adapter, bot, request)
     )
 
 
@@ -627,7 +625,7 @@ async def _get_guild_audit_log(
 
 async def _list_auto_moderation_rules_for_guild(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
-) -> List[AutoModerationRule]:
+) -> list[AutoModerationRule]:
     """list auto moderation rules for guild
 
     see https://discord.com/developers/docs/resources/auto-moderation#list-auto-moderation-rules-for-guild
@@ -639,7 +637,7 @@ async def _list_auto_moderation_rules_for_guild(
         url=adapter.base_url / f"guilds/{guild_id}/auto-moderation/rules",
     )
     return type_validate_python(
-        List[AutoModerationRule], await _request(adapter, bot, request)
+        list[AutoModerationRule], await _request(adapter, bot, request)
     )
 
 
@@ -831,7 +829,7 @@ async def _delete_channel(
 
 async def _get_channel_messages(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **data
-) -> List[MessageGet]:
+) -> list[MessageGet]:
     """get channel messages
 
     see https://discord.com/developers/docs/resources/channel#get-channel-messages"""
@@ -842,7 +840,7 @@ async def _get_channel_messages(
         url=adapter.base_url / f"channels/{channel_id}/messages",
         params=data,
     )
-    return type_validate_python(List[MessageGet], await _request(adapter, bot, request))
+    return type_validate_python(list[MessageGet], await _request(adapter, bot, request))
 
 
 async def _get_channel_message(
@@ -971,7 +969,7 @@ async def _get_reactions(
     emoji: str,
     emoji_id: Optional[SnowflakeType] = None,
     **params,
-) -> List[User]:
+) -> list[User]:
     """get reactions
 
     see https://discord.com/developers/docs/resources/channel#get-reactions"""
@@ -985,7 +983,7 @@ async def _get_reactions(
         / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}",
         params=params,
     )
-    return type_validate_python(List[User], await _request(adapter, bot, request))
+    return type_validate_python(list[User], await _request(adapter, bot, request))
 
 
 async def _delete_all_reactions(
@@ -1106,7 +1104,7 @@ async def _edit_channel_permissions(
 
 async def _get_channel_invites(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType
-) -> List[Invite]:
+) -> list[Invite]:
     """https://discord.com/developers/docs/resources/channel#get-channel-invites"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1114,7 +1112,7 @@ async def _get_channel_invites(
         method="GET",
         url=adapter.base_url / f"channels/{channel_id}/invites",
     )
-    return type_validate_python(List[Invite], await _request(adapter, bot, request))
+    return type_validate_python(list[Invite], await _request(adapter, bot, request))
 
 
 async def _create_channel_invite(
@@ -1181,7 +1179,7 @@ async def _trigger_typing_indicator(
 
 async def _get_pinned_messages(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType
-) -> List[MessageGet]:
+) -> list[MessageGet]:
     """https://discord.com/developers/docs/resources/channel#get-pinned-messages"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1189,7 +1187,7 @@ async def _get_pinned_messages(
         method="GET",
         url=adapter.base_url / f"channels/{channel_id}/pins",
     )
-    return type_validate_python(List[MessageGet], await _request(adapter, bot, request))
+    return type_validate_python(list[MessageGet], await _request(adapter, bot, request))
 
 
 async def _pin_message(
@@ -1382,7 +1380,7 @@ async def _get_thread_member(
 
 async def _list_thread_members(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **params
-) -> List[ThreadMember]:
+) -> list[ThreadMember]:
     """https://discord.com/developers/docs/resources/channel#list-thread-members"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1392,7 +1390,7 @@ async def _list_thread_members(
         params=params,
     )
     return type_validate_python(
-        List[ThreadMember], await _request(adapter, bot, request)
+        list[ThreadMember], await _request(adapter, bot, request)
     )
 
 
@@ -1453,7 +1451,7 @@ async def _list_joined_private_archived_threads(
 
 async def _list_guild_emojis(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
-) -> List[Emoji]:
+) -> list[Emoji]:
     """https://discord.com/developers/docs/resources/emoji#list-guild-emojis"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1461,7 +1459,7 @@ async def _list_guild_emojis(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/emojis",
     )
-    return type_validate_python(List[Emoji], await _request(adapter, bot, request))
+    return type_validate_python(list[Emoji], await _request(adapter, bot, request))
 
 
 async def _get_guild_emoji(
@@ -1601,7 +1599,7 @@ async def _delete_guild(
 
 async def _get_guild_channels(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
-) -> List[Channel]:
+) -> list[Channel]:
     """https://discord.com/developers/docs/resources/guild#get-guild-channels"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1609,7 +1607,7 @@ async def _get_guild_channels(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/channels",
     )
-    return type_validate_python(List[Channel], await _request(adapter, bot, request))
+    return type_validate_python(list[Channel], await _request(adapter, bot, request))
 
 
 async def _create_guild_channel(
@@ -1675,7 +1673,7 @@ async def _get_guild_member(
 
 async def _list_guild_members(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **params
-) -> List[GuildMember]:
+) -> list[GuildMember]:
     """https://discord.com/developers/docs/resources/guild#list-guild-members"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1685,13 +1683,13 @@ async def _list_guild_members(
         params=params,
     )
     return type_validate_python(
-        List[GuildMember], await _request(adapter, bot, request)
+        list[GuildMember], await _request(adapter, bot, request)
     )
 
 
 async def _search_guild_members(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **params
-) -> List[GuildMember]:
+) -> list[GuildMember]:
     """https://discord.com/developers/docs/resources/guild#search-guild-members"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1701,7 +1699,7 @@ async def _search_guild_members(
         params=params,
     )
     return type_validate_python(
-        List[GuildMember], await _request(adapter, bot, request)
+        list[GuildMember], await _request(adapter, bot, request)
     )
 
 
@@ -1836,7 +1834,7 @@ async def _remove_guild_member(
 
 async def _get_guild_bans(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **params
-) -> List[Ban]:
+) -> list[Ban]:
     """https://discord.com/developers/docs/resources/guild#get-guild-bans"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1845,7 +1843,7 @@ async def _get_guild_bans(
         url=adapter.base_url / f"guilds/{guild_id}/bans",
         params=params,
     )
-    return type_validate_python(List[Ban], await _request(adapter, bot, request))
+    return type_validate_python(list[Ban], await _request(adapter, bot, request))
 
 
 async def _get_guild_ban(
@@ -1902,7 +1900,7 @@ async def _remove_guild_ban(
 
 async def _get_guild_roles(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
-) -> List[Role]:
+) -> list[Role]:
     """https://discord.com/developers/docs/resources/guild#get-guild-roles"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1910,7 +1908,7 @@ async def _get_guild_roles(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/roles",
     )
-    return type_validate_python(List[Role], await _request(adapter, bot, request))
+    return type_validate_python(list[Role], await _request(adapter, bot, request))
 
 
 async def _create_guild_role(
@@ -1931,7 +1929,7 @@ async def _create_guild_role(
 
 async def _modify_guild_role_positions(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **data
-) -> List[Role]:
+) -> list[Role]:
     """https://discord.com/developers/docs/resources/guild#modify-guild-role-positions"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
@@ -1942,7 +1940,7 @@ async def _modify_guild_role_positions(
         url=adapter.base_url / f"guilds/{guild_id}/roles",
         json=data,
     )
-    return type_validate_python(List[Role], await _request(adapter, bot, request))
+    return type_validate_python(list[Role], await _request(adapter, bot, request))
 
 
 async def _modify_guild_role(
@@ -2002,7 +2000,7 @@ async def _delete_guild_role(
 
 async def _get_guild_prune_count(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **data
-) -> Dict[Literal["pruned"], int]:
+) -> dict[Literal["pruned"], int]:
     """https://discord.com/developers/docs/resources/guild#get-guild-prune-count"""
     if "include_roles" in data:
         data["include_roles"] = ",".join(str(role) for role in data["include_roles"])
@@ -2018,7 +2016,7 @@ async def _get_guild_prune_count(
 
 async def _begin_guild_prune(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **data
-) -> Dict[Literal["pruned"], int]:
+) -> dict[Literal["pruned"], int]:
     """https://discord.com/developers/docs/resources/guild#begin-guild-prune"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
@@ -2034,7 +2032,7 @@ async def _begin_guild_prune(
 
 async def _get_guild_voice_regions(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
-) -> List[VoiceRegion]:
+) -> list[VoiceRegion]:
     """https://discord.com/developers/docs/resources/guild#get-guild-voice-regions"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2043,13 +2041,13 @@ async def _get_guild_voice_regions(
         url=adapter.base_url / f"guilds/{guild_id}/regions",
     )
     return type_validate_python(
-        List[VoiceRegion], await _request(adapter, bot, request)
+        list[VoiceRegion], await _request(adapter, bot, request)
     )
 
 
 async def _get_guild_invites(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
-) -> List[Invite]:
+) -> list[Invite]:
     """https://discord.com/developers/docs/resources/guild#get-guild-invites"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2057,12 +2055,12 @@ async def _get_guild_invites(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/invites",
     )
-    return type_validate_python(List[Invite], await _request(adapter, bot, request))
+    return type_validate_python(list[Invite], await _request(adapter, bot, request))
 
 
 async def _get_guild_integrations(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
-) -> List[Integration]:
+) -> list[Integration]:
     """https://discord.com/developers/docs/resources/guild#get-guild-integrations"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2071,7 +2069,7 @@ async def _get_guild_integrations(
         url=adapter.base_url / f"guilds/{guild_id}/integrations",
     )
     return type_validate_python(
-        List[Integration], await _request(adapter, bot, request)
+        list[Integration], await _request(adapter, bot, request)
     )
 
 
@@ -2244,7 +2242,7 @@ async def _modify_user_voice_state(
 
 async def _list_scheduled_events_for_guild(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **params
-) -> List[GuildScheduledEvent]:
+) -> list[GuildScheduledEvent]:
     """https://discord.com/developers/docs/resources/guild-scheduled-event#list-scheduled-events-for-guild"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2254,7 +2252,7 @@ async def _list_scheduled_events_for_guild(
         params=params,
     )
     return type_validate_python(
-        List[GuildScheduledEvent], await _request(adapter, bot, request)
+        list[GuildScheduledEvent], await _request(adapter, bot, request)
     )
 
 
@@ -2343,7 +2341,7 @@ async def _get_guild_scheduled_event_users(
     guild_id: SnowflakeType,
     event_id: SnowflakeType,
     **params,
-) -> List[GuildScheduledEventUser]:
+) -> list[GuildScheduledEventUser]:
     """https://discord.com/developers/docs/resources/guild-scheduled-event#get-guild-scheduled-event-users"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2353,7 +2351,7 @@ async def _get_guild_scheduled_event_users(
         params=params,
     )
     return type_validate_python(
-        List[GuildScheduledEventUser], await _request(adapter, bot, request)
+        list[GuildScheduledEventUser], await _request(adapter, bot, request)
     )
 
 
@@ -2386,7 +2384,7 @@ async def _create_guild_from_guild_template(
 
 async def _get_guild_templates(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
-) -> List[GuildTemplate]:
+) -> list[GuildTemplate]:
     """https://discord.com/developers/docs/resources/guild-template#get-guild-templates"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2395,7 +2393,7 @@ async def _get_guild_templates(
         url=adapter.base_url / f"guilds/{guild_id}/templates",
     )
     return type_validate_python(
-        List[GuildTemplate], await _request(adapter, bot, request)
+        list[GuildTemplate], await _request(adapter, bot, request)
     )
 
 
@@ -2563,7 +2561,7 @@ async def _get_sticker(
 
 async def _list_nitro_sticker_packs(
     adapter: "Adapter", bot: "Bot"
-) -> List[StickerPack]:
+) -> list[StickerPack]:
     """https://discord.com/developers/docs/resources/sticker#list-nitro-sticker-packs"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2572,13 +2570,13 @@ async def _list_nitro_sticker_packs(
         url=adapter.base_url / "sticker-packs",
     )
     return type_validate_python(
-        List[StickerPack], await _request(adapter, bot, request)
+        list[StickerPack], await _request(adapter, bot, request)
     )
 
 
 async def _list_guild_stickers(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
-) -> List[Sticker]:
+) -> list[Sticker]:
     """https://discord.com/developers/docs/resources/sticker#list-guild-stickers"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2586,7 +2584,7 @@ async def _list_guild_stickers(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/stickers",
     )
-    return type_validate_python(List[Sticker], await _request(adapter, bot, request))
+    return type_validate_python(list[Sticker], await _request(adapter, bot, request))
 
 
 async def _get_guild_sticker(
@@ -2706,7 +2704,7 @@ async def _modify_current_user(adapter: "Adapter", bot: "Bot", **data) -> User:
 
 async def _get_current_user_guilds(
     adapter: "Adapter", bot: "Bot", **params
-) -> List[CurrentUserGuild]:
+) -> list[CurrentUserGuild]:
     """https://discord.com/developers/docs/resources/user#get-current-user-guilds"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2716,7 +2714,7 @@ async def _get_current_user_guilds(
         params=params,
     )
     return type_validate_python(
-        List[CurrentUserGuild], await _request(adapter, bot, request)
+        list[CurrentUserGuild], await _request(adapter, bot, request)
     )
 
 
@@ -2771,7 +2769,7 @@ async def _create_group_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:
 async def _get_user_connections(
     adapter: "Adapter",
     bot: "Bot",
-) -> List[Connection]:
+) -> list[Connection]:
     """https://discord.com/developers/docs/resources/user#get-user-connections"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2779,7 +2777,7 @@ async def _get_user_connections(
         method="GET",
         url=adapter.base_url / "users/@me/connections",
     )
-    return type_validate_python(List[Connection], await _request(adapter, bot, request))
+    return type_validate_python(list[Connection], await _request(adapter, bot, request))
 
 
 async def _get_user_application_role_connection(
@@ -2819,7 +2817,7 @@ async def _update_user_application_role_connection(
     )
 
 
-async def _list_voice_regions(adapter: "Adapter", bot: "Bot") -> List[VoiceRegion]:
+async def _list_voice_regions(adapter: "Adapter", bot: "Bot") -> list[VoiceRegion]:
     """https://discord.com/developers/docs/resources/voice#list-voice-regions"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2828,7 +2826,7 @@ async def _list_voice_regions(adapter: "Adapter", bot: "Bot") -> List[VoiceRegio
         url=adapter.base_url / "voice/regions",
     )
     return type_validate_python(
-        List[VoiceRegion], await _request(adapter, bot, request)
+        list[VoiceRegion], await _request(adapter, bot, request)
     )
 
 
@@ -2850,7 +2848,7 @@ async def _create_webhook(
 
 async def _get_channel_webhooks(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType
-) -> List[Webhook]:
+) -> list[Webhook]:
     """https://discord.com/developers/docs/resources/webhook#get-channel-webhooks"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2858,12 +2856,12 @@ async def _get_channel_webhooks(
         method="GET",
         url=adapter.base_url / f"channels/{channel_id}/webhooks",
     )
-    return type_validate_python(List[Webhook], await _request(adapter, bot, request))
+    return type_validate_python(list[Webhook], await _request(adapter, bot, request))
 
 
 async def _get_guild_webhooks(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
-) -> List[Webhook]:
+) -> list[Webhook]:
     """https://discord.com/developers/docs/resources/webhook#get-guild-webhooks"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -2871,7 +2869,7 @@ async def _get_guild_webhooks(
         method="GET",
         url=adapter.base_url / f"guilds/{guild_id}/webhooks",
     )
-    return type_validate_python(List[Webhook], await _request(adapter, bot, request))
+    return type_validate_python(list[Webhook], await _request(adapter, bot, request))
 
 
 async def _get_webhook(
@@ -3111,7 +3109,7 @@ async def _get_current_authorization_information(
     )
 
 
-API_HANDLERS: Dict[str, Callable[..., Awaitable[Any]]] = {
+API_HANDLERS: dict[str, Callable[..., Awaitable[Any]]] = {
     "get_global_application_commands": _get_global_application_commands,
     "create_global_application_command": _create_global_application_command,
     "get_global_application_command": _get_global_application_command,

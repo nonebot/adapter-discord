@@ -1,6 +1,6 @@
 from enum import IntEnum
-from typing import Optional, Union
-from typing_extensions import Annotated, Literal
+from typing import Annotated, Optional, Union
+from typing_extensions import Literal
 
 from nonebot.compat import PYDANTIC_V2, ConfigDict
 

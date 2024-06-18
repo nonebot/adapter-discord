@@ -4,12 +4,9 @@ import sys
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Generic,
-    List,
     Literal,
     Optional,
-    Tuple,
     TypeVar,
     Union,
     final,
@@ -156,16 +153,16 @@ class ApplicationCommand(BaseModel):
     """Guild ID of the command, if not global"""
     name: str
     """Name of command, 1-32 characters"""
-    name_localizations: MissingOrNullable[Dict[str, str]] = UNSET
+    name_localizations: MissingOrNullable[dict[str, str]] = UNSET
     """Localization dictionary for name field.
     Values follow the same restrictions as name"""
     description: Missing[str] = UNSET
     """Description for CHAT_INPUT commands, 1-100 characters.
     Empty string for USER and MESSAGE commands"""
-    description_localizations: MissingOrNullable[Dict[str, str]] = UNSET
+    description_localizations: MissingOrNullable[dict[str, str]] = UNSET
     """Localization dictionary for description field.
     Values follow the same restrictions as description"""
-    options: MissingOrNullable[List["ApplicationCommandOption"]] = UNSET
+    options: MissingOrNullable[list["ApplicationCommandOption"]] = UNSET
     """Parameters for the command, max of 25"""
     default_member_permissions: Optional[str] = Field(...)
     """Set of permissions represented as a bit set"""
@@ -185,10 +182,10 @@ class ApplicationCommand(BaseModel):
 class ApplicationCommandCreate(BaseModel):
     type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
     name: str
-    name_localizations: Optional[Dict[str, str]] = None
+    name_localizations: Optional[dict[str, str]] = None
     description: Optional[str] = None
-    description_localizations: Optional[Dict[str, str]] = None
-    options: Optional[List["AnyCommandOption"]] = None
+    description_localizations: Optional[dict[str, str]] = None
+    options: Optional[list["AnyCommandOption"]] = None
     default_member_permissions: Optional[str] = None
     dm_permission: Optional[bool] = None
     default_permission: Optional[bool] = None
@@ -198,9 +195,9 @@ class ApplicationCommandCreate(BaseModel):
 class CommandOptionBase(BaseModel):
     type: ApplicationCommandOptionType
     name: str
-    name_localizations: Optional[Dict[str, str]] = None
+    name_localizations: Optional[dict[str, str]] = None
     description: str
-    description_localizations: Optional[Dict[str, str]] = None
+    description_localizations: Optional[dict[str, str]] = None
 
 
 class ApplicationCommandOption(CommandOptionBase):
@@ -215,23 +212,23 @@ class ApplicationCommandOption(CommandOptionBase):
     """Type of option"""
     name: str
     """1-32 character name"""
-    name_localizations: MissingOrNullable[Dict[str, str]] = UNSET
+    name_localizations: MissingOrNullable[dict[str, str]] = UNSET
     """Localization dictionary for the name field.
     Values follow the same restrictions as name"""
     description: Missing[str] = UNSET
     """1-100 character description"""
-    description_localizations: MissingOrNullable[Dict[str, str]] = UNSET
+    description_localizations: MissingOrNullable[dict[str, str]] = UNSET
     """Localization dictionary for the description field.
     Values follow the same restrictions as description"""
     required: Missing[bool] = UNSET
     """If the parameter is required or optional--default false"""
-    choices: Missing[List["ApplicationCommandOptionChoice"]] = UNSET
+    choices: Missing[list["ApplicationCommandOptionChoice"]] = UNSET
     """Choices for STRING, INTEGER,
     and NUMBER types for the user to pick from, max 25"""
-    options: MissingOrNullable[List["ApplicationCommandOption"]] = UNSET
+    options: MissingOrNullable[list["ApplicationCommandOption"]] = UNSET
     """If the option is a subcommand or subcommand group type,
     these nested options will be the parameters"""
-    channel_types: Missing[List[ChannelType]] = UNSET
+    channel_types: Missing[list[ChannelType]] = UNSET
     """	If the option is a channel type,
     the channels shown will be restricted to these types"""
     min_value: Missing[Union[int, float]] = UNSET
@@ -251,7 +248,7 @@ class ApplicationCommandOption(CommandOptionBase):
 
 class OptionChoice(GenericModel, Generic[T]):
     name: str
-    name_localizations: Optional[Dict[str, str]] = None
+    name_localizations: Optional[dict[str, str]] = None
     value: T
 
 
@@ -260,7 +257,7 @@ class SubCommandOption(CommandOptionBase):
         ApplicationCommandOptionType.SUB_COMMAND, init=False
     )
     options: Optional[
-        List[
+        list[
             Union[
                 "IntegerOption",
                 "StringOption",
@@ -280,14 +277,14 @@ class SubCommandGroupOption(CommandOptionBase):
     type: Literal[ApplicationCommandOptionType.SUB_COMMAND_GROUP] = Field(
         ApplicationCommandOptionType.SUB_COMMAND_GROUP, init=False
     )
-    options: Optional[List[SubCommandOption]] = None
+    options: Optional[list[SubCommandOption]] = None
 
 
 class IntegerOption(CommandOptionBase):
     type: Literal[ApplicationCommandOptionType.INTEGER] = Field(
         ApplicationCommandOptionType.INTEGER, init=False
     )
-    choices: Optional[List[OptionChoice[int]]] = None
+    choices: Optional[list[OptionChoice[int]]] = None
     min_value: Optional[int] = None
     max_value: Optional[int] = None
     autocomplete: Optional[bool] = None
@@ -298,7 +295,7 @@ class StringOption(CommandOptionBase):
     type: Literal[ApplicationCommandOptionType.STRING] = Field(
         ApplicationCommandOptionType.STRING, init=False
     )
-    choices: Optional[List[OptionChoice[str]]] = None
+    choices: Optional[list[OptionChoice[str]]] = None
     min_length: Optional[int] = None
     max_length: Optional[int] = None
     autocomplete: Optional[bool] = None
@@ -323,7 +320,7 @@ class ChannelOption(CommandOptionBase):
     type: Literal[ApplicationCommandOptionType.CHANNEL] = Field(
         ApplicationCommandOptionType.CHANNEL, init=False
     )
-    channel_types: Optional[List[ChannelType]] = None
+    channel_types: Optional[list[ChannelType]] = None
     required: bool = False
 
 
@@ -345,7 +342,7 @@ class NumberOption(CommandOptionBase):
     type: Literal[ApplicationCommandOptionType.NUMBER] = Field(
         ApplicationCommandOptionType.NUMBER, init=False
     )
-    choices: Optional[List[OptionChoice[float]]] = None
+    choices: Optional[list[OptionChoice[float]]] = None
     min_value: Optional[float] = None
     required: bool = False
 
@@ -383,7 +380,7 @@ class ApplicationCommandOptionChoice(BaseModel):
 
     name: str
     """1-100 character choice name"""
-    name_localizations: MissingOrNullable[Dict[str, str]] = UNSET
+    name_localizations: MissingOrNullable[dict[str, str]] = UNSET
     """Localization dictionary for the name field.
     Values follow the same restrictions as name"""
     value: Union[str, int, float]
@@ -406,7 +403,7 @@ class GuildApplicationCommandPermissions(BaseModel):
     """ID of the application the command belongs to"""
     guild_id: Snowflake
     """ID of the guild"""
-    permissions: List["ApplicationCommandPermissions"]
+    permissions: list["ApplicationCommandPermissions"]
     """Permissions for the command in the guild, max of 100"""
 
 
@@ -443,7 +440,7 @@ class ActionRow(BaseModel):
     """
 
     type: ComponentType = Field(default=ComponentType.ActionRow)
-    components: List[Union["Button", "SelectMenu", "TextInput"]]
+    components: list[Union["Button", "SelectMenu", "TextInput"]]
 
 
 class ComponentEmoji(BaseModel):
@@ -514,10 +511,10 @@ class SelectMenu(BaseModel):
     """Type of select menu component"""
     custom_id: str
     """ID for the select menu; max 100 characters"""
-    options: Missing[List["SelectOption"]] = UNSET
+    options: Missing[list["SelectOption"]] = UNSET
     """Specified choices in a select menu
     (only required and available for string selects; max 25"""
-    channel_types: Missing[List[ChannelType]] = UNSET
+    channel_types: Missing[list[ChannelType]] = UNSET
     """List of channel types to include in the channel select component"""
     placeholder: Missing[str] = UNSET
     """Placeholder text if nothing is selected; max 150 characters"""
@@ -559,10 +556,10 @@ class SelectMenuResolved(BaseModel):
     see https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-resolved-object
     """
 
-    users: Missing[Dict[Snowflake, "User"]] = UNSET
-    roles: Missing[Dict[Snowflake, "Role"]] = UNSET
-    channels: Missing[Dict[Snowflake, "Channel"]] = UNSET
-    members: Missing[Dict[Snowflake, "GuildMember"]] = UNSET
+    users: Missing[dict[Snowflake, "User"]] = UNSET
+    roles: Missing[dict[Snowflake, "Role"]] = UNSET
+    channels: Missing[dict[Snowflake, "Channel"]] = UNSET
+    members: Missing[dict[Snowflake, "GuildMember"]] = UNSET
 
 
 class TextInput(BaseModel):
@@ -659,7 +656,7 @@ class ApplicationCommandData(BaseModel):
     """the type of the invoked command"""
     resolved: Missing["ResolvedData"] = UNSET
     """converted users + roles + channels + attachments"""
-    options: Missing[List["ApplicationCommandInteractionDataOption"]] = UNSET
+    options: Missing[list["ApplicationCommandInteractionDataOption"]] = UNSET
     """the params + values from the user"""
     guild_id: Missing[Snowflake] = UNSET
     """the id of the guild the command is registered to"""
@@ -679,7 +676,7 @@ class MessageComponentData(BaseModel):
     """the custom_id of the component"""
     component_type: ComponentType
     """the type of the component"""
-    values: Missing[List[str]] = UNSET
+    values: Missing[list[str]] = UNSET
     """values the user selected in a select menu component"""
 
 
@@ -691,7 +688,7 @@ class ModalSubmitData(BaseModel):
 
     custom_id: str
     """the custom_id of the modal"""
-    components: List[Component]
+    components: list[Component]
     """the values submitted by the user"""
 
 
@@ -712,17 +709,17 @@ class ResolvedData(BaseModel):
     see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
     """
 
-    users: Missing[Dict[Snowflake, "User"]] = UNSET
+    users: Missing[dict[Snowflake, "User"]] = UNSET
     """the ids and User objects"""
-    members: Missing[Dict[Snowflake, "GuildMember"]] = UNSET
+    members: Missing[dict[Snowflake, "GuildMember"]] = UNSET
     """the ids and partial Member objects"""
-    roles: Missing[Dict[Snowflake, "Role"]] = UNSET
+    roles: Missing[dict[Snowflake, "Role"]] = UNSET
     """the ids and Role objects"""
-    channels: Missing[Dict[Snowflake, "Channel"]] = UNSET
+    channels: Missing[dict[Snowflake, "Channel"]] = UNSET
     """the ids and partial Channel objects"""
-    messages: Missing[Dict[Snowflake, "MessageGet"]] = UNSET
+    messages: Missing[dict[Snowflake, "MessageGet"]] = UNSET
     """the ids and partial Message objects"""
-    attachments: Missing[Dict[Snowflake, "Attachment"]] = UNSET
+    attachments: Missing[dict[Snowflake, "Attachment"]] = UNSET
     """the ids and attachment objects"""
 
 
@@ -742,7 +739,7 @@ class ApplicationCommandInteractionDataOption(BaseModel):
     """Value of application command option type"""
     value: Missing[Union[str, int, float, bool]] = UNSET
     """Value of the option resulting from user input"""
-    options: Missing[List["ApplicationCommandInteractionDataOption"]] = UNSET
+    options: Missing[list["ApplicationCommandInteractionDataOption"]] = UNSET
     """Present if this option is a group or subcommand"""
     focused: Missing[bool] = UNSET
     """true if this option is the currently focused option for autocomplete"""
@@ -790,20 +787,20 @@ class InteractionCallbackMessage(BaseModel):
     """is the response TTS"""
     content: Optional[str] = None
     """message content"""
-    embeds: Optional[List["Embed"]] = None
+    embeds: Optional[list["Embed"]] = None
     """supports up to 10 embeds"""
     allowed_mentions: Optional["AllowedMention"] = None
     """allowed mentions object"""
     flags: Optional[MessageFlag] = None
     """message flags combined as a bitfield
     (only SUPPRESS_EMBEDS and EPHEMERAL can be set)"""
-    components: Optional[List[Component]] = None
+    components: Optional[list[Component]] = None
     """message components"""
-    attachments: Optional[List["AttachmentSend"]] = None
+    attachments: Optional[list["AttachmentSend"]] = None
     """attachment objects with filename and description.
     See Uploading Files for details."""
 
-    files: Optional[List["File"]] = None
+    files: Optional[list["File"]] = None
 
 
 class InteractionCallbackAutocomplete(BaseModel):
@@ -812,7 +809,7 @@ class InteractionCallbackAutocomplete(BaseModel):
     see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete
     """
 
-    choices: List[ApplicationCommandOptionChoice]
+    choices: list[ApplicationCommandOptionChoice]
     """autocomplete choices (max of 25 choices)"""
 
 
@@ -828,7 +825,7 @@ class InteractionCallbackModal(BaseModel):
     """a developer-defined identifier for the modal, max 100 characters"""
     title: str
     """the title of the popup modal, max 45 characters"""
-    components: List[Component]
+    components: list[Component]
     """between 1 and 5 (inclusive) components that make up the modal"""
 
 
@@ -857,7 +854,7 @@ class Application(BaseModel):
     """the icon hash of the app"""
     description: str
     """the description of the app"""
-    rpc_origins: Missing[List[str]] = UNSET
+    rpc_origins: Missing[list[str]] = UNSET
     """an array of rpc origin urls, if rpc is enabled"""
     bot_public: bool
     """when false only app owner can join the app's bot to guilds"""
@@ -889,7 +886,7 @@ class Application(BaseModel):
     """the application's default rich presence invite cover image hash"""
     flags: Missing[ApplicationFlag] = UNSET
     """the application's public flags"""
-    tags: Missing[List[str]] = UNSET
+    tags: Missing[list[str]] = UNSET
     """up to 5 tags describing the content and functionality of the application"""
     install_params: Missing["InstallParams"] = UNSET
     """settings for the application's default in-app authorization link, if enabled"""
@@ -907,7 +904,7 @@ class InstallParams(BaseModel):
     see https://discord.com/developers/docs/resources/application#install-params-object
     """
 
-    scopes: List[str]
+    scopes: list[str]
     """the scopes to add the application to the server with"""
     permissions: str
     """	the permissions to request for the bot role"""
@@ -930,11 +927,11 @@ class ApplicationRoleConnectionMetadata(BaseModel):
     (must be a-z, 0-9, or _ characters; 1-50 characters)"""
     name: str
     """name of the metadata field (1-100 characters)"""
-    name_localizations: Missing[Dict[str, str]] = UNSET
+    name_localizations: Missing[dict[str, str]] = UNSET
     """translations of the name"""
     description: str
     """description of the metadata field (1-200 characters)"""
-    description_localizations: Missing[Dict[str, str]] = UNSET
+    description_localizations: Missing[dict[str, str]] = UNSET
     """translations of the description"""
 
 
@@ -947,21 +944,21 @@ class AuditLog(BaseModel):
 
     see https://discord.com/developers/docs/resources/audit-log#audit-log-object"""
 
-    application_commands: List[ApplicationCommand]
+    application_commands: list[ApplicationCommand]
     """List of application commands referenced in the audit log"""
-    audit_log_entries: List["AuditLogEntry"]
+    audit_log_entries: list["AuditLogEntry"]
     """List of audit log entries, sorted from most to least recent"""
-    auto_moderation_rules: List["AutoModerationRule"]
+    auto_moderation_rules: list["AutoModerationRule"]
     """List of auto moderation rules referenced in the audit log"""
-    guild_scheduled_events: List["GuildScheduledEvent"]
+    guild_scheduled_events: list["GuildScheduledEvent"]
     """List of guild scheduled events referenced in the audit log"""
-    integrations: List["Integration"]  # partial integration object
+    integrations: list["Integration"]  # partial integration object
     """List of partial integration objects"""
-    threads: List["Channel"]  # thread-specific channel objects
+    threads: list["Channel"]  # thread-specific channel objects
     """List of threads referenced in the audit log"""
-    users: List["User"]
+    users: list["User"]
     """List of users referenced in the audit log"""
-    webhooks: List["Webhook"]
+    webhooks: list["Webhook"]
     """List of webhooks referenced in the audit log"""
 
 
@@ -973,7 +970,7 @@ class AuditLogEntry(BaseModel):
 
     target_id: Optional[str]
     """ID of the affected entity (webhook, user, role, etc.)"""
-    changes: Missing[List["AuditLogChange"]] = UNSET
+    changes: Missing[list["AuditLogChange"]] = UNSET
     """Changes made to the target_id"""
     user_id: Optional[Snowflake]
     """User or app that made the changes"""
@@ -1065,13 +1062,13 @@ class AutoModerationRule(BaseModel):
     """the rule trigger type"""
     trigger_metadata: "TriggerMetadata"
     """the rule trigger metadata"""
-    actions: List["AutoModerationAction"]
+    actions: list["AutoModerationAction"]
     """the actions which will execute when the rule is triggered"""
     enabled: bool
     """whether the rule is enabled"""
-    exempt_roles: List[Snowflake]
+    exempt_roles: list[Snowflake]
     """the role ids that should not be affected by the rule (Maximum of 20)"""
-    exempt_channels: List[Snowflake]
+    exempt_channels: list[Snowflake]
     """the channel ids that should not be affected by the rule (Maximum of 50)"""
 
 
@@ -1082,14 +1079,14 @@ class TriggerMetadata(BaseModel):
     see https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata
     """
 
-    keyword_filter: List[str]
+    keyword_filter: list[str]
     """substrings which will be searched for in content (Maximum of 1000)"""
-    regex_patterns: List[str]
+    regex_patterns: list[str]
     """regular expression patterns which will be matched
     against content (Maximum of 10)"""
-    presets: List[KeywordPresetType]
+    presets: list[KeywordPresetType]
     """the internally pre-defined wordsets which will be searched for in content"""
-    allow_list: List[str]
+    allow_list: list[str]
     """substrings which should not trigger the rule (Maximum of 100 or 1000)"""
     mention_total_limit: int
     """total number of unique role and user mentions allowed
@@ -1133,10 +1130,10 @@ class CreateAndModifyAutoModerationRuleParams(BaseModel):
     event_type: Optional[AutoModerationRuleEventType]
     trigger_type: Optional[TriggerType]
     trigger_metadata: Optional[TriggerMetadata]
-    actions: Optional[List[AutoModerationAction]]
+    actions: Optional[list[AutoModerationAction]]
     enabled: Optional[bool]
-    exempt_roles: Optional[List[Snowflake]]
-    exempt_channels: Optional[List[Snowflake]]
+    exempt_roles: Optional[list[Snowflake]]
+    exempt_channels: Optional[list[Snowflake]]
 
 
 # Channel
@@ -1157,7 +1154,7 @@ class Channel(BaseModel):
     received over gateway guild dispatches)"""
     position: Missing[int] = UNSET
     """sorting position of the channel"""
-    permission_overwrites: Missing[List["Overwrite"]] = UNSET
+    permission_overwrites: Missing[list["Overwrite"]] = UNSET
     """explicit permission overwrites for members and roles"""
     name: MissingOrNullable[str] = UNSET
     """the name of the channel (1-100 characters)"""
@@ -1178,7 +1175,7 @@ class Channel(BaseModel):
     """amount of seconds a user has to wait before sending another message (0-21600);
     bots, as well as users with the permission manage_messages or
     manage_channel, are unaffected"""
-    recipients: Missing[List["User"]] = UNSET
+    recipients: Missing[list["User"]] = UNSET
     """the recipients of the DM"""
     icon: MissingOrNullable[str] = UNSET
     """icon hash of the group DM"""
@@ -1223,9 +1220,9 @@ class Channel(BaseModel):
     total_message_sent: Missing[int] = UNSET
     """number of messages ever sent in a thread, it's similar to message_count
     on message creation, but will not decrement the number when a message is deleted"""
-    available_tags: Missing[List["ForumTag"]] = UNSET
+    available_tags: Missing[list["ForumTag"]] = UNSET
     """the set of tags that can be used in a GUILD_FORUM channel"""
-    applied_tags: Missing[List[Snowflake]] = UNSET
+    applied_tags: Missing[list[Snowflake]] = UNSET
     """the IDs of the set of tags that have been applied to a
     thread in a GUILD_FORUM channel"""
     default_reaction_emoji: MissingOrNullable["DefaultReaction"] = UNSET
@@ -1256,12 +1253,12 @@ class MessageGet(BaseModel):
     edited_timestamp: Optional[datetime.datetime] = Field(...)
     tts: bool
     mention_everyone: bool
-    mentions: List["User"]
-    mention_roles: List[str]
-    mention_channels: Missing[List["ChannelMention"]] = UNSET
-    attachments: List["Attachment"]
-    embeds: List["Embed"]
-    reactions: Missing[List["Reaction"]] = UNSET
+    mentions: list["User"]
+    mention_roles: list[str]
+    mention_channels: Missing[list["ChannelMention"]] = UNSET
+    attachments: list["Attachment"]
+    embeds: list["Embed"]
+    reactions: Missing[list["Reaction"]] = UNSET
     nonce: Missing[Union[int, str]] = UNSET
     pinned: bool
     webhook_id: Missing[Snowflake] = UNSET
@@ -1274,9 +1271,9 @@ class MessageGet(BaseModel):
     referenced_message: MissingOrNullable["MessageGet"] = UNSET
     interaction: Missing[MessageInteraction] = UNSET
     thread: Missing[Channel] = UNSET
-    components: Missing[List[DirectComponent]] = UNSET
-    sticker_items: Missing[List["StickerItem"]] = UNSET
-    stickers: Missing[List["Sticker"]] = UNSET
+    components: Missing[list[DirectComponent]] = UNSET
+    sticker_items: Missing[list["StickerItem"]] = UNSET
+    stickers: Missing[list["Sticker"]] = UNSET
     position: Missing[int] = UNSET
     role_subscription_data: Missing["RoleSubscriptionData"] = UNSET
 
@@ -1406,7 +1403,7 @@ class Embed(BaseModel):
     video: Missing["EmbedVideo"] = UNSET
     provider: Missing["EmbedProvider"] = UNSET
     author: Missing["EmbedAuthor"] = UNSET
-    fields: Missing[List["EmbedField"]] = UNSET
+    fields: Missing[list["EmbedField"]] = UNSET
 
 
 class EmbedThumbnail(BaseModel):
@@ -1529,11 +1526,11 @@ class AllowedMention(BaseModel):
 
     see https://discord.com/developers/docs/resources/channel#allowed-mentions-object"""
 
-    parse: List[AllowedMentionType]
+    parse: list[AllowedMentionType]
     """An array of allowed mention types to parse from the content."""
-    roles: List[Snowflake]
+    roles: list[Snowflake]
     """Array of role_ids to mention (Max size of 100)"""
-    users: List[Snowflake]
+    users: list[Snowflake]
     """	Array of user_ids to mention (Max size of 100)"""
     replied_user: bool
     """For replies, whether to mention the author of the message
@@ -1558,8 +1555,8 @@ class ArchivedThreadsResponse(BaseModel):
     see https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body
     """
 
-    threads: List[Channel]
-    members: List[ThreadMember]
+    threads: list[Channel]
+    members: list[ThreadMember]
     has_more: bool
 
 
@@ -1585,13 +1582,13 @@ class MessageSend(BaseModel):
     content: Optional[str]
     nonce: Optional[Union[int, str]]
     tts: Optional[bool]
-    embeds: Optional[List[Embed]]
+    embeds: Optional[list[Embed]]
     allowed_mentions: Optional[AllowedMention]
     message_reference: Optional[MessageReference]
-    components: Optional[List[DirectComponent]]
-    sticker_ids: Optional[List[Snowflake]]
-    files: Optional[List[File]]
-    attachments: Optional[List[AttachmentSend]]
+    components: Optional[list[DirectComponent]]
+    sticker_ids: Optional[list[Snowflake]]
+    files: Optional[list[File]]
+    attachments: Optional[list[AttachmentSend]]
     flags: Optional[MessageFlag]
 
 
@@ -1609,13 +1606,13 @@ class ModifyChannelParams(BaseModel):
     rate_limit_per_user: Optional[int]
     bitrate: Optional[int]
     user_limit: Optional[int]
-    permission_overwrites: Optional[List[Overwrite]]
+    permission_overwrites: Optional[list[Overwrite]]
     parent_id: Optional[Snowflake]
     rtc_region: Optional[str]
     video_quality_mode: Optional[VideoQualityMode]
     default_auto_archive_duration: Optional[int]
     flags: Optional[ChannelFlags]
-    available_tags: Optional[List[ForumTag]]
+    available_tags: Optional[list[ForumTag]]
     default_reaction_emoji: Optional[DefaultReaction]
     default_thread_rate_limit_per_user: Optional[int]
     default_sort_order: Optional[SortOrderTypes]
@@ -1635,7 +1632,7 @@ class Emoji(BaseModel):
     """emoji id"""
     name: Optional[str]
     """emoji name(can be null only in reaction emoji objects)"""
-    roles: Missing[List[Snowflake]] = UNSET
+    roles: Missing[list[Snowflake]] = UNSET
     """roles allowed to use this emoji"""
     user: Missing["User"] = UNSET
     """user that created this emoji"""
@@ -1673,9 +1670,9 @@ class Guild(BaseModel):
     verification_level: VerificationLevel
     default_message_notifications: DefaultMessageNotificationLevel
     explicit_content_filter: ExplicitContentFilterLevel
-    roles: List["Role"]
-    emojis: List[Emoji]
-    features: List[GuildFeature]
+    roles: list["Role"]
+    emojis: list[Emoji]
+    features: list[GuildFeature]
     mfa_level: MFALevel
     application_id: Optional[Snowflake] = Field(...)
     system_channel_id: Optional[Snowflake] = Field(...)
@@ -1696,7 +1693,7 @@ class Guild(BaseModel):
     approximate_presence_count: Missing[int] = UNSET
     welcome_screen: Missing["WelcomeScreen"] = UNSET
     nsfw_level: GuildNSFWLevel
-    stickers: Missing[List["Sticker"]] = UNSET
+    stickers: Missing[list["Sticker"]] = UNSET
     premium_progress_bar_enabled: bool
 
 
@@ -1710,7 +1707,7 @@ class CurrentUserGuild(BaseModel):
     icon: Optional[str] = Field(...)
     owner: Missing[bool] = UNSET
     permissions: Missing[str] = UNSET
-    features: List[GuildFeature]
+    features: list[GuildFeature]
 
 
 class UnavailableGuild(BaseModel):
@@ -1732,12 +1729,12 @@ class GuildPreview(BaseModel):
     icon: Optional[str]
     splash: Optional[str]
     discovery_splash: Optional[str]
-    emojis: List[Emoji]
-    features: List[GuildFeature]
+    emojis: list[Emoji]
+    features: list[GuildFeature]
     approximate_member_count: int
     approximate_presence_count: int
     description: Optional[str]
-    stickers: List["Sticker"]
+    stickers: list["Sticker"]
 
 
 class GuildWidgetSettings(BaseModel):
@@ -1758,8 +1755,8 @@ class GuildWidget(BaseModel):
     id: Snowflake
     name: str
     instant_invite: Optional[str]
-    channels: List["Channel"]  # partial channel objects
-    members: List["User"]  # partial user objects
+    channels: list["Channel"]  # partial channel objects
+    members: list["User"]  # partial user objects
     presence_count: int
 
 
@@ -1771,7 +1768,7 @@ class GuildMember(BaseModel):
     user: Missing["User"] = UNSET
     nick: MissingOrNullable[str] = UNSET
     avatar: MissingOrNullable[str] = UNSET
-    roles: List[Snowflake]
+    roles: list[Snowflake]
     joined_at: datetime.datetime
     premium_since: MissingOrNullable[datetime.datetime] = UNSET
     deaf: Missing[bool] = UNSET
@@ -1802,7 +1799,7 @@ class Integration(BaseModel):
     subscriber_count: Missing[int] = UNSET
     revoked: Missing[bool] = UNSET
     application: Missing["IntegrationApplication"] = UNSET
-    scopes: Missing[List[str]] = UNSET  # TODO: OAuth2 scopes
+    scopes: Missing[list[str]] = UNSET  # TODO: OAuth2 scopes
 
 
 class IntegrationAccount(BaseModel):
@@ -1843,7 +1840,7 @@ class WelcomeScreen(BaseModel):
     see https://discord.com/developers/docs/resources/guild#welcome-screen-object"""
 
     description: Optional[str]
-    welcome_channels: List["WelcomeScreenChannel"]
+    welcome_channels: list["WelcomeScreenChannel"]
 
 
 class WelcomeScreenChannel(BaseModel):
@@ -1864,8 +1861,8 @@ class GuildOnboarding(BaseModel):
     see https://discord.com/developers/docs/resources/guild#guild-onboarding-object"""
 
     guild_id: Snowflake
-    prompts: List["OnboardingPrompt"]
-    default_channel_ids: List[Snowflake]
+    prompts: list["OnboardingPrompt"]
+    default_channel_ids: list[Snowflake]
     enabled: bool
 
 
@@ -1877,7 +1874,7 @@ class OnboardingPrompt(BaseModel):
 
     id: Snowflake
     type: OnboardingPromptType
-    options: List["OnboardingPromptOption"]
+    options: list["OnboardingPromptOption"]
     title: str
     single_select: bool
     required: bool
@@ -1891,8 +1888,8 @@ class OnboardingPromptOption(BaseModel):
     """
 
     id: Snowflake
-    channel_ids: List[Snowflake]
-    role_ids: List[Snowflake]
+    channel_ids: list[Snowflake]
+    role_ids: list[Snowflake]
     emoji: Emoji
     title: str
     description: Optional[str]
@@ -1916,8 +1913,8 @@ class CreateGuildParams(BaseModel):
     verification_level: Optional[VerificationLevel]
     default_message_notifications: Optional[DefaultMessageNotificationLevel]
     explicit_content_filter: Optional[ExplicitContentFilterLevel]
-    roles: Optional[List["Role"]]
-    channels: Optional[List[Channel]]
+    roles: Optional[list["Role"]]
+    channels: Optional[list[Channel]]
     afk_channel_id: Optional[Snowflake]
     afk_timeout: Optional[int]
     system_channel_id: Optional[Snowflake]
@@ -1946,7 +1943,7 @@ class ModifyGuildParams(BaseModel):
     rules_channel_id: Optional[Snowflake]
     public_updates_channel_id: Optional[Snowflake]
     preferred_locale: Optional[str]
-    features: Optional[List[GuildFeature]]
+    features: Optional[list[GuildFeature]]
     description: Optional[str]
     premium_progress_bar_enabled: Optional[bool]
 
@@ -1963,14 +1960,14 @@ class CreateGuildChannelParams(BaseModel):
     user_limit: Optional[int]
     rate_limit_per_user: Optional[int]
     position: Optional[int]
-    permission_overwrites: Optional[List["Overwrite"]]
+    permission_overwrites: Optional[list["Overwrite"]]
     parent_id: Optional[Snowflake]
     nsfw: Optional[bool]
     rtc_region: Optional[str]
     video_quality_mode: Optional[VideoQualityMode]
     default_auto_archive_duration: Optional[int]
     default_reaction_emoji: Optional[DefaultReaction]
-    available_tags: Optional[List[ForumTag]]
+    available_tags: Optional[list[ForumTag]]
     default_sort_order: Optional[SortOrderTypes]
 
 
@@ -1979,8 +1976,8 @@ class ListActiveGuildThreadsResponse(BaseModel):
 
     see https://discord.com/developers/docs/resources/guild#list-active-guild-threads"""
 
-    threads: List[Channel]
-    members: List[ThreadMember]
+    threads: list[Channel]
+    members: list[ThreadMember]
 
 
 class ModifyGuildWelcomeScreenParams(BaseModel):
@@ -1990,7 +1987,7 @@ class ModifyGuildWelcomeScreenParams(BaseModel):
     """
 
     enabled: Optional[bool]
-    welcome_channels: Optional[List[WelcomeScreenChannel]]
+    welcome_channels: Optional[list[WelcomeScreenChannel]]
     description: Optional[str]
 
 
@@ -2138,7 +2135,7 @@ class InviteStageInstance(BaseModel):
     see https://discord.com/developers/docs/resources/invite#invite-stage-instance-object
     """
 
-    members: List[GuildMember]  # partial guild member objects
+    members: list[GuildMember]  # partial guild member objects
     participant_count: int
     speaker_count: int
     topic: str
@@ -2200,7 +2197,7 @@ class StickerPack(BaseModel):
     see https://discord.com/developers/docs/resources/sticker#sticker-pack-object"""
 
     id: Snowflake
-    stickers: List[Sticker]
+    stickers: list[Sticker]
     name: str
     sku_id: Snowflake
     cover_sticker_id: Missing[Snowflake] = UNSET
@@ -2243,7 +2240,7 @@ class Connection(BaseModel):
     name: str
     type: ConnectionServiceType
     revoked: Missing[bool] = UNSET
-    integrations: Missing[List["Integration"]] = UNSET
+    integrations: Missing[list["Integration"]] = UNSET
     verified: bool
     friend_sync: bool
     show_activity: bool
@@ -2327,11 +2324,11 @@ class ExecuteWebhookParams(BaseModel):
     username: Optional[str] = None
     avatar_url: Optional[str] = None
     tts: Optional[bool] = None
-    embeds: Optional[List[Embed]] = None
+    embeds: Optional[list[Embed]] = None
     allowed_mentions: Optional[AllowedMention] = None
-    components: Optional[List[DirectComponent]] = None
-    files: Optional[List[File]] = None
-    attachments: Optional[List[AttachmentSend]] = None
+    components: Optional[list[DirectComponent]] = None
+    files: Optional[list[File]] = None
+    attachments: Optional[list[AttachmentSend]] = None
     flags: Optional[MessageFlag] = None
     thread_name: Optional[str] = None
 
@@ -2380,7 +2377,7 @@ class Identify(BaseModel):
     properties: "IdentifyConnectionProperties"
     compress: Missing[bool] = UNSET
     large_threshold: Missing[int] = UNSET
-    shard: Missing[List[int]] = UNSET
+    shard: Missing[list[int]] = UNSET
     presence: Missing["PresenceUpdate"] = UNSET
     intents: int
 
@@ -2416,7 +2413,7 @@ class RequestGuildMembers(BaseModel):
     query: Missing[str] = UNSET
     limit: int
     presences: Missing[bool] = UNSET
-    user_ids: Missing[Union[Snowflake, List[Snowflake]]] = UNSET
+    user_ids: Missing[Union[Snowflake, list[Snowflake]]] = UNSET
     nonce: Missing[str] = UNSET
 
 
@@ -2437,7 +2434,7 @@ class UpdatePresence(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#update-presence"""
 
     since: Optional[int] = Field(...)
-    activities: List["Activity"]
+    activities: list["Activity"]
     status: UpdatePresenceStatusType
     afk: bool
 
@@ -2464,10 +2461,10 @@ class Ready(BaseModel):
 
     v: int
     user: User
-    guilds: List[UnavailableGuild]
+    guilds: list[UnavailableGuild]
     session_id: str
     resume_gateway_url: str
-    shard: Missing[List[int]] = UNSET
+    shard: Missing[list[int]] = UNSET
     application: ApplicationReady
 
 
@@ -2562,9 +2559,9 @@ class ThreadListSync(BaseModel):
     """
 
     guild_id: Snowflake
-    channel_ids: Missing[List[Snowflake]] = UNSET
-    threads: List[Channel]
-    members: List[ThreadMember]
+    channel_ids: Missing[list[Snowflake]] = UNSET
+    threads: list[Channel]
+    members: list[ThreadMember]
 
 
 class ThreadMemberUpdate(ThreadMember):
@@ -2585,8 +2582,8 @@ class ThreadMembersUpdate(BaseModel):
     id: Snowflake
     guild_id: Snowflake
     member_count: int
-    added_members: Missing[List[ThreadMember]] = UNSET
-    removed_member_ids: Missing[List[Snowflake]] = UNSET
+    added_members: Missing[list[ThreadMember]] = UNSET
+    removed_member_ids: Missing[list[Snowflake]] = UNSET
 
 
 class ChannelPinsUpdate(BaseModel):
@@ -2622,9 +2619,9 @@ class GuildCreate(BaseModel):
     verification_level: Missing[VerificationLevel] = UNSET
     default_message_notifications: Missing[DefaultMessageNotificationLevel] = UNSET
     explicit_content_filter: Missing[ExplicitContentFilterLevel] = UNSET
-    roles: Missing[List["Role"]] = UNSET
-    emojis: Missing[List[Emoji]] = UNSET
-    features: Missing[List[GuildFeature]] = UNSET
+    roles: Missing[list["Role"]] = UNSET
+    emojis: Missing[list[Emoji]] = UNSET
+    features: Missing[list[GuildFeature]] = UNSET
     mfa_level: Missing[MFALevel] = UNSET
     application_id: MissingOrNullable[Snowflake] = UNSET
     system_channel_id: MissingOrNullable[Snowflake] = UNSET
@@ -2645,20 +2642,20 @@ class GuildCreate(BaseModel):
     approximate_presence_count: Missing[int] = UNSET
     welcome_screen: Missing[WelcomeScreen] = UNSET
     nsfw_level: Missing[GuildNSFWLevel] = UNSET
-    stickers: Missing[List[Sticker]] = UNSET
+    stickers: Missing[list[Sticker]] = UNSET
     premium_progress_bar_enabled: Missing[bool] = UNSET
     joined_at: Missing[str] = UNSET
     large: Missing[bool] = UNSET
     member_count: Missing[int] = UNSET
-    voice_states: Missing[List["VoiceState"]] = UNSET
-    members: Missing[List["GuildMember"]] = UNSET
-    channels: Missing[List["Channel"]] = UNSET
-    threads: Missing[List["Channel"]] = UNSET
-    presences: Missing[List["PresenceUpdate"]] = (
+    voice_states: Missing[list["VoiceState"]] = UNSET
+    members: Missing[list["GuildMember"]] = UNSET
+    channels: Missing[list["Channel"]] = UNSET
+    threads: Missing[list["Channel"]] = UNSET
+    presences: Missing[list["PresenceUpdate"]] = (
         UNSET  # partial presence update objects
     )
-    stage_instances: Missing[List["StageInstance"]] = UNSET
-    guild_scheduled_events: Missing[List["GuildScheduledEvent"]] = UNSET
+    stage_instances: Missing[list["StageInstance"]] = UNSET
+    guild_scheduled_events: Missing[list["GuildScheduledEvent"]] = UNSET
 
 
 class GuildUpdate(Guild):
@@ -2704,7 +2701,7 @@ class GuildEmojisUpdate(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#guild-emojis-update"""
 
     guild_id: Snowflake
-    emojis: List[Emoji]
+    emojis: list[Emoji]
 
 
 class GuildStickersUpdate(BaseModel):
@@ -2714,7 +2711,7 @@ class GuildStickersUpdate(BaseModel):
     """
 
     guild_id: Snowflake
-    stickers: List[Sticker]
+    stickers: list[Sticker]
 
 
 class GuildIntegrationsUpdate(BaseModel):
@@ -2749,7 +2746,7 @@ class GuildMemberUpdate(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#guild-member-update"""
 
     guild_id: Snowflake
-    roles: List[Snowflake]
+    roles: list[Snowflake]
     user: User
     nick: MissingOrNullable[str] = UNSET
     joined_at: Optional[datetime.datetime] = Field(...)
@@ -2766,11 +2763,11 @@ class GuildMembersChunk(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#guild-members-chunk"""
 
     guild_id: Snowflake
-    members: List[GuildMember]
+    members: list[GuildMember]
     chunk_index: int
     chunk_count: int
-    not_found: Missing[List[Snowflake]] = UNSET
-    presences: Missing[List["PresenceUpdate"]] = UNSET
+    not_found: Missing[list[Snowflake]] = UNSET
+    presences: Missing[list["PresenceUpdate"]] = UNSET
     nonce: Missing[str] = UNSET
 
 
@@ -2909,7 +2906,7 @@ class MessageCreate(MessageGet):
 
     guild_id: Missing[Snowflake] = UNSET
     member: Missing[GuildMember] = UNSET  # partial member object
-    mentions: List[User]
+    mentions: list[User]
 
 
 class MessageUpdate(MessageGet):
@@ -2923,7 +2920,7 @@ class MessageUpdate(MessageGet):
 
     guild_id: Missing[str] = UNSET
     member: Missing[GuildMember] = UNSET
-    mentions: Missing[List[User]] = UNSET
+    mentions: Missing[list[User]] = UNSET
     id: Snowflake
     channel_id: Snowflake
     author: Missing["User"] = UNSET
@@ -2932,11 +2929,11 @@ class MessageUpdate(MessageGet):
     edited_timestamp: MissingOrNullable[datetime.datetime] = UNSET
     tts: Missing[bool] = UNSET
     mention_everyone: Missing[bool] = UNSET
-    mention_roles: Missing[List[str]] = UNSET
-    mention_channels: Missing[List["ChannelMention"]] = UNSET
-    attachments: Missing[List["Attachment"]] = UNSET
-    embeds: Missing[List["Embed"]] = UNSET
-    reactions: Missing[List["Reaction"]] = UNSET
+    mention_roles: Missing[list[str]] = UNSET
+    mention_channels: Missing[list["ChannelMention"]] = UNSET
+    attachments: Missing[list["Attachment"]] = UNSET
+    embeds: Missing[list["Embed"]] = UNSET
+    reactions: Missing[list["Reaction"]] = UNSET
     nonce: Missing[Union[int, str]] = UNSET
     pinned: Missing[bool] = UNSET
     webhook_id: Missing[Snowflake] = UNSET
@@ -2949,9 +2946,9 @@ class MessageUpdate(MessageGet):
     referenced_message: MissingOrNullable["MessageGet"] = UNSET
     interaction: Missing[MessageInteraction] = UNSET
     thread: Missing[Channel] = UNSET
-    components: Missing[List[DirectComponent]] = UNSET
-    sticker_items: Missing[List["StickerItem"]] = UNSET
-    stickers: Missing[List["Sticker"]] = UNSET
+    components: Missing[list[DirectComponent]] = UNSET
+    sticker_items: Missing[list["StickerItem"]] = UNSET
+    stickers: Missing[list["Sticker"]] = UNSET
     position: Missing[int] = UNSET
     role_subscription_data: Missing["RoleSubscriptionData"] = UNSET
 
@@ -2973,7 +2970,7 @@ class MessageDeleteBulk(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#message-delete-bulk
     """
 
-    ids: List[Snowflake]
+    ids: list[Snowflake]
     channel_id: Snowflake
     guild_id: Missing[Snowflake] = UNSET
 
@@ -3059,7 +3056,7 @@ class PresenceUpdate(BaseModel):
     user: PresenceUpdateUser
     guild_id: Missing[Snowflake] = UNSET
     status: PresenceStatus
-    activities: List["Activity"]
+    activities: list["Activity"]
     client_status: "ClientStatus"
 
 
@@ -3093,7 +3090,7 @@ class Activity(BaseModel):
     secrets: Missing["ActivitySecrets"] = UNSET
     instance: Missing[bool] = UNSET
     flags: Missing[ActivityFlags] = UNSET
-    buttons: Missing[List["ActivityButtons"]] = UNSET
+    buttons: Missing[list["ActivityButtons"]] = UNSET
 
 
 class ActivityTimestamps(BaseModel):
@@ -3124,7 +3121,7 @@ class ActivityParty(BaseModel):
     """
 
     id: Missing[str] = UNSET
-    size: Missing[Tuple[int, int]] = UNSET
+    size: Missing[tuple[int, int]] = UNSET
 
 
 class ActivityAssets(BaseModel):
@@ -3291,7 +3288,7 @@ class Team(BaseModel):
 
     icon: Optional[str] = Field(...)
     id: str
-    members: List["TeamMember"]
+    members: list["TeamMember"]
     name: str
     owner_user_id: Snowflake
 
@@ -3303,7 +3300,7 @@ class TeamMember(BaseModel):
     """
 
     membership_state: MembershipState
-    permissions: List[str]
+    permissions: list[str]
     team_id: Snowflake
     user: "TeamMemberUser"
 
@@ -3324,7 +3321,7 @@ class AuthorizationResponse(BaseModel):
     """
 
     application: Application  # partial application object
-    scopes: List[str]
+    scopes: list[str]
     expires: datetime.datetime
     user: Missing[User] = UNSET
 
