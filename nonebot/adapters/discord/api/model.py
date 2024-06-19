@@ -2651,9 +2651,9 @@ class GuildCreate(BaseModel):
     members: Missing[list["GuildMember"]] = UNSET
     channels: Missing[list["Channel"]] = UNSET
     threads: Missing[list["Channel"]] = UNSET
-    presences: Missing[
-        list["PresenceUpdate"]
-    ] = UNSET  # partial presence update objects
+    presences: Missing[list["PresenceUpdate"]] = (
+        UNSET  # partial presence update objects
+    )
     stage_instances: Missing[list["StageInstance"]] = UNSET
     guild_scheduled_events: Missing[list["GuildScheduledEvent"]] = UNSET
 
