@@ -2302,7 +2302,7 @@ class SourceGuild(BaseModel):
     # partial guild object
     id: Snowflake
     name: str
-    icon: Optional[str]
+    icon: Optional[str] = None
 
 
 class SourceChannel(BaseModel):
