@@ -44,7 +44,7 @@ class Dispatch(Payload):
 
 class Heartbeat(Payload):
     opcode: Literal[Opcode.HEARTBEAT] = Field(Opcode.HEARTBEAT, alias="op")
-    data: Optional[int] = Field(alias="d")
+    data: Optional[int] = Field(None, alias="d")
 
 
 class Identify(Payload):

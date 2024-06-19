@@ -850,7 +850,7 @@ class Application(BaseModel):
     """the id of the app"""
     name: str
     """the name of the app"""
-    icon: Optional[str]
+    icon: Optional[str] = None
     """the icon hash of the app"""
     description: str
     """the description of the app"""
@@ -870,7 +870,7 @@ class Application(BaseModel):
     verify_key: str
     """the hex encoded key for verification in
     interactions and the GameSDK's GetTicket"""
-    team: Optional["Team"]
+    team: Optional["Team"] = None
     """if the application belongs to a team, this will
     be a list of the members of that team"""
     guild_id: Missing[Snowflake] = UNSET
@@ -968,11 +968,11 @@ class AuditLogEntry(BaseModel):
     see https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object
     """
 
-    target_id: Optional[str]
+    target_id: Optional[str] = None
     """ID of the affected entity (webhook, user, role, etc.)"""
     changes: Missing[list["AuditLogChange"]] = UNSET
     """Changes made to the target_id"""
-    user_id: Optional[Snowflake]
+    user_id: Optional[Snowflake] = None
     """User or app that made the changes"""
     id: Snowflake
     """ID of the entry"""
@@ -1126,14 +1126,14 @@ class CreateAndModifyAutoModerationRuleParams(BaseModel):
     see https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
     """
 
-    name: Optional[str]
-    event_type: Optional[AutoModerationRuleEventType]
-    trigger_type: Optional[TriggerType]
-    trigger_metadata: Optional[TriggerMetadata]
-    actions: Optional[list[AutoModerationAction]]
-    enabled: Optional[bool]
-    exempt_roles: Optional[list[Snowflake]]
-    exempt_channels: Optional[list[Snowflake]]
+    name: Optional[str] = None
+    event_type: Optional[AutoModerationRuleEventType] = None
+    trigger_type: Optional[TriggerType] = None
+    trigger_metadata: Optional[TriggerMetadata] = None
+    actions: Optional[list[AutoModerationAction]] = None
+    enabled: Optional[bool] = None
+    exempt_roles: Optional[list[Snowflake]] = None
+    exempt_channels: Optional[list[Snowflake]] = None
 
 
 # Channel
@@ -1285,7 +1285,7 @@ class MessageActivity(BaseModel):
     """
 
     type: MessageActivityType
-    party_id: Optional[str]
+    party_id: Optional[str] = None
 
 
 class MessageReference(BaseModel):
@@ -1348,8 +1348,8 @@ class ThreadMetadata(BaseModel):
     auto_archive_duration: int
     archive_timestamp: str
     locked: bool
-    invitable: Optional[bool]
-    create_timestamp: Optional[str]
+    invitable: Optional[bool] = None
+    create_timestamp: Optional[str] = None
 
 
 class ThreadMember(BaseModel):
@@ -1357,11 +1357,11 @@ class ThreadMember(BaseModel):
 
     see https://discord.com/developers/docs/resources/channel#thread-member-object"""
 
-    id: Optional[str]
-    user_id: Optional[str]
+    id: Optional[str] = None
+    user_id: Optional[str] = None
     join_timestamp: str
     flags: int
-    member: Optional["GuildMember"]
+    member: Optional["GuildMember"] = None
 
 
 class DefaultReaction(BaseModel):
@@ -1369,8 +1369,8 @@ class DefaultReaction(BaseModel):
 
     see https://discord.com/developers/docs/resources/channel#default-reaction-object"""
 
-    emoji_id: Optional[str]
-    emoji_name: Optional[str]
+    emoji_id: Optional[str] = None
+    emoji_name: Optional[str] = None
 
 
 class ForumTag(BaseModel):
@@ -1383,7 +1383,7 @@ class ForumTag(BaseModel):
     name: str
     moderated: bool
     emoji_id: MissingOrNullable[Snowflake] = UNSET
-    emoji_name: Optional[str]
+    emoji_name: Optional[str] = None
 
 
 class Embed(BaseModel):
@@ -1571,7 +1571,7 @@ class AttachmentSend(BaseModel):
     see https://discord.com/developers/docs/resources/channel#attachment-object"""
 
     filename: str
-    description: Optional[str]
+    description: Optional[str] = None
 
 
 class MessageSend(BaseModel):
@@ -1579,17 +1579,17 @@ class MessageSend(BaseModel):
 
     see https://discord.com/developers/docs/resources/channel#create-message"""
 
-    content: Optional[str]
-    nonce: Optional[Union[int, str]]
-    tts: Optional[bool]
-    embeds: Optional[list[Embed]]
-    allowed_mentions: Optional[AllowedMention]
-    message_reference: Optional[MessageReference]
-    components: Optional[list[DirectComponent]]
-    sticker_ids: Optional[list[Snowflake]]
-    files: Optional[list[File]]
-    attachments: Optional[list[AttachmentSend]]
-    flags: Optional[MessageFlag]
+    content: Optional[str] = None
+    nonce: Optional[Union[int, str]] = None
+    tts: Optional[bool] = None
+    embeds: Optional[list[Embed]] = None
+    allowed_mentions: Optional[AllowedMention] = None
+    message_reference: Optional[MessageReference] = None
+    components: Optional[list[DirectComponent]] = None
+    sticker_ids: Optional[list[Snowflake]] = None
+    files: Optional[list[File]] = None
+    attachments: Optional[list[AttachmentSend]] = None
+    flags: Optional[MessageFlag] = None
 
 
 class ModifyChannelParams(BaseModel):
@@ -1598,25 +1598,25 @@ class ModifyChannelParams(BaseModel):
     see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
     """
 
-    name: Optional[str]
-    type: Optional[ChannelType]
-    position: Optional[int]
-    topic: Optional[str]
-    nsfw: Optional[bool]
-    rate_limit_per_user: Optional[int]
-    bitrate: Optional[int]
-    user_limit: Optional[int]
-    permission_overwrites: Optional[list[Overwrite]]
-    parent_id: Optional[Snowflake]
-    rtc_region: Optional[str]
-    video_quality_mode: Optional[VideoQualityMode]
-    default_auto_archive_duration: Optional[int]
-    flags: Optional[ChannelFlags]
-    available_tags: Optional[list[ForumTag]]
-    default_reaction_emoji: Optional[DefaultReaction]
-    default_thread_rate_limit_per_user: Optional[int]
-    default_sort_order: Optional[SortOrderTypes]
-    default_forum_layout: Optional[ForumLayoutTypes]
+    name: Optional[str] = None
+    type: Optional[ChannelType] = None
+    position: Optional[int] = None
+    topic: Optional[str] = None
+    nsfw: Optional[bool] = None
+    rate_limit_per_user: Optional[int] = None
+    bitrate: Optional[int] = None
+    user_limit: Optional[int] = None
+    permission_overwrites: Optional[list[Overwrite]] = None
+    parent_id: Optional[Snowflake] = None
+    rtc_region: Optional[str] = None
+    video_quality_mode: Optional[VideoQualityMode] = None
+    default_auto_archive_duration: Optional[int] = None
+    flags: Optional[ChannelFlags] = None
+    available_tags: Optional[list[ForumTag]] = None
+    default_reaction_emoji: Optional[DefaultReaction] = None
+    default_thread_rate_limit_per_user: Optional[int] = None
+    default_sort_order: Optional[SortOrderTypes] = None
+    default_forum_layout: Optional[ForumLayoutTypes] = None
 
 
 # Emoji
@@ -1628,9 +1628,9 @@ class Emoji(BaseModel):
 
     see https://discord.com/developers/docs/resources/emoji#emoji-object"""
 
-    id: Optional[str]
+    id: Optional[str] = None
     """emoji id"""
-    name: Optional[str]
+    name: Optional[str] = None
     """emoji name(can be null only in reaction emoji objects)"""
     roles: Missing[list[Snowflake]] = UNSET
     """roles allowed to use this emoji"""
@@ -1658,7 +1658,7 @@ class Guild(BaseModel):
     icon: Optional[str] = Field(...)
     icon_hash: MissingOrNullable[str] = UNSET
     splash: Optional[str] = Field(...)
-    discovery_splash: Optional[str]
+    discovery_splash: Optional[str] = None
     owner: Missing[bool] = UNSET
     owner_id: Snowflake
     permissions: Missing[str] = UNSET
@@ -1726,14 +1726,14 @@ class GuildPreview(BaseModel):
 
     id: Snowflake
     name: str
-    icon: Optional[str]
-    splash: Optional[str]
-    discovery_splash: Optional[str]
+    icon: Optional[str] = None
+    splash: Optional[str] = None
+    discovery_splash: Optional[str] = None
     emojis: list[Emoji]
     features: list[GuildFeature]
     approximate_member_count: int
     approximate_presence_count: int
-    description: Optional[str]
+    description: Optional[str] = None
     stickers: list["Sticker"]
 
 
@@ -1744,7 +1744,7 @@ class GuildWidgetSettings(BaseModel):
     """
 
     enabled: bool
-    channel_id: Optional[Snowflake]
+    channel_id: Optional[Snowflake] = None
 
 
 class GuildWidget(BaseModel):
@@ -1754,7 +1754,7 @@ class GuildWidget(BaseModel):
 
     id: Snowflake
     name: str
-    instant_invite: Optional[str]
+    instant_invite: Optional[str] = None
     channels: list["Channel"]  # partial channel objects
     members: list["User"]  # partial user objects
     presence_count: int
@@ -1794,7 +1794,7 @@ class Integration(BaseModel):
     expire_behavior: Missing[IntegrationExpireBehaviors] = UNSET
     expire_grace_period: Missing[int] = UNSET
     user: Missing["User"] = UNSET
-    account: Optional["IntegrationAccount"]
+    account: Optional["IntegrationAccount"] = None
     synced_at: Missing[datetime.datetime] = UNSET
     subscriber_count: Missing[int] = UNSET
     revoked: Missing[bool] = UNSET
@@ -1820,7 +1820,7 @@ class IntegrationApplication(BaseModel):
 
     id: Snowflake
     name: str
-    icon: Optional[str]
+    icon: Optional[str] = None
     description: str
     bot: Missing["User"] = UNSET
 
@@ -1830,7 +1830,7 @@ class Ban(BaseModel):
 
     see https://discord.com/developers/docs/resources/guild#ban-object"""
 
-    reason: Optional[str]
+    reason: Optional[str] = None
     user: "User"
 
 
@@ -1839,7 +1839,7 @@ class WelcomeScreen(BaseModel):
 
     see https://discord.com/developers/docs/resources/guild#welcome-screen-object"""
 
-    description: Optional[str]
+    description: Optional[str] = None
     welcome_channels: list["WelcomeScreenChannel"]
 
 
@@ -1851,8 +1851,8 @@ class WelcomeScreenChannel(BaseModel):
 
     channel_id: Snowflake
     description: str
-    emoji_id: Optional[Snowflake]
-    emoji_name: Optional[str]
+    emoji_id: Optional[Snowflake] = None
+    emoji_name: Optional[str] = None
 
 
 class GuildOnboarding(BaseModel):
@@ -1892,7 +1892,7 @@ class OnboardingPromptOption(BaseModel):
     role_ids: list[Snowflake]
     emoji: Emoji
     title: str
-    description: Optional[str]
+    description: Optional[str] = None
 
 
 class MembershipScreening(BaseModel):
@@ -1908,17 +1908,17 @@ class CreateGuildParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#create-guild"""
 
     name: str
-    region: Optional[str]
-    icon: Optional[str]
-    verification_level: Optional[VerificationLevel]
-    default_message_notifications: Optional[DefaultMessageNotificationLevel]
-    explicit_content_filter: Optional[ExplicitContentFilterLevel]
-    roles: Optional[list["Role"]]
-    channels: Optional[list[Channel]]
-    afk_channel_id: Optional[Snowflake]
-    afk_timeout: Optional[int]
-    system_channel_id: Optional[Snowflake]
-    system_channel_flags: Optional[SystemChannelFlags]
+    region: Optional[str] = None
+    icon: Optional[str] = None
+    verification_level: Optional[VerificationLevel] = None
+    default_message_notifications: Optional[DefaultMessageNotificationLevel] = None
+    explicit_content_filter: Optional[ExplicitContentFilterLevel] = None
+    roles: Optional[list["Role"]] = None
+    channels: Optional[list[Channel]] = None
+    afk_channel_id: Optional[Snowflake] = None
+    afk_timeout: Optional[int] = None
+    system_channel_id: Optional[Snowflake] = None
+    system_channel_flags: Optional[SystemChannelFlags] = None
 
 
 class ModifyGuildParams(BaseModel):
@@ -1927,25 +1927,25 @@ class ModifyGuildParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#modify-guild"""
 
     name: str
-    region: Optional[str]
-    verification_level: Optional[VerificationLevel]
-    default_message_notifications: Optional[DefaultMessageNotificationLevel]
-    explicit_content_filter: Optional[ExplicitContentFilterLevel]
-    afk_channel_id: Optional[Snowflake]
-    afk_timeout: Optional[int]
-    icon: Optional[str]
-    owner_id: Optional[Snowflake]
-    splash: Optional[str]
-    discovery_splash: Optional[str]
-    banner: Optional[str]
-    system_channel_id: Optional[Snowflake]
-    system_channel_flags: Optional[SystemChannelFlags]
-    rules_channel_id: Optional[Snowflake]
-    public_updates_channel_id: Optional[Snowflake]
-    preferred_locale: Optional[str]
-    features: Optional[list[GuildFeature]]
-    description: Optional[str]
-    premium_progress_bar_enabled: Optional[bool]
+    region: Optional[str] = None
+    verification_level: Optional[VerificationLevel] = None
+    default_message_notifications: Optional[DefaultMessageNotificationLevel] = None
+    explicit_content_filter: Optional[ExplicitContentFilterLevel] = None
+    afk_channel_id: Optional[Snowflake] = None
+    afk_timeout: Optional[int] = None
+    icon: Optional[str] = None
+    owner_id: Optional[Snowflake] = None
+    splash: Optional[str] = None
+    discovery_splash: Optional[str] = None
+    banner: Optional[str] = None
+    system_channel_id: Optional[Snowflake] = None
+    system_channel_flags: Optional[SystemChannelFlags] = None
+    rules_channel_id: Optional[Snowflake] = None
+    public_updates_channel_id: Optional[Snowflake] = None
+    preferred_locale: Optional[str] = None
+    features: Optional[list[GuildFeature]] = None
+    description: Optional[str] = None
+    premium_progress_bar_enabled: Optional[bool] = None
 
 
 class CreateGuildChannelParams(BaseModel):
@@ -1954,21 +1954,21 @@ class CreateGuildChannelParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#create-guild-channel"""
 
     name: str
-    type: Optional[ChannelType]
-    topic: Optional[str]
-    bitrate: Optional[int]
-    user_limit: Optional[int]
-    rate_limit_per_user: Optional[int]
-    position: Optional[int]
-    permission_overwrites: Optional[list["Overwrite"]]
-    parent_id: Optional[Snowflake]
-    nsfw: Optional[bool]
-    rtc_region: Optional[str]
-    video_quality_mode: Optional[VideoQualityMode]
-    default_auto_archive_duration: Optional[int]
-    default_reaction_emoji: Optional[DefaultReaction]
-    available_tags: Optional[list[ForumTag]]
-    default_sort_order: Optional[SortOrderTypes]
+    type: Optional[ChannelType] = None
+    topic: Optional[str] = None
+    bitrate: Optional[int] = None
+    user_limit: Optional[int] = None
+    rate_limit_per_user: Optional[int] = None
+    position: Optional[int] = None
+    permission_overwrites: Optional[list["Overwrite"]] = None
+    parent_id: Optional[Snowflake] = None
+    nsfw: Optional[bool] = None
+    rtc_region: Optional[str] = None
+    video_quality_mode: Optional[VideoQualityMode] = None
+    default_auto_archive_duration: Optional[int] = None
+    default_reaction_emoji: Optional[DefaultReaction] = None
+    available_tags: Optional[list[ForumTag]] = None
+    default_sort_order: Optional[SortOrderTypes] = None
 
 
 class ListActiveGuildThreadsResponse(BaseModel):
@@ -1986,9 +1986,9 @@ class ModifyGuildWelcomeScreenParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
     """
 
-    enabled: Optional[bool]
-    welcome_channels: Optional[list[WelcomeScreenChannel]]
-    description: Optional[str]
+    enabled: Optional[bool] = None
+    welcome_channels: Optional[list[WelcomeScreenChannel]] = None
+    description: Optional[str] = None
 
 
 # Guild Scheduled Event
@@ -2003,17 +2003,17 @@ class GuildScheduledEvent(BaseModel):
 
     id: Snowflake
     guild_id: Snowflake
-    channel_id: Optional[Snowflake]
+    channel_id: Optional[Snowflake] = None
     creator_id: MissingOrNullable[Snowflake] = UNSET
     name: str
     description: MissingOrNullable[str] = UNSET
     scheduled_start_time: datetime.datetime
-    scheduled_end_time: Optional[datetime.datetime]
+    scheduled_end_time: Optional[datetime.datetime] = None
     privacy_level: GuildScheduledEventPrivacyLevel
     status: GuildScheduledEventStatus
     entity_type: GuildScheduledEventEntityType
-    entity_id: Optional[Snowflake]
-    entity_metadata: Optional["GuildScheduledEventEntityMetadata"]
+    entity_id: Optional[Snowflake] = None
+    entity_metadata: Optional["GuildScheduledEventEntityMetadata"] = None
     creator: Missing["User"] = UNSET
     user_count: Missing[int] = UNSET
     image: MissingOrNullable[str] = UNSET
@@ -2045,15 +2045,15 @@ class CreateGuildScheduledEventParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event-json-params
     """
 
-    channel_id: Optional[Snowflake]
-    entity_metadata: Optional[GuildScheduledEventEntityMetadata]
+    channel_id: Optional[Snowflake] = None
+    entity_metadata: Optional[GuildScheduledEventEntityMetadata] = None
     name: str
     privacy_level: GuildScheduledEventPrivacyLevel
     scheduled_start_time: datetime.datetime  # ISO8601 timestamp
-    scheduled_end_time: Optional[datetime.datetime]  # ISO8601 timestamp
-    description: Optional[str]
+    scheduled_end_time: Optional[datetime.datetime] = None  # ISO8601 timestamp
+    description: Optional[str] = None
     entity_type: GuildScheduledEventEntityType
-    image: Optional[str]
+    image: Optional[str] = None
 
 
 class ModifyGuildScheduledEventParams(BaseModel):
@@ -2062,16 +2062,16 @@ class ModifyGuildScheduledEventParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event-json-params
     """
 
-    channel_id: Optional[Snowflake]
-    entity_metadata: Optional[GuildScheduledEventEntityMetadata]
-    name: Optional[str]
-    privacy_level: Optional[GuildScheduledEventPrivacyLevel]
-    scheduled_start_time: Optional[datetime.datetime]  # ISO8601 timestamp
-    scheduled_end_time: Optional[datetime.datetime]  # ISO8601 timestamp
-    description: Optional[str]
-    entity_type: Optional[GuildScheduledEventEntityType]
-    status: Optional[GuildScheduledEventStatus]
-    image: Optional[str]
+    channel_id: Optional[Snowflake] = None
+    entity_metadata: Optional[GuildScheduledEventEntityMetadata] = None
+    name: Optional[str] = None
+    privacy_level: Optional[GuildScheduledEventPrivacyLevel] = None
+    scheduled_start_time: Optional[datetime.datetime] = None  # ISO8601 timestamp
+    scheduled_end_time: Optional[datetime.datetime] = None  # ISO8601 timestamp
+    description: Optional[str] = None
+    entity_type: Optional[GuildScheduledEventEntityType] = None
+    status: Optional[GuildScheduledEventStatus] = None
+    image: Optional[str] = None
 
 
 # Guild Template
@@ -2084,7 +2084,7 @@ class GuildTemplate(BaseModel):
 
     code: str
     name: str
-    description: Optional[str]
+    description: Optional[str] = None
     usage_count: int
     creator_id: str
     creator: "User"
@@ -2092,7 +2092,7 @@ class GuildTemplate(BaseModel):
     updated_at: datetime.datetime
     source_guild_id: Snowflake
     serialized_source_guild: "Guild"  # partial guild object
-    is_dirty: Optional[bool]
+    is_dirty: Optional[bool] = None
 
 
 # Invite
@@ -2157,7 +2157,7 @@ class StageInstance(BaseModel):
     topic: str
     privacy_level: StagePrivacyLevel
     discoverable_disabled: bool
-    guild_scheduled_event_id: Optional[Snowflake]
+    guild_scheduled_event_id: Optional[Snowflake] = None
 
 
 # Sticker
@@ -2215,7 +2215,7 @@ class User(BaseModel):
     id: Snowflake
     username: str
     discriminator: str
-    global_name: Optional[str]
+    global_name: Optional[str] = None
     avatar: Optional[str] = Field(...)
     bot: Missing[bool] = UNSET
     system: Missing[bool] = UNSET
@@ -2651,9 +2651,9 @@ class GuildCreate(BaseModel):
     members: Missing[list["GuildMember"]] = UNSET
     channels: Missing[list["Channel"]] = UNSET
     threads: Missing[list["Channel"]] = UNSET
-    presences: Missing[list["PresenceUpdate"]] = (
-        UNSET  # partial presence update objects
-    )
+    presences: Missing[
+        list["PresenceUpdate"]
+    ] = UNSET  # partial presence update objects
     stage_instances: Missing[list["StageInstance"]] = UNSET
     guild_scheduled_events: Missing[list["GuildScheduledEvent"]] = UNSET
 
@@ -3308,7 +3308,7 @@ class TeamMember(BaseModel):
 class TeamMemberUser(BaseModel):
     """partial user object for TeamMember"""
 
-    avatar: Optional[str]
+    avatar: Optional[str] = None
     discriminator: str
     id: Snowflake
     username: str
