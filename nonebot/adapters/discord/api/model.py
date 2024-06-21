@@ -2298,6 +2298,19 @@ class VoiceRegion(BaseModel):
 
 # Webhook
 # see https://discord.com/developers/docs/resources/webhook
+class SourceGuild(BaseModel):
+    # partial guild object
+    id: Snowflake
+    name: str
+    icon: Optional[str] = None
+
+
+class SourceChannel(BaseModel):
+    # partial channel object
+    id: Snowflake
+    name: str
+
+
 class Webhook(BaseModel):
     """Used to represent a webhook.
 
@@ -2312,9 +2325,8 @@ class Webhook(BaseModel):
     avatar: Optional[str] = Field(...)
     token: Missing[str] = UNSET
     application_id: Optional[Snowflake] = Field(...)
-    source_guild: MissingOrNullable[Guild] = UNSET  # partial guild object
-    # partial channel object
-    source_channel: MissingOrNullable[Channel] = UNSET
+    source_guild: Missing[SourceGuild] = UNSET
+    source_channel: Missing[SourceChannel] = UNSET
     url: Missing[str] = UNSET
 
 
