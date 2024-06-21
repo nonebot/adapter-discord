@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Literal, Type, Union
+from typing import Any, Literal, Union
 
 from nonebot.compat import type_validate_python
 
@@ -13,13 +13,13 @@ from ..utils import model_dump
 
 
 def parse_data(
-    data: Dict[str, Any], model_class: Type[Union[MessageSend, ExecuteWebhookParams]]
-) -> Dict[Literal["files", "json"], Any]:
+    data: dict[str, Any], model_class: type[Union[MessageSend, ExecuteWebhookParams]]
+) -> dict[Literal["files", "json"], Any]:
     model = type_validate_python(model_class, data)
-    payload: Dict[str, Any] = model_dump(model, exclude={"files"}, exclude_none=True)
+    payload: dict[str, Any] = model_dump(model, exclude={"files"}, exclude_none=True)
     if model.files:
-        multipart: Dict[str, Any] = {}
-        attachments: List[dict] = payload.pop("attachments", [])
+        multipart: dict[str, Any] = {}
+        attachments: list[dict] = payload.pop("attachments", [])
         for index, file in enumerate(model.files):
             for attachment in attachments:
                 if attachment["filename"] == file.filename:
@@ -35,11 +35,11 @@ def parse_data(
 
 
 def parse_forum_thread_message(
-    data: Dict[str, Any],
-) -> Dict[Literal["files", "json"], Any]:
+    data: dict[str, Any],
+) -> dict[Literal["files", "json"], Any]:
     model = type_validate_python(MessageSend, data)
-    payload: Dict[str, Any] = {}
-    content: Dict[str, Any] = model_dump(model, exclude={"files"}, exclude_none=True)
+    payload: dict[str, Any] = {}
+    content: dict[str, Any] = model_dump(model, exclude={"files"}, exclude_none=True)
     if auto_archive_duration := data.pop("auto_archive_duration"):
         payload["auto_archive_duration"] = auto_archive_duration
     if rate_limit_per_user := data.pop("rate_limit_per_user"):
@@ -48,7 +48,7 @@ def parse_forum_thread_message(
         payload["applied_tags"] = applied_tags
     payload["message"] = content
     if model.files:
-        multipart: Dict[str, Any] = {"payload_json": None}
+        multipart: dict[str, Any] = {"payload_json": None}
         attachments: list[dict] = payload.pop("attachments", [])
         for index, file in enumerate(model.files):
             for attachment in attachments:
@@ -66,15 +66,15 @@ def parse_forum_thread_message(
 
 def parse_interaction_response(
     response: InteractionResponse,
-) -> Dict[Literal["files", "json"], Any]:
-    payload: Dict[str, Any] = model_dump(response, exclude_none=True)
+) -> dict[Literal["files", "json"], Any]:
+    payload: dict[str, Any] = model_dump(response, exclude_none=True)
     if response.data and isinstance(response.data, InteractionCallbackMessage):
         payload["data"] = model_dump(
             response.data, exclude={"files"}, exclude_none=True
         )
         if response.data.files:
-            multipart: Dict[str, Any] = {}
-            attachments: List[dict] = payload["data"].pop("attachments", [])
+            multipart: dict[str, Any] = {}
+            attachments: list[dict] = payload["data"].pop("attachments", [])
             for index, file in enumerate(response.data.files):
                 for attachment in attachments:
                     if attachment["filename"] == file.filename:

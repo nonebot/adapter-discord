@@ -2,7 +2,7 @@ import asyncio
 import contextlib
 import json
 import sys
-from typing import Any, List, Optional, Tuple
+from typing import Any, Optional
 from typing_extensions import override
 
 from nonebot.adapters import Adapter as BaseAdapter
@@ -41,7 +41,7 @@ class Adapter(BaseAdapter):
     def __init__(self, driver: Driver, **kwargs: Any):
         super().__init__(driver, **kwargs)
         self.discord_config: Config = get_plugin_config(Config)
-        self.tasks: List[asyncio.Task] = []
+        self.tasks: list[asyncio.Task] = []
         self.base_url: URL = URL(
             f"https://discord.com/api/v{self.discord_config.discord_api_version}",
         )
@@ -151,7 +151,7 @@ class Adapter(BaseAdapter):
         self,
         bot_info: BotInfo,
         ws_url: URL,
-        shard: Tuple[int, int],
+        shard: tuple[int, int],
     ) -> None:
         log("DEBUG", f"Forwarding WebSocket Connection to {escape_tag(str(ws_url))}...")
         headers = {"Authorization": self.get_authorization(bot_info)}
@@ -288,7 +288,7 @@ class Adapter(BaseAdapter):
             await self._heartbeat(ws, bot)
             await asyncio.sleep(heartbeat_interval / 1000.0)
 
-    async def _authenticate(self, bot: Bot, ws: WebSocket, shard: Tuple[int, int]):
+    async def _authenticate(self, bot: Bot, ws: WebSocket, shard: tuple[int, int]):
         """鉴权连接"""
         if not bot.ready:
             payload = type_validate_python(

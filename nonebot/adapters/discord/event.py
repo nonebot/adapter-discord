@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Literal, Optional, Type, Union
+from typing import Literal, Optional, Union
 from typing_extensions import override
 
 from nonebot.adapters import Event as BaseEvent
@@ -280,7 +280,7 @@ class ApplicationCommandPermissionsUpdateEvent(NoticeEvent):
     id: Snowflake
     application_id: Snowflake
     guild_id: Snowflake
-    permissions: List[ApplicationCommandPermissions]
+    permissions: list[ApplicationCommandPermissions]
 
 
 class AutoModerationEvent(NoticeEvent):
@@ -905,7 +905,7 @@ class WebhooksUpdateEvent(NoticeEvent, WebhooksUpdate):
     __type__ = EventType.WEBHOOKS_UPDATE
 
 
-event_classes: Dict[str, Type[Event]] = {
+event_classes: dict[str, type[Event]] = {
     EventType.HELLO.value: HelloEvent,
     EventType.READY.value: ReadyEvent,
     EventType.RESUMED.value: ResumedEvent,

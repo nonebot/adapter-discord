@@ -1,4 +1,4 @@
-from typing import Dict, List, Literal, Optional, Tuple, Union
+from typing import Literal, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -52,15 +52,15 @@ class Intents(BaseModel):
 
 class BotInfo(BaseModel):
     token: str
-    shard: Optional[Tuple[int, int]] = None
+    shard: Optional[tuple[int, int]] = None
     intent: Intents = Field(default_factory=Intents)
-    application_commands: Dict[str, List[Union[Literal["*"], Snowflake]]] = Field(
+    application_commands: dict[str, list[Union[Literal["*"], Snowflake]]] = Field(
         default_factory=dict
     )
 
 
 class Config(BaseModel):
-    discord_bots: List[BotInfo] = Field(default_factory=list)
+    discord_bots: list[BotInfo] = Field(default_factory=list)
     discord_compress: bool = False
     discord_api_version: int = 10
     discord_api_timeout: float = 30.0

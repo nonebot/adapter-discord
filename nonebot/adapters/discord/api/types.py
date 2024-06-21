@@ -1,6 +1,11 @@
 from enum import Enum, IntEnum, IntFlag
-from typing import Any, Dict, Literal, TypeVar, Union, final
+from typing import Any, Literal, TypeVar, Union, final
 from typing_extensions import TypeAlias
+
+from nonebot.compat import PYDANTIC_V2
+
+if PYDANTIC_V2:
+    from pydantic_core import core_schema
 
 T = TypeVar("T")
 
@@ -21,12 +26,23 @@ class Unset(Enum):
     def __copy__(self):
         return self._UNSET
 
-    def __deepcopy__(self, memo: Dict[int, Any]):
+    def __deepcopy__(self, memo: dict[int, Any]):
         return self._UNSET
 
-    @classmethod
-    def __get_validators__(cls):
-        yield cls._validate
+    if PYDANTIC_V2:
+
+        @classmethod
+        def __get_pydantic_core_schema__(
+            cls, source_type: Any, handler: Any
+        ) -> core_schema.CoreSchema:
+            return core_schema.with_info_plain_validator_function(
+                lambda value, _: cls._validate(value)
+            )
+    else:
+
+        @classmethod
+        def __get_validators__(cls):
+            yield cls._validate
 
     @classmethod
     def _validate(cls, value: Any):

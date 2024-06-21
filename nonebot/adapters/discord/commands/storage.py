@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import TYPE_CHECKING, Dict, List, Literal
+from typing import TYPE_CHECKING, Literal
 
 from ..api import ApplicationCommandCreate, Snowflake
 from ..bot import Bot
@@ -8,7 +8,7 @@ from ..utils import model_dump
 if TYPE_CHECKING:
     from .matcher import ApplicationCommandConfig
 
-_application_command_storage: Dict[str, "ApplicationCommandConfig"] = {}
+_application_command_storage: dict[str, "ApplicationCommandConfig"] = {}
 
 OPTION_KEY: Literal["_discord_application_command_options"] = (
     "_discord_application_command_options"
@@ -16,8 +16,8 @@ OPTION_KEY: Literal["_discord_application_command_options"] = (
 
 
 async def sync_application_command(bot: Bot):
-    commands_global: List[ApplicationCommandCreate] = []
-    commands_guild: Dict[Snowflake, List[ApplicationCommandCreate]] = defaultdict(List)
+    commands_global: list[ApplicationCommandCreate] = []
+    commands_guild: dict[Snowflake, list[ApplicationCommandCreate]] = defaultdict(list)
     if "*" in bot.bot_info.application_commands:
         if "*" in bot.bot_info.application_commands["*"]:
             commands_global = [

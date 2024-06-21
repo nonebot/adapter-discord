@@ -1,6 +1,6 @@
 from enum import IntEnum
-from typing import Optional, Union
-from typing_extensions import Annotated, Literal
+from typing import Annotated, Optional, Union
+from typing_extensions import Literal
 
 from nonebot.compat import PYDANTIC_V2, ConfigDict
 
@@ -44,7 +44,7 @@ class Dispatch(Payload):
 
 class Heartbeat(Payload):
     opcode: Literal[Opcode.HEARTBEAT] = Field(Opcode.HEARTBEAT, alias="op")
-    data: Optional[int] = Field(alias="d")
+    data: Optional[int] = Field(None, alias="d")
 
 
 class Identify(Payload):

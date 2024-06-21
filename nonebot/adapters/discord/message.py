@@ -1,14 +1,12 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
 import datetime
 import re
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
-    Iterable,
     Literal,
     Optional,
-    Type,
     TypedDict,
     Union,
     overload,
@@ -42,7 +40,7 @@ from .utils import unescape
 class MessageSegment(BaseMessageSegment["Message"]):
     @classmethod
     @override
-    def get_message_class(cls) -> Type["Message"]:
+    def get_message_class(cls) -> type["Message"]:
         return Message
 
     @staticmethod
@@ -371,7 +369,7 @@ class ReferenceSegment(MessageSegment):
 class Message(BaseMessage[MessageSegment]):
     @classmethod
     @override
-    def get_segment_class(cls) -> Type[MessageSegment]:
+    def get_segment_class(cls) -> type[MessageSegment]:
         return MessageSegment
 
     @override
@@ -476,7 +474,7 @@ class Message(BaseMessage[MessageSegment]):
         )
 
 
-def parse_message(message: Union[Message, MessageSegment, str]) -> Dict[str, Any]:
+def parse_message(message: Union[Message, MessageSegment, str]) -> dict[str, Any]:
     message = MessageSegment.text(message) if isinstance(message, str) else message
     message = message if isinstance(message, Message) else Message(message)
 

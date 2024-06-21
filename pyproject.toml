@@ -13,7 +13,7 @@ keywords = ["nonebot", "discord", "bot"]
 packages = [{ include = "nonebot" }]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 nonebot2 = "^2.2.1"
 
 [tool.poetry.group.dev.dependencies]
@@ -25,7 +25,7 @@ pre-commit = "^3.1.0"
 select = ["E", "W", "F", "I", "UP", "C", "T", "PYI", "PT"]
 ignore = ["E402", "F403", "F405", "C901", "PYI021", "PYI048", "W191", "E501"]
 line-length = 88
-target-version = "py38"
+target-version = "py39"
 ignore-init-module-imports = true
 
 

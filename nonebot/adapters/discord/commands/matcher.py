@@ -1,5 +1,6 @@
+from collections.abc import Iterable
 from datetime import datetime, timedelta
-from typing import Any, Dict, Iterable, List, Optional, Type, Union
+from typing import Any, Optional, Union
 
 from nonebot.adapters import MessageTemplate
 from nonebot.dependencies import Dependent
@@ -53,7 +54,7 @@ type_str_mapping = {
 
 
 class ApplicationCommandConfig(ApplicationCommandCreate):
-    guild_ids: Optional[List[Snowflake]] = None
+    guild_ids: Optional[list[Snowflake]] = None
 
 
 # def _application_command_rule(event: ApplicationCommandInteractionEvent) -> bool:
@@ -316,25 +317,25 @@ class UserMessageCommandMatcher(ApplicationCommandMatcher):
 def on_slash_command(
     name: str,
     description: str,
-    options: Optional[List[AnyCommandOption]] = None,
+    options: Optional[list[AnyCommandOption]] = None,
     internal_id: Optional[str] = None,
     rule: Union[Rule, T_RuleChecker, None] = None,
     permission: Union[Permission, T_PermissionChecker, None] = None,
     *,
-    name_localizations: Optional[Dict[str, str]] = None,
-    description_localizations: Optional[Dict[str, str]] = None,
+    name_localizations: Optional[dict[str, str]] = None,
+    description_localizations: Optional[dict[str, str]] = None,
     default_member_permissions: Optional[str] = None,
     dm_permission: Optional[bool] = None,
     default_permission: Optional[bool] = None,
     nsfw: Optional[bool] = None,
-    handlers: Optional[List[Union[T_Handler, Dependent]]] = None,
+    handlers: Optional[list[Union[T_Handler, Dependent]]] = None,
     temp: bool = False,
     expire_time: Union[datetime, timedelta, None] = None,
     priority: int = 1,
     block: bool = True,
     state: Optional[T_State] = None,
     _depth: int = 0,
-) -> Type[SlashCommandMatcher]:
+) -> type[SlashCommandMatcher]:
     config = ApplicationCommandConfig(
         type=ApplicationCommandType.CHAT_INPUT,
         name=name,
@@ -348,7 +349,7 @@ def on_slash_command(
         nsfw=nsfw,
     )
     _application_command_storage[internal_id or name] = config
-    matcher: Type[SlashCommandMatcher] = SlashCommandMatcher.new(
+    matcher: type[SlashCommandMatcher] = SlashCommandMatcher.new(
         "notice",
         Rule() & rule,
         Permission() | permission,
@@ -388,19 +389,19 @@ def on_user_command(
     rule: Union[Rule, T_RuleChecker, None] = None,
     permission: Union[Permission, T_PermissionChecker, None] = None,
     *,
-    name_localizations: Optional[Dict[str, str]] = None,
+    name_localizations: Optional[dict[str, str]] = None,
     default_member_permissions: Optional[str] = None,
     dm_permission: Optional[bool] = None,
     default_permission: Optional[bool] = None,
     nsfw: Optional[bool] = None,
-    handlers: Optional[List[Union[T_Handler, Dependent]]] = None,
+    handlers: Optional[list[Union[T_Handler, Dependent]]] = None,
     temp: bool = False,
     expire_time: Union[datetime, timedelta, None] = None,
     priority: int = 1,
     block: bool = True,
     state: Optional[T_State] = None,
     _depth: int = 0,
-) -> Type[UserMessageCommandMatcher]:
+) -> type[UserMessageCommandMatcher]:
     config = ApplicationCommandConfig(
         type=ApplicationCommandType.USER,
         name=name,
@@ -411,7 +412,7 @@ def on_user_command(
         nsfw=nsfw,
     )
     _application_command_storage[internal_id or name] = config
-    matcher: Type[UserMessageCommandMatcher] = UserMessageCommandMatcher.new(
+    matcher: type[UserMessageCommandMatcher] = UserMessageCommandMatcher.new(
         "notice",
         Rule() & rule,
         Permission() | permission,
@@ -451,19 +452,19 @@ def on_message_command(
     rule: Union[Rule, T_RuleChecker, None] = None,
     permission: Union[Permission, T_PermissionChecker, None] = None,
     *,
-    name_localizations: Optional[Dict[str, str]] = None,
+    name_localizations: Optional[dict[str, str]] = None,
     default_member_permissions: Optional[str] = None,
     dm_permission: Optional[bool] = None,
     default_permission: Optional[bool] = None,
     nsfw: Optional[bool] = None,
-    handlers: Optional[List[Union[T_Handler, Dependent]]] = None,
+    handlers: Optional[list[Union[T_Handler, Dependent]]] = None,
     temp: bool = False,
     expire_time: Union[datetime, timedelta, None] = None,
     priority: int = 1,
     block: bool = True,
     state: Optional[T_State] = None,
     _depth: int = 0,
-) -> Type[UserMessageCommandMatcher]:
+) -> type[UserMessageCommandMatcher]:
     config = ApplicationCommandConfig(
         type=ApplicationCommandType.MESSAGE,
         name=name,
@@ -474,7 +475,7 @@ def on_message_command(
         nsfw=nsfw,
     )
     _application_command_storage[internal_id or name] = config
-    matcher: Type[UserMessageCommandMatcher] = UserMessageCommandMatcher.new(
+    matcher: type[UserMessageCommandMatcher] = UserMessageCommandMatcher.new(
         "notice",
         Rule() & rule,
         Permission() | permission,
