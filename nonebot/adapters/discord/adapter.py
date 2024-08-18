@@ -96,7 +96,7 @@ class Adapter(BaseAdapter):
         if remain and remain <= 0:
             log(
                 "ERROR",
-                "<r><bg #f8bbd0>Failed to establish connection to QQ Guild "
+                "<r><bg #f8bbd0>Failed to establish connection to Discord "
                 "because of session start limit.</bg #f8bbd0></r>\n"
                 f"{escape_tag(str(gateway_info))}",
             )
