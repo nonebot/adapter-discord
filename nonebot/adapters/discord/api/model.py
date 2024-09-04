@@ -635,7 +635,7 @@ class Interaction(BaseModel):
     This is always present on application command, message component,
     and modal submit interaction types.
     It is optional for future-proofing against new interaction types"""
-    guild: Missing["Guild"] = UNSET  # partial guild object
+    guild: Missing["InteractionGuild"] = UNSET
     """Guild that the interaction was sent from"""
     guild_id: Missing[Snowflake] = UNSET
     """Guild that the interaction was sent from"""
@@ -660,7 +660,7 @@ class Interaction(BaseModel):
     """Selected language of the invoking user"""
     guild_locale: Missing[str] = UNSET
     """Guild's preferred locale, if invoked in a guild"""
-    entitlements: Missing["Entitlement"] = UNSET
+    entitlements: Missing[list["Entitlement"]] = UNSET
     """For monetized apps, any entitlements for the
     invoking user, representing access to premium SKUs"""
     authorizing_integration_owners: dict[
@@ -671,6 +671,14 @@ class Interaction(BaseModel):
     See Authorizing Integration Owners Object for details"""
     context: Missing[InteractionContextType] = UNSET
     """Context where the interaction was triggered from"""
+
+
+class InteractionGuild(BaseModel):
+    """partial guild object for Interaction"""
+
+    id: Snowflake
+    locale: Missing[str] = UNSET
+    features: list[GuildFeature]
 
 
 class ApplicationCommandData(BaseModel):
@@ -960,9 +968,13 @@ class Application(BaseModel):
     """Approximate count of users that have installed the app"""
     redirect_uris: Missing[list[str]] = UNSET
     """Array of redirect URIs for the app"""
-    interactions_endpoint_url: Missing[str] = UNSET
+    interactions_endpoint_url: MissingOrNullable[str] = (
+        UNSET  # return type not match the docs
+    )
     """Interactions endpoint URL for the app"""
-    role_connections_verification_url: Missing[str] = UNSET
+    role_connections_verification_url: MissingOrNullable[str] = (
+        UNSET  # return type not match the docs
+    )
     """Role connection verification URL for the app"""
     tags: Missing[list[str]] = UNSET
     """up to 5 tags describing the content and functionality of the application"""
@@ -1918,7 +1930,7 @@ class GuildWidget(BaseModel):
 
 
 class GuildWidgetChannel(BaseModel):
-    """partial channel objects for Guild Widget
+    """partial channel objects for GuildWidget.channels
 
     see https://discord.com/developers/docs/resources/guild#guild-widget-object-example-guild-widget
     """
@@ -1929,7 +1941,7 @@ class GuildWidgetChannel(BaseModel):
 
 
 class GuildWidgetUser(BaseModel):
-    """partial user objects for Guild Widget
+    """partial user objects for GuildWidget.members
 
     The fields id, discriminator and avatar are anonymized to prevent abuse.
 
@@ -2367,7 +2379,7 @@ class Invite(BaseModel):
 
     type: InviteType
     code: str
-    guild: Missing[Guild] = UNSET  # partial guild object
+    guild: Missing["InviteGuild"] = Field(...)
     channel: Optional[Channel] = Field(...)  # partial channel object
     inviter: Missing["User"] = UNSET
     target_type: Missing["InviteTargetType"] = UNSET
@@ -2375,9 +2387,28 @@ class Invite(BaseModel):
     target_application: Missing["Application"] = UNSET  # partial application object
     approximate_presence_count: Missing[int] = UNSET
     approximate_member_count: Missing[int] = UNSET
-    expires_at: Missing[datetime.datetime] = UNSET
+    expires_at: MissingOrNullable[datetime.datetime] = UNSET
     stage_instance: Missing["StageInstance"] = UNSET
     guild_scheduled_event: Missing["GuildScheduledEvent"] = UNSET
+
+
+class InviteGuild(BaseModel):
+    """partial guild object for Invite.guild
+
+    see https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object
+    """
+
+    id: Snowflake
+    name: str
+    splash: Optional[str] = None
+    banner: Optional[str] = None
+    description: Optional[str] = None
+    icon: Optional[str] = None
+    features: list[GuildFeature]
+    verification_level: VerificationLevel
+    vanity_url_code: Optional[str] = None
+    nsfw_level: GuildNSFWLevel
+    premium_subscription_count: Optional[int] = None
 
 
 class InviteMetadata(BaseModel):
@@ -3905,6 +3936,7 @@ __all__ = [
     "GuildTemplateGuildRole",
     "GuildTemplateGuildChannel",
     "Invite",
+    "InviteGuild",
     "InviteMetadata",
     "InviteStageInstance",
     "StageInstance",
