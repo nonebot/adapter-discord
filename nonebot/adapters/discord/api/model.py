@@ -3910,6 +3910,84 @@ class Subscription(BaseModel):
     country: Missing[str] = UNSET
 
 
+class EntitlementCreate(Entitlement):
+    """Entitlement Create Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#entitlement-create"""
+
+
+class EntitlementUpdate(Entitlement):
+    """Entitlement Update Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#entitlement-update"""
+
+
+class EntitlementDelete(Entitlement):
+    """Entitlement Delete Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#entitlement-delete"""
+
+
+class SubscriptionCreate(Subscription):
+    """Subscription Create Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#subscription-create"""
+
+
+class SubscriptionUpdate(Subscription):
+    """Subscription Update Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#subscription-update"""
+
+
+class SubscriptionDelete(Subscription):
+    """Subscription Delete Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#subscription-delete"""
+
+
+class VoiceChannelEffectSend(BaseModel):
+    """Voice Channel Effect Send Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#voice-channel-effect-send-voice-channel-effect-send-event-fields
+    """
+
+    channel_id: Snowflake
+    guild_id: Snowflake
+    user_id: Snowflake
+    emoji: MissingOrNullable[Emoji] = UNSET
+    animation_type: MissingOrNullable[AnimationType] = UNSET
+    animation_id: Missing[int] = UNSET
+    sound_id: Missing[Union[Snowflake, int]] = UNSET
+    sound_volume: Missing[float] = UNSET
+
+
+class MessagePollVoteAdd(BaseModel):
+    """Message Poll Vote Add Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-add-message-poll-vote-add-fields
+    """
+
+    user_id: Snowflake
+    channel_id: Snowflake
+    message_id: Snowflake
+    guild_id: Missing[Snowflake] = UNSET
+    answer_id: int
+
+
+class MessagePollVoteRemove(BaseModel):
+    """Message Poll Vote Remove Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-add-message-poll-vote-remove-fields
+    """
+
+    user_id: Snowflake
+    channel_id: Snowflake
+    message_id: Snowflake
+    guild_id: Missing[Snowflake] = UNSET
+    answer_id: int
+
+
 for name, obj in inspect.getmembers(sys.modules[__name__]):
     if inspect.isclass(obj) and issubclass(obj, BaseModel) and obj is not BaseModel:
         if PYDANTIC_V2:
@@ -4162,4 +4240,13 @@ __all__ = [
     "AnswerVoters",
     "SKU",
     "Subscription",
+    "EntitlementCreate",
+    "EntitlementUpdate",
+    "EntitlementDelete",
+    "SubscriptionCreate",
+    "SubscriptionUpdate",
+    "SubscriptionDelete",
+    "VoiceChannelEffectSend",
+    "MessagePollVoteAdd",
+    "MessagePollVoteRemove",
 ]

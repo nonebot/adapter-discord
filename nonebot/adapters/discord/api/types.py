@@ -124,6 +124,18 @@ class ActivityType(IntEnum):
     """	Competing in {name}"""
 
 
+class AnimationType(IntEnum):
+    """Animation Type
+
+    see https://discord.com/developers/docs/topics/gateway-events#voice-channel-effect-send-animation-types
+    """
+
+    PREMIUM = 0
+    """A fun animation, sent by a Nitro subscriber"""
+    BASIC = 1
+    """The standard animation"""
+
+
 class ApplicationCommandOptionType(IntEnum):
     """Application Command Option Type
 
@@ -1576,6 +1588,7 @@ __all__ = [
     "ActivityAssetImage",
     "ActivityFlags",
     "ActivityType",
+    "AnimationType",
     "ApplicationCommandOptionType",
     "ApplicationCommandPermissionsType",
     "ApplicationCommandType",
