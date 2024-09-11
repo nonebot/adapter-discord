@@ -1212,6 +1212,8 @@ async def _follow_announcement_channel(
 ) -> FollowedChannel:
     """https://discord.com/developers/docs/resources/channel#follow-announcement-channel"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
     request = Request(
         headers=headers,
         method="POST",

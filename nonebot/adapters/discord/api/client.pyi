@@ -635,9 +635,13 @@ class ApiClient:
         ...
 
     async def follow_announcement_channel(
-        self, *, channel_id: SnowflakeType, webhook_channel_id: SnowflakeType = ...
+        self,
+        *,
+        channel_id: SnowflakeType,
+        webhook_channel_id: SnowflakeType = ...,
+        reason: str | None = ...,
     ) -> FollowedChannel:
-        """https://discord.com/developers/docs/resources/channel#follow-news-channel"""
+        """https://discord.com/developers/docs/resources/channel#follow-announcement-channel"""
         ...
 
     async def trigger_typing_indicator(self, *, channel_id: SnowflakeType) -> None:
