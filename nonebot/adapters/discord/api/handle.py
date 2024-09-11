@@ -376,7 +376,7 @@ async def _edit_application_command_permissions(
 
     You can add up to 100 permission overwrites for a command.
 
-    see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command-permissions
+    see https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions
     """
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -402,6 +402,7 @@ async def _create_interaction_response(
     interaction_token: str,
     response: InteractionResponse,
 ) -> None:
+    """https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response"""
     params = parse_interaction_response(response)
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -420,6 +421,7 @@ async def _get_origin_interaction_response(
     application_id: SnowflakeType,
     interaction_token: str,
 ) -> MessageGet:
+    """https://discord.com/developers/docs/interactions/receiving-and-responding#get-original-interaction-response"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -437,6 +439,7 @@ async def _edit_origin_interaction_response(
     interaction_token: str,
     **data,
 ) -> MessageGet:
+    """https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response"""
     params = {}
     if data.get("thread_id"):
         params["thread_id"] = data.pop("thread_id")
@@ -459,6 +462,7 @@ async def _delete_origin_interaction_response(
     interaction_token: str,
     **data,
 ) -> None:
+    """https://discord.com/developers/docs/interactions/receiving-and-responding#delete-original-interaction-response"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -477,6 +481,7 @@ async def _create_followup_message(
     interaction_token: str,
     **data,
 ) -> MessageGet:
+    """https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message"""
     data = parse_data(data, ExecuteWebhookParams)
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -496,6 +501,10 @@ async def _get_followup_message(
     message_id: SnowflakeType,
     **params,
 ) -> MessageGet:
+    """Returns a followup message for an Interaction. Functions the same as Get Webhook Message.
+
+    see https://discord.com/developers/docs/interactions/receiving-and-responding#get-followup-message
+    """
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -515,6 +524,10 @@ async def _edit_followup_message(
     message_id: SnowflakeType,
     **data,
 ):
+    """Edits a followup message for an Interaction. Functions the same as Edit Webhook Message.
+
+    see https://discord.com/developers/docs/interactions/receiving-and-responding#edit-followup-message
+    """
     params = {}
     if data.get("thread_id"):
         params["thread_id"] = data.pop("thread_id")
@@ -538,6 +551,10 @@ async def _delete_followup_message(
     interaction_token: str,
     message_id: SnowflakeType,
 ):
+    """Deletes a followup message for an Interaction.
+
+    see https://discord.com/developers/docs/interactions/receiving-and-responding#delete-followup-message
+    """
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -548,8 +565,8 @@ async def _delete_followup_message(
     await _request(adapter, bot, request)
 
 
-# Application Role Connection Metadata
-# see https://discord.com/developers/docs/resources/application-role-connection-metadata
+# Application
+# see https://discord.com/developers/docs/resources/application
 
 
 async def _get_current_application(
@@ -567,6 +584,50 @@ async def _get_current_application(
         url=adapter.base_url / "applications/@me",
     )
     return type_validate_python(Application, await _request(adapter, bot, request))
+
+
+async def _edit_current_application(
+    adapter: "Adapter",
+    bot: "Bot",
+    **data,
+) -> Application:
+    """Edit properties of the app associated with the requesting bot user.
+
+    see https://discord.com/developers/docs/resources/application#edit-current-application
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="PATCH",
+        url=adapter.base_url / "applications/@me",
+        json=data,
+    )
+    return type_validate_python(Application, await _request(adapter, bot, request))
+
+
+async def _get_application_activity_instance(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    instance_id: str,
+) -> ActivityInstance:
+    """Returns a serialized activity instance, if it exists.
+    Useful for preventing unwanted activity sessions.
+
+    see https://discord.com/developers/docs/resources/application#get-application-activity-instance
+    """
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url
+        / f"applications/{application_id}/activity-instances/{instance_id}",
+    )
+    return type_validate_python(ActivityInstance, await _request(adapter, bot, request))
+
+
+# Application Role Connection Metadata
+# see https://discord.com/developers/docs/resources/application-role-connection-metadata
 
 
 async def _get_application_role_connection_metadata_records(
@@ -607,10 +668,23 @@ async def _update_application_role_connection_metadata_records(
     )
 
 
+# Audit Logs
+# see https://discord.com/developers/docs/resources/audit-log
+
+
 async def _get_guild_audit_log(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **data
 ) -> AuditLog:
-    """get guild audit log
+    """Returns an audit log object for the guild.
+    Requires the VIEW_AUDIT_LOG permission.
+
+    The returned list of audit log entries is ordered based on whether you use
+    before or after. When using before, the list is ordered by the audit log entry
+    ID descending (newer entries first). If after is used, the list is reversed and
+    appears in ascending order (older entries first). Omitting both before and after
+    defaults to before the current timestamp and will show the most recent entries
+    in descending order by ID, the opposite can be achieved using after=0 (showing
+    oldest entries).
 
     see https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
@@ -621,6 +695,10 @@ async def _get_guild_audit_log(
         params=data,
     )
     return type_validate_python(AuditLog, await _request(adapter, bot, request))
+
+
+# Auto Moderation
+# see https://discord.com/developers/docs/resources/auto-moderation
 
 
 async def _list_auto_moderation_rules_for_guild(
@@ -735,6 +813,10 @@ async def _delete_auto_moderation_rule(
     await _request(adapter, bot, request)
 
 
+# Channels
+# https://discord.com/developers/docs/resources/channel
+
+
 async def _get_channel(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType
 ) -> Channel:
@@ -771,9 +853,7 @@ async def _modify_DM(
 async def _modify_channel(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **data
 ) -> Channel:
-    """modify channel
-
-    see https://discord.com/developers/docs/resources/channel#modify-channel"""
+    """https://discord.com/developers/docs/resources/channel#modify-channel"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
@@ -792,9 +872,7 @@ async def _modify_channel(
 async def _modify_thread(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **data
 ) -> Channel:
-    """modify channel
-
-    see https://discord.com/developers/docs/resources/channel#modify-channel"""
+    """https://discord.com/developers/docs/resources/channel#modify-channel"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
@@ -813,9 +891,7 @@ async def _delete_channel(
     channel_id: SnowflakeType,
     reason: Optional[str] = None,
 ) -> Channel:
-    """delete channel
-
-    see https://discord.com/developers/docs/resources/channel#deleteclose-channel"""
+    """https://discord.com/developers/docs/resources/channel#deleteclose-channel"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
         headers["X-Audit-Log-Reason"] = reason
@@ -827,12 +903,14 @@ async def _delete_channel(
     return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
+# Messages
+# see https://discord.com/developers/docs/resources/message
+
+
 async def _get_channel_messages(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **data
 ) -> list[MessageGet]:
-    """get channel messages
-
-    see https://discord.com/developers/docs/resources/channel#get-channel-messages"""
+    """https://discord.com/developers/docs/resources/message#get-channel-messages"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -846,9 +924,7 @@ async def _get_channel_messages(
 async def _get_channel_message(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, message_id: SnowflakeType
 ) -> MessageGet:
-    """get channel message
-
-    see https://discord.com/developers/docs/resources/channel#get-channel-message"""
+    """https://discord.com/developers/docs/resources/message#get-channel-message"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -861,10 +937,7 @@ async def _get_channel_message(
 async def _create_message(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **data
 ) -> MessageGet:
-    """create message
-
-    see https://discord.com/developers/docs/resources/channel#create-message
-    """
+    """https://discord.com/developers/docs/resources/message#create-message"""
     params = parse_data(data, MessageSend)
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -879,9 +952,7 @@ async def _create_message(
 async def _crosspost_message(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, message_id: SnowflakeType
 ) -> MessageGet:
-    """crosspost message
-
-    see https://discord.com/developers/docs/resources/channel#crosspost-message"""
+    """https://discord.com/developers/docs/resources/message#crosspost-message"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -899,9 +970,7 @@ async def _create_reaction(
     emoji: str,
     emoji_id: Optional[SnowflakeType] = None,
 ) -> None:
-    """create reaction
-
-    see https://discord.com/developers/docs/resources/channel#create-reaction"""
+    """https://discord.com/developers/docs/resources/message#create-reaction"""
     if emoji_id is not None:
         emoji = f"{emoji}:{emoji_id}"
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
@@ -922,9 +991,7 @@ async def _delete_own_reaction(
     emoji: str,
     emoji_id: Optional[SnowflakeType] = None,
 ) -> None:
-    """delete own reaction
-
-    see https://discord.com/developers/docs/resources/channel#delete-own-reaction"""
+    """https://discord.com/developers/docs/resources/message#delete-own-reaction"""
     if emoji_id is not None:
         emoji = f"{emoji}:{emoji_id}"
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
@@ -946,9 +1013,7 @@ async def _delete_user_reaction(
     emoji: str,
     emoji_id: Optional[SnowflakeType] = None,
 ) -> None:
-    """delete user reaction
-
-    see https://discord.com/developers/docs/resources/channel#delete-user-reaction"""
+    """https://discord.com/developers/docs/resources/message#delete-user-reaction"""
     if emoji_id is not None:
         emoji = f"{emoji}:{emoji_id}"
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
@@ -970,9 +1035,7 @@ async def _get_reactions(
     emoji_id: Optional[SnowflakeType] = None,
     **params,
 ) -> list[User]:
-    """get reactions
-
-    see https://discord.com/developers/docs/resources/channel#get-reactions"""
+    """https://discord.com/developers/docs/resources/message#get-reactions"""
     if emoji_id is not None:
         emoji = f"{emoji}:{emoji_id}"
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
@@ -992,10 +1055,7 @@ async def _delete_all_reactions(
     channel_id: SnowflakeType,
     message_id: SnowflakeType,
 ):
-    """
-
-    see https://discord.com/developers/docs/resources/channel#delete-all-reactions
-    """
+    """https://discord.com/developers/docs/resources/message#delete-all-reactions"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -1013,10 +1073,7 @@ async def _delete_all_reactions_for_emoji(
     emoji: str,
     emoji_id: Optional[SnowflakeType] = None,
 ):
-    """
-
-    see https://discord.com/developers/docs/resources/channel#delete-all-reactions
-    """
+    """https://discord.com/developers/docs/resources/message#delete-all-reactions-for-emoji"""
     if emoji_id is not None:
         emoji = f"{emoji}:{emoji_id}"
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
@@ -1036,7 +1093,7 @@ async def _edit_message(
     message_id: SnowflakeType,
     **data,
 ) -> MessageGet:
-    """see https://discord.com/developers/docs/resources/channel#edit-message"""
+    """https://discord.com/developers/docs/resources/message#edit-message"""
     params = parse_data(data, MessageSend)
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1055,7 +1112,7 @@ async def _delete_message(
     message_id: SnowflakeType,
     reason: Optional[str] = None,
 ):
-    """https://discord.com/developers/docs/resources/channel#delete-message"""
+    """https://discord.com/developers/docs/resources/message#delete-message"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
         headers["X-Audit-Log-Reason"] = reason
@@ -1070,7 +1127,7 @@ async def _delete_message(
 async def _bulk_delete_message(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **data
 ):
-    """https://discord.com/developers/docs/resources/channel#bulk-delete-messages"""
+    """https://discord.com/developers/docs/resources/message#bulk-delete-messages"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
@@ -1153,7 +1210,7 @@ async def _delete_channel_permission(
 async def _follow_announcement_channel(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **data
 ) -> FollowedChannel:
-    """https://discord.com/developers/docs/resources/channel#follow-news-channel"""
+    """https://discord.com/developers/docs/resources/channel#follow-announcement-channel"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -1197,7 +1254,7 @@ async def _pin_message(
     message_id: SnowflakeType,
     reason: Optional[str] = None,
 ):
-    """https://discord.com/developers/docs/resources/channel#add-pinned-channel-message"""
+    """https://discord.com/developers/docs/resources/channel#pin-message"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
         headers["X-Audit-Log-Reason"] = reason
@@ -1216,7 +1273,7 @@ async def _unpin_message(
     message_id: SnowflakeType,
     reason: Optional[str] = None,
 ):
-    """https://discord.com/developers/docs/resources/channel#delete-pinned-channel-message"""
+    """https://discord.com/developers/docs/resources/channel#unpin-message"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
         headers["X-Audit-Log-Reason"] = reason
@@ -1266,7 +1323,7 @@ async def _start_thread_from_message(
     message_id: SnowflakeType,
     **data,
 ) -> Channel:
-    """https://discord.com/developers/docs/resources/channel#start-thread-with-message"""
+    """https://discord.com/developers/docs/resources/channel#start-thread-from-message"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
@@ -1298,7 +1355,7 @@ async def _start_thread_without_message(
 async def _start_thread_in_forum_channel(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **data
 ) -> Channel:
-    """https://discord.com/developers/docs/resources/channel#start-thread-in-forum-channel"""
+    """https://discord.com/developers/docs/resources/channel#start-thread-in-forum-or-media-channel"""
     params = parse_forum_thread_message(data)
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
@@ -1449,6 +1506,10 @@ async def _list_joined_private_archived_threads(
     )
 
 
+# Emoji
+# see https://discord.com/developers/docs/resources/emoji
+
+
 async def _list_guild_emojis(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
 ) -> list[Emoji]:
@@ -1530,6 +1591,160 @@ async def _delete_guild_emoji(
     await _request(adapter, bot, request)
 
 
+async def _list_application_emojis(
+    adapter: "Adapter", bot: "Bot", application_id: SnowflakeType
+) -> ApplicationEmojis:
+    """https://discord.com/developers/docs/resources/emoji#list-application-emojis"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"applications/{application_id}/emojis",
+    )
+    return type_validate_python(
+        ApplicationEmojis, await _request(adapter, bot, request)
+    )
+
+
+async def _get_application_emoji(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    emoji_id: SnowflakeType,
+) -> Emoji:
+    """https://discord.com/developers/docs/resources/emoji#get-application-emoji"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"applications/{application_id}/emojis/{emoji_id}",
+    )
+    return type_validate_python(Emoji, await _request(adapter, bot, request))
+
+
+async def _create_application_emoji(
+    adapter: "Adapter", bot: "Bot", application_id: SnowflakeType, **data
+) -> Emoji:
+    """https://discord.com/developers/docs/resources/emoji#create-application-emoji"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="POST",
+        url=adapter.base_url / f"applications/{application_id}/emojis",
+        json=data,
+    )
+    return type_validate_python(Emoji, await _request(adapter, bot, request))
+
+
+async def _modify_application_emoji(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    emoji_id: SnowflakeType,
+    **data,
+) -> Emoji:
+    """https://discord.com/developers/docs/resources/emoji#modify-application-emoji"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="PATCH",
+        url=adapter.base_url / f"applications/{application_id}/emojis/{emoji_id}",
+        json=data,
+    )
+    return type_validate_python(Emoji, await _request(adapter, bot, request))
+
+
+async def _delete_application_emoji(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    emoji_id: SnowflakeType,
+) -> None:
+    """https://discord.com/developers/docs/resources/emoji#delete-application-emoji"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="DELETE",
+        url=adapter.base_url / f"applications/{application_id}/emojis/{emoji_id}",
+    )
+    await _request(adapter, bot, request)
+
+
+# Entitlements
+# see https://discord.com/developers/docs/resources/entitlement
+
+
+async def _list_entitlements(
+    adapter: "Adapter", bot: "Bot", application_id: SnowflakeType, **params
+) -> list[Entitlement]:
+    """https://discord.com/developers/docs/resources/entitlement#list-entitlements"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"applications/{application_id}/entitlements",
+        params=params,
+    )
+    return type_validate_python(
+        list[Entitlement], await _request(adapter, bot, request)
+    )
+
+
+async def _consume_an_entitlement(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    entitlement_id: SnowflakeType,
+) -> None:
+    """https://discord.com/developers/docs/resources/entitlement#consume-an-entitlement"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="POST",
+        url=adapter.base_url
+        / f"applications/{application_id}/entitlements/{entitlement_id}/consume",
+    )
+    await _request(adapter, bot, request)
+
+
+async def _create_test_entitlement(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    **data,
+) -> Entitlement:
+    """https://discord.com/developers/docs/resources/entitlement#create-test-entitlement"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="POST",
+        url=adapter.base_url / f"applications/{application_id}/entitlements",
+        json=data,
+    )
+    return type_validate_python(Entitlement, await _request(adapter, bot, request))
+
+
+async def _delete_test_entitlement(
+    adapter: "Adapter",
+    bot: "Bot",
+    application_id: SnowflakeType,
+    entitlement_id: SnowflakeType,
+) -> None:
+    """https://discord.com/developers/docs/resources/entitlement#create-test-entitlement"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="POST",
+        url=adapter.base_url
+        / f"applications/{application_id}/entitlements/{entitlement_id}",
+    )
+    await _request(adapter, bot, request)
+
+
+# Guild
+# see https://discord.com/developers/docs/resources/guild
+
+
 async def _create_guild(adapter: "Adapter", bot: "Bot", **data) -> Guild:
     """https://discord.com/developers/docs/resources/guild#create-guild"""
     data = model_dump(type_validate_python(CreateGuildParams, data), exclude_unset=True)
@@ -1578,7 +1793,7 @@ async def _modify_guild(
     request = Request(
         headers=headers,
         method="PATCH",
-        url=adapter.base_url / f"guilds/{guild_id}/preview",
+        url=adapter.base_url / f"guilds/{guild_id}",
         json=data,
     )
     return type_validate_python(Guild, await _request(adapter, bot, request))
@@ -1760,7 +1975,9 @@ async def _modify_current_member(
 async def _modify_current_user_nick(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **data
 ) -> GuildMember:
-    """https://discord.com/developers/docs/resources/guild#modify-current-user-nick"""
+    """Deprecated in favor of Modify Current Member.
+
+    https://discord.com/developers/docs/resources/guild#modify-current-user-nick"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
@@ -1898,6 +2115,25 @@ async def _remove_guild_ban(
     await _request(adapter, bot, request)
 
 
+async def _bulk_guild_ban(
+    adapter: "Adapter",
+    bot: "Bot",
+    guild_id: SnowflakeType,
+    **data,
+) -> BulkBan:
+    """https://discord.com/developers/docs/resources/guild#bulk-guild-ban"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
+    request = Request(
+        headers=headers,
+        method="POST",
+        url=adapter.base_url / f"guilds/{guild_id}/bulk-ban",
+        json=data,
+    )
+    return type_validate_python(BulkBan, await _request(adapter, bot, request))
+
+
 async def _get_guild_roles(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
 ) -> list[Role]:
@@ -1909,6 +2145,19 @@ async def _get_guild_roles(
         url=adapter.base_url / f"guilds/{guild_id}/roles",
     )
     return type_validate_python(list[Role], await _request(adapter, bot, request))
+
+
+async def _get_guild_role(
+    adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, role_id: SnowflakeType
+) -> Role:
+    """https://discord.com/developers/docs/resources/guild#get-guild-role"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"guilds/{guild_id}/roles/{role_id}",
+    )
+    return type_validate_python(Role, await _request(adapter, bot, request))
 
 
 async def _create_guild_role(
@@ -2208,10 +2457,72 @@ async def _get_guild_onboarding(
     return type_validate_python(GuildOnboarding, await _request(adapter, bot, request))
 
 
+async def _modify_guild_onboarding(
+    adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **data
+) -> GuildOnboarding:
+    """https://discord.com/developers/docs/resources/guild#get-guild-onboarding"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    if data.get("reason"):
+        headers["X-Audit-Log-Reason"] = data.pop("reason")
+    data = model_dump(
+        type_validate_python(ModifyGuildOnboardingParams, data), exclude_unset=True
+    )
+    request = Request(
+        headers=headers,
+        method="PUT",
+        url=adapter.base_url / f"guilds/{guild_id}/onboarding",
+        json=data,
+    )
+    return type_validate_python(GuildOnboarding, await _request(adapter, bot, request))
+
+
+# Voice
+# https://discord.com/developers/docs/resources/voice
+
+
+async def _list_voice_regions(adapter: "Adapter", bot: "Bot") -> list[VoiceRegion]:
+    """https://discord.com/developers/docs/resources/voice#list-voice-regions"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / "voice/regions",
+    )
+    return type_validate_python(
+        list[VoiceRegion], await _request(adapter, bot, request)
+    )
+
+
+async def _get_current_user_voice_state(
+    adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
+) -> VoiceState:
+    """https://discord.com/developers/docs/resources/voice#get-current-user-voice-state"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"guilds/{guild_id}/voice-states/@me",
+    )
+    return type_validate_python(VoiceState, await _request(adapter, bot, request))
+
+
+async def _get_user_voice_state(
+    adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, user_id: SnowflakeType
+) -> VoiceState:
+    """https://discord.com/developers/docs/resources/voice#get-user-voice-state"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"guilds/{guild_id}/voice-states/{user_id}",
+    )
+    return type_validate_python(VoiceState, await _request(adapter, bot, request))
+
+
 async def _modify_current_user_voice_state(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **data
 ) -> None:
-    """https://discord.com/developers/docs/resources/guild#modify-current-user-voice-state"""
+    """https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -2229,7 +2540,7 @@ async def _modify_user_voice_state(
     user_id: SnowflakeType,
     **data,
 ) -> None:
-    """https://discord.com/developers/docs/resources/guild#modify-user-voice-state"""
+    """https://discord.com/developers/docs/resources/voice#modify-user-voice-state"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -2238,6 +2549,10 @@ async def _modify_user_voice_state(
         json=data,
     )
     await _request(adapter, bot, request)
+
+
+# Guild Scheduled Event
+# see https://discord.com/developers/docs/resources/guild-scheduled-event
 
 
 async def _list_scheduled_events_for_guild(
@@ -2355,6 +2670,10 @@ async def _get_guild_scheduled_event_users(
     )
 
 
+# Guild Template
+# see https://discord.com/developers/docs/resources/guild-template
+
+
 async def _get_guild_template(
     adapter: "Adapter", bot: "Bot", template_code: str
 ) -> GuildTemplate:
@@ -2371,7 +2690,7 @@ async def _get_guild_template(
 async def _create_guild_from_guild_template(
     adapter: "Adapter", bot: "Bot", template_code: str, **data
 ) -> Guild:
-    """https://discord.com/developers/docs/resources/guild-template#create-guild-from-template"""
+    """https://discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -2451,6 +2770,10 @@ async def _delete_guild_template(
     await _request(adapter, bot, request)
 
 
+# Invite
+# see https://discord.com/developers/docs/resources/invite
+
+
 async def _get_invite(
     adapter: "Adapter", bot: "Bot", invite_code: str, **params
 ) -> Invite:
@@ -2478,6 +2801,67 @@ async def _delete_invite(
         url=adapter.base_url / f"invites/{invite_code}",
     )
     return type_validate_python(Invite, await _request(adapter, bot, request))
+
+
+# Poll
+# see https://discord.com/developers/docs/resources/poll
+
+
+async def _get_answer_voters(
+    adapter: "Adapter",
+    bot: "Bot",
+    channel_id: SnowflakeType,
+    message_id: SnowflakeType,
+    answer_id: int,
+    **params,
+) -> AnswerVoters:
+    """https://discord.com/developers/docs/resources/poll#get-answer-voters"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url
+        / f"channels/{channel_id}/polls/{message_id}/answers/{answer_id}",
+        params=params,
+    )
+    return type_validate_python(AnswerVoters, await _request(adapter, bot, request))
+
+
+async def _end_poll(
+    adapter: "Adapter",
+    bot: "Bot",
+    channel_id: SnowflakeType,
+    message_id: SnowflakeType,
+) -> MessageGet:
+    """https://discord.com/developers/docs/resources/poll#end-poll"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="POST",
+        url=adapter.base_url / f"channels/{channel_id}/polls/{message_id}/expire",
+    )
+    return type_validate_python(MessageGet, await _request(adapter, bot, request))
+
+
+# SKU
+# see https://discord.com/developers/docs/resources/sku
+
+
+async def _list_SKUs(
+    adapter: "Adapter", bot: "Bot", application_id: SnowflakeType
+) -> list[SKU]:
+    """https://discord.com/developers/docs/resources/sku#list-skus"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"applications/{application_id}/skus",
+    )
+    return type_validate_python(list[SKU], await _request(adapter, bot, request))
+
+
+# Stage Instance
+# see https://discord.com/developers/docs/resources/stage-instance
 
 
 async def _create_stage_instance(
@@ -2546,6 +2930,10 @@ async def _delete_stage_instance(
     await _request(adapter, bot, request)
 
 
+# Sticker
+# see https://discord.com/developers/docs/resources/sticker
+
+
 async def _get_sticker(
     adapter: "Adapter", bot: "Bot", sticker_id: SnowflakeType
 ) -> Sticker:
@@ -2562,7 +2950,7 @@ async def _get_sticker(
 async def _list_nitro_sticker_packs(
     adapter: "Adapter", bot: "Bot"
 ) -> list[StickerPack]:
-    """https://discord.com/developers/docs/resources/sticker#list-nitro-sticker-packs"""
+    """https://discord.com/developers/docs/resources/sticker#list-sticker-packs"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -2572,6 +2960,19 @@ async def _list_nitro_sticker_packs(
     return type_validate_python(
         list[StickerPack], await _request(adapter, bot, request)
     )
+
+
+async def _get_sticker_packs(
+    adapter: "Adapter", bot: "Bot", pack_id: SnowflakeType
+) -> StickerPack:
+    """https://discord.com/developers/docs/resources/sticker#get-sticker-pack"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"sticker-packs/{pack_id}",
+    )
+    return type_validate_python(StickerPack, await _request(adapter, bot, request))
 
 
 async def _list_guild_stickers(
@@ -2668,6 +3069,44 @@ async def _delete_guild_sticker(
     await _request(adapter, bot, request)
 
 
+# Subscription
+# see https://discord.com/developers/docs/resources/subscription
+
+
+async def _list_SKU_subscriptions(
+    adapter: "Adapter", bot: "Bot", sku_id: SnowflakeType
+) -> list[Subscription]:
+    """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"gskus/{sku_id}/subscriptions",
+    )
+    return type_validate_python(
+        list[Subscription], await _request(adapter, bot, request)
+    )
+
+
+async def _get_SKU_subscription(
+    adapter: "Adapter",
+    bot: "Bot",
+    sku_id: SnowflakeType,
+) -> Subscription:
+    """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions"""
+    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    request = Request(
+        headers=headers,
+        method="GET",
+        url=adapter.base_url / f"gskus/{sku_id}/subscriptions",
+    )
+    return type_validate_python(Subscription, await _request(adapter, bot, request))
+
+
+# Users
+# see https://discord.com/developers/docs/resources/user
+
+
 async def _get_current_user(adapter: "Adapter", bot: "Bot") -> User:
     """https://discord.com/developers/docs/resources/user#get-current-user"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
@@ -2721,7 +3160,7 @@ async def _get_current_user_guilds(
 async def _get_current_user_guild_member(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType
 ) -> GuildMember:
-    """https://discord.com/developers/docs/resources/user#get-current-user-guilds-member"""
+    """https://discord.com/developers/docs/resources/user#get-current-user-guild-member"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -2770,7 +3209,7 @@ async def _get_user_connections(
     adapter: "Adapter",
     bot: "Bot",
 ) -> list[Connection]:
-    """https://discord.com/developers/docs/resources/user#get-user-connections"""
+    """https://discord.com/developers/docs/resources/user#get-current-user-connections"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -2783,7 +3222,7 @@ async def _get_user_connections(
 async def _get_user_application_role_connection(
     adapter: "Adapter", bot: "Bot", application_id: SnowflakeType
 ) -> ApplicationRoleConnection:
-    """https://discord.com/developers/docs/resources/user#get-user-application-connections"""
+    """https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -2799,7 +3238,7 @@ async def _get_user_application_role_connection(
 async def _update_user_application_role_connection(
     adapter: "Adapter", bot: "Bot", application_id: SnowflakeType, **data
 ) -> ApplicationRoleConnection:
-    """https://discord.com/developers/docs/resources/user#modify-current-user"""
+    """https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection"""
     if "metadata" in data and isinstance(
         data["metadata"], ApplicationRoleConnectionMetadata
     ):
@@ -2817,17 +3256,8 @@ async def _update_user_application_role_connection(
     )
 
 
-async def _list_voice_regions(adapter: "Adapter", bot: "Bot") -> list[VoiceRegion]:
-    """https://discord.com/developers/docs/resources/voice#list-voice-regions"""
-    headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
-    request = Request(
-        headers=headers,
-        method="GET",
-        url=adapter.base_url / "voice/regions",
-    )
-    return type_validate_python(
-        list[VoiceRegion], await _request(adapter, bot, request)
-    )
+# Webhook
+# see https://discord.com/developers/docs/resources/webhook
 
 
 async def _create_webhook(
@@ -3060,6 +3490,10 @@ async def _delete_webhook_message(
     await _request(adapter, bot, request)
 
 
+# Gateway
+# see https://discord.com/developers/docs/topics/gateway
+
+
 async def _get_gateway(adapter: "Adapter", bot: "Bot") -> Gateway:
     """https://discord.com/developers/docs/topics/gateway#get-gateway"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
@@ -3072,6 +3506,7 @@ async def _get_gateway(adapter: "Adapter", bot: "Bot") -> Gateway:
 
 
 async def _get_gateway_bot(adapter: "Adapter", bot: "Bot") -> GatewayBot:
+    """https://discord.com/developers/docs/topics/gateway#get-gateway-bot"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -3081,10 +3516,14 @@ async def _get_gateway_bot(adapter: "Adapter", bot: "Bot") -> GatewayBot:
     return type_validate_python(GatewayBot, await _request(adapter, bot, request))
 
 
+# OAuth2
+# see https://discord.com/developers/docs/topics/oauth2
+
+
 async def _get_current_bot_application_information(
     adapter: "Adapter", bot: "Bot"
 ) -> Application:
-    """https://discord.com/developers/docs/resources/user#get-current-application-information"""
+    """https://discord.com/developers/docs/topics/oauth2#get-current-bot-application-information"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -3097,7 +3536,7 @@ async def _get_current_bot_application_information(
 async def _get_current_authorization_information(
     adapter: "Adapter", bot: "Bot"
 ) -> AuthorizationResponse:
-    """https://discord.com/developers/docs/resources/user#get-current-authorization-information"""
+    """https://discord.com/developers/docs/topics/oauth2#get-current-authorization-information"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
@@ -3140,6 +3579,8 @@ API_HANDLERS: dict[str, Callable[..., Awaitable[Any]]] = {
     "edit_followup_message": _edit_followup_message,
     "delete_followup_message": _delete_followup_message,
     "get_current_application": _get_current_application,
+    "edit_current_application": _edit_current_application,
+    "get_application_activity_instance": _get_application_activity_instance,
     "get_application_role_connection_metadata_records": (
         _get_application_role_connection_metadata_records
     ),
@@ -3198,6 +3639,15 @@ API_HANDLERS: dict[str, Callable[..., Awaitable[Any]]] = {
     "create_guild_emoji": _create_guild_emoji,
     "modify_guild_emoji": _modify_guild_emoji,
     "delete_guild_emoji": _delete_guild_emoji,
+    "list_application_emojis": _list_application_emojis,
+    "get_application_emoji": _get_application_emoji,
+    "create_application_emoji": _create_application_emoji,
+    "modify_application_emoji": _modify_application_emoji,
+    "delete_application_emoji": _delete_application_emoji,
+    "list_entitlements": _list_entitlements,
+    "consume_an_entitlement": _consume_an_entitlement,
+    "create_test_entitlement": _create_test_entitlement,
+    "delete_test_entitlement": _delete_test_entitlement,
     "create_guild": _create_guild,
     "get_guild": _get_guild,
     "get_guild_preview": _get_guild_preview,
@@ -3221,7 +3671,9 @@ API_HANDLERS: dict[str, Callable[..., Awaitable[Any]]] = {
     "get_guild_ban": _get_guild_ban,
     "create_guild_ban": _create_guild_ban,
     "remove_guild_ban": _remove_guild_ban,
+    "bulk_guild_ban": _bulk_guild_ban,
     "get_guild_roles": _get_guild_roles,
+    "get_guild_role": _get_guild_role,
     "create_guild_role": _create_guild_role,
     "modify_guild_role_positions": _modify_guild_role_positions,
     "modify_guild_role": _modify_guild_role,
@@ -3241,6 +3693,10 @@ API_HANDLERS: dict[str, Callable[..., Awaitable[Any]]] = {
     "get_guild_welcome_screen": _get_guild_welcome_screen,
     "modify_guild_welcome_screen": _modify_guild_welcome_screen,
     "get_guild_onboarding": _get_guild_onboarding,
+    "modify_guild_onboarding": _modify_guild_onboarding,
+    "list_voice_regions": _list_voice_regions,
+    "get_current_user_voice_state": _get_current_user_voice_state,
+    "get_user_voice_state": _get_user_voice_state,
     "modify_current_user_voice_state": _modify_current_user_voice_state,
     "modify_user_voice_state": _modify_user_voice_state,
     "list_scheduled_events_for_guild": _list_scheduled_events_for_guild,
@@ -3258,17 +3714,23 @@ API_HANDLERS: dict[str, Callable[..., Awaitable[Any]]] = {
     "delete_guild_template": _delete_guild_template,
     "get_invite": _get_invite,
     "delete_invite": _delete_invite,
+    "get_answer_voters": _get_answer_voters,
+    "end_poll": _end_poll,
+    "list_SKUs": _list_SKUs,
     "create_stage_instance": _create_stage_instance,
     "get_stage_instance": _get_stage_instance,
     "modify_stage_instance": _modify_stage_instance,
     "delete_stage_instance": _delete_stage_instance,
     "get_sticker": _get_sticker,
     "list_nitro_sticker_packs": _list_nitro_sticker_packs,
+    "get_sticker_packs": _get_sticker_packs,
     "list_guild_stickers": _list_guild_stickers,
     "get_guild_sticker": _get_guild_sticker,
     "create_guild_sticker": _create_guild_sticker,
     "modify_guild_sticker": _modify_guild_sticker,
     "delete_guild_sticker": _delete_guild_sticker,
+    "list_SKU_subscriptions": _list_SKU_subscriptions,
+    "get_SKU_subscription": _get_SKU_subscription,
     "get_current_user": _get_current_user,
     "get_user": _get_user,
     "modify_current_user": _modify_current_user,
@@ -3280,7 +3742,6 @@ API_HANDLERS: dict[str, Callable[..., Awaitable[Any]]] = {
     "get_user_connections": _get_user_connections,
     "get_user_application_role_connection": _get_user_application_role_connection,
     "update_user_application_role_connection": _update_user_application_role_connection,
-    "list_voice_regions": _list_voice_regions,
     "create_webhook": _create_webhook,
     "get_channel_webhooks": _get_channel_webhooks,
     "get_guild_webhooks": _get_guild_webhooks,

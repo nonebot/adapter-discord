@@ -3801,6 +3801,115 @@ class GuildScheduledEventRecurrenceRuleN_WeekdayStructure(BaseModel):
     """The day within the week to reoccur on"""
 
 
+class ModifyGuildOnboardingParams(BaseModel):
+    """Modify Guild Onboarding Params
+
+    see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
+    """
+
+    prompts: list[OnboardingPrompt]
+    """Prompts shown during onboarding and in customize community"""
+    default_channel_ids: list[Snowflake]
+    """Channel IDs that members get opted into automatically"""
+    enabled: bool
+    """Whether onboarding is enabled in the guild"""
+    mode: OnboardingMode
+    """Current mode of onboarding"""
+
+
+class ActivityInstance(BaseModel):
+    """Activity Instance
+
+    see https://discord.com/developers/docs/resources/application#get-application-activity-instance-activity-instance-object
+    """
+
+    application_id: Snowflake
+    """Application ID"""
+    instance_id: str
+    """Activity Instance ID"""
+    launch_id: Snowflake
+    """Unique identifier for the launch"""
+    location: "ActivityLocation"
+    """The Location the instance is runnning in"""
+    users: list[Snowflake]
+    """The IDs of the Users currently connected to the instance"""
+
+
+class ActivityLocation(BaseModel):
+    """The Activity Location is an object that describes
+    the location in which an activity instance is running.
+
+    see https://discord.com/developers/docs/resources/application#get-application-activity-instance-activity-location-object
+    """
+
+    id: str
+    """	The unique identifier for the location"""
+    kind: Literal["gc", "pc"]
+    """
+    Enum describing kind of location
+
+    'gc'	The Location is a Guild Channel\n
+    'pc'	The Location is a Private Channel, such as a DM or GDM
+    """
+    channel_id: Snowflake
+    guild_id: MissingOrNullable[Snowflake] = UNSET
+
+
+class ApplicationEmojis(BaseModel):
+    """a list of emoji objects for the given application under the items key.
+
+    see https://discord.com/developers/docs/resources/emoji#list-application-emojis"""
+
+    items: list[Emoji]
+
+
+class BulkBan(BaseModel):
+    """bulk ban response
+
+    see https://discord.com/developers/docs/resources/guild#bulk-guild-ban-bulk-ban-response
+    """
+
+    banned_users: list[Snowflake]
+    """list of user ids, that were successfully banned"""
+    failed_users: list[Snowflake]
+    """list of user ids, that were not banned"""
+
+
+class AnswerVoters(BaseModel):
+    """get answer voter response
+
+    see https://discord.com/developers/docs/resources/poll#get-answer-voters-response-body
+    """
+
+    users: list[User]
+    """Users who voted for this answer"""
+
+
+class SKU(BaseModel):
+    """https://discord.com/developers/docs/resources/sku#sku-object"""
+
+    id: Snowflake
+    type: SKUType
+    application_id: Snowflake
+    name: str
+    slug: str
+    flags: SKUFlag
+
+
+class Subscription(BaseModel):
+    """https://discord.com/developers/docs/resources/subscription#subscription-object"""
+
+    id: Snowflake
+    user_id: Snowflake
+    sku_ids: list[Snowflake]
+    entitlement_ids: list[Snowflake]
+    current_period_start: datetime.datetime
+    current_period_end: datetime.datetime
+    status: SubscriptionStatus
+    canceled_at: Optional[datetime.datetime] = None
+    country: Missing[str] = UNSET
+
+
 for name, obj in inspect.getmembers(sys.modules[__name__]):
     if inspect.isclass(obj) and issubclass(obj, BaseModel) and obj is not BaseModel:
         if PYDANTIC_V2:
@@ -4045,4 +4154,12 @@ __all__ = [
     "Entitlement",
     "RecurrenceRule",
     "GuildScheduledEventRecurrenceRuleN_WeekdayStructure",
+    "ModifyGuildOnboardingParams",
+    "ActivityInstance",
+    "ActivityLocation",
+    "ApplicationEmojis",
+    "BulkBan",
+    "AnswerVoters",
+    "SKU",
+    "Subscription",
 ]

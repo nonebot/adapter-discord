@@ -1265,6 +1265,38 @@ class RoleFlag(IntFlag):
     """role can be selected by members in an onboarding prompt"""
 
 
+class SKUFlag(IntFlag):
+    """SKUFlag
+
+    see https://discord.com/developers/docs/resources/sku#sku-object-sku-flags
+    """
+
+    AVAILABLE = 1 << 2
+    """SKU is available for purchase"""
+    GUILD_SUBSCRIPTION = 1 << 7
+    """Recurring SKU that can be purchased by a user and applied
+    to a single server. Grants access to every user in that server."""
+    USER_SUBSCRIPTION = 1 << 8
+    """Recurring SKU purchased by a user for themselves.
+    Grants access to the purchasing user in every server."""
+
+
+class SKUType(IntEnum):
+    """SKU Type
+
+    see https://discord.com/developers/docs/resources/sku#sku-object-sku-types
+    """
+
+    DURABLE = 2
+    """Durable one-time purchase"""
+    CONSUMABLE = 3
+    """Consumable one-time purchase"""
+    SUBSCRIPTION = 5
+    """Represents a recurring subscription"""
+    SUBSCRIPTION_GROUP = 6
+    """System-generated group for each SUBSCRIPTION SKU created"""
+
+
 class SortOrderTypes(IntEnum):
     """Sort order types.
 
@@ -1311,6 +1343,20 @@ class StickerType(IntEnum):
     """an official sticker in a pack, part of Nitro or in a removed purchasable pack"""
     GUILD = 2
     """a sticker uploaded to a guild for the guild's members"""
+
+
+class SubscriptionStatus(IntEnum):
+    """Subscription Statuses
+
+    see https://discord.com/developers/docs/resources/subscription#subscription-statuses
+    """
+
+    ACTIVE = 0
+    """Subscription is active and scheduled to renew."""
+    ENDING = 1
+    """Subscription is active but will not renew."""
+    INACTIVE = 2
+    """Subscription is inactive and not being charged."""
 
 
 class SystemChannelFlags(IntFlag):
@@ -1582,10 +1628,13 @@ __all__ = [
     "PresenceStatus",
     "ReactionType",
     "RoleFlag",
+    "SKUFlag",
+    "SKUType",
     "SortOrderTypes",
     "StagePrivacyLevel",
     "StickerFormatType",
     "StickerType",
+    "SubscriptionStatus",
     "SystemChannelFlags",
     "TeamMemberRoleType",
     "TextInputStyle",
