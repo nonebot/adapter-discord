@@ -25,6 +25,8 @@ class Intents(BaseModel):
     guild_scheduled_events: bool = True
     auto_moderation_configuration: bool = True
     auto_moderation_execution: bool = True
+    guild_message_polls: bool = True
+    direct_message_polls: bool = True
 
     def to_int(self):
         return (
@@ -47,6 +49,8 @@ class Intents(BaseModel):
             | self.guild_scheduled_events << 16
             | self.auto_moderation_configuration << 20
             | self.auto_moderation_execution << 21
+            | self.guild_message_polls << 24
+            | self.direct_message_polls << 25
         )
 
 

@@ -998,6 +998,14 @@ class MessagePollVoteAddEvent(NoticeEvent, MessagePollVoteAdd):
     __type__ = EventType.MESSAGE_POLL_VOTE_ADD
 
 
+class GuildMessagePollVoteAddEvent(MessagePollVoteAddEvent):
+    guild_id: Snowflake
+
+
+class DirectMessagePollVoteAddEvent(MessagePollVoteAddEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+
+
 class MessagePollVoteRemoveEvent(NoticeEvent, MessagePollVoteRemove):
     """Message Poll Vote Remove Event
 
@@ -1005,6 +1013,14 @@ class MessagePollVoteRemoveEvent(NoticeEvent, MessagePollVoteRemove):
     """
 
     __type__ = EventType.MESSAGE_POLL_VOTE_REMOVE
+
+
+class GuildMessagePollVoteRemoveEvent(MessagePollVoteRemoveEvent):
+    guild_id: Snowflake
+
+
+class DirectMessagePollVoteRemoveEvent(MessagePollVoteRemoveEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
 
 
 event_classes: dict[str, type[Event]] = {
@@ -1120,8 +1136,16 @@ event_classes: dict[str, type[Event]] = {
     EventType.VOICE_STATE_UPDATE.value: VoiceStateUpdateEvent,
     EventType.VOICE_SERVER_UPDATE.value: VoiceServerUpdateEvent,
     EventType.WEBHOOKS_UPDATE.value: WebhooksUpdateEvent,
-    EventType.MESSAGE_POLL_VOTE_ADD.value: MessagePollVoteAddEvent,
-    EventType.MESSAGE_POLL_VOTE_REMOVE.value: MessagePollVoteRemoveEvent,
+    EventType.MESSAGE_POLL_VOTE_ADD.value: Union[
+        GuildMessagePollVoteAddEvent,
+        DirectMessagePollVoteAddEvent,
+        MessagePollVoteAddEvent,
+    ],
+    EventType.MESSAGE_POLL_VOTE_REMOVE.value: Union[
+        GuildMessagePollVoteRemoveEvent,
+        DirectMessagePollVoteRemoveEvent,
+        MessagePollVoteRemoveEvent,
+    ],
 }  # type: ignore
 
 __all__ = [
@@ -1231,6 +1255,10 @@ __all__ = [
     "VoiceServerUpdateEvent",
     "WebhooksUpdateEvent",
     "MessagePollVoteAddEvent",
+    "GuildMessagePollVoteAddEvent",
+    "DirectMessagePollVoteAddEvent",
     "MessagePollVoteRemoveEvent",
+    "GuildMessagePollVoteRemoveEvent",
+    "DirectMessagePollVoteRemoveEvent",
     "event_classes",
 ]
