@@ -3706,7 +3706,7 @@ class PollRequest(BaseModel):
     """Number of hours the poll should be open for, up to 32 days. Defaults to 24"""
     allow_multiselect: Missing[bool] = UNSET
     """Whether a user can select multiple answers. Defaults to false"""
-    layout_type: Missing[int]
+    layout_type: Missing[int] = UNSET
     """The layout type of the poll"""
 
 
