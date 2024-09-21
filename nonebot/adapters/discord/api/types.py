@@ -558,6 +558,8 @@ class EmbedTypes(StrEnum):
     """article embed"""
     link = "link"
     """link embed"""
+    poll_result = "poll_result"
+    """poll result embed"""
 
 
 class EntitlementType(IntEnum):
@@ -1148,6 +1150,7 @@ class MessageType(IntEnum):
     GUILD_INCIDENT_REPORT_RAID = 38
     GUILD_INCIDENT_REPORT_FALSE_ALARM = 39
     PURCHASE_NOTIFICATION = 44
+    POLL_RESULT = 46
 
 
 class MembershipState(IntEnum):

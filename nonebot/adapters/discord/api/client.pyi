@@ -458,6 +458,7 @@ class ApiClient:
         files: list[File] | None = ...,
         attachments: list[AttachmentSend] | None = ...,
         flags: MessageFlag | None = ...,
+        poll: PollRequest | None = ...,
     ) -> MessageGet:
         """create message
 
@@ -1827,6 +1828,8 @@ class ApiClient:
         attachments: list[AttachmentSend] | None = ...,
         flags: int | None = ...,
         thread_name: str | None = ...,
+        applied_tags: list[SnowflakeType] | None = ...,
+        poll: PollRequest | None = ...,
         **data,
     ) -> None: ...
     @overload
@@ -1848,6 +1851,8 @@ class ApiClient:
         attachments: list[AttachmentSend] | None = ...,
         flags: int | None = ...,
         thread_name: str | None = ...,
+        applied_tags: list[SnowflakeType] | None = ...,
+        poll: PollRequest | None = ...,
         **data,
     ) -> MessageGet: ...
     async def execute_webhook(
@@ -1868,6 +1873,8 @@ class ApiClient:
         attachments: list[AttachmentSend] | None = ...,
         flags: int | None = ...,
         thread_name: str | None = ...,
+        applied_tags: list[SnowflakeType] | None = ...,
+        poll: PollRequest | None = ...,
         **data,
     ) -> MessageGet | None:
         """https://discord.com/developers/docs/resources/webhook#execute-webhook"""
@@ -1918,6 +1925,7 @@ class ApiClient:
         components: list[Component] | None = ...,
         files: list[File] | None = ...,
         attachments: list[AttachmentSend] | None = ...,
+        poll: PollRequest | None = ...,
     ) -> MessageGet:
         """https://discord.com/developers/docs/resources/webhook#edit-webhook-message"""
         ...

@@ -871,6 +871,8 @@ class InteractionCallbackMessage(BaseModel):
     attachments: Optional[list["AttachmentSend"]] = None
     """attachment objects with filename and description.
     See Uploading Files for details."""
+    poll: Optional["PollRequest"] = None
+    """Details about the poll"""
 
     files: Optional[list["File"]] = None
 
@@ -1756,6 +1758,7 @@ class MessageSend(BaseModel):
     files: Optional[list[File]] = None
     attachments: Optional[list[AttachmentSend]] = None
     flags: Optional[MessageFlag] = None
+    poll: Optional["PollRequest"] = None
 
 
 class ModifyChannelParams(BaseModel):
@@ -3676,7 +3679,7 @@ class Poll(BaseModel):
     """The question of the poll. Only `text` is supported."""
     answers: list["PollAnswer"]
     """Each of the answers available in the poll."""
-    expiry: datetime.datetime
+    expiry: Optional[datetime.datetime] = None
     """The time when the poll ends."""
     allow_multiselect: bool
     """Whether a user can select multiple answers"""
@@ -3684,6 +3687,27 @@ class Poll(BaseModel):
     """The layout type of the poll"""
     results: Missing["PollResults"] = UNSET
     """The results of the poll"""
+
+
+class PollRequest(BaseModel):
+    """This is the request object used when creating a poll across the
+    different endpoints. It is similar but not exactly identical to the
+    main poll object. The main difference is that the request has `duration`
+    which eventually becomes `expiry`.
+
+    see https://discord.com/developers/docs/resources/poll#poll-create-request-object
+    """
+
+    question: "PollMedia"
+    """The question of the poll. Only `text` is supported."""
+    answers: list["PollAnswer"]
+    """Each of the answers available in the poll, up to 10"""
+    duration: Missing[int] = UNSET
+    """Number of hours the poll should be open for, up to 32 days. Defaults to 24"""
+    allow_multiselect: Missing[bool] = UNSET
+    """Whether a user can select multiple answers. Defaults to false"""
+    layout_type: Missing[int]
+    """The layout type of the poll"""
 
 
 class PollAnswer(BaseModel):
@@ -4225,6 +4249,7 @@ __all__ = [
     "TeamMemberUser",
     "AuthorizationResponse",
     "Poll",
+    "PollRequest",
     "PollAnswer",
     "PollMedia",
     "PollResults",

@@ -32,6 +32,8 @@ from .api import (
     File,
     MessageGet,
     MessageReference,
+    Poll,
+    PollRequest,
     SelectMenu,
     Snowflake,
     SnowflakeType,
@@ -173,6 +175,10 @@ class MessageSegment(BaseMessageSegment["Message"]):
             )
 
         return ReferenceSegment("reference", {"reference": _reference})
+
+    @staticmethod
+    def poll(poll: Union[Poll, PollRequest]) -> "PollSegment":
+        return PollSegment("poll", {"poll": poll})
 
     @override
     def is_text(self) -> bool:
@@ -483,6 +489,21 @@ SEGMENT_TYPE_MAP = {
 }
 
 
+class PollData(TypedDict):
+    poll: Union[Poll, PollRequest]
+
+
+@dataclass
+class PollSegment(MessageSegment):
+    if TYPE_CHECKING:
+        type: Literal["poll"]
+        data: PollData
+
+    @override
+    def __str__(self) -> str:
+        return f"<Poll:{self.data["poll"].question.text}>"
+
+
 class Message(BaseMessage[MessageSegment]):
     @classmethod
     @override
@@ -572,6 +593,8 @@ class Message(BaseMessage[MessageSegment]):
             msg.extend(
                 MessageSegment.component(component) for component in message.components
             )
+        if message.poll:
+            msg.append(MessageSegment.poll(message.poll))
         return msg
 
     def extract_content(self) -> str:
@@ -604,6 +627,8 @@ def parse_message(message: Union[Message, MessageSegment, str]) -> dict[str, Any
         components = [component.data["component"] for component in components]
     if sticker_ids := (message["sticker"] or None):
         sticker_ids = [sticker.data["id"] for sticker in sticker_ids]
+    if poll := (message["poll"] or None):
+        poll = poll[-1].data["poll"]
 
     attachments = None
     files = None
@@ -624,6 +649,7 @@ def parse_message(message: Union[Message, MessageSegment, str]) -> dict[str, Any
             "message_reference": reference,
             "components": components,
             "sticker_ids": sticker_ids,
+            "poll": poll,
             "files": files,
             "attachments": attachments,
         }.items()
