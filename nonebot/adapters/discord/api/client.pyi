@@ -7,7 +7,14 @@ from .types import *
 class ApiClient:
     async def get_global_application_commands(
         self, *, application_id: SnowflakeType, with_localizations: bool | None = ...
-    ) -> list[ApplicationCommand]: ...
+    ) -> list[ApplicationCommand]:
+        """Fetch a global command for your application.
+        Returns an application command object.
+
+        see https://discord.com/developers/docs/interactions/application-commands#get-global-application-command
+        """
+        ...
+
     async def create_global_application_command(
         self,
         *,
@@ -22,10 +29,25 @@ class ApiClient:
         default_permission: bool | None = ...,
         type: ApplicationCommandType | None = ...,
         nsfw: bool | None = ...,
-    ) -> ApplicationCommand: ...
+    ) -> ApplicationCommand:
+        """Create a new global command.
+        Returns 201 if a command with the same name does not already exist,
+        or a 200 if it does (in which case the previous command will be overwritten).
+        Both responses include an application command object.
+        see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
+        """
+        ...
+
     async def get_global_application_command(
         self, *, application_id: SnowflakeType, command_id: SnowflakeType
-    ) -> ApplicationCommand: ...
+    ) -> ApplicationCommand:
+        """Fetch a global command for your application.
+        Returns an application command object.
+
+        see https://discord.com/developers/docs/interactions/application-commands#get-global-application-command
+        """
+        ...
+
     async def edit_global_application_command(
         self,
         *,
@@ -46,17 +68,40 @@ class ApiClient:
         *,
         application_id: SnowflakeType,
         command_id: SnowflakeType,
-    ) -> None: ...
+    ) -> None:
+        """Deletes a global command. Returns 204 No Content on success.
+
+        see https://discord.com/developers/docs/interactions/application-commands#delete-global-application-command
+        """
+        ...
+
     async def bulk_overwrite_global_application_commands(
         self, *, application_id: SnowflakeType, commands: list[ApplicationCommandCreate]
-    ) -> list[ApplicationCommand]: ...
+    ) -> list[ApplicationCommand]:
+        """Takes a list of application commands,
+        overwriting the existing global command list for this application.
+        Returns 200 and a list of application command objects.
+        Commands that do not already exist will count toward
+        daily application command create limits.
+
+        see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
+        """
+        ...
+
     async def get_guild_application_commands(
         self,
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         with_localizations: bool | None = ...,
-    ) -> list[ApplicationCommand]: ...
+    ) -> list[ApplicationCommand]:
+        """Fetch all of the guild commands for your application for a specific guild.
+        Returns an array of application command objects.
+
+        see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-commands
+        """
+        ...
+
     async def create_guild_application_command(
         self,
         *,
@@ -71,14 +116,31 @@ class ApiClient:
         default_permission: bool | None = ...,
         type: ApplicationCommandType | None = ...,
         nsfw: bool | None = ...,
-    ) -> ApplicationCommand: ...
+    ) -> ApplicationCommand:
+        """Create a new guild command.
+        New guild commands will be available in the guild immediately.
+        Returns 201 if a command with the same name does not already exist,
+        or a 200 if it does (in which case the previous command will be overwritten).
+        Both responses include an application command object.
+
+        see https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command
+        """
+        ...
+
     async def get_guild_application_command(
         self,
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
-    ) -> ApplicationCommand: ...
+    ) -> ApplicationCommand:
+        """Fetch a guild command for your application.
+        Returns an application command object.
+
+        see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command
+        """
+        ...
+
     async def edit_guild_application_command(
         self,
         *,
@@ -93,34 +155,74 @@ class ApiClient:
         default_member_permissions: str | None = ...,
         default_permission: bool | None = ...,
         nsfw: bool | None = ...,
-    ) -> ApplicationCommand: ...
+    ) -> ApplicationCommand:
+        """Edit a guild command.
+        Updates for guild commands will be available immediately.
+        Returns 200 and an application command object.
+        All fields are optional,
+        but any fields provided will entirely overwrite the existing values of those fields.
+
+        see https://discord.com/developers/docs/interactions/application-commands#edit-guild-application-command
+        """
+        ...
+
     async def delete_guild_application_command(
         self,
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
-    ) -> None: ...
+    ) -> None:
+        """Delete a guild command. Returns 204 No Content on success.
+
+        see https://discord.com/developers/docs/interactions/application-commands#delete-guild-application-command
+        """
+        ...
+
     async def bulk_overwrite_guild_application_commands(
         self,
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         commands: list[ApplicationCommandCreate],
-    ) -> list[ApplicationCommand]: ...
+    ) -> list[ApplicationCommand]:
+        """Takes a list of application commands,
+        overwriting the existing command list for this application for the targeted guild.
+        Returns 200 and a list of application command objects.
+
+        see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-guild-application-commands
+        """
+        ...
+
     async def get_guild_application_command_permissions(
         self,
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
-    ) -> GuildApplicationCommandPermissions: ...
+    ) -> GuildApplicationCommandPermissions:
+        """
+        Fetches permissions for all commands for your application in a guild.
+        Returns an array of guild application command permissions objects.
+
+        see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command-permissions
+        """
+        ...
+
     async def get_application_command_permissions(
         self,
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
-    ) -> GuildApplicationCommandPermissions: ...
+    ) -> GuildApplicationCommandPermissions:
+        """
+        Fetches permissions for a specific command for your application in a guild.
+        Returns a guild application command permissions object.
+
+        see https://discord.com/developers/docs/interactions/application-commands#get-application-command-permissions
+        """
+        ...
+
     async def edit_application_command_permissions(
         self,
         *,
@@ -128,21 +230,38 @@ class ApiClient:
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
         permissions: list[ApplicationCommandPermissions],
-    ) -> GuildApplicationCommandPermissions: ...
+    ) -> GuildApplicationCommandPermissions:
+        """
+        Edits command permissions for a specific command for your application in a guild
+        and returns a guild application command permissions object.
+        Fires an Application Command Permissions Update Gateway event.
+
+        You can add up to 100 permission overwrites for a command.
+
+        see https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions
+        """
+        ...
+
     async def create_interaction_response(
         self,
         *,
         interaction_id: SnowflakeType,
         interaction_token: str,
         response: InteractionResponse,
-    ) -> None: ...
+    ) -> None:
+        """https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response"""
+        ...
+
     async def get_origin_interaction_response(
         self,
         *,
         application_id: SnowflakeType,
         interaction_token: str,
         thread_id: SnowflakeType | None = ...,
-    ) -> MessageGet: ...
+    ) -> MessageGet:
+        """https://discord.com/developers/docs/interactions/receiving-and-responding#get-original-interaction-response"""
+        ...
+
     async def edit_origin_interaction_response(
         self,
         *,
@@ -155,13 +274,19 @@ class ApiClient:
         components: list[Component] | None = ...,
         files: list[File] | None = ...,
         attachments: list[AttachmentSend] | None = ...,
-    ) -> MessageGet: ...
+    ) -> MessageGet:
+        """https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response"""
+        ...
+
     async def delete_origin_interaction_response(
         self,
         *,
         application_id: SnowflakeType,
         interaction_token: str,
-    ) -> None: ...
+    ) -> None:
+        """https://discord.com/developers/docs/interactions/receiving-and-responding#delete-original-interaction-response"""
+        ...
+
     async def create_followup_message(
         self,
         *,
@@ -176,14 +301,23 @@ class ApiClient:
         attachments: list[AttachmentSend] | None = ...,
         flags: int | None = ...,
         thread_name: str | None = ...,
-    ) -> MessageGet: ...
+    ) -> MessageGet:
+        """https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message"""
+        ...
+
     async def get_followup_message(
         self,
         *,
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
-    ) -> MessageGet: ...
+    ) -> MessageGet:
+        """Returns a followup message for an Interaction. Functions the same as Get Webhook Message.
+
+        see https://discord.com/developers/docs/interactions/receiving-and-responding#get-followup-message
+        """
+        ...
+
     async def edit_followup_message(
         self,
         *,
@@ -197,14 +331,26 @@ class ApiClient:
         components: list[Component] | None = ...,
         files: list[File] | None = ...,
         attachments: list[AttachmentSend] | None = ...,
-    ) -> MessageGet: ...
+    ) -> MessageGet:
+        """Edits a followup message for an Interaction. Functions the same as Edit Webhook Message.
+
+        see https://discord.com/developers/docs/interactions/receiving-and-responding#edit-followup-message
+        """
+        ...
+
     async def delete_followup_message(
         self,
         *,
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
-    ) -> None: ...
+    ) -> None:
+        """Deletes a followup message for an Interaction.
+
+        see https://discord.com/developers/docs/interactions/receiving-and-responding#delete-followup-message
+        """
+        ...
+
     async def get_current_application(self) -> Application:
         """Returns the application object associated with the requesting bot user
 
@@ -662,7 +808,7 @@ class ApiClient:
         message_id: SnowflakeType,
         reason: str | None = ...,
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#add-pinned-channel-message"""
+        """https://discord.com/developers/docs/resources/channel#pin-message"""
         ...
 
     async def unpin_message(
@@ -672,7 +818,7 @@ class ApiClient:
         message_id: SnowflakeType,
         reason: str | None = ...,
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#delete-pinned-channel-message"""
+        """https://discord.com/developers/docs/resources/channel#unpin-message"""
         ...
 
     async def group_DM_add_recipient(
@@ -702,7 +848,7 @@ class ApiClient:
         rate_limit_per_user: int | None = ...,
         reason: str | None = ...,
     ) -> Channel:
-        """https://discord.com/developers/docs/resources/channel#start-thread-with-message"""
+        """https://discord.com/developers/docs/resources/channel#start-thread-from-message"""
         ...
 
     async def start_thread_without_message(
@@ -739,7 +885,7 @@ class ApiClient:
         flags: MessageFlag | None = ...,
         reason: str | None = ...,
     ) -> Channel:
-        """https://discord.com/developers/docs/resources/channel#start-thread-in-forum-channel"""
+        """https://discord.com/developers/docs/resources/channel#start-thread-in-forum-or-media-channel"""
         ...
 
     async def join_thread(self, *, channel_id: SnowflakeType) -> None:
@@ -1407,7 +1553,7 @@ class ApiClient:
         suppress: bool | None = ...,
         request_to_speak_timestamp: datetime.datetime | None = ...,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#modify-current-user-voice-state"""
+        """https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state"""
         ...
 
     async def modify_user_voice_state(
@@ -1418,7 +1564,7 @@ class ApiClient:
         channel_id: SnowflakeType,
         suppress: bool | None = ...,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#modify-user-voice-state"""
+        """https://discord.com/developers/docs/resources/voice#modify-user-voice-state"""
         ...
 
     async def list_scheduled_events_for_guild(
@@ -1501,7 +1647,7 @@ class ApiClient:
     async def create_guild_from_guild_template(
         self, *, template_code: str, name: str, icon: str | None = ...
     ) -> Guild:
-        """https://discord.com/developers/docs/resources/guild-template#create-guild-from-template"""
+        """https://discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template"""
         ...
 
     async def get_guild_templates(
@@ -1621,7 +1767,7 @@ class ApiClient:
         ...
 
     async def list_nitro_sticker_packs(self) -> list[StickerPack]:
-        """https://discord.com/developers/docs/resources/sticker#list-nitro-sticker-packs"""
+        """https://discord.com/developers/docs/resources/sticker#list-sticker-packs"""
         ...
 
     async def get_sticker_packs(self, *, pack_id: SnowflakeType) -> StickerPack:
@@ -1725,13 +1871,13 @@ class ApiClient:
         ...
 
     async def get_user_connections(self) -> list[Connection]:
-        """https://discord.com/developers/docs/resources/user#get-user-connections"""
+        """https://discord.com/developers/docs/resources/user#get-current-user-connections"""
         ...
 
     async def get_user_application_role_connection(
         self, *, application_id: SnowflakeType
     ) -> ApplicationRoleConnection:
-        """https://discord.com/developers/docs/resources/user#get-user-application-connections"""
+        """https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection"""
         ...
 
     async def update_user_application_role_connection(
@@ -1954,5 +2100,5 @@ class ApiClient:
         ...
 
     async def get_current_authorization_information(self) -> AuthorizationResponse:
-        """https://discord.com/developers/docs/resources/user#get-current-authorization-information"""
+        """https://discord.com/developers/docs/topics/oauth2#get-current-authorization-information"""
         ...
