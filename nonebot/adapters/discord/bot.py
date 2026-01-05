@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Any, Optional, Union
 from typing_extensions import override
 
 from nonebot.adapters import Bot as BaseBot
+
 from nonebot.message import handle_event
 
 from .api import (

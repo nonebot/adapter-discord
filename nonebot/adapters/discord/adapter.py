@@ -6,6 +6,7 @@ from typing import Any, Optional
 from typing_extensions import override
 
 from nonebot.adapters import Adapter as BaseAdapter
+
 from nonebot.compat import type_validate_json, type_validate_python
 from nonebot.drivers import URL, Driver, ForwardDriver, Request, WebSocket
 from nonebot.exception import WebSocketClosed

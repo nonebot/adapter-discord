@@ -13,7 +13,6 @@ from typing import (
 )
 
 from nonebot.compat import PYDANTIC_V2
-
 from pydantic import (
     BaseModel,
     Field,

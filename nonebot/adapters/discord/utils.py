@@ -3,7 +3,6 @@ import zlib
 
 from nonebot.compat import model_dump as model_dump_
 from nonebot.utils import logger_wrapper
-
 from pydantic import BaseModel
 
 from .api.types import UNSET
