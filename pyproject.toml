@@ -16,9 +16,16 @@ dependencies = ["nonebot2>=2.4.4"]
 
 [dependency-groups]
 dev = [
+    { include-group = "test" },
     "ruff>=0.14.0,<0.15.0",
     "nonemoji>=0.1.2,<0.2.0",
     "pre-commit>=4.0.0,<5.0.0",
+]
+test = [
+    "nonebug>=0.4.0,<0.5.0",
+    "pytest>=7.0.0,<10.0.0",
+    "pytest-asyncio>=1.1.0,<2.0.0",
+    "pytest-cov>=7.0.0",
 ]
 
 [project.urls]
@@ -51,6 +58,9 @@ section-order = [
     "third-party",
     "local-folder",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
 
 [build-system]
 requires = ["uv_build>=0.9.18,<0.10.0"]
