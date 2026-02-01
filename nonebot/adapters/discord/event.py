@@ -4,9 +4,9 @@ from typing import Literal, Optional, Union
 from typing_extensions import override
 
 from nonebot.adapters import Event as BaseEvent
+
 from nonebot.compat import model_dump
 from nonebot.utils import escape_tag
-
 from pydantic import Field
 
 from .api.model import *

@@ -3,7 +3,6 @@ from typing import Annotated, Optional, Union
 from typing_extensions import Literal
 
 from nonebot.compat import PYDANTIC_V2, ConfigDict
-
 from pydantic import BaseModel, Field
 
 from .api.model import (
