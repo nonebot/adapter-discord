@@ -17,6 +17,7 @@ from nonebot.adapters import (
     Message as BaseMessage,
     MessageSegment as BaseMessageSegment,
 )
+
 from nonebot.compat import type_validate_python
 
 from .api import (
