@@ -1,35 +1,44 @@
-[tool.poetry]
+#:schema https://json.schemastore.org/pyproject.json
+
+[project]
 name = "nonebot-adapter-discord"
 version = "0.1.8"
 description = "Discord adapter for nonebot2"
-authors = ["CMHopeSunshine <277073121@qq.com>", "yanyongyu <yyy@nonebot.dev>"]
+authors = [
+    { name = "CMHopeSunshine", email = "277073121@qq.com" },
+    { name = "yanyongyu", email = "yyy@nonebot.dev" },
+]
 license = "MIT"
 readme = "README.md"
+keywords = ["nonebot", "discord", "bot"]
+requires-python = ">=3.9,<4.0.0"
+dependencies = ["nonebot2>=2.4.4"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.0,<0.15.0",
+    "nonemoji>=0.1.2,<0.2.0",
+    "pre-commit>=4.0.0,<5.0.0",
+]
+
+[project.urls]
 homepage = "https://github.com/nonebot/adapter-discord"
 repository = "https://github.com/nonebot/adapter-discord"
 documentation = "https://github.com/nonebot/adapter-discord"
-keywords = ["nonebot", "discord", "bot"]
 
-packages = [{ include = "nonebot" }]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-nonebot2 = "^2.2.1"
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.1.4"
-nonemoji = "^0.1.2"
-pre-commit = "^3.1.0"
+[tool.uv.build-backend]
+module-name = "nonebot.adapters.discord"
+module-root = ""
 
 [tool.ruff]
-select = ["E", "W", "F", "I", "UP", "C", "T", "PYI", "PT"]
-ignore = ["E402", "F403", "F405", "C901", "PYI021", "PYI048", "W191", "E501"]
 line-length = 88
 target-version = "py39"
-ignore-init-module-imports = true
 
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "C", "T", "PYI", "PT"]
+ignore = ["E402", "F403", "F405", "C901", "PYI021", "PYI048", "W191", "E501"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 force-sort-within-sections = true
 extra-standard-library = ["typing_extensions"]
 combine-as-imports = true
@@ -44,5 +53,5 @@ section-order = [
 ]
 
 [build-system]
-requires = ["poetry_core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
