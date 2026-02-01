@@ -12,15 +12,25 @@ jobs:
       id-token: write
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
-      - name: Setup Python environment
-        uses: ./.github/actions/setup-python
+      - uses: astral-sh/setup-uv@v7
+        name: Setup UV
+        with:
+          enable-cache: true
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: ".python-version"
+
+      - run: uv sync
+        shell: bash
 
       - name: Get Version
         id: version
         run: |
-          echo "VERSION=$(poetry version -s)" >> $GITHUB_OUTPUT
+          echo "VERSION=$(uv version --short)" >> $GITHUB_OUTPUT
           echo "TAG_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
@@ -29,10 +39,10 @@ jobs:
         run: exit 1
 
       - name: Build Package
-        run: poetry build
+        run: uv build
 
       - name: Publish Package to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        run: uv publish
 
       - name: Publish Package to GitHub
         run: |
