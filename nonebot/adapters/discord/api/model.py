@@ -1,5 +1,6 @@
 import datetime
 import inspect
+import warnings
 import sys
 from typing import (
     TYPE_CHECKING,
@@ -187,6 +188,11 @@ class ApplicationCommand(BaseModel):
 
 
 class ApplicationCommandCreate(BaseModel):
+    """Application Command Create
+
+    see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
+    """
+
     type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
     name: str
     name_localizations: Optional[dict[str, str]] = None
@@ -200,6 +206,11 @@ class ApplicationCommandCreate(BaseModel):
 
 
 class CommandOptionBase(BaseModel):
+    """Application Command Option Base
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: ApplicationCommandOptionType
     name: str
     name_localizations: Optional[dict[str, str]] = None
@@ -254,12 +265,22 @@ class ApplicationCommandOption(CommandOptionBase):
 
 
 class OptionChoice(GenericModel, Generic[T]):
+    """Application Command Option Choice
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
+    """
+
     name: str
     name_localizations: Optional[dict[str, str]] = None
     value: T
 
 
 class SubCommandOption(CommandOptionBase):
+    """Sub Command Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.SUB_COMMAND] = Field(
         ApplicationCommandOptionType.SUB_COMMAND, init=False
     )
@@ -281,6 +302,11 @@ class SubCommandOption(CommandOptionBase):
 
 
 class SubCommandGroupOption(CommandOptionBase):
+    """Sub Command Group Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.SUB_COMMAND_GROUP] = Field(
         ApplicationCommandOptionType.SUB_COMMAND_GROUP, init=False
     )
@@ -288,6 +314,11 @@ class SubCommandGroupOption(CommandOptionBase):
 
 
 class IntegerOption(CommandOptionBase):
+    """Integer Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.INTEGER] = Field(
         ApplicationCommandOptionType.INTEGER, init=False
     )
@@ -299,6 +330,11 @@ class IntegerOption(CommandOptionBase):
 
 
 class StringOption(CommandOptionBase):
+    """String Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.STRING] = Field(
         ApplicationCommandOptionType.STRING, init=False
     )
@@ -310,6 +346,11 @@ class StringOption(CommandOptionBase):
 
 
 class BooleanOption(CommandOptionBase):
+    """Boolean Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.BOOLEAN] = Field(
         ApplicationCommandOptionType.BOOLEAN, init=False
     )
@@ -317,6 +358,11 @@ class BooleanOption(CommandOptionBase):
 
 
 class UserOption(CommandOptionBase):
+    """User Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.USER] = Field(
         ApplicationCommandOptionType.USER, init=False
     )
@@ -324,6 +370,11 @@ class UserOption(CommandOptionBase):
 
 
 class ChannelOption(CommandOptionBase):
+    """Channel Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.CHANNEL] = Field(
         ApplicationCommandOptionType.CHANNEL, init=False
     )
@@ -332,6 +383,11 @@ class ChannelOption(CommandOptionBase):
 
 
 class RoleOption(CommandOptionBase):
+    """Role Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.ROLE] = Field(
         ApplicationCommandOptionType.ROLE, init=False
     )
@@ -339,6 +395,11 @@ class RoleOption(CommandOptionBase):
 
 
 class MentionableOption(CommandOptionBase):
+    """Mentionable Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.MENTIONABLE] = Field(
         ApplicationCommandOptionType.MENTIONABLE, init=False
     )
@@ -346,6 +407,11 @@ class MentionableOption(CommandOptionBase):
 
 
 class NumberOption(CommandOptionBase):
+    """Number Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.NUMBER] = Field(
         ApplicationCommandOptionType.NUMBER, init=False
     )
@@ -355,6 +421,11 @@ class NumberOption(CommandOptionBase):
 
 
 class AttachmentOption(CommandOptionBase):
+    """Attachment Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.ATTACHMENT] = Field(
         ApplicationCommandOptionType.ATTACHMENT, init=False
     )
@@ -509,6 +580,8 @@ class SelectMenu(BaseModel):
     - Select menus must be sent inside an Action Row
     - An Action Row can contain only one select menu
     - An Action Row containing a select menu cannot also contain buttons
+
+    see https://discord.com/developers/docs/interactions/message-components#select-menu-object
     """
 
     type: Literal[
@@ -528,7 +601,7 @@ class SelectMenu(BaseModel):
     """List of channel types to include in the channel select component"""
     placeholder: Missing[str] = UNSET
     """Placeholder text if nothing is selected; max 150 characters"""
-    default_values: Missing["SelectDefaultValue"] = UNSET
+    default_values: Missing[list["SelectDefaultValue"]] = UNSET
     """List of default values for auto-populated select
     menu components; number of default values must be in
     the range defined by min_values and max_values"""
@@ -674,7 +747,10 @@ class Interaction(BaseModel):
 
 
 class InteractionGuild(BaseModel):
-    """partial guild object for Interaction"""
+    """partial guild object for Interaction
+
+    see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
+    """
 
     id: Snowflake
     locale: Missing[str] = UNSET
@@ -717,7 +793,7 @@ class MessageComponentData(BaseModel):
     """the custom_id of the component"""
     component_type: ComponentType
     """the type of the component"""
-    values: Missing[list[SelectOption]] = UNSET
+    values: Missing[list[str]] = UNSET
     """values the user selected in a select menu component"""
     resolved: Missing["ResolvedData"] = UNSET
     """resolved entities from selected options"""
@@ -1096,29 +1172,29 @@ class OptionalAuditEntryInfo(BaseModel):
     see https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info
     """
 
-    application_id: Snowflake
+    application_id: Missing[Snowflake] = UNSET
     """ID of the app whose permissions were targeted"""
-    auto_moderation_rule_name: str
+    auto_moderation_rule_name: Missing[str] = UNSET
     """Name of the Auto Moderation rule that was triggered"""
-    auto_moderation_rule_trigger_type: str
+    auto_moderation_rule_trigger_type: Missing[str] = UNSET
     """Trigger type of the Auto Moderation rule that was triggered"""
-    channel_id: Snowflake
+    channel_id: Missing[Snowflake] = UNSET
     """Channel in which the entities were targeted"""
-    count: str
+    count: Missing[str] = UNSET
     """Number of entities that were targeted"""
-    delete_member_days: str
+    delete_member_days: Missing[str] = UNSET
     """Number of days after which inactive members were kicked"""
-    id: Snowflake
+    id: Missing[Snowflake] = UNSET
     """ID of the overwritten entity"""
-    members_removed: str
+    members_removed: Missing[str] = UNSET
     """Number of members removed by the prune"""
-    message_id: Snowflake
+    message_id: Missing[Snowflake] = UNSET
     """ID of the message that was targeted"""
-    role_name: str
+    role_name: Missing[str] = UNSET
     """Name of the role if type is "0" (not present if type is "1")"""
-    type: str
+    type: Missing[str] = UNSET
     """Type of overwritten entity - role ("0") or member ("1")"""
-    integration_type: str
+    integration_type: Missing[str] = UNSET
     """The type of integration which performed the action"""
 
 
@@ -1187,19 +1263,19 @@ class TriggerMetadata(BaseModel):
     see https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata
     """
 
-    keyword_filter: list[str]
+    keyword_filter: Missing[list[str]] = UNSET
     """substrings which will be searched for in content (Maximum of 1000)"""
-    regex_patterns: list[str]
+    regex_patterns: Missing[list[str]] = UNSET
     """regular expression patterns which will be matched
     against content (Maximum of 10)"""
-    presets: list[KeywordPresetType]
+    presets: Missing[list[KeywordPresetType]] = UNSET
     """the internally pre-defined wordsets which will be searched for in content"""
-    allow_list: list[str]
+    allow_list: Missing[list[str]] = UNSET
     """substrings which should not trigger the rule (Maximum of 100 or 1000)"""
-    mention_total_limit: int
+    mention_total_limit: Missing[int] = UNSET
     """total number of unique role and user mentions allowed
     per message (Maximum of 50)"""
-    mention_raid_protection_enabled: bool
+    mention_raid_protection_enabled: Missing[bool] = UNSET
     """whether to automatically detect mention raids"""
 
 
@@ -1221,9 +1297,9 @@ class AutoModerationActionMetadata(BaseModel):
     see https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-metadata
     """
 
-    channel_id: Snowflake
+    channel_id: Missing[Snowflake] = UNSET
     """channel to which user content should be logged"""
-    duration_seconds: int
+    duration_seconds: Missing[int] = UNSET
     """	timeout duration in seconds"""
     custom_message: Missing[str] = UNSET
     """additional explanation that will be shown to members
@@ -1477,11 +1553,11 @@ class Reaction(BaseModel):
     see https://discord.com/developers/docs/resources/message#reaction-object"""
 
     count: int
-    count_details: "CountDetails"
+    count_details: Missing["CountDetails"] = UNSET
     me: bool
-    me_burst: bool
+    me_burst: Missing[bool] = UNSET
     emoji: "Emoji"
-    burst_colors: list
+    burst_colors: Missing[list[str]] = UNSET
 
 
 class CountDetails(BaseModel):
@@ -1729,6 +1805,11 @@ class ArchivedThreadsResponse(BaseModel):
 
 
 class File(BaseModel):
+    """File payload for multipart upload.
+
+    see https://discord.com/developers/docs/reference#uploading-files
+    """
+
     content: bytes
     filename: str
 
@@ -1864,7 +1945,7 @@ class Guild(BaseModel):
     nsfw_level: GuildNSFWLevel
     stickers: Missing[list["Sticker"]] = UNSET
     premium_progress_bar_enabled: bool
-    safety_alerts_channel_id: Optional[Snowflake] = Field(...)
+    safety_alerts_channel_id: MissingOrNullable[Snowflake] = UNSET
 
 
 class CurrentUserGuild(BaseModel):
@@ -2153,6 +2234,7 @@ class ModifyGuildParams(BaseModel):
     features: Optional[list[GuildFeature]] = None
     description: Optional[str] = None
     premium_progress_bar_enabled: Optional[bool] = None
+    safety_alerts_channel_id: Optional[Snowflake] = None
 
 
 class CreateGuildChannelParams(BaseModel):
@@ -2378,11 +2460,14 @@ class GuildTemplateGuildChannel(BaseModel):
 class Invite(BaseModel):
     """Invite
 
+    Warning:
+        stage_instance is deprecated by Discord and may be omitted.
+
     see https://discord.com/developers/docs/resources/invite#invite-object"""
 
     type: InviteType
     code: str
-    guild: Missing["InviteGuild"] = Field(...)
+    guild: Missing["InviteGuild"] = UNSET
     channel: Optional[Channel] = Field(...)  # partial channel object
     inviter: Missing["User"] = UNSET
     target_type: Missing["InviteTargetType"] = UNSET
@@ -2391,8 +2476,17 @@ class Invite(BaseModel):
     approximate_presence_count: Missing[int] = UNSET
     approximate_member_count: Missing[int] = UNSET
     expires_at: MissingOrNullable[datetime.datetime] = UNSET
-    stage_instance: Missing["StageInstance"] = UNSET
+    stage_instance: Missing["InviteStageInstance"] = UNSET
     guild_scheduled_event: Missing["GuildScheduledEvent"] = UNSET
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if data.get("stage_instance", UNSET) is not UNSET:
+            warnings.warn(
+                "Invite.stage_instance is deprecated by Discord",
+                DeprecationWarning,
+                stacklevel=2,
+            )
 
 
 class InviteGuild(BaseModel):
@@ -2438,6 +2532,14 @@ class InviteStageInstance(BaseModel):
     participant_count: int
     speaker_count: int
     topic: str
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        warnings.warn(
+            "InviteStageInstance is deprecated by Discord",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
 
 # Stage Instance
@@ -2779,7 +2881,10 @@ class Hello(BaseModel):
 
 
 class ApplicationReady(BaseModel):
-    """partial application object for ready event."""
+    """partial application object for ready event.
+
+    see https://discord.com/developers/docs/events/gateway-events#ready
+    """
 
     id: str
     flags: int
@@ -3603,7 +3708,7 @@ class Role(BaseModel):
     managed: bool
     mentionable: bool
     tags: Missing["RoleTags"] = UNSET
-    flags: RoleFlag
+    flags: Missing[RoleFlag] = UNSET
 
 
 class RoleTags(BaseModel):
@@ -3647,7 +3752,10 @@ class TeamMember(BaseModel):
 
 
 class TeamMemberUser(BaseModel):
-    """partial user object for TeamMember"""
+    """partial user object for TeamMember
+
+    see https://discord.com/developers/docs/topics/teams#data-models-team-member-object
+    """
 
     avatar: Optional[str] = None
     discriminator: str
@@ -3700,7 +3808,7 @@ class PollRequest(BaseModel):
 
     question: "PollMedia"
     """The question of the poll. Only `text` is supported."""
-    answers: list["PollAnswer"]
+    answers: list["PollAnswerRequest"]
     """Each of the answers available in the poll, up to 10"""
     duration: Missing[int] = UNSET
     """Number of hours the poll should be open for, up to 32 days. Defaults to 24"""
@@ -3717,6 +3825,15 @@ class PollAnswer(BaseModel):
     """
 
     answer_id: int
+    poll_media: "PollMedia"
+
+
+class PollAnswerRequest(BaseModel):
+    """Poll answer request object.
+
+    see https://discord.com/developers/docs/resources/poll#poll-create-request-object
+    """
+
     poll_media: "PollMedia"
 
 
@@ -3927,6 +4044,7 @@ class Subscription(BaseModel):
     user_id: Snowflake
     sku_ids: list[Snowflake]
     entitlement_ids: list[Snowflake]
+    renewal_sku_ids: MissingOrNullable[list[Snowflake]] = UNSET
     current_period_start: datetime.datetime
     current_period_end: datetime.datetime
     status: SubscriptionStatus
@@ -4251,6 +4369,7 @@ __all__ = [
     "Poll",
     "PollRequest",
     "PollAnswer",
+    "PollAnswerRequest",
     "PollMedia",
     "PollResults",
     "PollAnswerCount",

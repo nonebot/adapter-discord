@@ -12,6 +12,11 @@ T = TypeVar("T")
 
 @final
 class Unset(Enum):
+    """Unset marker for optional fields.
+
+    see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields
+    """
+
     _UNSET = "<UNSET>"
 
     def __repr__(self) -> str:
@@ -61,18 +66,25 @@ Missing: TypeAlias = Union[Literal[UNSET], T]
 
 Missing[T] equal to Union[UNSET, T].
 
-example: Missing[int] == Union[UNSET, int]"""
+example: Missing[int] == Union[UNSET, int]
+
+see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
 
 MissingOrNullable: TypeAlias = Union[Literal[UNSET], T, None]
 """MissingOrNullable means that the field maybe not given in the data or value is None.
 
 MissingOrNullable[T] equal to Union[UNSET, T, None].
 
-example: MissingOrNullable[int] == Union[UNSET, int, None]"""
+example: MissingOrNullable[int] == Union[UNSET, int, None]
+
+see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
 
 
 class StrEnum(str, Enum):
-    """String enum."""
+    """String enum.
+
+    see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields
+    """
 
 
 class ActivityAssetImage(StrEnum):
