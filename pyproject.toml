@@ -90,11 +90,14 @@ select = [
     "TRY",   # tryceratops
 ]
 ignore = [
-    "E501",   # 过长的行由 ruff format 处理, 剩余的都是字符串
     "COM812", # 强制尾随逗号
-    "TID252", # 相对导入
+    "E501",   # 过长的行由 ruff format 处理, 剩余的都是字符串
     "PYI021", # docstring-in-stub
+    "TID252", # 相对导入
     "W191",   # tab-indentation 由 ruff format 处理
+    "TC001",  # 避免依赖注入问题
+    "TC002",  # 避免依赖注入问题
+    "TC003",  # 避免依赖注入问题
 ]
 
 flake8-quotes = { inline-quotes = "double", multiline-quotes = "double" }
