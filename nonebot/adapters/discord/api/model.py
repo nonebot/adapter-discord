@@ -11,6 +11,7 @@ from typing import (
     Union,
     final,
 )
+import warnings
 
 from nonebot.compat import PYDANTIC_V2
 from pydantic import (
@@ -174,11 +175,24 @@ class ApplicationCommand(BaseModel):
     when the app is added to a guild, defaults to true"""
     nsfw: Missing[bool] = UNSET
     """Indicates whether the command is age-restricted, defaults to false"""
+    integration_types: Missing[list[ApplicationIntegrationType]] = UNSET
+    """Installation contexts where the command is available,
+    only for globally-scoped commands. Defaults to your
+    app's configured contexts"""
+    contexts: MissingOrNullable[list[InteractionContextType]] = UNSET
+    """Interaction context(s) where the command can be used,
+    only for globally-scoped commands. By default, all
+    interaction context types included for new commands."""
     version: Snowflake
     """Autoincrementing version identifier updated during substantial record changes"""
 
 
 class ApplicationCommandCreate(BaseModel):
+    """Application Command Create
+
+    see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
+    """
+
     type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
     name: str
     name_localizations: Optional[dict[str, str]] = None
@@ -192,6 +206,11 @@ class ApplicationCommandCreate(BaseModel):
 
 
 class CommandOptionBase(BaseModel):
+    """Application Command Option Base
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: ApplicationCommandOptionType
     name: str
     name_localizations: Optional[dict[str, str]] = None
@@ -246,12 +265,22 @@ class ApplicationCommandOption(CommandOptionBase):
 
 
 class OptionChoice(GenericModel, Generic[T]):
+    """Application Command Option Choice
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
+    """
+
     name: str
     name_localizations: Optional[dict[str, str]] = None
     value: T
 
 
 class SubCommandOption(CommandOptionBase):
+    """Sub Command Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.SUB_COMMAND] = Field(
         ApplicationCommandOptionType.SUB_COMMAND, init=False
     )
@@ -273,6 +302,11 @@ class SubCommandOption(CommandOptionBase):
 
 
 class SubCommandGroupOption(CommandOptionBase):
+    """Sub Command Group Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.SUB_COMMAND_GROUP] = Field(
         ApplicationCommandOptionType.SUB_COMMAND_GROUP, init=False
     )
@@ -280,6 +314,11 @@ class SubCommandGroupOption(CommandOptionBase):
 
 
 class IntegerOption(CommandOptionBase):
+    """Integer Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.INTEGER] = Field(
         ApplicationCommandOptionType.INTEGER, init=False
     )
@@ -291,6 +330,11 @@ class IntegerOption(CommandOptionBase):
 
 
 class StringOption(CommandOptionBase):
+    """String Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.STRING] = Field(
         ApplicationCommandOptionType.STRING, init=False
     )
@@ -302,6 +346,11 @@ class StringOption(CommandOptionBase):
 
 
 class BooleanOption(CommandOptionBase):
+    """Boolean Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.BOOLEAN] = Field(
         ApplicationCommandOptionType.BOOLEAN, init=False
     )
@@ -309,6 +358,11 @@ class BooleanOption(CommandOptionBase):
 
 
 class UserOption(CommandOptionBase):
+    """User Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.USER] = Field(
         ApplicationCommandOptionType.USER, init=False
     )
@@ -316,6 +370,11 @@ class UserOption(CommandOptionBase):
 
 
 class ChannelOption(CommandOptionBase):
+    """Channel Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.CHANNEL] = Field(
         ApplicationCommandOptionType.CHANNEL, init=False
     )
@@ -324,6 +383,11 @@ class ChannelOption(CommandOptionBase):
 
 
 class RoleOption(CommandOptionBase):
+    """Role Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.ROLE] = Field(
         ApplicationCommandOptionType.ROLE, init=False
     )
@@ -331,6 +395,11 @@ class RoleOption(CommandOptionBase):
 
 
 class MentionableOption(CommandOptionBase):
+    """Mentionable Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.MENTIONABLE] = Field(
         ApplicationCommandOptionType.MENTIONABLE, init=False
     )
@@ -338,6 +407,11 @@ class MentionableOption(CommandOptionBase):
 
 
 class NumberOption(CommandOptionBase):
+    """Number Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.NUMBER] = Field(
         ApplicationCommandOptionType.NUMBER, init=False
     )
@@ -347,6 +421,11 @@ class NumberOption(CommandOptionBase):
 
 
 class AttachmentOption(CommandOptionBase):
+    """Attachment Option
+
+    see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[ApplicationCommandOptionType.ATTACHMENT] = Field(
         ApplicationCommandOptionType.ATTACHMENT, init=False
     )
@@ -477,6 +556,9 @@ class Button(BaseModel):
     """emoji name, id, and animated"""
     custom_id: Missing[str] = UNSET
     """Developer-defined identifier for the button; max 100 characters"""
+    sku_id: Missing[Snowflake] = UNSET
+    """Identifier for a purchasable SKU, only
+    available when using premium-style buttons"""
     url: Missing[str] = UNSET
     """URL for link-style buttons"""
     disabled: Missing[bool] = UNSET
@@ -498,6 +580,8 @@ class SelectMenu(BaseModel):
     - Select menus must be sent inside an Action Row
     - An Action Row can contain only one select menu
     - An Action Row containing a select menu cannot also contain buttons
+
+    see https://discord.com/developers/docs/interactions/message-components#select-menu-object
     """
 
     type: Literal[
@@ -517,15 +601,25 @@ class SelectMenu(BaseModel):
     """List of channel types to include in the channel select component"""
     placeholder: Missing[str] = UNSET
     """Placeholder text if nothing is selected; max 150 characters"""
+    default_values: Missing[list["SelectDefaultValue"]] = UNSET
+    """List of default values for auto-populated select
+    menu components; number of default values must be in
+    the range defined by min_values and max_values"""
     min_values: Missing[int] = UNSET
     """Minimum number of items that must be chosen (defaults to 1); min 0, max 25"""
     max_values: Missing[int] = UNSET
     """Maximum number of items that can be chosen (defaults to 1); max 25"""
     disabled: Missing[bool] = UNSET
     """Whether select menu is disabled (defaults to false)"""
-    resolved: Missing["SelectMenuResolved"] = UNSET
-    """Resolved values for user, role, and channel selects,
-    can be returned only by the payload, but cannot be set actively"""
+
+
+class SelectDefaultValue(BaseModel):
+    """see https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-default-value-structure"""
+
+    id: Snowflake
+    """ID of a user, role, or channel"""
+    type: Literal["user", "role", "channel"]
+    """Type of value that `id` represents."""
 
 
 class SelectOption(BaseModel):
@@ -614,13 +708,15 @@ class Interaction(BaseModel):
     This is always present on application command, message component,
     and modal submit interaction types.
     It is optional for future-proofing against new interaction types"""
+    guild: Missing["InteractionGuild"] = UNSET
+    """Guild that the interaction was sent from"""
     guild_id: Missing[Snowflake] = UNSET
     """Guild that the interaction was sent from"""
-    channel: Missing["Channel"] = UNSET
+    channel: Missing["Channel"] = UNSET  # partial channel object
     """Channel that the interaction was sent from"""
     channel_id: Missing[Snowflake] = UNSET
     """Channel that the interaction was sent from"""
-    member: Missing["GuildMember"] = UNSET
+    member: Missing["GuildMember"] = UNSET  # guild member object
     """Guild member data for the invoking user, including permissions"""
     user: Missing["User"] = UNSET
     """User object for the invoking user, if invoked in a DM"""
@@ -637,6 +733,28 @@ class Interaction(BaseModel):
     """Selected language of the invoking user"""
     guild_locale: Missing[str] = UNSET
     """Guild's preferred locale, if invoked in a guild"""
+    entitlements: Missing[list["Entitlement"]] = UNSET
+    """For monetized apps, any entitlements for the
+    invoking user, representing access to premium SKUs"""
+    authorizing_integration_owners: dict[
+        ApplicationIntegrationType, Union[Snowflake, Literal["0"]]
+    ]
+    """Mapping of installation contexts that the interaction
+    was authorized for to related user or guild IDs.
+    See Authorizing Integration Owners Object for details"""
+    context: Missing[InteractionContextType] = UNSET
+    """Context where the interaction was triggered from"""
+
+
+class InteractionGuild(BaseModel):
+    """partial guild object for Interaction
+
+    see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
+    """
+
+    id: Snowflake
+    locale: Missing[str] = UNSET
+    features: list[GuildFeature]
 
 
 class ApplicationCommandData(BaseModel):
@@ -677,6 +795,8 @@ class MessageComponentData(BaseModel):
     """the type of the component"""
     values: Missing[list[str]] = UNSET
     """values the user selected in a select menu component"""
+    resolved: Missing["ResolvedData"] = UNSET
+    """resolved entities from selected options"""
 
 
 class ModalSubmitData(BaseModel):
@@ -747,7 +867,7 @@ class ApplicationCommandInteractionDataOption(BaseModel):
 class MessageInteraction(BaseModel):
     """Message interaction.
 
-    see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
+    see https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object
     """
 
     id: Snowflake
@@ -758,8 +878,37 @@ class MessageInteraction(BaseModel):
     """Name of the application command, including subcommands and subcommand groups"""
     user: "User"
     """User who invoked the interaction"""
-    member: Missing["GuildMember"] = UNSET
+    member: Missing["GuildMember"] = UNSET  # partial member object
     """Member who invoked the interaction in the guild"""
+
+
+class MessageInteractionMetadata(BaseModel):
+    """Message Interaction Metadata
+
+    Metadata about the interaction, including the source of the interaction and relevant server and user IDs.
+
+    see https://discord.com/developers/docs/resources/message#message-interaction-metadata-object
+    """
+
+    id: Snowflake
+    """ID of the interaction"""
+    type: InteractionType
+    """Type of interaction"""
+    user: "User"
+    """User who triggered the interaction"""
+    authorizing_integration_owners: dict[
+        ApplicationIntegrationType, Union[Snowflake, Literal["0"]]
+    ]
+    """IDs for installation context(s) related to an interaction.
+    Details in Authorizing Integration Owners Object"""
+    original_response_message_id: Missing[Snowflake] = UNSET
+    """ID of the original response message, present only on follow-up messages"""
+    interacted_message_id: Missing[Snowflake] = UNSET
+    """ID of the message that contained interactive component,
+    present only on messages created from component interactions"""
+    triggering_interaction_metadata: Missing["MessageInteractionMetadata"] = UNSET
+    """Metadata for the interaction that was used to open the modal,
+    present only on modal submit interactions"""
 
 
 class InteractionResponse(BaseModel):
@@ -798,6 +947,8 @@ class InteractionCallbackMessage(BaseModel):
     attachments: Optional[list["AttachmentSend"]] = None
     """attachment objects with filename and description.
     See Uploading Files for details."""
+    poll: Optional["PollRequest"] = None
+    """Details about the poll"""
 
     files: Optional[list["File"]] = None
 
@@ -860,6 +1011,8 @@ class Application(BaseModel):
     bot_require_code_grant: bool
     """when true the app's bot will only join upon completion
     of the full oauth2 code grant flow"""
+    bot: Missing["User"] = UNSET  # partial user object
+    """Partial user object for the bot user associated with the app"""
     terms_of_service_url: Missing[str] = UNSET
     """the url of the app's terms of service"""
     privacy_policy_url: Missing[str] = UNSET
@@ -875,6 +1028,8 @@ class Application(BaseModel):
     guild_id: Missing[Snowflake] = UNSET
     """if this application is a game sold on Discord,
     this field will be the guild to which it has been linked"""
+    guild: Missing["Guild"] = UNSET  # partial guild object
+    """Partial object of the associated guild"""
     primary_sku_id: Missing[Snowflake] = UNSET
     """if this application is a game sold on Discord,
     this field will be the id of the "Game SKU" that is created, if exists"""
@@ -885,16 +1040,35 @@ class Application(BaseModel):
     """the application's default rich presence invite cover image hash"""
     flags: Missing[ApplicationFlag] = UNSET
     """the application's public flags"""
+    approximate_guild_count: Missing[int] = UNSET
+    """Approximate count of guilds the app has been added to"""
+    approximate_user_install_count: Missing[int] = UNSET
+    """Approximate count of users that have installed the app"""
+    redirect_uris: Missing[list[str]] = UNSET
+    """Array of redirect URIs for the app"""
+    interactions_endpoint_url: MissingOrNullable[str] = (
+        UNSET  # return type not match the docs
+    )
+    """Interactions endpoint URL for the app"""
+    role_connections_verification_url: MissingOrNullable[str] = (
+        UNSET  # return type not match the docs
+    )
+    """Role connection verification URL for the app"""
     tags: Missing[list[str]] = UNSET
     """up to 5 tags describing the content and functionality of the application"""
     install_params: Missing["InstallParams"] = UNSET
     """settings for the application's default in-app authorization link, if enabled"""
+    integration_types_config: Missing[
+        dict[
+            ApplicationIntegrationType,
+            "ApplicationIntegrationTypeConfiguration",
+        ]
+    ] = UNSET
+    """Default scopes and permissions for each supported
+    installation context. Value for each key is an integration
+    type configuration object"""
     custom_install_url: Missing[str] = UNSET
     """the application's default custom authorization link, if enabled"""
-    role_connections_verification_url: Missing[str] = UNSET
-    """the application's role connection verification entry point,
-    which when configured will render the app as a verification method
-    in the guild role verification configuration"""
 
 
 class InstallParams(BaseModel):
@@ -907,6 +1081,15 @@ class InstallParams(BaseModel):
     """the scopes to add the application to the server with"""
     permissions: str
     """	the permissions to request for the bot role"""
+
+
+class ApplicationIntegrationTypeConfiguration(BaseModel):
+    """Application Integration Type Configuration
+
+    see https://discord.com/developers/docs/resources/application#application-object-application-integration-type-configuration-object
+    """
+
+    oauth2_install_params: Missing["InstallParams"] = UNSET
 
 
 # Application Role Connection Metadata
@@ -989,28 +1172,30 @@ class OptionalAuditEntryInfo(BaseModel):
     see https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info
     """
 
-    application_id: Snowflake
+    application_id: Missing[Snowflake] = UNSET
     """ID of the app whose permissions were targeted"""
-    auto_moderation_rule_name: str
+    auto_moderation_rule_name: Missing[str] = UNSET
     """Name of the Auto Moderation rule that was triggered"""
-    auto_moderation_rule_trigger_type: str
+    auto_moderation_rule_trigger_type: Missing[str] = UNSET
     """Trigger type of the Auto Moderation rule that was triggered"""
-    channel_id: Snowflake
+    channel_id: Missing[Snowflake] = UNSET
     """Channel in which the entities were targeted"""
-    count: str
+    count: Missing[str] = UNSET
     """Number of entities that were targeted"""
-    delete_member_days: str
+    delete_member_days: Missing[str] = UNSET
     """Number of days after which inactive members were kicked"""
-    id: Snowflake
+    id: Missing[Snowflake] = UNSET
     """ID of the overwritten entity"""
-    members_removed: str
+    members_removed: Missing[str] = UNSET
     """Number of members removed by the prune"""
-    message_id: Snowflake
+    message_id: Missing[Snowflake] = UNSET
     """ID of the message that was targeted"""
-    role_name: str
+    role_name: Missing[str] = UNSET
     """Name of the role if type is "0" (not present if type is "1")"""
-    type: str
+    type: Missing[str] = UNSET
     """Type of overwritten entity - role ("0") or member ("1")"""
+    integration_type: Missing[str] = UNSET
+    """The type of integration which performed the action"""
 
 
 class AuditLogChange(BaseModel):
@@ -1078,18 +1263,20 @@ class TriggerMetadata(BaseModel):
     see https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata
     """
 
-    keyword_filter: list[str]
+    keyword_filter: Missing[list[str]] = UNSET
     """substrings which will be searched for in content (Maximum of 1000)"""
-    regex_patterns: list[str]
+    regex_patterns: Missing[list[str]] = UNSET
     """regular expression patterns which will be matched
     against content (Maximum of 10)"""
-    presets: list[KeywordPresetType]
+    presets: Missing[list[KeywordPresetType]] = UNSET
     """the internally pre-defined wordsets which will be searched for in content"""
-    allow_list: list[str]
+    allow_list: Missing[list[str]] = UNSET
     """substrings which should not trigger the rule (Maximum of 100 or 1000)"""
-    mention_total_limit: int
+    mention_total_limit: Missing[int] = UNSET
     """total number of unique role and user mentions allowed
     per message (Maximum of 50)"""
+    mention_raid_protection_enabled: Missing[bool] = UNSET
+    """whether to automatically detect mention raids"""
 
 
 class AutoModerationAction(BaseModel):
@@ -1110,9 +1297,9 @@ class AutoModerationActionMetadata(BaseModel):
     see https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-metadata
     """
 
-    channel_id: Snowflake
+    channel_id: Missing[Snowflake] = UNSET
     """channel to which user content should be logged"""
-    duration_seconds: int
+    duration_seconds: Missing[int] = UNSET
     """	timeout duration in seconds"""
     custom_message: Missing[str] = UNSET
     """additional explanation that will be shown to members
@@ -1189,7 +1376,7 @@ class Channel(BaseModel):
     """for guild channels: id of the parent category for a channel
     (each parent category can contain up to 50 channels),
     for threads: id of the text channel this thread was created"""
-    last_pin_timestamp: MissingOrNullable[str] = UNSET
+    last_pin_timestamp: MissingOrNullable[datetime.datetime] = UNSET
     """when the last pinned message was pinned.
     This may be null in events such as GUILD_CREATE when a message is not pinned."""
     rtc_region: MissingOrNullable[str] = UNSET
@@ -1220,10 +1407,10 @@ class Channel(BaseModel):
     """number of messages ever sent in a thread, it's similar to message_count
     on message creation, but will not decrement the number when a message is deleted"""
     available_tags: Missing[list["ForumTag"]] = UNSET
-    """the set of tags that can be used in a GUILD_FORUM channel"""
+    """the set of tags that can be used in a GUILD_FORUM or a GUILD_MEDIA channel"""
     applied_tags: Missing[list[Snowflake]] = UNSET
     """the IDs of the set of tags that have been applied to a
-    thread in a GUILD_FORUM channel"""
+    thread in a GUILD_FORUM or a GUILD_MEDIA channel"""
     default_reaction_emoji: MissingOrNullable["DefaultReaction"] = UNSET
     """the emoji to show in the add reaction button on a
     thread in a GUILD_FORUM channel"""
@@ -1242,7 +1429,7 @@ class Channel(BaseModel):
 class MessageGet(BaseModel):
     """Message
 
-    see https://discord.com/developers/docs/resources/channel#message-object"""
+    see https://discord.com/developers/docs/resources/message#message-object"""
 
     id: Snowflake
     channel_id: Snowflake
@@ -1253,7 +1440,7 @@ class MessageGet(BaseModel):
     tts: bool
     mention_everyone: bool
     mentions: list["User"]
-    mention_roles: list[str]
+    mention_roles: list[Snowflake]
     mention_channels: Missing[list["ChannelMention"]] = UNSET
     attachments: list["Attachment"]
     embeds: list["Embed"]
@@ -1267,7 +1454,9 @@ class MessageGet(BaseModel):
     application_id: Missing[Snowflake] = UNSET
     message_reference: Missing["MessageReference"] = UNSET
     flags: Missing[MessageFlag] = UNSET
+    message_snapshots: Missing[list["MessageSnapshot"]] = UNSET
     referenced_message: MissingOrNullable["MessageGet"] = UNSET
+    interaction_metadata: Missing[MessageInteractionMetadata] = UNSET
     interaction: Missing[MessageInteraction] = UNSET
     thread: Missing[Channel] = UNSET
     components: Missing[list[DirectComponent]] = UNSET
@@ -1275,24 +1464,39 @@ class MessageGet(BaseModel):
     stickers: Missing[list["Sticker"]] = UNSET
     position: Missing[int] = UNSET
     role_subscription_data: Missing["RoleSubscriptionData"] = UNSET
+    resolved: Missing[ResolvedData] = UNSET
+    poll: Missing["Poll"] = UNSET
+    call: Missing["MessageCall"] = UNSET
 
 
 class MessageActivity(BaseModel):
     """Message activity.
 
-    see https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure
+    see https://discord.com/developers/docs/resources/message#message-object-message-activity-structure
     """
 
     type: MessageActivityType
-    party_id: Optional[str] = None
+    party_id: Missing[str] = UNSET
+
+
+class MessageCall(BaseModel):
+    """Information about the call in a private channel.
+
+    see https://discord.com/developers/docs/resources/message#message-call-object
+    """
+
+    participants: list[Snowflake]
+    ended_timestamp: MissingOrNullable[datetime.datetime] = UNSET
 
 
 class MessageReference(BaseModel):
     """Message reference.
 
-    see https://discord.com/developers/docs/resources/channel#message-reference-object
+    see https://discord.com/developers/docs/resources/message#message-reference-object
     """
 
+    type: Missing[MessageReferenceType] = UNSET
+    """type of reference."""
     message_id: Missing[Snowflake] = UNSET
     """id of the originating message"""
     channel_id: Missing[Snowflake] = UNSET
@@ -1308,6 +1512,32 @@ class MessageReference(BaseModel):
     as a normal (non-reply) message, default true"""
 
 
+class MessageSnapshot(BaseModel):
+    """Message Snapshot
+
+    While message snapshots are able to support nested snapshots, we currently limit the depth of nesting to 1.
+    see https://discord.com/developers/docs/resources/message#message-snapshot-object
+    """
+
+    message: "MessageSnapshotMessage"
+
+
+class MessageSnapshotMessage(BaseModel):
+    """partial message object for Message Snapshot
+
+    see https://discord.com/developers/docs/resources/message#message-snapshot-object"""
+
+    type: MessageType
+    content: str
+    embeds: list["Embed"]
+    attachments: list["Attachment"]
+    timestamp: datetime.datetime
+    edited_timestamp: Optional[datetime.datetime] = Field(...)
+    flags: Missing[MessageFlag] = UNSET
+    mentions: list["User"]
+    mention_roles: list[Snowflake]
+
+
 class FollowedChannel(BaseModel):
     """Followed channel.
 
@@ -1320,11 +1550,24 @@ class FollowedChannel(BaseModel):
 class Reaction(BaseModel):
     """Reaction.
 
-    see https://discord.com/developers/docs/resources/channel#reaction-object"""
+    see https://discord.com/developers/docs/resources/message#reaction-object"""
 
     count: int
+    count_details: Missing["CountDetails"] = UNSET
     me: bool
+    me_burst: Missing[bool] = UNSET
     emoji: "Emoji"
+    burst_colors: Missing[list[str]] = UNSET
+
+
+class CountDetails(BaseModel):
+    """Reaction Count Details
+
+    see https://discord.com/developers/docs/resources/message#reaction-count-details-object
+    """
+
+    burst: int
+    normal: int
 
 
 class Overwrite(BaseModel):
@@ -1332,7 +1575,7 @@ class Overwrite(BaseModel):
 
     see https://discord.com/developers/docs/resources/channel#overwrite-object"""
 
-    id: str
+    id: Snowflake
     type: OverwriteType
     allow: str
     deny: str
@@ -1345,10 +1588,10 @@ class ThreadMetadata(BaseModel):
 
     archived: bool
     auto_archive_duration: int
-    archive_timestamp: str
+    archive_timestamp: datetime.datetime
     locked: bool
-    invitable: Optional[bool] = None
-    create_timestamp: Optional[str] = None
+    invitable: Missing[bool] = UNSET
+    create_timestamp: MissingOrNullable[datetime.datetime] = UNSET
 
 
 class ThreadMember(BaseModel):
@@ -1356,11 +1599,11 @@ class ThreadMember(BaseModel):
 
     see https://discord.com/developers/docs/resources/channel#thread-member-object"""
 
-    id: Optional[str] = None
-    user_id: Optional[str] = None
-    join_timestamp: str
+    id: Missing[Snowflake] = UNSET
+    user_id: Missing[Snowflake] = UNSET
+    join_timestamp: datetime.datetime
     flags: int
-    member: Optional["GuildMember"] = None
+    member: Missing["GuildMember"] = UNSET
 
 
 class DefaultReaction(BaseModel):
@@ -1374,14 +1617,14 @@ class DefaultReaction(BaseModel):
 
 class ForumTag(BaseModel):
     """An object that represents a tag that is able to be applied
-    to a thread in a GUILD_FORUM channel.
+    to a thread in a GUILD_FORUM or GUILD_MEDIA channel.
 
     see https://discord.com/developers/docs/resources/channel#forum-tag-object"""
 
     id: Snowflake
     name: str
     moderated: bool
-    emoji_id: MissingOrNullable[Snowflake] = UNSET
+    emoji_id: Optional[Snowflake] = None
     emoji_name: Optional[str] = None
 
 
@@ -1394,7 +1637,7 @@ class Embed(BaseModel):
     type: Missing[EmbedTypes] = UNSET
     description: Missing[str] = UNSET
     url: Missing[str] = UNSET
-    timestamp: Missing[str] = UNSET
+    timestamp: Missing[datetime.datetime] = UNSET
     color: Missing[int] = UNSET
     footer: Missing["EmbedFooter"] = UNSET
     image: Missing["EmbedImage"] = UNSET
@@ -1408,7 +1651,7 @@ class Embed(BaseModel):
 class EmbedThumbnail(BaseModel):
     """Embed thumbnail.
 
-    see https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure
+    see https://discord.com/developers/docs/resources/message#embed-object-embed-thumbnail-structure
     """
 
     url: str
@@ -1420,7 +1663,7 @@ class EmbedThumbnail(BaseModel):
 class EmbedVideo(BaseModel):
     """Embed video.
 
-    see https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure
+    see https://discord.com/developers/docs/resources/message#embed-object-embed-video-structure
     """
 
     url: Missing[str] = UNSET
@@ -1432,7 +1675,7 @@ class EmbedVideo(BaseModel):
 class EmbedImage(BaseModel):
     """Embed image.
 
-    see https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
+    see https://discord.com/developers/docs/resources/message#embed-object-embed-image-structure
     """
 
     url: str
@@ -1444,7 +1687,7 @@ class EmbedImage(BaseModel):
 class EmbedProvider(BaseModel):
     """Embed provider.
 
-    see https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure
+    see https://discord.com/developers/docs/resources/message#embed-object-embed-provider-structure
     """
 
     name: Missing[str] = UNSET
@@ -1454,7 +1697,7 @@ class EmbedProvider(BaseModel):
 class EmbedAuthor(BaseModel):
     """Embed author.
 
-    see https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
+    see https://discord.com/developers/docs/resources/message#embed-object-embed-author-structure
     """
 
     name: str
@@ -1466,7 +1709,7 @@ class EmbedAuthor(BaseModel):
 class EmbedFooter(BaseModel):
     """Embed footer.
 
-    see https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
+    see https://discord.com/developers/docs/resources/message#embed-object-embed-footer-structure
     """
 
     text: str
@@ -1477,7 +1720,7 @@ class EmbedFooter(BaseModel):
 class EmbedField(BaseModel):
     """Embed field.
 
-    see https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
+    see https://discord.com/developers/docs/resources/message#embed-object-embed-field-structure
     """
 
     name: str
@@ -1488,10 +1731,11 @@ class EmbedField(BaseModel):
 class Attachment(BaseModel):
     """Attachment
 
-    see https://discord.com/developers/docs/resources/channel#attachment-object"""
+    see https://discord.com/developers/docs/resources/message#attachment-object"""
 
-    id: str
+    id: Snowflake
     filename: str
+    title: Missing[str] = UNSET
     description: Missing[str] = UNSET
     content_type: Missing[str] = UNSET
     size: int
@@ -1499,15 +1743,16 @@ class Attachment(BaseModel):
     proxy_url: str
     height: MissingOrNullable[int] = UNSET
     width: MissingOrNullable[int] = UNSET
-    ephemeral: MissingOrNullable[bool] = UNSET
+    ephemeral: Missing[bool] = UNSET
     duration_secs: Missing[float] = UNSET
     waveform: Missing[str] = UNSET
+    flags: Missing[AttachmentFlag] = UNSET
 
 
 class ChannelMention(BaseModel):
     """Channel mention.
 
-    see https://discord.com/developers/docs/resources/channel#channel-mention-object"""
+    see https://discord.com/developers/docs/resources/message#channel-mention-object"""
 
     id: str
     guild_id: str
@@ -1523,7 +1768,7 @@ class AllowedMention(BaseModel):
     still have @everyone in the message content),
     and check against user/bot permissions.
 
-    see https://discord.com/developers/docs/resources/channel#allowed-mentions-object"""
+    see https://discord.com/developers/docs/resources/message#allowed-mentions-object"""
 
     parse: list[AllowedMentionType]
     """An array of allowed mention types to parse from the content."""
@@ -1539,7 +1784,7 @@ class AllowedMention(BaseModel):
 class RoleSubscriptionData(BaseModel):
     """Role subscription data.
 
-    see https://discord.com/developers/docs/resources/channel#role-subscription-data-object
+    see https://discord.com/developers/docs/resources/message#role-subscription-data-object
     """
 
     role_subscription_listing_id: str
@@ -1560,6 +1805,11 @@ class ArchivedThreadsResponse(BaseModel):
 
 
 class File(BaseModel):
+    """File payload for multipart upload.
+
+    see https://discord.com/developers/docs/reference#uploading-files
+    """
+
     content: bytes
     filename: str
 
@@ -1589,6 +1839,7 @@ class MessageSend(BaseModel):
     files: Optional[list[File]] = None
     attachments: Optional[list[AttachmentSend]] = None
     flags: Optional[MessageFlag] = None
+    poll: Optional["PollRequest"] = None
 
 
 class ModifyChannelParams(BaseModel):
@@ -1627,7 +1878,7 @@ class Emoji(BaseModel):
 
     see https://discord.com/developers/docs/resources/emoji#emoji-object"""
 
-    id: Optional[str] = None
+    id: Optional[Snowflake] = None
     """emoji id"""
     name: Optional[str] = None
     """emoji name(can be null only in reaction emoji objects)"""
@@ -1694,6 +1945,7 @@ class Guild(BaseModel):
     nsfw_level: GuildNSFWLevel
     stickers: Missing[list["Sticker"]] = UNSET
     premium_progress_bar_enabled: bool
+    safety_alerts_channel_id: MissingOrNullable[Snowflake] = UNSET
 
 
 class CurrentUserGuild(BaseModel):
@@ -1707,6 +1959,8 @@ class CurrentUserGuild(BaseModel):
     owner: Missing[bool] = UNSET
     permissions: Missing[str] = UNSET
     features: list[GuildFeature]
+    approximate_member_count: Missing[int] = UNSET
+    approximate_presence_count: Missing[int] = UNSET
 
 
 class UnavailableGuild(BaseModel):
@@ -1754,9 +2008,36 @@ class GuildWidget(BaseModel):
     id: Snowflake
     name: str
     instant_invite: Optional[str] = None
-    channels: list["Channel"]  # partial channel objects
-    members: list["User"]  # partial user objects
+    channels: list["GuildWidgetChannel"]
+    members: list["GuildWidgetUser"]
     presence_count: int
+
+
+class GuildWidgetChannel(BaseModel):
+    """partial channel objects for GuildWidget.channels
+
+    see https://discord.com/developers/docs/resources/guild#guild-widget-object-example-guild-widget
+    """
+
+    id: Snowflake
+    name: str
+    position: Missing[int] = UNSET
+
+
+class GuildWidgetUser(BaseModel):
+    """partial user objects for GuildWidget.members
+
+    The fields id, discriminator and avatar are anonymized to prevent abuse.
+
+    see https://discord.com/developers/docs/resources/guild#guild-widget-object-example-guild-widget
+    """
+
+    id: str
+    username: str
+    discriminator: str
+    avatar: Optional[str] = None
+    status: str
+    avatar_url: str
 
 
 class GuildMember(BaseModel):
@@ -1776,6 +2057,7 @@ class GuildMember(BaseModel):
     pending: Missing[bool] = UNSET
     permissions: Missing[str] = UNSET
     communication_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
+    avatar_decoration_data: MissingOrNullable["AvatarDecorationData"] = UNSET
 
 
 class Integration(BaseModel):
@@ -1793,7 +2075,7 @@ class Integration(BaseModel):
     expire_behavior: Missing[IntegrationExpireBehaviors] = UNSET
     expire_grace_period: Missing[int] = UNSET
     user: Missing["User"] = UNSET
-    account: Optional["IntegrationAccount"] = None
+    account: "IntegrationAccount"
     synced_at: Missing[datetime.datetime] = UNSET
     subscriber_count: Missing[int] = UNSET
     revoked: Missing[bool] = UNSET
@@ -1863,6 +2145,7 @@ class GuildOnboarding(BaseModel):
     prompts: list["OnboardingPrompt"]
     default_channel_ids: list[Snowflake]
     enabled: bool
+    mode: OnboardingMode
 
 
 class OnboardingPrompt(BaseModel):
@@ -1883,13 +2166,19 @@ class OnboardingPrompt(BaseModel):
 class OnboardingPromptOption(BaseModel):
     """Onboarding prompt option.
 
+    When creating or updating a prompt option, the `emoji_id`, `emoji_name`, and
+    `emoji_animated` fields must be used instead of the emoji object.
+
     see https://discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-prompt-option-structure
     """
 
     id: Snowflake
     channel_ids: list[Snowflake]
     role_ids: list[Snowflake]
-    emoji: Emoji
+    emoji: Missing[Emoji] = UNSET
+    emoji_id: Missing[Snowflake] = UNSET
+    emoji_name: Missing[str] = UNSET
+    emoji_animated: Missing[bool] = UNSET
     title: str
     description: Optional[str] = None
 
@@ -1925,7 +2214,7 @@ class ModifyGuildParams(BaseModel):
 
     see https://discord.com/developers/docs/resources/guild#modify-guild"""
 
-    name: str
+    name: Optional[str] = None
     region: Optional[str] = None
     verification_level: Optional[VerificationLevel] = None
     default_message_notifications: Optional[DefaultMessageNotificationLevel] = None
@@ -1945,6 +2234,7 @@ class ModifyGuildParams(BaseModel):
     features: Optional[list[GuildFeature]] = None
     description: Optional[str] = None
     premium_progress_bar_enabled: Optional[bool] = None
+    safety_alerts_channel_id: Optional[Snowflake] = None
 
 
 class CreateGuildChannelParams(BaseModel):
@@ -1968,6 +2258,8 @@ class CreateGuildChannelParams(BaseModel):
     default_reaction_emoji: Optional[DefaultReaction] = None
     available_tags: Optional[list[ForumTag]] = None
     default_sort_order: Optional[SortOrderTypes] = None
+    default_forum_layout: Optional[ForumLayoutTypes] = None
+    default_thread_rate_limit_per_user: Optional[int] = None
 
 
 class ListActiveGuildThreadsResponse(BaseModel):
@@ -2016,6 +2308,7 @@ class GuildScheduledEvent(BaseModel):
     creator: Missing["User"] = UNSET
     user_count: Missing[int] = UNSET
     image: MissingOrNullable[str] = UNSET
+    recurrence_rule: Optional["RecurrenceRule"] = None
 
 
 class GuildScheduledEventEntityMetadata(BaseModel):
@@ -2053,6 +2346,7 @@ class CreateGuildScheduledEventParams(BaseModel):
     description: Optional[str] = None
     entity_type: GuildScheduledEventEntityType
     image: Optional[str] = None
+    recurrence_rule: Optional["RecurrenceRule"] = None
 
 
 class ModifyGuildScheduledEventParams(BaseModel):
@@ -2071,6 +2365,7 @@ class ModifyGuildScheduledEventParams(BaseModel):
     entity_type: Optional[GuildScheduledEventEntityType] = None
     status: Optional[GuildScheduledEventStatus] = None
     image: Optional[str] = None
+    recurrence_rule: Optional["RecurrenceRule"] = None
 
 
 # Guild Template
@@ -2090,8 +2385,74 @@ class GuildTemplate(BaseModel):
     created_at: datetime.datetime
     updated_at: datetime.datetime
     source_guild_id: Snowflake
-    serialized_source_guild: "Guild"  # partial guild object
+    serialized_source_guild: "GuildTemplateGuild"
     is_dirty: Optional[bool] = None
+
+
+class GuildTemplateGuild(BaseModel):
+    """partial guild object for GuildTemplate
+
+    see https://discord.com/developers/docs/resources/guild-template#guild-template-object-example-guild-template-object
+    """
+
+    name: str
+    description: Optional[str] = None
+    region: MissingOrNullable[str] = UNSET
+    verification_level: VerificationLevel
+    default_message_notifications: DefaultMessageNotificationLevel
+    explicit_content_filter: ExplicitContentFilterLevel
+    preferred_locale: str
+    afk_channel_id: Optional[Snowflake] = None
+    afk_timeout: int
+    system_channel_id: Optional[Snowflake] = None
+    system_channel_flags: SystemChannelFlags
+    icon_hash: MissingOrNullable[str] = UNSET
+    roles: list["GuildTemplateGuildRole"]
+    channels: list["GuildTemplateGuildChannel"]
+
+
+class GuildTemplateGuildRole(BaseModel):
+    """partial role object for GuildTemplateGuild
+
+    see https://discord.com/developers/docs/resources/guild-template#guild-template-object-example-guild-template-object
+    """
+
+    id: Snowflake
+    name: str
+    permissions: str
+    color: int
+    hoist: bool
+    mentionable: bool
+    icon: MissingOrNullable[str] = UNSET
+    unicode_emoji: MissingOrNullable[str] = UNSET
+
+
+class GuildTemplateGuildChannel(BaseModel):
+    """partial role object for GuildTemplateGuild
+
+    see https://discord.com/developers/docs/resources/guild-template#guild-template-object-example-guild-template-object
+    """
+
+    id: Snowflake
+    type: ChannelType
+    name: MissingOrNullable[str] = UNSET
+    position: Missing[int] = UNSET
+    topic: MissingOrNullable[str] = UNSET
+    bitrate: Missing[int] = UNSET
+    user_limit: Missing[int] = UNSET
+    nsfw: Missing[bool] = UNSET
+    rate_limit_per_user: Missing[int] = UNSET
+    parent_id: MissingOrNullable[Snowflake] = UNSET
+    default_auto_archive_duration: MissingOrNullable[int] = UNSET
+    permission_overwrites: Missing[list["Overwrite"]] = UNSET
+    available_tags: MissingOrNullable[list["ForumTag"]] = UNSET
+    template: Missing[str] = UNSET
+    default_reaction_emoji: MissingOrNullable["DefaultReaction"] = UNSET
+    default_thread_rate_limit_per_user: MissingOrNullable[int] = UNSET
+    default_sort_order: MissingOrNullable[SortOrderTypes] = UNSET
+    default_forum_layout: MissingOrNullable[ForumLayoutTypes] = UNSET
+    icon_emoji: MissingOrNullable[Emoji] = UNSET
+    theme_color: MissingOrNullable[int] = UNSET
 
 
 # Invite
@@ -2099,21 +2460,52 @@ class GuildTemplate(BaseModel):
 class Invite(BaseModel):
     """Invite
 
+    Warning:
+        stage_instance is deprecated by Discord and may be omitted.
+
     see https://discord.com/developers/docs/resources/invite#invite-object"""
 
+    type: InviteType
     code: str
-    guild: Missing[Guild] = UNSET  # partial guild object
+    guild: Missing["InviteGuild"] = UNSET
     channel: Optional[Channel] = Field(...)  # partial channel object
     inviter: Missing["User"] = UNSET
     target_type: Missing["InviteTargetType"] = UNSET
     target_user: Missing["User"] = UNSET
-    # partial application object
-    target_application: Missing["Application"] = UNSET
+    target_application: Missing["Application"] = UNSET  # partial application object
     approximate_presence_count: Missing[int] = UNSET
     approximate_member_count: Missing[int] = UNSET
-    expires_at: Missing[datetime.datetime] = UNSET
-    stage_instance: Missing["StageInstance"] = UNSET
+    expires_at: MissingOrNullable[datetime.datetime] = UNSET
+    stage_instance: Missing["InviteStageInstance"] = UNSET
     guild_scheduled_event: Missing["GuildScheduledEvent"] = UNSET
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if data.get("stage_instance", UNSET) is not UNSET:
+            warnings.warn(
+                "Invite.stage_instance is deprecated by Discord",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
+
+class InviteGuild(BaseModel):
+    """partial guild object for Invite.guild
+
+    see https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object
+    """
+
+    id: Snowflake
+    name: str
+    splash: Optional[str] = None
+    banner: Optional[str] = None
+    description: Optional[str] = None
+    icon: Optional[str] = None
+    features: list[GuildFeature]
+    verification_level: VerificationLevel
+    vanity_url_code: Optional[str] = None
+    nsfw_level: GuildNSFWLevel
+    premium_subscription_count: Optional[int] = None
 
 
 class InviteMetadata(BaseModel):
@@ -2131,6 +2523,8 @@ class InviteMetadata(BaseModel):
 class InviteStageInstance(BaseModel):
     """Invite Stage Instance
 
+    This is deprecated.
+
     see https://discord.com/developers/docs/resources/invite#invite-stage-instance-object
     """
 
@@ -2138,6 +2532,14 @@ class InviteStageInstance(BaseModel):
     participant_count: int
     speaker_count: int
     topic: str
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        warnings.warn(
+            "InviteStageInstance is deprecated by Discord",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
 
 # Stage Instance
@@ -2172,6 +2574,7 @@ class Sticker(BaseModel):
     description: Optional[str] = Field(...)
     tags: str
     asset: Missing[str] = UNSET
+    """Deprecated. previously the sticker asset hash, now an empty string"""
     type: StickerType
     format_type: StickerFormatType
     available: Missing[bool] = UNSET
@@ -2227,7 +2630,17 @@ class User(BaseModel):
     flags: Missing[int] = UNSET
     premium_type: Missing[PremiumType] = UNSET
     public_flags: Missing[UserFlags] = UNSET
-    avatar_decoration: MissingOrNullable[str] = UNSET
+    avatar_decoration_data: MissingOrNullable["AvatarDecorationData"] = UNSET
+
+
+class AvatarDecorationData(BaseModel):
+    """Avatar Decoration Data
+
+    see https://discord.com/developers/docs/resources/user#avatar-decoration-data-object
+    """
+
+    asset: str
+    sku_id: Snowflake
 
 
 class Connection(BaseModel):
@@ -2239,7 +2652,7 @@ class Connection(BaseModel):
     name: str
     type: ConnectionServiceType
     revoked: Missing[bool] = UNSET
-    integrations: Missing[list["Integration"]] = UNSET
+    integrations: Missing[list["Integration"]] = UNSET  # partial server integrations
     verified: bool
     friend_sync: bool
     show_activity: bool
@@ -2295,14 +2708,21 @@ class VoiceRegion(BaseModel):
 # Webhook
 # see https://discord.com/developers/docs/resources/webhook
 class SourceGuild(BaseModel):
-    # partial guild object
+    """partial guild object for Webhook.source_guild
+
+    see https://discord.com/developers/docs/resources/webhook#webhook-object-example-channel-follower-webhook
+    """
+
     id: Snowflake
     name: str
     icon: Optional[str] = None
 
 
 class SourceChannel(BaseModel):
-    # partial channel object
+    """partial channel object for Webhook.source_channel
+
+    see https://discord.com/developers/docs/resources/webhook#webhook-object-example-channel-follower-webhook"""
+
     id: Snowflake
     name: str
 
@@ -2342,6 +2762,8 @@ class ExecuteWebhookParams(BaseModel):
     attachments: Optional[list[AttachmentSend]] = None
     flags: Optional[MessageFlag] = None
     thread_name: Optional[str] = None
+    applied_tags: Optional[list[Snowflake]] = None
+    poll: Optional["Poll"] = None
 
 
 # gateway
@@ -2459,7 +2881,10 @@ class Hello(BaseModel):
 
 
 class ApplicationReady(BaseModel):
-    """partial application object for ready event."""
+    """partial application object for ready event.
+
+    see https://discord.com/developers/docs/events/gateway-events#ready
+    """
 
     id: str
     flags: int
@@ -2566,7 +2991,7 @@ class ThreadDelete(BaseModel):
 class ThreadListSync(BaseModel):
     """Thread List Sync Event Fields
 
-    see https://discord.com/developers/docs/topics/gateway-events#thread-list-sync-thread-list-sync-event
+    see https://discord.com/developers/docs/topics/gateway-events#thread-list-sync
     """
 
     guild_id: Snowflake
@@ -2587,7 +3012,7 @@ class ThreadMemberUpdate(ThreadMember):
 class ThreadMembersUpdate(BaseModel):
     """Thread Members Update Event Fields
 
-    see https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event
+    see https://discord.com/developers/docs/topics/gateway-events#thread-members-update
     """
 
     id: Snowflake
@@ -2760,12 +3185,15 @@ class GuildMemberUpdate(BaseModel):
     roles: list[Snowflake]
     user: User
     nick: MissingOrNullable[str] = UNSET
+    avatar: Optional[str] = Field(...)
     joined_at: Optional[datetime.datetime] = Field(...)
     premium_since: MissingOrNullable[datetime.datetime] = UNSET
     deaf: Missing[bool] = UNSET
     mute: Missing[bool] = UNSET
     pending: Missing[bool] = UNSET
     communication_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
+    flags: Missing[GuildMemberFlags] = UNSET
+    avatar_decoration_data: MissingOrNullable[AvatarDecorationData] = UNSET
 
 
 class GuildMembersChunk(BaseModel):
@@ -2892,7 +3320,7 @@ class InviteCreate(BaseModel):
     max_uses: int
     target_type: Missing[InviteTargetType] = UNSET
     target_user: Missing[User] = UNSET
-    target_application: Missing[Application] = UNSET
+    target_application: Missing[Application] = UNSET  # partial application object
     temporary: bool
     uses: int
 
@@ -2998,6 +3426,10 @@ class MessageReactionAdd(BaseModel):
     guild_id: Missing[Snowflake] = UNSET
     member: Missing[GuildMember] = UNSET
     emoji: Emoji  # partial emoji object
+    message_author_id: Missing[Snowflake] = UNSET
+    burst: bool
+    burst_colors: Missing[list[str]] = UNSET
+    type: ReactionType
 
 
 class MessageReactionRemove(BaseModel):
@@ -3011,6 +3443,8 @@ class MessageReactionRemove(BaseModel):
     message_id: Snowflake
     guild_id: Missing[Snowflake] = UNSET
     emoji: Emoji  # partial emoji object
+    burst: bool
+    type: ReactionType
 
 
 class MessageReactionRemoveAll(BaseModel):
@@ -3065,7 +3499,7 @@ class PresenceUpdate(BaseModel):
     """
 
     user: PresenceUpdateUser
-    guild_id: Missing[Snowflake] = UNSET
+    guild_id: Snowflake
     status: PresenceStatus
     activities: list["Activity"]
     client_status: "ClientStatus"
@@ -3107,7 +3541,7 @@ class Activity(BaseModel):
 class ActivityTimestamps(BaseModel):
     """Activity Timestamps
 
-    see https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types
+    see https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
     """
 
     start: Missing[int] = UNSET
@@ -3274,6 +3708,7 @@ class Role(BaseModel):
     managed: bool
     mentionable: bool
     tags: Missing["RoleTags"] = UNSET
+    flags: Missing[RoleFlag] = UNSET
 
 
 class RoleTags(BaseModel):
@@ -3311,13 +3746,16 @@ class TeamMember(BaseModel):
     """
 
     membership_state: MembershipState
-    permissions: list[str]
     team_id: Snowflake
     user: "TeamMemberUser"
+    role: TeamMemberRoleType
 
 
 class TeamMemberUser(BaseModel):
-    """partial user object for TeamMember"""
+    """partial user object for TeamMember
+
+    see https://discord.com/developers/docs/topics/teams#data-models-team-member-object
+    """
 
     avatar: Optional[str] = None
     discriminator: str
@@ -3335,6 +3773,361 @@ class AuthorizationResponse(BaseModel):
     scopes: list[str]
     expires: datetime.datetime
     user: Missing[User] = UNSET
+
+
+class Poll(BaseModel):
+    """The poll object has a lot of levels and nested structures.
+    It was also designed to support future extensibility,
+    so some fields may appear to be more complex than necessary.
+
+    see https://discord.com/developers/docs/resources/poll#poll-object
+    """
+
+    question: "PollMedia"
+    """The question of the poll. Only `text` is supported."""
+    answers: list["PollAnswer"]
+    """Each of the answers available in the poll."""
+    expiry: Optional[datetime.datetime] = None
+    """The time when the poll ends."""
+    allow_multiselect: bool
+    """Whether a user can select multiple answers"""
+    layout_type: int
+    """The layout type of the poll"""
+    results: Missing["PollResults"] = UNSET
+    """The results of the poll"""
+
+
+class PollRequest(BaseModel):
+    """This is the request object used when creating a poll across the
+    different endpoints. It is similar but not exactly identical to the
+    main poll object. The main difference is that the request has `duration`
+    which eventually becomes `expiry`.
+
+    see https://discord.com/developers/docs/resources/poll#poll-create-request-object
+    """
+
+    question: "PollMedia"
+    """The question of the poll. Only `text` is supported."""
+    answers: list["PollAnswerRequest"]
+    """Each of the answers available in the poll, up to 10"""
+    duration: Missing[int] = UNSET
+    """Number of hours the poll should be open for, up to 32 days. Defaults to 24"""
+    allow_multiselect: Missing[bool] = UNSET
+    """Whether a user can select multiple answers. Defaults to false"""
+    layout_type: Missing[int] = UNSET
+    """The layout type of the poll"""
+
+
+class PollAnswer(BaseModel):
+    """answer_id: Only sent as part of responses from Discord's API/Gateway.
+
+    see https://discord.com/developers/docs/resources/poll#poll-answer-object
+    """
+
+    answer_id: int
+    poll_media: "PollMedia"
+
+
+class PollAnswerRequest(BaseModel):
+    """Poll answer request object.
+
+    see https://discord.com/developers/docs/resources/poll#poll-create-request-object
+    """
+
+    poll_media: "PollMedia"
+
+
+class PollMedia(BaseModel):
+    """The poll media object is a common object that backs both the question and
+    answers. The intention is that it allows us to extensibly add new ways to
+    display things in the future. For now, `question` only supports `text`, while
+    answers can have an optional `emoji`.
+
+    see https://discord.com/developers/docs/resources/poll#poll-media-object
+    """
+
+    text: Missing[str] = UNSET
+    emoji: Missing["Emoji"] = UNSET  # partial emoji
+
+
+class PollResults(BaseModel):
+    """Poll Results
+
+    see https://discord.com/developers/docs/resources/poll#poll-results-object
+    """
+
+    is_finalized: bool
+    answer_counts: list["PollAnswerCount"]
+
+
+class PollAnswerCount(BaseModel):
+    """Poll Answer Count
+
+    see https://discord.com/developers/docs/resources/poll#poll-results-object-poll-answer-count-object-structure
+    """
+
+    id: int
+    count: int
+    me_voted: bool
+
+
+class Entitlement(BaseModel):
+    """see https://discord.com/developers/docs/monetization/entitlements#entitlement-object"""
+
+    id: Snowflake
+    """ID of the entitlement"""
+    sku_id: Snowflake
+    """ID of the SKU"""
+    application_id: Snowflake
+    """ID of the parent application"""
+    user_id: Missing[Snowflake] = UNSET
+    """ID of the user that is granted access to the entitlement's sku"""
+    type: EntitlementType
+    """Type of entitlement"""
+    deleted: bool
+    """Entitlement was deleted"""
+    starts_at: Missing[datetime.datetime] = UNSET
+    """Start date at which the entitlement is valid.
+    Not present when using test entitlements."""
+    ends_at: Missing[datetime.datetime] = UNSET
+    """Date at which the entitlement is no longer valid.
+    Not present when using test entitlements."""
+    guild_id: Missing[Snowflake] = UNSET
+    """ID of the guild that is granted access to the entitlement's sku"""
+    consumed: Missing[bool] = UNSET
+    """For consumable items, whether or not the entitlement has been consumed"""
+
+
+class RecurrenceRule(BaseModel):
+    """Discord's recurrence rule is a subset of the behaviors defined
+    in the iCalendar RFC and implemented by python's dateutil rrule
+
+    see https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object
+    """
+
+    start: datetime.datetime
+    """Starting time of the recurrence interval"""
+    end: Optional[datetime.datetime] = None
+    """Ending time of the recurrence interval"""
+    frequency: GuildScheduledEventRecurrenceRuleFrequency
+    """How often the event occurs"""
+    interval: int
+    """The spacing between the events, defined by frequency. For example,
+    frecency of WEEKLY and an interval of 2 would be "every-other week"""
+    by_weekday: Optional[list[GuildScheduledEventRecurrenceRuleWeekday]] = None
+    """Set of specific days within a week for the event to recur on"""
+    by_n_weekday: Optional[
+        list["GuildScheduledEventRecurrenceRuleN_WeekdayStructure"]
+    ] = None
+    """List of specific days within a specific week (1-5) to recur on"""
+    by_month: Optional[list[GuildScheduledEventRecurrenceRuleMonth]] = None
+    """Set of specific months to recur on"""
+    by_month_day: Optional[int] = None
+    """Set of specific dates within a month to recur on"""
+    by_year_day: Optional[int] = None
+    """Set of days within a year to recur on (1-364)"""
+    count: Optional[int] = None
+    """The total amount of times that the event is allowed to recur before stopping"""
+
+
+class GuildScheduledEventRecurrenceRuleN_WeekdayStructure(BaseModel):
+    """Guild Scheduled Event Recurrence Rule - N_Weekday Structure
+
+    see https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-nweekday-structure
+    """
+
+    n: int
+    """The week to reoccur on. 1 - 5"""
+    day: GuildScheduledEventRecurrenceRuleWeekday
+    """The day within the week to reoccur on"""
+
+
+class ModifyGuildOnboardingParams(BaseModel):
+    """Modify Guild Onboarding Params
+
+    see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
+    """
+
+    prompts: list[OnboardingPrompt]
+    """Prompts shown during onboarding and in customize community"""
+    default_channel_ids: list[Snowflake]
+    """Channel IDs that members get opted into automatically"""
+    enabled: bool
+    """Whether onboarding is enabled in the guild"""
+    mode: OnboardingMode
+    """Current mode of onboarding"""
+
+
+class ActivityInstance(BaseModel):
+    """Activity Instance
+
+    see https://discord.com/developers/docs/resources/application#get-application-activity-instance-activity-instance-object
+    """
+
+    application_id: Snowflake
+    """Application ID"""
+    instance_id: str
+    """Activity Instance ID"""
+    launch_id: Snowflake
+    """Unique identifier for the launch"""
+    location: "ActivityLocation"
+    """The Location the instance is runnning in"""
+    users: list[Snowflake]
+    """The IDs of the Users currently connected to the instance"""
+
+
+class ActivityLocation(BaseModel):
+    """The Activity Location is an object that describes
+    the location in which an activity instance is running.
+
+    see https://discord.com/developers/docs/resources/application#get-application-activity-instance-activity-location-object
+    """
+
+    id: str
+    """	The unique identifier for the location"""
+    kind: Literal["gc", "pc"]
+    """
+    Enum describing kind of location
+
+    'gc'	The Location is a Guild Channel\n
+    'pc'	The Location is a Private Channel, such as a DM or GDM
+    """
+    channel_id: Snowflake
+    guild_id: MissingOrNullable[Snowflake] = UNSET
+
+
+class ApplicationEmojis(BaseModel):
+    """a list of emoji objects for the given application under the items key.
+
+    see https://discord.com/developers/docs/resources/emoji#list-application-emojis"""
+
+    items: list[Emoji]
+
+
+class BulkBan(BaseModel):
+    """bulk ban response
+
+    see https://discord.com/developers/docs/resources/guild#bulk-guild-ban-bulk-ban-response
+    """
+
+    banned_users: list[Snowflake]
+    """list of user ids, that were successfully banned"""
+    failed_users: list[Snowflake]
+    """list of user ids, that were not banned"""
+
+
+class AnswerVoters(BaseModel):
+    """get answer voter response
+
+    see https://discord.com/developers/docs/resources/poll#get-answer-voters-response-body
+    """
+
+    users: list[User]
+    """Users who voted for this answer"""
+
+
+class SKU(BaseModel):
+    """https://discord.com/developers/docs/resources/sku#sku-object"""
+
+    id: Snowflake
+    type: SKUType
+    application_id: Snowflake
+    name: str
+    slug: str
+    flags: SKUFlag
+
+
+class Subscription(BaseModel):
+    """https://discord.com/developers/docs/resources/subscription#subscription-object"""
+
+    id: Snowflake
+    user_id: Snowflake
+    sku_ids: list[Snowflake]
+    entitlement_ids: list[Snowflake]
+    renewal_sku_ids: MissingOrNullable[list[Snowflake]] = UNSET
+    current_period_start: datetime.datetime
+    current_period_end: datetime.datetime
+    status: SubscriptionStatus
+    canceled_at: Optional[datetime.datetime] = None
+    country: Missing[str] = UNSET
+
+
+class EntitlementCreate(Entitlement):
+    """Entitlement Create Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#entitlement-create"""
+
+
+class EntitlementUpdate(Entitlement):
+    """Entitlement Update Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#entitlement-update"""
+
+
+class EntitlementDelete(Entitlement):
+    """Entitlement Delete Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#entitlement-delete"""
+
+
+class SubscriptionCreate(Subscription):
+    """Subscription Create Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#subscription-create"""
+
+
+class SubscriptionUpdate(Subscription):
+    """Subscription Update Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#subscription-update"""
+
+
+class SubscriptionDelete(Subscription):
+    """Subscription Delete Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#subscription-delete"""
+
+
+class VoiceChannelEffectSend(BaseModel):
+    """Voice Channel Effect Send Event Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#voice-channel-effect-send-voice-channel-effect-send-event-fields
+    """
+
+    channel_id: Snowflake
+    guild_id: Snowflake
+    user_id: Snowflake
+    emoji: MissingOrNullable[Emoji] = UNSET
+    animation_type: MissingOrNullable[AnimationType] = UNSET
+    animation_id: Missing[int] = UNSET
+    sound_id: Missing[Union[Snowflake, int]] = UNSET
+    sound_volume: Missing[float] = UNSET
+
+
+class MessagePollVoteAdd(BaseModel):
+    """Message Poll Vote Add Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-add-message-poll-vote-add-fields
+    """
+
+    user_id: Snowflake
+    channel_id: Snowflake
+    message_id: Snowflake
+    guild_id: Missing[Snowflake] = UNSET
+    answer_id: int
+
+
+class MessagePollVoteRemove(BaseModel):
+    """Message Poll Vote Remove Fields
+
+    see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-add-message-poll-vote-remove-fields
+    """
+
+    user_id: Snowflake
+    channel_id: Snowflake
+    message_id: Snowflake
+    guild_id: Missing[Snowflake] = UNSET
+    answer_id: int
 
 
 for name, obj in inspect.getmembers(sys.modules[__name__]):
@@ -3372,6 +4165,7 @@ __all__ = [
     "ComponentEmoji",
     "Button",
     "SelectMenu",
+    "SelectDefaultValue",
     "SelectOption",
     "SelectMenuResolved",
     "TextInput",
@@ -3385,6 +4179,7 @@ __all__ = [
     "ResolvedData",
     "ApplicationCommandInteractionDataOption",
     "MessageInteraction",
+    "MessageInteractionMetadata",
     "InteractionResponse",
     "InteractionCallbackMessage",
     "InteractionCallbackAutocomplete",
@@ -3392,6 +4187,7 @@ __all__ = [
     "InteractionCallbackData",
     "Application",
     "InstallParams",
+    "ApplicationIntegrationTypeConfiguration",
     "ApplicationRoleConnectionMetadata",
     "AuditLog",
     "AuditLogEntry",
@@ -3407,8 +4203,11 @@ __all__ = [
     "MessageGet",
     "MessageActivity",
     "MessageReference",
+    "MessageSnapshot",
+    "MessageSnapshotMessage",
     "FollowedChannel",
     "Reaction",
+    "CountDetails",
     "Overwrite",
     "ThreadMetadata",
     "ThreadMember",
@@ -3438,6 +4237,8 @@ __all__ = [
     "GuildPreview",
     "GuildWidgetSettings",
     "GuildWidget",
+    "GuildWidgetChannel",
+    "GuildWidgetUser",
     "GuildMember",
     "Integration",
     "IntegrationAccount",
@@ -3460,7 +4261,11 @@ __all__ = [
     "CreateGuildScheduledEventParams",
     "ModifyGuildScheduledEventParams",
     "GuildTemplate",
+    "GuildTemplateGuild",
+    "GuildTemplateGuildRole",
+    "GuildTemplateGuildChannel",
     "Invite",
+    "InviteGuild",
     "InviteMetadata",
     "InviteStageInstance",
     "StageInstance",
@@ -3468,6 +4273,7 @@ __all__ = [
     "StickerItem",
     "StickerPack",
     "User",
+    "AvatarDecorationData",
     "Connection",
     "ApplicationRoleConnection",
     "VoiceState",
@@ -3560,4 +4366,31 @@ __all__ = [
     "TeamMember",
     "TeamMemberUser",
     "AuthorizationResponse",
+    "Poll",
+    "PollRequest",
+    "PollAnswer",
+    "PollAnswerRequest",
+    "PollMedia",
+    "PollResults",
+    "PollAnswerCount",
+    "Entitlement",
+    "RecurrenceRule",
+    "GuildScheduledEventRecurrenceRuleN_WeekdayStructure",
+    "ModifyGuildOnboardingParams",
+    "ActivityInstance",
+    "ActivityLocation",
+    "ApplicationEmojis",
+    "BulkBan",
+    "AnswerVoters",
+    "SKU",
+    "Subscription",
+    "EntitlementCreate",
+    "EntitlementUpdate",
+    "EntitlementDelete",
+    "SubscriptionCreate",
+    "SubscriptionUpdate",
+    "SubscriptionDelete",
+    "VoiceChannelEffectSend",
+    "MessagePollVoteAdd",
+    "MessagePollVoteRemove",
 ]

@@ -12,6 +12,11 @@ T = TypeVar("T")
 
 @final
 class Unset(Enum):
+    """Unset marker for optional fields.
+
+    see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields
+    """
+
     _UNSET = "<UNSET>"
 
     def __repr__(self) -> str:
@@ -61,18 +66,25 @@ Missing: TypeAlias = Union[Literal[UNSET], T]
 
 Missing[T] equal to Union[UNSET, T].
 
-example: Missing[int] == Union[UNSET, int]"""
+example: Missing[int] == Union[UNSET, int]
+
+see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
 
 MissingOrNullable: TypeAlias = Union[Literal[UNSET], T, None]
 """MissingOrNullable means that the field maybe not given in the data or value is None.
 
 MissingOrNullable[T] equal to Union[UNSET, T, None].
 
-example: MissingOrNullable[int] == Union[UNSET, int, None]"""
+example: MissingOrNullable[int] == Union[UNSET, int, None]
+
+see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
 
 
 class StrEnum(str, Enum):
-    """String enum."""
+    """String enum.
+
+    see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields
+    """
 
 
 class ActivityAssetImage(StrEnum):
@@ -122,6 +134,18 @@ class ActivityType(IntEnum):
     """{emoji} {name}"""
     Competing = 5
     """	Competing in {name}"""
+
+
+class AnimationType(IntEnum):
+    """Animation Type
+
+    see https://discord.com/developers/docs/topics/gateway-events#voice-channel-effect-send-animation-types
+    """
+
+    PREMIUM = 0
+    """A fun animation, sent by a Nitro subscriber"""
+    BASIC = 1
+    """The standard animation"""
 
 
 class ApplicationCommandOptionType(IntEnum):
@@ -209,6 +233,18 @@ class ApplicationFlag(IntFlag):
     """Indicates if an app has registered global application commands"""
 
 
+class ApplicationIntegrationType(IntEnum):
+    """Application Integration Type
+
+    see https://discord.com/developers/docs/resources/application#application-object-application-integration-types
+    """
+
+    GUILD_INSTALL = 0
+    """App is installable to servers"""
+    USER_INSTALL = 1
+    """App is installable to users"""
+
+
 class ApplicationRoleConnectionMetadataType(IntEnum):
     """Application role connection metadata type.
 
@@ -244,7 +280,7 @@ class ApplicationRoleConnectionMetadataType(IntEnum):
 class AllowedMentionType(StrEnum):
     """Allowed mentions types.
 
-    see https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mention-types
+    see https://discord.com/developers/docs/resources/message#allowed-mentions-object-allowed-mention-types
     """
 
     RoleMentions = "roles"
@@ -253,6 +289,16 @@ class AllowedMentionType(StrEnum):
     """Controls user mentions"""
     EveryoneMentions = "everyone"
     """Controls @everyone and @here mentions"""
+
+
+class AttachmentFlag(IntFlag):
+    """Attachment Flags
+
+    see https://discord.com/developers/docs/resources/message#attachment-object-attachment-flags
+    """
+
+    IS_REMIX = 1 << 2
+    """this attachment has been edited using the remix feature on mobile"""
 
 
 class AuditLogEventType(IntEnum):
@@ -315,6 +361,15 @@ class AuditLogEventType(IntEnum):
     AUTO_MODERATION_BLOCK_MESSAGE = 143
     AUTO_MODERATION_FLAG_TO_CHANNEL = 144
     AUTO_MODERATION_USER_COMMUNICATION_DISABLED = 145
+    CREATOR_MONETIZATION_REQUEST_CREATED = 150
+    CREATOR_MONETIZATION_TERMS_ACCEPTED = 151
+    ONBOARDING_PROMPT_CREATE = 163
+    ONBOARDING_PROMPT_UPDATE = 164
+    ONBOARDING_PROMPT_DELETE = 165
+    ONBOARDING_CREATE = 166
+    ONBOARDING_UPDATE = 167
+    HOME_SETTINGS_CREATE = 190
+    HOME_SETTINGS_UPDATE = 191
 
 
 class AutoModerationActionType(IntEnum):
@@ -330,9 +385,12 @@ class AutoModerationActionType(IntEnum):
     SEND_ALERT_MESSAGE = 2
     """logs user content to a specified channel"""
     TIMEOUT = 3
-    """timeout user for a specified duration.
+    """timeout user for a specified duration
+
     A TIMEOUT action can only be set up for KEYWORD and MENTION_SPAM rules.
     The MODERATE_MEMBERS permission is required to use the TIMEOUT action type."""
+    BLOCK_MEMBER_INTERACTION = 4
+    """prevents a member from using text, voice, or other interactions"""
 
 
 class AutoModerationRuleEventType(IntEnum):
@@ -343,6 +401,8 @@ class AutoModerationRuleEventType(IntEnum):
 
     MESSAGE_SEND = 1
     """when a member sends or edits a message in the guild"""
+    MEMBER_UPDATE = 2
+    """when a member edits their profile"""
 
 
 class ButtonStyle(IntEnum):
@@ -361,6 +421,8 @@ class ButtonStyle(IntEnum):
     """color: red, required field: custom_id"""
     Link = 5
     """color: grey, navigates to a URL, required field: url"""
+    Premium = 6
+    """color: blurple, required field: sku_id"""
 
 
 class ChannelFlags(IntFlag):
@@ -375,10 +437,20 @@ class ChannelFlags(IntFlag):
     """whether a tag is required to be specified
     when creating a thread in a GUILD_FORUM channel.
     Tags are specified in the applied_tags field."""
+    HIDE_MEDIA_DOWNLOAD_OPTIONS = 1 << 15
+    """when set hides the embedded media download options. Available only for
+    media channels"""
 
 
 class ChannelType(IntEnum):
     """Channel type.
+
+    Type ANNOUNCEMENT_THREAD(10), PUBLIC_THREAD(11) and PRIVATE_THREAD(12) are only
+    available in API v9 and above.
+
+    The GUILD_MEDIA(16) channel type is still in active development.
+    Avoid implementing any features that are not documented here, since they are
+    subject to change without notice!
 
     see https://discord.com/developers/docs/resources/channel#channel-object-channel-types
     """
@@ -409,6 +481,8 @@ class ChannelType(IntEnum):
     """the channel in a hub containing the listed servers"""
     GUILD_FORUM = 15
     """Channel that can only contain threads"""
+    GUILD_MEDIA = 16
+    """Channel that can only contain threads, similar to GUILD_FORUM channels"""
 
 
 class ComponentType(IntEnum):
@@ -441,16 +515,19 @@ class ConnectionServiceType(StrEnum):
     see https://discord.com/developers/docs/resources/user#connection-object-services"""
 
     Battle_net = "battlenet"
+    Bungie_net = "bungie"
+    Domain = "domain"
     eBay = "ebay"
     Epic_Games = "epicgames"
     Facebook = "facebook"
-    GitHub = "gitHub"
+    GitHub = "github"
     Instagram = "instagram"
     League_of_Legends = "leagueoflegends"
-    PayPal = "payPal"
+    PayPal = "paypal"
     PlayStation_Network = "playstation"
     Reddit = "reddit"
     Riot_Games = "riotgames"
+    Roblox = "roblox"
     Spotify = "spotify"
     Skype = "skype"
     Steam = "steam"
@@ -478,7 +555,7 @@ class EmbedTypes(StrEnum):
     """
     Embed types.
 
-    see https://discord.com/developers/docs/resources/channel#embed-object-embed-types
+    see https://discord.com/developers/docs/resources/message#embed-object-embed-types
     """
 
     rich = "rich"
@@ -493,6 +570,32 @@ class EmbedTypes(StrEnum):
     """article embed"""
     link = "link"
     """link embed"""
+    poll_result = "poll_result"
+    """poll result embed"""
+
+
+class EntitlementType(IntEnum):
+    """Entitlement Types
+
+    see https://discord.com/developers/docs/monetization/entitlements#entitlement-object-entitlement-types
+    """
+
+    PURCHASE = 1
+    """Entitlement was purchased by user"""
+    PREMIUM_SUBSCRIPTION = 2
+    """Entitlement for Discord Nitro subscription"""
+    DEVELOPER_GIFT = 3
+    """Entitlement was gifted by developer"""
+    TEST_MODE_PURCHASE = 4
+    """Entitlement was purchased by a dev in application test mode"""
+    FREE_PURCHASE = 5
+    """Entitlement was granted when the SKU was free"""
+    USER_GIFT = 6
+    """Entitlement was gifted by another user"""
+    PREMIUM_PURCHASE = 7
+    """Entitlement was claimed by user for free as a Nitro Subscriber"""
+    APPLICATION_SUBSCRIPTION = 8
+    """Entitlement was purchased as an app subscription"""
 
 
 class ExplicitContentFilterLevel(IntEnum):
@@ -798,6 +901,53 @@ class GuildScheduledEventPrivacyLevel(IntEnum):
     GUILD_ONLY = 2
 
 
+class GuildScheduledEventRecurrenceRuleFrequency(IntEnum):
+    """Guild Scheduled Event Recurrence Rule - Frequency
+
+    see https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-frequency
+    """
+
+    YEARLY = 0
+    MONTHLY = 1
+    WEEKLY = 2
+    DAILY = 3
+
+
+class GuildScheduledEventRecurrenceRuleWeekday(IntEnum):
+    """Guild Scheduled Event Recurrence Rule - Weekday
+
+    see https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-weekday
+    """
+
+    MONDAY = 0
+    TUESDAY = 1
+    WEDNESDAY = 2
+    THURSDAY = 3
+    FRIDAY = 4
+    SATURDAY = 5
+    SUNDAY = 6
+
+
+class GuildScheduledEventRecurrenceRuleMonth(IntEnum):
+    """Guild Scheduled Event Recurrence Rule - Month
+
+    see https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-month
+    """
+
+    JANUARY = 1
+    FEBRUARY = 2
+    MARCH = 3
+    APRIL = 4
+    MAY = 5
+    JUNE = 6
+    JULY = 7
+    AUGUST = 8
+    SEPTEMBER = 9
+    OCTOBER = 10
+    NOVEMBER = 11
+    DECEMBER = 12
+
+
 class GuildScheduledEventStatus(IntEnum):
     """Guild Scheduled Event Status
 
@@ -812,6 +962,20 @@ class GuildScheduledEventStatus(IntEnum):
     CANCELED = 4
 
 
+class InteractionContextType(IntEnum):
+    """Interaction Context Type
+
+    see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-context-types
+    """
+
+    GUILD = 0
+    """Interaction can be used within servers"""
+    BOT_DM = 1
+    """Interaction can be used within DMs with the app's bot user"""
+    PRIVATE_CHANNEL = 2
+    """Interaction can be used within Group DMs and DMs other than the app's bot user"""
+
+
 class IntegrationExpireBehaviors(IntEnum):
     """Integration Expire Behaviors
 
@@ -819,7 +983,7 @@ class IntegrationExpireBehaviors(IntEnum):
     """
 
     RemoveRole = 0
-    Kick = 0
+    Kick = 1
 
 
 class InteractionType(IntEnum):
@@ -870,6 +1034,17 @@ class InviteTargetType(IntEnum):
     EMBEDDED_APPLICATION = 2
 
 
+class InviteType(IntEnum):
+    """Invite Types
+
+    see https://discord.com/developers/docs/resources/invite#invite-object-invite-types
+    """
+
+    GUILD = 0
+    GROUP_DM = 1
+    FRIEND = 2
+
+
 class KeywordPresetType(IntEnum):
     """Keyword preset type.
 
@@ -887,7 +1062,7 @@ class KeywordPresetType(IntEnum):
 class MessageActivityType(IntEnum):
     """Message activity type.
 
-    see https://discord.com/developers/docs/resources/channel#message-object-message-activity-types
+    see https://discord.com/developers/docs/resources/message#message-object-message-activity-types
     """
 
     JOIN = 1
@@ -899,7 +1074,7 @@ class MessageActivityType(IntEnum):
 class MessageFlag(IntFlag):
     """Message flags.
 
-    see https://discord.com/developers/docs/resources/channel#message-object-message-flags
+    see https://discord.com/developers/docs/resources/message#message-object-message-flags
     """
 
     CROSSPOSTED = 1 << 0
@@ -922,7 +1097,25 @@ class MessageFlag(IntFlag):
     FAILED_TO_MENTION_SOME_ROLES_IN_THREAD = 1 << 8
     """this message failed to mention some roles and add their members to the thread"""
     SUPPRESS_NOTIFICATIONS = 1 << 12
-    """	this message will not trigger push and desktop notifications"""
+    """this message will not trigger push and desktop notifications"""
+    IS_VOICE_MESSAGE = 1 << 13
+    """this message is a voice message"""
+
+
+class MessageReferenceType(IntEnum):
+    """Message Reference Types
+
+    Determines how associated data is populated.
+
+    see https://discord.com/developers/docs/resources/message#message-reference-types
+    """
+
+    DEFAULT = 0
+    """A standard reference used by replies.
+    Coupled Message Field: `referenced_message`"""
+    FORWARD = 1
+    """Reference used to point to a message at a point in time.
+    Coupled Message Field: `message_snapshot`"""
 
 
 class MessageType(IntEnum):
@@ -930,7 +1123,7 @@ class MessageType(IntEnum):
     In v6, they are represented as type DEFAULT(0).
     Additionally, type THREAD_STARTER_MESSAGE(21) is only available in API v9 and above.
 
-    see https://discord.com/developers/docs/resources/channel#message-object-message-types
+    see https://discord.com/developers/docs/resources/message#message-object-message-types
     """
 
     DEFAULT = 0
@@ -964,6 +1157,12 @@ class MessageType(IntEnum):
     STAGE_SPEAKER = 29
     STAGE_TOPIC = 31
     GUILD_APPLICATION_PREMIUM_SUBSCRIPTION = 32
+    GUILD_INCIDENT_ALERT_MODE_ENABLED = 36
+    GUILD_INCIDENT_ALERT_MODE_DISABLED = 37
+    GUILD_INCIDENT_REPORT_RAID = 38
+    GUILD_INCIDENT_REPORT_FALSE_ALARM = 39
+    PURCHASE_NOTIFICATION = 44
+    POLL_RESULT = 46
 
 
 class MembershipState(IntEnum):
@@ -995,10 +1194,24 @@ class MutableGuildFeature(StrEnum):
 
     COMMUNITY = "COMMUNITY"
     """Enables Community Features in the guild"""
-    INVITES_DISABLED = "INVITES_DISABLED"
-    """Pauses all invites/access to the server"""
     DISCOVERABLE = "DISCOVERABLE"
     """Enables discovery in the guild, making it publicly listed"""
+    INVITES_DISABLED = "INVITES_DISABLED"
+    """Pauses all invites/access to the server"""
+    RAID_ALERTS_DISABLED = "RAID_ALERTS_DISABLED"
+    """Disables alerts for join raids"""
+
+
+class OnboardingMode(IntEnum):
+    """Defines the criteria used to satisfy Onboarding constraints that are required for enabling.
+
+    see https://discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-mode
+    """
+
+    ONBOARDING_DEFAULT = 0
+    """Counts only Default Channels towards constraints"""
+    ONBOARDING_ADVANCED = 1
+    """Counts Default Channels and Questions towards constraints"""
 
 
 class OnboardingPromptType(IntEnum):
@@ -1059,6 +1272,58 @@ class PresenceStatus(StrEnum):
     OFFLINE = "offline"
 
 
+class ReactionType(IntEnum):
+    """Reaction Types
+
+    see https://discord.com/developers/docs/resources/message#get-reactions-reaction-types
+    """
+
+    NORMAL = 0
+    BURST = 1
+
+
+class RoleFlag(IntFlag):
+    """Role Flags
+
+    see https://discord.com/developers/docs/topics/permissions#role-object-role-flags
+    """
+
+    IN_PROMPT = 1 << 0
+    """role can be selected by members in an onboarding prompt"""
+
+
+class SKUFlag(IntFlag):
+    """SKUFlag
+
+    see https://discord.com/developers/docs/resources/sku#sku-object-sku-flags
+    """
+
+    AVAILABLE = 1 << 2
+    """SKU is available for purchase"""
+    GUILD_SUBSCRIPTION = 1 << 7
+    """Recurring SKU that can be purchased by a user and applied
+    to a single server. Grants access to every user in that server."""
+    USER_SUBSCRIPTION = 1 << 8
+    """Recurring SKU purchased by a user for themselves.
+    Grants access to the purchasing user in every server."""
+
+
+class SKUType(IntEnum):
+    """SKU Type
+
+    see https://discord.com/developers/docs/resources/sku#sku-object-sku-types
+    """
+
+    DURABLE = 2
+    """Durable one-time purchase"""
+    CONSUMABLE = 3
+    """Consumable one-time purchase"""
+    SUBSCRIPTION = 5
+    """Represents a recurring subscription"""
+    SUBSCRIPTION_GROUP = 6
+    """System-generated group for each SUBSCRIPTION SKU created"""
+
+
 class SortOrderTypes(IntEnum):
     """Sort order types.
 
@@ -1107,6 +1372,20 @@ class StickerType(IntEnum):
     """a sticker uploaded to a guild for the guild's members"""
 
 
+class SubscriptionStatus(IntEnum):
+    """Subscription Statuses
+
+    see https://discord.com/developers/docs/resources/subscription#subscription-statuses
+    """
+
+    ACTIVE = 0
+    """Subscription is active and scheduled to renew."""
+    ENDING = 1
+    """Subscription is active but will not renew."""
+    INACTIVE = 2
+    """Subscription is inactive and not being charged."""
+
+
 class SystemChannelFlags(IntFlag):
     """System channel flags.
 
@@ -1125,6 +1404,31 @@ class SystemChannelFlags(IntFlag):
     """Suppress role subscription purchase and renewal notifications"""
     SUPPRESS_ROLE_SUBSCRIPTION_PURCHASE_NOTIFICATION_REPLIES = 1 << 5
     """Hide role subscription sticker reply buttons"""
+
+
+class TeamMemberRoleType(StrEnum):
+    """Team Member Role Types
+
+    see https://discord.com/developers/docs/topics/teams#team-member-roles"""
+
+    # Owner = ""
+    # """Owners are the most permissible role, and can take destructive,
+    # irreversible actions like deleting team-owned apps or the team itself.
+    # Teams are limited to 1 owner."""
+    Admin = "admin"
+    """Admins have similar access as owners, except they cannot take
+    destructive actions on the team or team-owned apps."""
+    Developer = "developer"
+    """Developers can access information about team-owned apps,
+    like the client secret or public key. They can also take limited
+    actions on team-owned apps, like configuring interaction endpoints or
+    resetting the bot token. Members with the Developer role cannot manage
+    the team or its members, or take destructive actions on team-owned apps."""
+    Read_only = "read_only"
+    """Read-only members can access information about a team and
+    any team-owned apps. Some examples include getting the IDs of
+    applications and exporting payout records. Members can also
+    invite bots associated with team-owned apps that are marked private."""
 
 
 class TextInputStyle(IntEnum):
@@ -1175,6 +1479,8 @@ class TriggerType(IntEnum):
     """check if content contains words from internal pre-defined wordsets"""
     MENTION_SPAM = 5
     """check if content contains more unique mentions than allowed"""
+    MEMBER_PROFILE = 6
+    """check if member profile contains words from a user defined list of keywords"""
 
 
 class UpdatePresenceStatusType(StrEnum):
@@ -1297,12 +1603,15 @@ __all__ = [
     "ActivityAssetImage",
     "ActivityFlags",
     "ActivityType",
+    "AnimationType",
     "ApplicationCommandOptionType",
     "ApplicationCommandPermissionsType",
     "ApplicationCommandType",
     "ApplicationFlag",
+    "ApplicationIntegrationType",
     "ApplicationRoleConnectionMetadataType",
     "AllowedMentionType",
+    "AttachmentFlag",
     "AuditLogEventType",
     "AutoModerationActionType",
     "AutoModerationRuleEventType",
@@ -1313,6 +1622,7 @@ __all__ = [
     "ConnectionServiceType",
     "DefaultMessageNotificationLevel",
     "EmbedTypes",
+    "EntitlementType",
     "ExplicitContentFilterLevel",
     "ForumLayoutTypes",
     "GuildFeature",
@@ -1320,28 +1630,41 @@ __all__ = [
     "GuildNSFWLevel",
     "GuildScheduledEventEntityType",
     "GuildScheduledEventPrivacyLevel",
+    "GuildScheduledEventRecurrenceRuleFrequency",
+    "GuildScheduledEventRecurrenceRuleWeekday",
+    "GuildScheduledEventRecurrenceRuleMonth",
     "GuildScheduledEventStatus",
+    "InteractionContextType",
     "IntegrationExpireBehaviors",
     "InteractionType",
     "InteractionCallbackType",
     "InviteTargetType",
+    "InviteType",
     "KeywordPresetType",
     "MessageActivityType",
     "MessageFlag",
+    "MessageReferenceType",
     "MessageType",
     "MembershipState",
     "MFALevel",
     "MutableGuildFeature",
+    "OnboardingMode",
     "OnboardingPromptType",
     "OverwriteType",
     "PremiumTier",
     "PremiumType",
     "PresenceStatus",
+    "ReactionType",
+    "RoleFlag",
+    "SKUFlag",
+    "SKUType",
     "SortOrderTypes",
     "StagePrivacyLevel",
     "StickerFormatType",
     "StickerType",
+    "SubscriptionStatus",
     "SystemChannelFlags",
+    "TeamMemberRoleType",
     "TextInputStyle",
     "TimeStampStyle",
     "TriggerType",

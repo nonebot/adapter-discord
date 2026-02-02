@@ -49,6 +49,11 @@ class EventType(str, Enum):
     THREAD_MEMBER_UPDATE = "THREAD_MEMBER_UPDATE"
     THREAD_MEMBERS_UPDATE = "THREAD_MEMBERS_UPDATE"
 
+    # ENTITLEMENTS
+    ENTITLEMENT_CREATE = "ENTITLEMENT_CREATE"
+    ENTITLEMENT_UPDATE = "ENTITLEMENT_UPDATE"
+    ENTITLEMENT_DELETE = "ENTITLEMENT_DELETE"
+
     # GUILDS
     GUILD_CREATE = "GUILD_CREATE"
     GUILD_UPDATE = "GUILD_UPDATE"
@@ -108,6 +113,11 @@ class EventType(str, Enum):
     STAGE_INSTANCE_UPDATE = "STAGE_INSTANCE_UPDATE"
     STAGE_INSTANCE_DELETE = "STAGE_INSTANCE_DELETE"
 
+    # SUBSCRIPTION
+    SUBSCRIPTION_CREATE = "SUBSCRIPTION_CREATE"
+    SUBSCRIPTION_UPDATE = "SUBSCRIPTION_UPDATE"
+    SUBSCRIPTION_DELETE = "SUBSCRIPTION_DELETE"
+
     # TYPING
     TYPING_START = "TYPING_START"
 
@@ -115,11 +125,16 @@ class EventType(str, Enum):
     USER_UPDATE = "USER_UPDATE"
 
     # VOICE
+    VOICE_CHANNEL_EFFECT_SEND = "VOICE_CHANNEL_EFFECT_SEND"
     VOICE_STATE_UPDATE = "VOICE_STATE_UPDATE"
     VOICE_SERVER_UPDATE = "VOICE_SERVER_UPDATE"
 
     # WEBHOOKS
     WEBHOOKS_UPDATE = "WEBHOOKS_UPDATE"
+
+    # POLL
+    MESSAGE_POLL_VOTE_ADD = "MESSAGE_POLL_VOTE_ADD"
+    MESSAGE_POLL_VOTE_REMOVE = "MESSAGE_POLL_VOTE_REMOVE"
 
 
 class Event(BaseEvent):
@@ -405,6 +420,36 @@ class ThreadMemberUpdateEvent(ThreadEvent, ThreadMemberUpdate):
 
 class ThreadMembersUpdateEvent(ThreadEvent, ThreadMembersUpdate):
     __type__ = EventType.THREAD_MEMBERS_UPDATE
+
+
+class EntitlementEvent(NoticeEvent):
+    """Entitlement event
+
+    see https://discord.com/developers/docs/topics/gateway-events#entitlements"""
+
+
+class EntitlementCreateEvent(EntitlementEvent, EntitlementCreate):
+    """Entitlement create event
+
+    see https://discord.com/developers/docs/topics/gateway-events#entitlement-create"""
+
+    __type__ = EventType.ENTITLEMENT_CREATE
+
+
+class EntitlementUpdateEvent(EntitlementEvent, EntitlementUpdate):
+    """Entitlement update event
+
+    see https://discord.com/developers/docs/topics/gateway-events#entitlement-update"""
+
+    __type__ = EventType.ENTITLEMENT_UPDATE
+
+
+class EntitlementDeleteEvent(EntitlementEvent, EntitlementDelete):
+    """Entitlement delete event
+
+    see https://discord.com/developers/docs/topics/gateway-events#entitlement-delete"""
+
+    __type__ = EventType.ENTITLEMENT_DELETE
 
 
 class GuildEvent(NoticeEvent):
@@ -734,7 +779,7 @@ class MessageDeleteBulkEvent(NoticeEvent, MessageDeleteBulk):
     see https://discord.com/developers/docs/topics/gateway-events#message-delete-bulk
     """
 
-    __type__ = EventType.MESSAGE_DELETE
+    __type__ = EventType.MESSAGE_DELETE_BULK
 
 
 class GuildMessageDeleteBulkEvent(MessageDeleteBulkEvent):
@@ -850,6 +895,36 @@ class StageInstanceDeleteEvent(GuildEvent, StageInstanceDelete):
     __type__ = EventType.STAGE_INSTANCE_DELETE
 
 
+class SubscriptionEvent(NoticeEvent):
+    """Subscription event
+
+    see https://discord.com/developers/docs/topics/gateway-events#subscriptions"""
+
+
+class SubscriptionCreateEvent(SubscriptionEvent, SubscriptionCreate):
+    """Subscription create event
+
+    see https://discord.com/developers/docs/topics/gateway-events#subscription-create"""
+
+    __type__ = EventType.SUBSCRIPTION_CREATE
+
+
+class SubscriptionUpdateEvent(SubscriptionEvent, SubscriptionUpdate):
+    """Subscription Update event
+
+    see https://discord.com/developers/docs/topics/gateway-events#subscription-update"""
+
+    __type__ = EventType.SUBSCRIPTION_UPDATE
+
+
+class SubscriptionDeleteEvent(SubscriptionEvent, SubscriptionDelete):
+    """Subscription delete event
+
+    see https://discord.com/developers/docs/topics/gateway-events#subscription-delete"""
+
+    __type__ = EventType.SUBSCRIPTION_DELETE
+
+
 class TypingStartEvent(NoticeEvent, TypingStart):
     """Typing Start Event
 
@@ -876,6 +951,15 @@ class UserUpdateEvent(NoticeEvent, UserUpdate):
     """
 
     __type__ = EventType.USER_UPDATE
+
+
+class VoiceChannelEffectSendEvent(NoticeEvent, VoiceChannelEffectSend):
+    """Voice Channel Effect Send Event
+
+    see https://discord.com/developers/docs/topics/gateway-events#voice-channel-effect-send
+    """
+
+    __type__ = EventType.VOICE_CHANNEL_EFFECT_SEND
 
 
 class VoiceStateUpdateEvent(NoticeEvent, VoiceStateUpdate):
@@ -905,6 +989,40 @@ class WebhooksUpdateEvent(NoticeEvent, WebhooksUpdate):
     __type__ = EventType.WEBHOOKS_UPDATE
 
 
+class MessagePollVoteAddEvent(NoticeEvent, MessagePollVoteAdd):
+    """Message Poll Vote Add Event
+
+    see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-add
+    """
+
+    __type__ = EventType.MESSAGE_POLL_VOTE_ADD
+
+
+class GuildMessagePollVoteAddEvent(MessagePollVoteAddEvent):
+    guild_id: Snowflake
+
+
+class DirectMessagePollVoteAddEvent(MessagePollVoteAddEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+
+
+class MessagePollVoteRemoveEvent(NoticeEvent, MessagePollVoteRemove):
+    """Message Poll Vote Remove Event
+
+    see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-remove
+    """
+
+    __type__ = EventType.MESSAGE_POLL_VOTE_REMOVE
+
+
+class GuildMessagePollVoteRemoveEvent(MessagePollVoteRemoveEvent):
+    guild_id: Snowflake
+
+
+class DirectMessagePollVoteRemoveEvent(MessagePollVoteRemoveEvent):
+    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+
+
 event_classes: dict[str, type[Event]] = {
     EventType.HELLO.value: HelloEvent,
     EventType.READY.value: ReadyEvent,
@@ -930,6 +1048,9 @@ event_classes: dict[str, type[Event]] = {
     EventType.THREAD_LIST_SYNC.value: ThreadListSyncEvent,
     EventType.THREAD_MEMBER_UPDATE.value: ThreadMemberUpdateEvent,
     EventType.THREAD_MEMBERS_UPDATE.value: ThreadMembersUpdateEvent,
+    EventType.ENTITLEMENT_CREATE.value: EntitlementCreateEvent,
+    EventType.ENTITLEMENT_UPDATE.value: EntitlementUpdateEvent,
+    EventType.ENTITLEMENT_DELETE.value: EntitlementDeleteEvent,
     EventType.GUILD_CREATE.value: GuildCreateEvent,
     EventType.GUILD_UPDATE.value: GuildUpdateEvent,
     EventType.GUILD_DELETE.value: GuildDeleteEvent,
@@ -985,17 +1106,17 @@ event_classes: dict[str, type[Event]] = {
         DirectMessageReactionAddEvent,
         MessageReactionAddEvent,
     ],
-    EventType.MESSAGE_REACTION_REMOVE: Union[
+    EventType.MESSAGE_REACTION_REMOVE.value: Union[
         GuildMessageReactionRemoveEvent,
         DirectMessageReactionRemoveEvent,
         MessageReactionRemoveEvent,
     ],
-    EventType.MESSAGE_REACTION_REMOVE_ALL: Union[
+    EventType.MESSAGE_REACTION_REMOVE_ALL.value: Union[
         GuildMessageReactionRemoveAllEvent,
         DirectMessageReactionRemoveAllEvent,
         MessageReactionRemoveAllEvent,
     ],
-    EventType.MESSAGE_REACTION_REMOVE_EMOJI: Union[
+    EventType.MESSAGE_REACTION_REMOVE_EMOJI.value: Union[
         GuildMessageReactionRemoveEmojiEvent,
         DirectMessageReactionRemoveEmojiEvent,
         MessageReactionRemoveEmojiEvent,
@@ -1004,13 +1125,27 @@ event_classes: dict[str, type[Event]] = {
     EventType.STAGE_INSTANCE_CREATE.value: StageInstanceCreateEvent,
     EventType.STAGE_INSTANCE_UPDATE.value: StageInstanceUpdateEvent,
     EventType.STAGE_INSTANCE_DELETE.value: StageInstanceDeleteEvent,
+    EventType.SUBSCRIPTION_CREATE.value: SubscriptionCreateEvent,
+    EventType.SUBSCRIPTION_UPDATE.value: SubscriptionUpdateEvent,
+    EventType.SUBSCRIPTION_DELETE.value: SubscriptionDeleteEvent,
     EventType.TYPING_START.value: Union[
         GuildTypingStartEvent, DirectTypingStartEvent, TypingStartEvent
     ],
     EventType.USER_UPDATE.value: UserUpdateEvent,
+    EventType.VOICE_CHANNEL_EFFECT_SEND.value: VoiceChannelEffectSendEvent,
     EventType.VOICE_STATE_UPDATE.value: VoiceStateUpdateEvent,
     EventType.VOICE_SERVER_UPDATE.value: VoiceServerUpdateEvent,
     EventType.WEBHOOKS_UPDATE.value: WebhooksUpdateEvent,
+    EventType.MESSAGE_POLL_VOTE_ADD.value: Union[
+        GuildMessagePollVoteAddEvent,
+        DirectMessagePollVoteAddEvent,
+        MessagePollVoteAddEvent,
+    ],
+    EventType.MESSAGE_POLL_VOTE_REMOVE.value: Union[
+        GuildMessagePollVoteRemoveEvent,
+        DirectMessagePollVoteRemoveEvent,
+        MessagePollVoteRemoveEvent,
+    ],
 }  # type: ignore
 
 __all__ = [
@@ -1043,6 +1178,9 @@ __all__ = [
     "ThreadListSyncEvent",
     "ThreadMemberUpdateEvent",
     "ThreadMembersUpdateEvent",
+    "EntitlementCreateEvent",
+    "EntitlementUpdateEvent",
+    "EntitlementDeleteEvent",
     "GuildEvent",
     "GuildCreateEvent",
     "GuildUpdateEvent",
@@ -1105,12 +1243,22 @@ __all__ = [
     "StageInstanceCreateEvent",
     "StageInstanceUpdateEvent",
     "StageInstanceDeleteEvent",
+    "SubscriptionCreateEvent",
+    "SubscriptionUpdateEvent",
+    "SubscriptionDeleteEvent",
     "TypingStartEvent",
     "GuildTypingStartEvent",
     "DirectTypingStartEvent",
     "UserUpdateEvent",
+    "VoiceChannelEffectSendEvent",
     "VoiceStateUpdateEvent",
     "VoiceServerUpdateEvent",
     "WebhooksUpdateEvent",
+    "MessagePollVoteAddEvent",
+    "GuildMessagePollVoteAddEvent",
+    "DirectMessagePollVoteAddEvent",
+    "MessagePollVoteRemoveEvent",
+    "GuildMessagePollVoteRemoveEvent",
+    "DirectMessagePollVoteRemoveEvent",
     "event_classes",
 ]
