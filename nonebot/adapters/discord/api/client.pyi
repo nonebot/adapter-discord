@@ -8,10 +8,10 @@ class ApiClient:
     async def get_global_application_commands(
         self, *, application_id: SnowflakeType, with_localizations: bool | None = ...
     ) -> list[ApplicationCommand]:
-        """Fetch a global command for your application.
-        Returns an application command object.
+        """Fetch global commands for your application.
+        Returns an array of application command objects.
 
-        see https://discord.com/developers/docs/interactions/application-commands#get-global-application-command
+        see https://discord.com/developers/docs/interactions/application-commands#get-global-application-commands
         """
         ...
 
@@ -404,9 +404,9 @@ class ApiClient:
     async def update_application_role_connection_metadata_records(
         self, *, application_id: SnowflakeType
     ) -> list[ApplicationRoleConnectionMetadata]:
-        """get application role connection metadata records
+        """update application role connection metadata records
 
-        see https://discord.com/developers/docs/resources/application-role-connection-metadata#get-application-role-connection-metadata-records
+        see https://discord.com/developers/docs/resources/application-role-connection-metadata#update-application-role-connection-metadata-records
         """
         ...
 
@@ -698,7 +698,7 @@ class ApiClient:
     ) -> None:
         """
 
-        see https://discord.com/developers/docs/resources/message#delete-all-reactions
+        see https://discord.com/developers/docs/resources/message#delete-all-reactions-for-emoji
         """
         ...
 
@@ -1073,7 +1073,7 @@ class ApiClient:
         application_id: SnowflakeType,
         entitlement_id: SnowflakeType,
     ) -> None:
-        """https://discord.com/developers/docs/resources/entitlement#create-test-entitlement"""
+        """https://discord.com/developers/docs/resources/entitlement#delete-test-entitlement"""
         ...
 
     async def create_guild(
@@ -1526,7 +1526,7 @@ class ApiClient:
         mode: OnboardingMode = ...,
         reason: str | None = ...,
     ) -> GuildOnboarding:
-        """https://discord.com/developers/docs/resources/guild#get-guild-onboarding"""
+        """https://discord.com/developers/docs/resources/guild#modify-guild-onboarding"""
         ...
 
     async def list_voice_regions(self) -> list[VoiceRegion]:
@@ -1790,7 +1790,7 @@ class ApiClient:
     #                                description: str,
     #                                tags: str,
     #                                file: File,
-    #                                reason: Optional[str] = ...) -> Sticker:
+    #                                reason: str | None = ...) -> Sticker:
     #     """https://discord.com/developers/docs/resources/sticker#create-guild-sticker"""
     #     ...
     async def modify_guild_sticker(
@@ -1817,13 +1817,21 @@ class ApiClient:
         ...
 
     async def list_SKU_subscriptions(
-        self, *, sku_id: SnowflakeType
+        self,
+        *,
+        sku_id: SnowflakeType,
+        before: SnowflakeType | None = ...,
+        after: SnowflakeType | None = ...,
+        limit: int | None = ...,
+        user_id: SnowflakeType | None = ...,
     ) -> list[Subscription]:
         """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions"""
         ...
 
-    async def get_SKU_subscription(self, *, sku_id: SnowflakeType) -> Subscription:
-        """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions"""
+    async def get_SKU_subscription(
+        self, *, sku_id: SnowflakeType, subscription_id: SnowflakeType
+    ) -> Subscription:
+        """https://discord.com/developers/docs/resources/subscription#get-sku-subscription"""
         ...
 
     async def get_current_user(self) -> User:

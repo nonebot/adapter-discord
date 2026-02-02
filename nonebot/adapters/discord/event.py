@@ -779,7 +779,7 @@ class MessageDeleteBulkEvent(NoticeEvent, MessageDeleteBulk):
     see https://discord.com/developers/docs/topics/gateway-events#message-delete-bulk
     """
 
-    __type__ = EventType.MESSAGE_DELETE
+    __type__ = EventType.MESSAGE_DELETE_BULK
 
 
 class GuildMessageDeleteBulkEvent(MessageDeleteBulkEvent):
@@ -1106,17 +1106,17 @@ event_classes: dict[str, type[Event]] = {
         DirectMessageReactionAddEvent,
         MessageReactionAddEvent,
     ],
-    EventType.MESSAGE_REACTION_REMOVE: Union[
+    EventType.MESSAGE_REACTION_REMOVE.value: Union[
         GuildMessageReactionRemoveEvent,
         DirectMessageReactionRemoveEvent,
         MessageReactionRemoveEvent,
     ],
-    EventType.MESSAGE_REACTION_REMOVE_ALL: Union[
+    EventType.MESSAGE_REACTION_REMOVE_ALL.value: Union[
         GuildMessageReactionRemoveAllEvent,
         DirectMessageReactionRemoveAllEvent,
         MessageReactionRemoveAllEvent,
     ],
-    EventType.MESSAGE_REACTION_REMOVE_EMOJI: Union[
+    EventType.MESSAGE_REACTION_REMOVE_EMOJI.value: Union[
         GuildMessageReactionRemoveEmojiEvent,
         DirectMessageReactionRemoveEmojiEvent,
         MessageReactionRemoveEmojiEvent,

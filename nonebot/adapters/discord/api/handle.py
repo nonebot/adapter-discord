@@ -28,10 +28,10 @@ if TYPE_CHECKING:
 async def _get_global_application_commands(
     adapter: "Adapter", bot: "Bot", application_id: SnowflakeType, **params
 ) -> list[ApplicationCommand]:
-    """Fetch a global command for your application.
-    Returns an application command object.
+    """Fetch global commands for your application.
+    Returns an array of application command objects.
 
-    see https://discord.com/developers/docs/interactions/application-commands#get-global-application-command
+    see https://discord.com/developers/docs/interactions/application-commands#get-global-application-commands
     """
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -82,7 +82,7 @@ async def _get_global_application_command(
     request = Request(
         headers=headers,
         method="GET",
-        url=adapter.base_url / f"applications/{application_id}/command/{command_id}",
+        url=adapter.base_url / f"applications/{application_id}/commands/{command_id}",
     )
     return type_validate_python(
         ApplicationCommand, await _request(adapter, bot, request)
@@ -106,7 +106,7 @@ async def _edit_global_application_command(
     request = Request(
         headers=headers,
         method="PATCH",
-        url=adapter.base_url / f"applications/{application_id}/command/{command_id}",
+        url=adapter.base_url / f"applications/{application_id}/commands/{command_id}",
         json=data,
     )
     return type_validate_python(
@@ -229,7 +229,7 @@ async def _get_guild_application_command(
         headers=headers,
         method="GET",
         url=adapter.base_url
-        / f"applications/{application_id}/guilds/{guild_id}/command/{command_id}",
+        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
     )
     return type_validate_python(
         ApplicationCommand, await _request(adapter, bot, request)
@@ -257,7 +257,7 @@ async def _edit_guild_application_command(
         headers=headers,
         method="PATCH",
         url=adapter.base_url
-        / f"applications/{application_id}/guilds/{guild_id}/command/{command_id}",
+        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
         json=data,
     )
     return type_validate_python(
@@ -281,7 +281,7 @@ async def _delete_guild_application_command(
         headers=headers,
         method="DELETE",
         url=adapter.base_url
-        / f"applications/{application_id}/guilds/{guild_id}/command/{command_id}",
+        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
     )
     await _request(adapter, bot, request)
 
@@ -384,7 +384,11 @@ async def _edit_application_command_permissions(
         method="PUT",
         url=adapter.base_url
         / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",  # noqa: E501
-        json=[model_dump(permission, exclude_unset=True) for permission in permissions],
+        json={
+            "permissions": [
+                model_dump(permission, exclude_unset=True) for permission in permissions
+            ]
+        },
     )
     return type_validate_python(
         GuildApplicationCommandPermissions, await _request(adapter, bot, request)
@@ -652,9 +656,9 @@ async def _get_application_role_connection_metadata_records(
 async def _update_application_role_connection_metadata_records(
     adapter: "Adapter", bot: "Bot", application_id: SnowflakeType
 ) -> list[ApplicationRoleConnectionMetadata]:
-    """get application role connection metadata records
+    """update application role connection metadata records
 
-    see https://discord.com/developers/docs/resources/application-role-connection-metadata#get-application-role-connection-metadata-records
+    see https://discord.com/developers/docs/resources/application-role-connection-metadata#update-application-role-connection-metadata-records
     """
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1732,11 +1736,11 @@ async def _delete_test_entitlement(
     application_id: SnowflakeType,
     entitlement_id: SnowflakeType,
 ) -> None:
-    """https://discord.com/developers/docs/resources/entitlement#create-test-entitlement"""
+    """https://discord.com/developers/docs/resources/entitlement#delete-test-entitlement"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
-        method="POST",
+        method="DELETE",
         url=adapter.base_url
         / f"applications/{application_id}/entitlements/{entitlement_id}",
     )
@@ -2462,7 +2466,7 @@ async def _get_guild_onboarding(
 async def _modify_guild_onboarding(
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **data
 ) -> GuildOnboarding:
-    """https://discord.com/developers/docs/resources/guild#get-guild-onboarding"""
+    """https://discord.com/developers/docs/resources/guild#modify-guild-onboarding"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
         headers["X-Audit-Log-Reason"] = data.pop("reason")
@@ -3076,14 +3080,30 @@ async def _delete_guild_sticker(
 
 
 async def _list_SKU_subscriptions(
-    adapter: "Adapter", bot: "Bot", sku_id: SnowflakeType
+    adapter: "Adapter",
+    bot: "Bot",
+    sku_id: SnowflakeType,
+    before: Optional[SnowflakeType] = None,
+    after: Optional[SnowflakeType] = None,
+    limit: Optional[int] = None,
+    user_id: Optional[SnowflakeType] = None,
 ) -> list[Subscription]:
-    """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions"""
+    """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions
+
+    Note: user_id is required except for OAuth queries.
+    """
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
+    params = {
+        "before": before,
+        "after": after,
+        "limit": limit,
+        "user_id": user_id,
+    }
     request = Request(
         headers=headers,
         method="GET",
-        url=adapter.base_url / f"gskus/{sku_id}/subscriptions",
+        url=adapter.base_url / f"skus/{sku_id}/subscriptions",
+        params={key: value for key, value in params.items() if value is not None},
     )
     return type_validate_python(
         list[Subscription], await _request(adapter, bot, request)
@@ -3094,13 +3114,14 @@ async def _get_SKU_subscription(
     adapter: "Adapter",
     bot: "Bot",
     sku_id: SnowflakeType,
+    subscription_id: SnowflakeType,
 ) -> Subscription:
-    """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions"""
+    """https://discord.com/developers/docs/resources/subscription#get-sku-subscription"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
         headers=headers,
         method="GET",
-        url=adapter.base_url / f"gskus/{sku_id}/subscriptions",
+        url=adapter.base_url / f"skus/{sku_id}/subscriptions/{subscription_id}",
     )
     return type_validate_python(Subscription, await _request(adapter, bot, request))
 
