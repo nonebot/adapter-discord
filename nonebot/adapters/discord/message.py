@@ -501,7 +501,7 @@ class PollSegment(MessageSegment):
 
     @override
     def __str__(self) -> str:
-        return f"<Poll:{self.data["poll"].question.text}>"
+        return f"<Poll:{self.data['poll'].question.text}>"
 
 
 class Message(BaseMessage[MessageSegment]):
