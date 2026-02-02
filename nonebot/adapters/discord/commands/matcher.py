@@ -278,14 +278,14 @@ class SlashCommandMatcher(ApplicationCommandMatcher):
             #             )
             #         ):
             #             state[OPTION_KEY][option.name] = data[
-            #                 Snowflake(option.value)  # type: ignore
+            #                 Snowflake(option.value)
             #             ]
             #         elif (
             #             option.type == ApplicationCommandOptionType.MENTIONABLE
             #             and event.data.resolved
             #             and event.data.resolved.users
             #         ):
-            #             sid = Snowflake(option.value)  # type: ignore
+            #             sid = Snowflake(option.value)
             #             state[OPTION_KEY][option.name] = (
             #                 event.data.resolved.users.get(sid),
             #                 (

@@ -209,7 +209,7 @@ class MessageEvent(Event, MessageGet):
 
     @property
     def original_message(self) -> Message:
-        return getattr(self, "_original_message", self.get_message())  # type: ignore
+        return getattr(self, "_original_message", self.get_message())
 
     @override
     def get_type(self) -> str:
@@ -1146,7 +1146,7 @@ event_classes: dict[str, type[Event]] = {
         DirectMessagePollVoteRemoveEvent,
         MessagePollVoteRemoveEvent,
     ],
-}  # type: ignore
+}
 
 __all__ = [
     "ApplicationCommandAutoCompleteInteractionEvent",

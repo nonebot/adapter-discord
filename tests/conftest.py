@@ -5,7 +5,7 @@ import nonebot.adapters
 from nonebug import NONEBOT_INIT_KWARGS, NONEBOT_START_LIFESPAN
 import pytest
 
-nonebot.adapters.__path__.append(  # type: ignore
+nonebot.adapters.__path__.append(
     str((Path(__file__).parent.parent / "nonebot" / "adapters").resolve())
 )
 

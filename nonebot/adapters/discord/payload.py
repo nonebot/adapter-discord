@@ -25,7 +25,7 @@ class Opcode(IntEnum):
 
 class Payload(BaseModel):
     if PYDANTIC_V2:
-        model_config = ConfigDict(extra="allow", populate_by_name=True)  # type: ignore
+        model_config = ConfigDict(extra="allow", populate_by_name=True)
 
     else:
 

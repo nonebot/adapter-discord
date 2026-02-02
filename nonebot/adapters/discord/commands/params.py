@@ -83,13 +83,13 @@ class OptionParam(Param):
                                 )
                             )
                         ):
-                            return data[Snowflake(option.value)]  # type: ignore
+                            return data[Snowflake(option.value)]
                         if (
                             option.type == ApplicationCommandOptionType.MENTIONABLE
                             and event.data.resolved
                             and event.data.resolved.users
                         ):
-                            sid = Snowflake(option.value)  # type: ignore
+                            sid = Snowflake(option.value)
                             return (
                                 event.data.resolved.users.get(sid),
                                 (

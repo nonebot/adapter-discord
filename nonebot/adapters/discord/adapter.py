@@ -435,7 +435,7 @@ class Adapter(BaseAdapter):
     async def receive_payload(self, ws: WebSocket) -> Payload:
         data = await ws.receive()
         data = decompress_data(data, self.discord_config.discord_compress)
-        return type_validate_json(PayloadType, data)  # type: ignore
+        return type_validate_json(PayloadType, data)
 
     @classmethod
     def payload_to_event(cls, payload: Dispatch) -> Event:
@@ -446,7 +446,7 @@ class Adapter(BaseAdapter):
                 f"Unknown payload type: {payload.type}, detail: {payload!r}",
             )
             event = type_validate_python(Event, payload.data)
-            event.__type__ = payload.type  # type: ignore
+            event.__type__ = payload.type
             return event
         return type_validate_python(EventClass, payload.data)
 

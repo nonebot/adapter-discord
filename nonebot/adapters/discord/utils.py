@@ -54,4 +54,4 @@ def unescape(s: str) -> str:
 
 
 def decompress_data(data: Union[str, bytes], compress: bool) -> Union[str, bytes]:
-    return zlib.decompress(data) if compress else data  # type: ignore
+    return zlib.decompress(data) if compress else data
