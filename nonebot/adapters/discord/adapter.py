@@ -115,8 +115,10 @@ class Adapter(BaseAdapter):
                 asyncio.create_task(self._forward_ws(bot_info, ws_url, (i, shards))),
             )
             await asyncio.sleep(
-                gateway_info.session_start_limit
-                and gateway_info.session_start_limit.max_concurrency
+                (
+                    gateway_info.session_start_limit
+                    and gateway_info.session_start_limit.max_concurrency
+                )
                 or 1,
             )
 
@@ -441,7 +443,7 @@ class Adapter(BaseAdapter):
         if not EventClass:
             log(
                 "WARNING",
-                f"Unknown payload type: {payload.type}, detail: {repr(payload)}",
+                f"Unknown payload type: {payload.type}, detail: {payload!r}",
             )
             event = type_validate_python(Event, payload.data)
             event.__type__ = payload.type  # type: ignore

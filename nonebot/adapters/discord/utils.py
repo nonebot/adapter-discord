@@ -15,9 +15,9 @@ def exclude_unset_data(data: Any) -> Any:
         return data.__class__(
             (k, exclude_unset_data(v)) for k, v in data.items() if v is not UNSET
         )
-    elif isinstance(data, list):
+    if isinstance(data, list):
         return data.__class__(exclude_unset_data(i) for i in data)
-    elif data is UNSET:
+    if data is UNSET:
         return None
     return data
 
@@ -42,8 +42,7 @@ def model_dump(
     )
     if exclude_none or exclude_unset:
         return exclude_unset_data(data)
-    else:
-        return data
+    return data
 
 
 def escape(s: str) -> str:

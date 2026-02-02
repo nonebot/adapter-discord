@@ -85,16 +85,15 @@ class MessageSegment(BaseMessageSegment["Message"]):
                     "file": None,
                 },
             )
-        else:
-            return AttachmentSegment(
-                "attachment",
-                {
-                    "attachment": AttachmentSend(
-                        filename=_filename, description=_description
-                    ),
-                    "file": File(filename=_filename, content=_content),
-                },
-            )
+        return AttachmentSegment(
+            "attachment",
+            {
+                "attachment": AttachmentSend(
+                    filename=_filename, description=_description
+                ),
+                "file": File(filename=_filename, content=_content),
+            },
+        )
 
     @staticmethod
     def sticker(sticker_id: SnowflakeType) -> "StickerSegment":
@@ -305,8 +304,7 @@ class CustomEmojiSegment(MessageSegment):
     def __str__(self) -> str:
         if self.data.get("animated"):
             return f"<a:{self.data['name']}:{self.data['id']}>"
-        else:
-            return f"<:{self.data['name']}:{self.data['id']}>"
+        return f"<:{self.data['name']}:{self.data['id']}>"
 
 
 class MentionUserData(TypedDict):
@@ -646,16 +644,12 @@ class Message(BaseMessage[MessageSegment]):
                     )
                 else:
                     yield MessageSegment.text(unescape(embed.group()))
+            elif len(cut := embed.group("param").split(":")) == 2 and cut[0].isdigit():
+                yield MessageSegment.timestamp(int(cut[0]), TimeStampStyle(cut[1]))
+            elif embed.group().isdigit():
+                yield MessageSegment.timestamp(int(embed.group()))
             else:
-                if (
-                    len(cut := embed.group("param").split(":")) == 2
-                    and cut[0].isdigit()
-                ):
-                    yield MessageSegment.timestamp(int(cut[0]), TimeStampStyle(cut[1]))
-                elif embed.group().isdigit():
-                    yield MessageSegment.timestamp(int(embed.group()))
-                else:
-                    yield MessageSegment.text(unescape(embed.group()))
+                yield MessageSegment.text(unescape(embed.group()))
         if content := msg[text_begin:]:
             yield MessageSegment.text(unescape(content))
 

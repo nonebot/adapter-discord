@@ -354,7 +354,7 @@ async def _get_application_command_permissions(
         headers=headers,
         method="GET",
         url=adapter.base_url
-        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",  # noqa: E501
+        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",
     )
     return type_validate_python(
         GuildApplicationCommandPermissions, await _request(adapter, bot, request)
@@ -383,7 +383,7 @@ async def _edit_application_command_permissions(
         headers=headers,
         method="PUT",
         url=adapter.base_url
-        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",  # noqa: E501
+        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",
         json={
             "permissions": [
                 model_dump(permission, exclude_unset=True) for permission in permissions
@@ -1025,7 +1025,7 @@ async def _delete_user_reaction(
         headers=headers,
         method="DELETE",
         url=adapter.base_url
-        / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/{user_id}",  # noqa: E501
+        / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/{user_id}",
     )
     await _request(adapter, bot, request)
 

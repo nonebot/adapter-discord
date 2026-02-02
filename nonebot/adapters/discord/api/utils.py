@@ -30,8 +30,7 @@ def parse_data(
             payload["attachments"] = attachments
         multipart["payload_json"] = (None, json.dumps(payload), "application/json")
         return {"files": multipart}
-    else:
-        return {"json": payload}
+    return {"json": payload}
 
 
 def parse_forum_thread_message(
@@ -60,8 +59,7 @@ def parse_forum_thread_message(
             payload["attachments"] = attachments
         multipart["payload_json"] = (None, json.dumps(payload), "application/json")
         return {"files": multipart}
-    else:
-        return {"json": payload}
+    return {"json": payload}
 
 
 def parse_interaction_response(

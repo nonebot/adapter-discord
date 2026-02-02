@@ -38,7 +38,7 @@ async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
         if msg.author.id == bot.self_info.id:
             event.to_me = True
     except Exception as e:
-        log("WARNING", f"Error when getting message reply info: {repr(e)}", e)
+        log("WARNING", f"Error when getting message reply info: {e!r}", e)
 
 
 def _check_at_me(bot: "Bot", event: MessageEvent) -> None:

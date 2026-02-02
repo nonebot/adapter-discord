@@ -47,7 +47,7 @@ class OptionParam(Param):
     ) -> Optional["OptionParam"]:
         if isinstance(param.default, CommandOptionType):
             return cls(key=param.default.key or param.name, validate=True)
-        elif get_origin(param.annotation) is Annotated:
+        if get_origin(param.annotation) is Annotated:
             for arg in get_args(param.annotation):
                 if isinstance(arg, CommandOptionType):
                     return cls(key=arg.key or param.name, validate=True)
@@ -84,7 +84,7 @@ class OptionParam(Param):
                             )
                         ):
                             return data[Snowflake(option.value)]  # type: ignore
-                        elif (
+                        if (
                             option.type == ApplicationCommandOptionType.MENTIONABLE
                             and event.data.resolved
                             and event.data.resolved.users
@@ -98,7 +98,7 @@ class OptionParam(Param):
                                     else None
                                 ),
                             )
-                        elif option.type in (
+                        if option.type in (
                             ApplicationCommandOptionType.INTEGER,
                             ApplicationCommandOptionType.STRING,
                             ApplicationCommandOptionType.NUMBER,

@@ -31,12 +31,11 @@ async def _request(adapter: "Adapter", bot: "Bot", request: Request) -> Any:
             return data.content and json.loads(
                 decompress_data(data.content, adapter.discord_config.discord_compress)
             )
-        elif data.status_code in (401, 403):
+        if data.status_code in (401, 403):
             raise UnauthorizedException(data)
-        elif data.status_code == 429:
+        if data.status_code == 429:
             raise RateLimitException(data)
-        else:
-            raise ActionFailed(data)
+        raise ActionFailed(data)
     except DiscordAdapterException:
         raise
     except Exception as e:
