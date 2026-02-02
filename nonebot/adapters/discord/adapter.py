@@ -42,7 +42,7 @@ class Adapter(BaseAdapter):
     def __init__(self, driver: Driver, **kwargs: Any) -> None:
         super().__init__(driver, **kwargs)
         self.discord_config: Config = get_plugin_config(Config)
-        self.tasks: list[asyncio.Task] = []
+        self.tasks: set[asyncio.Task] = set()
         self.base_url: URL = URL(
             f"https://discord.com/api/v{self.discord_config.discord_api_version}",
         )
@@ -60,9 +60,7 @@ class Adapter(BaseAdapter):
                 "doesn't support forward connections!"
                 "Discord Adapter need a ForwardDriver to work."
             )
-            raise RuntimeError(
-                msg,
-            )
+            raise RuntimeError(msg)  # noqa: TRY004
         self.on_ready(self.startup)
         self.driver.on_shutdown(self.shutdown)
         self.driver.on_bot_connect(sync_application_command)
@@ -73,7 +71,7 @@ class Adapter(BaseAdapter):
         log("DEBUG", f"Discord api base url: <y>{escape_tag(str(self.base_url))}</y>")
 
         for bot_info in self.discord_config.discord_bots:
-            self.tasks.append(asyncio.create_task(self.run_bot(bot_info)))
+            self.tasks.add(asyncio.create_task(self.run_bot(bot_info)))
 
     async def shutdown(self) -> None:
         for task in self.tasks:
@@ -83,9 +81,6 @@ class Adapter(BaseAdapter):
     async def run_bot(self, bot_info: BotInfo) -> None:
         try:
             gateway_info = await self._get_gateway_bot(bot_info)
-            if not gateway_info.url:
-                msg = "Failed to get gateway url"
-                raise ValueError(msg)
             ws_url = URL(gateway_info.url)
         except Exception as e:
             log(
@@ -108,14 +103,14 @@ class Adapter(BaseAdapter):
             return
 
         if bot_info.shard is not None:
-            self.tasks.append(
+            self.tasks.add(
                 asyncio.create_task(self._forward_ws(bot_info, ws_url, bot_info.shard)),
             )
             return
 
         shards = gateway_info.shards or 1
         for i in range(shards):
-            self.tasks.append(
+            self.tasks.add(
                 asyncio.create_task(self._forward_ws(bot_info, ws_url, (i, shards))),
             )
             await asyncio.sleep(
@@ -139,7 +134,11 @@ class Adapter(BaseAdapter):
         if not resp.content:
             msg = "Failed to get gateway info"
             raise ValueError(msg)
-        return type_validate_json(GatewayBot, resp.content)
+        gateway_info = type_validate_json(GatewayBot, resp.content)
+        if not gateway_info.url or gateway_info.url.isspace():
+            msg = "Failed to get gateway url"
+            raise ValueError(msg)
+        return gateway_info
 
     async def _get_bot_user(self, bot_info: BotInfo) -> User:
         headers = {"Authorization": self.get_authorization(bot_info)}
@@ -156,7 +155,7 @@ class Adapter(BaseAdapter):
             raise ValueError(msg)
         return type_validate_json(User, resp.content)
 
-    async def _forward_ws(
+    async def _forward_ws(  # noqa: C901
         self,
         bot_info: BotInfo,
         ws_url: URL,
@@ -251,19 +250,18 @@ class Adapter(BaseAdapter):
                 )
                 await asyncio.sleep(RECONNECT_INTERVAL)
 
-    async def _hello(self, ws: WebSocket):
+    async def _hello(self, ws: WebSocket) -> Optional[int]:
         """接收并处理服务器的 Hello 事件
 
         见 https://discord.com/developers/docs/topics/gateway#hello-event
         """
         try:
             payload = await self.receive_payload(ws)
-            assert isinstance(
-                payload,
-                Hello,
-            ), f"Received unexpected payload: {payload!r}"
-            log("DEBUG", f"Received hello: {payload}")
-            return payload.data.heartbeat_interval
+            if isinstance(payload, Hello):
+                log("DEBUG", f"Received hello: {payload}")
+                return payload.data.heartbeat_interval
+            msg = f"Received unexpected payload: {payload!r}"
+            raise ValueError(msg)  # noqa: TRY301
         except Exception as e:
             log(
                 "ERROR",
@@ -349,23 +347,21 @@ class Adapter(BaseAdapter):
         ready_event = None
         if not bot.ready:
             # https://discord.com/developers/docs/topics/gateway#ready-event
-            # 鉴权成功之后，后台会下发一个 Ready Event
+            # 鉴权成功之后, 后台会下发一个 Ready Event
             payload = await self.receive_payload(ws)
             if isinstance(payload, HeartbeatAck):
                 log(
                     "WARNING", "Received unexpected HeartbeatAck event when identifying"
                 )
                 payload = await self.receive_payload(ws)
-            assert isinstance(
-                payload,
-                Dispatch,
-            ), f"Received unexpected payload: {payload!r}"
+            if not isinstance(payload, Dispatch):
+                msg = f"Received unexpected payload: {payload!r}"
+                raise ValueError(msg)
             bot.sequence = payload.sequence
             ready_event = self.payload_to_event(payload)
-            assert isinstance(
-                ready_event,
-                ReadyEvent,
-            ), f"Received unexpected event: {ready_event!r}"
+            if not isinstance(ready_event, ReadyEvent):
+                msg = f"Received unexpected event: {ready_event!r}"
+                raise ValueError(msg)
             ws.request.url = URL(ready_event.resume_gateway_url)
             bot.session_id = ready_event.session_id
             bot.self_info = ready_event.user
@@ -379,7 +375,9 @@ class Adapter(BaseAdapter):
             )
 
         if ready_event:
-            asyncio.create_task(bot.handle_event(ready_event))
+            task = asyncio.create_task(bot.handle_event(ready_event))
+            task.add_done_callback(self.tasks.discard)
+            self.tasks.add(task)
 
         return True
 
@@ -396,10 +394,6 @@ class Adapter(BaseAdapter):
                 try:
                     event = self.payload_to_event(payload)
                 except Exception as e:
-                    # (Path() / f"{payload.type}-{payload.sequence}.json").write_text(
-                    #     json.dumps(model_dump(payload), indent=4, ensure_ascii=False),
-                    #     encoding="utf-8",
-                    # )
                     log(
                         "WARNING",
                         f"Failed to parse event {escape_tag(repr(payload))}",
@@ -411,9 +405,11 @@ class Adapter(BaseAdapter):
                         and event.get_user_id() == bot.self_id
                         and not self.discord_config.discord_handle_self_message
                     ):
-                        asyncio.create_task(bot.handle_event(event))
+                        task = asyncio.create_task(bot.handle_event(event))
+                        task.add_done_callback(self.tasks.discard)
+                        self.tasks.add(task)
             elif isinstance(payload, Heartbeat):
-                # 当接受到心跳payload时，需要立即发送一次心跳，见 https://discord.com/developers/docs/topics/gateway#heartbeat-requests
+                # 当接受到心跳payload时, 需要立即发送一次心跳见 https://discord.com/developers/docs/topics/gateway#heartbeat-requests
                 await self._heartbeat(ws, bot)
 
             elif isinstance(payload, HeartbeatAck):
@@ -444,12 +440,12 @@ class Adapter(BaseAdapter):
 
     async def receive_payload(self, ws: WebSocket) -> Payload:
         data = await ws.receive()
-        data = decompress_data(data, self.discord_config.discord_compress)
+        data = decompress_data(data, compress=self.discord_config.discord_compress)
         return type_validate_json(PayloadType, data)
 
     @classmethod
     def payload_to_event(cls, payload: Dispatch) -> Event:
-        EventClass = event_classes.get(payload.type, None)
+        EventClass: Optional[type[Event]] = event_classes.get(payload.type, None)  # noqa: N806
         if not EventClass:
             log(
                 "WARNING",

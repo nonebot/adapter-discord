@@ -99,6 +99,7 @@ ignore = [
     "TC002",  # 避免依赖注入问题
     "TC003",  # 避免依赖注入问题
     "FA100",  # future-rewritable-type-annotation
+    "BLE001", # blind-except
 ]
 
 flake8-quotes = { inline-quotes = "double", multiline-quotes = "double" }

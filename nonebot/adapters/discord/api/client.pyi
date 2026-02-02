@@ -101,6 +101,8 @@ from .types import (
     VideoQualityMode,
 )
 
+# ruff: noqa: ANN003 # TODO)): 将所有params/kwargs类型补全
+
 class ApiClient:
     async def get_global_application_commands(
         self, *, application_id: SnowflakeType, with_localizations: bool | None = ...
@@ -123,7 +125,7 @@ class ApiClient:
         default_member_permissions: str | None = ...,
         dm_permission: bool | None = ...,
         default_permission: bool | None = ...,
-        type: ApplicationCommandType | None = ...,
+        type: ApplicationCommandType | None = ...,  # noqa: A002
         nsfw: bool | None = ...,
     ) -> ApplicationCommand:
         """Create a new global command.
@@ -205,7 +207,7 @@ class ApiClient:
         options: list[ApplicationCommandOption] | None = ...,
         default_member_permissions: str | None = ...,
         default_permission: bool | None = ...,
-        type: ApplicationCommandType | None = ...,
+        type: ApplicationCommandType | None = ...,  # noqa: A002
         nsfw: bool | None = ...,
     ) -> ApplicationCommand:
         """Create a new guild command.
@@ -556,7 +558,7 @@ class ApiClient:
 
         see https://discord.com/developers/docs/resources/channel#get-channel"""
 
-    async def modify_DM(
+    async def modify_DM(  # noqa: N802
         self,
         *,
         channel_id: SnowflakeType,
@@ -574,7 +576,7 @@ class ApiClient:
         *,
         channel_id: SnowflakeType,
         name: str | None = ...,
-        type: ChannelType | None = ...,
+        type: ChannelType | None = ...,  # noqa: A002
         position: int | None = ...,
         topic: str | None = ...,
         nsfw: bool | None = ...,
@@ -791,7 +793,7 @@ class ApiClient:
         overwrite_id: SnowflakeType,
         allow: str | None = ...,
         deny: str | None = ...,
-        type: OverwriteType | None = ...,
+        type: OverwriteType | None = ...,  # noqa: A002
         reason: str | None = ...,
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#edit-channel-permissions"""
@@ -858,7 +860,7 @@ class ApiClient:
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#unpin-message"""
 
-    async def group_DM_add_recipient(
+    async def group_DM_add_recipient(  # noqa: N802
         self,
         *,
         channel_id: SnowflakeType,
@@ -868,7 +870,7 @@ class ApiClient:
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#group-dm-add-recipient"""
 
-    async def group_DM_remove_recipient(
+    async def group_DM_remove_recipient(  # noqa: N802
         self, *, channel_id: SnowflakeType, user_id: SnowflakeType
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#group-dm-remove-recipient"""
@@ -891,7 +893,7 @@ class ApiClient:
         channel_id: SnowflakeType,
         name: str = ...,
         auto_archive_duration: int | None = ...,
-        type: ChannelType | None = ...,
+        type: ChannelType | None = ...,  # noqa: A002
         invitable: bool | None = ...,
         rate_limit_per_user: int | None = ...,
         reason: str | None = ...,
@@ -1150,7 +1152,7 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         name: str = ...,
-        type: ChannelType | None = ...,
+        type: ChannelType | None = ...,  # noqa: A002
         topic: str | None = ...,
         bitrate: int | None = ...,
         user_limit: int | None = ...,
@@ -1173,7 +1175,7 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        id: SnowflakeType = ...,
+        id: SnowflakeType = ...,  # noqa: A002
         position: int | None = ...,
         lock_permissions: bool | None = ...,
         parent_id: SnowflakeType | None = ...,
@@ -1262,7 +1264,7 @@ class ApiClient:
         user_id: SnowflakeType,
         role_id: SnowflakeType,
         reason: str | None = ...,
-    ):
+    ) -> None:
         """https://discord.com/developers/docs/resources/guild#add-guild-member-role"""
 
     async def remove_guild_member_role(
@@ -1272,7 +1274,7 @@ class ApiClient:
         user_id: SnowflakeType,
         role_id: SnowflakeType,
         reason: str | None = ...,
-    ):
+    ) -> None:
         """https://discord.com/developers/docs/resources/guild#remove-guild-member-role"""
 
     async def remove_guild_member(
@@ -1281,7 +1283,7 @@ class ApiClient:
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
         reason: str | None = ...,
-    ):
+    ) -> None:
         """https://discord.com/developers/docs/resources/guild#remove-guild-member"""
 
     async def get_guild_bans(
@@ -1356,7 +1358,7 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        id: SnowflakeType,
+        id: SnowflakeType,  # noqa: A002
         position: int | None = ...,
         reason: str | None = ...,
     ) -> list[Role]:
@@ -1378,7 +1380,7 @@ class ApiClient:
     ) -> Role:
         """https://discord.com/developers/docs/resources/guild#modify-guild-role"""
 
-    async def modify_guild_MFA_level(
+    async def modify_guild_MFA_level(  # noqa: N802
         self, *, guild_id: SnowflakeType, level: int, reason: str | None = ...
     ) -> None:
         """https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level"""
@@ -1664,7 +1666,7 @@ class ApiClient:
     ) -> MessageGet:
         """https://discord.com/developers/docs/resources/poll#end-poll"""
 
-    async def list_SKUs(self, *, application_id: SnowflakeType) -> list[SKU]:
+    async def list_SKUs(self, *, application_id: SnowflakeType) -> list[SKU]:  # noqa: N802
         """https://discord.com/developers/docs/resources/sku#list-skus"""
 
     async def create_stage_instance(
@@ -1714,16 +1716,19 @@ class ApiClient:
         self, *, guild_id: SnowflakeType, sticker_id: SnowflakeType
     ) -> Sticker:
         """https://discord.com/developers/docs/resources/sticker#get-guild-sticker"""
-    # async def create_guild_sticker(self,
-    #                                *,
-    #                                guild_id: SnowflakeType,
-    #                                name: str,
-    #                                description: str,
-    #                                tags: str,
-    #                                file: File,
-    #                                reason: str | None = ...) -> Sticker:
-    #     """https://discord.com/developers/docs/resources/sticker#create-guild-sticker"""
-    #     ...
+
+    async def create_guild_sticker(
+        self,
+        *,
+        guild_id: SnowflakeType,
+        name: str,
+        description: str,
+        tags: str,
+        file: File,
+        reason: str | None = None,
+    ) -> Sticker:
+        """https://discord.com/developers/docs/resources/sticker#create-guild-sticker"""
+
     async def modify_guild_sticker(
         self,
         *,
@@ -1745,7 +1750,7 @@ class ApiClient:
     ) -> None:
         """https://discord.com/developers/docs/resources/sticker#delete-guild-sticker"""
 
-    async def list_SKU_subscriptions(
+    async def list_SKU_subscriptions(  # noqa: N802
         self,
         *,
         sku_id: SnowflakeType,
@@ -1756,7 +1761,7 @@ class ApiClient:
     ) -> list[Subscription]:
         """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions"""
 
-    async def get_SKU_subscription(
+    async def get_SKU_subscription(  # noqa: N802
         self, *, sku_id: SnowflakeType, subscription_id: SnowflakeType
     ) -> Subscription:
         """https://discord.com/developers/docs/resources/subscription#get-sku-subscription"""
@@ -1789,10 +1794,10 @@ class ApiClient:
     async def leave_guild(self, *, guild_id: SnowflakeType) -> None:
         """https://discord.com/developers/docs/resources/user#leave-guild"""
 
-    async def create_DM(self, *, recipient_id: SnowflakeType) -> Channel:
+    async def create_DM(self, *, recipient_id: SnowflakeType) -> Channel:  # noqa: N802
         """https://discord.com/developers/docs/resources/user#create-dm"""
 
-    async def create_group_DM(
+    async def create_group_DM(  # noqa: N802
         self, *, access_tokens: list[str], nicks: dict[SnowflakeType, str]
     ) -> Channel:
         """https://discord.com/developers/docs/resources/user#create-group-dm"""

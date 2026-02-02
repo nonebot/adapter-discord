@@ -84,6 +84,7 @@ if TYPE_CHECKING:
     from ..adapter import Adapter
     from ..bot import Bot
 
+# ruff: noqa: ANN003 # TODO)): 将所有params/kwargs类型补全
 
 # Application Commands
 # see https://discord.com/developers/docs/interactions/application-commands
@@ -159,7 +160,7 @@ async def _edit_global_application_command(
     application_id: SnowflakeType,
     command_id: SnowflakeType,
     **data,
-):
+) -> ApplicationCommand:
     """Edit a global command. Returns 200 and an application command object.
     All fields are optional, but any fields provided will entirely overwrite
     the existing values of those fields.
@@ -307,7 +308,7 @@ async def _edit_guild_application_command(
     guild_id: SnowflakeType,
     command_id: SnowflakeType,
     **data,
-):
+) -> ApplicationCommand:
     """Edit a guild command.
     Updates for guild commands will be available immediately.
     Returns 200 and an application command object.
@@ -425,7 +426,7 @@ async def _get_application_command_permissions(
     )
 
 
-async def _edit_application_command_permissions(
+async def _edit_application_command_permissions(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     application_id: SnowflakeType,
@@ -591,7 +592,7 @@ async def _edit_followup_message(
     interaction_token: str,
     message_id: SnowflakeType,
     **data,
-):
+) -> MessageGet:
     """Edits a followup message for an Interaction. Functions the same as Edit Webhook Message.
 
     see https://discord.com/developers/docs/interactions/receiving-and-responding#edit-followup-message
@@ -900,7 +901,7 @@ async def _get_channel(
     return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
-async def _modify_DM(
+async def _modify_DM(  # noqa: N802 # TODO)): 疑似与_modify_channel重复, 确认后弃用
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **data
 ) -> Channel:
     """modify channel
@@ -1030,7 +1031,7 @@ async def _crosspost_message(
     return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
-async def _create_reaction(
+async def _create_reaction(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
@@ -1051,7 +1052,7 @@ async def _create_reaction(
     await _request(adapter, bot, request)
 
 
-async def _delete_own_reaction(
+async def _delete_own_reaction(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
@@ -1072,7 +1073,7 @@ async def _delete_own_reaction(
     await _request(adapter, bot, request)
 
 
-async def _delete_user_reaction(
+async def _delete_user_reaction(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
@@ -1094,7 +1095,7 @@ async def _delete_user_reaction(
     await _request(adapter, bot, request)
 
 
-async def _get_reactions(
+async def _get_reactions(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
@@ -1133,7 +1134,7 @@ async def _delete_all_reactions(
     await _request(adapter, bot, request)
 
 
-async def _delete_all_reactions_for_emoji(
+async def _delete_all_reactions_for_emoji(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
@@ -1355,7 +1356,7 @@ async def _unpin_message(
     await _request(adapter, bot, request)
 
 
-async def _group_DM_add_recipient(
+async def _group_DM_add_recipient(  # noqa: N802
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
@@ -1373,7 +1374,7 @@ async def _group_DM_add_recipient(
     await _request(adapter, bot, request)
 
 
-async def _group_DM_remove_recipient(
+async def _group_DM_remove_recipient(  # noqa: N802
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, user_id: SnowflakeType
 ) -> None:
     """https://discord.com/developers/docs/resources/channel#group-dm-remove-recipient"""
@@ -2064,7 +2065,7 @@ async def _modify_current_user_nick(
     return type_validate_python(GuildMember, await _request(adapter, bot, request))
 
 
-async def _add_guild_member_role(
+async def _add_guild_member_role(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     guild_id: SnowflakeType,
@@ -2084,7 +2085,7 @@ async def _add_guild_member_role(
     await _request(adapter, bot, request)
 
 
-async def _remove_guild_member_role(
+async def _remove_guild_member_role(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     guild_id: SnowflakeType,
@@ -2286,7 +2287,7 @@ async def _modify_guild_role(
     return type_validate_python(Role, await _request(adapter, bot, request))
 
 
-async def _modify_guild_MFA_level(
+async def _modify_guild_MFA_level(  # noqa: N802 # TODO)): 验证接口是否还存在
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **data
 ) -> None:
     """https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level"""
@@ -2472,7 +2473,7 @@ async def _get_guild_vanity_url(
     return type_validate_python(Invite, await _request(adapter, bot, request))
 
 
-async def _get_guild_widget_image(
+async def _get_guild_widget_image(  # noqa: ANN202 # TODO)): 校验接口返回值并更新类型
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **params
 ):
     """https://discord.com/developers/docs/resources/guild#get-guild-widget-image"""
@@ -2921,7 +2922,7 @@ async def _end_poll(
 # see https://discord.com/developers/docs/resources/sku
 
 
-async def _list_SKUs(
+async def _list_SKUs(  # noqa: N802
     adapter: "Adapter", bot: "Bot", application_id: SnowflakeType
 ) -> list[SKU]:
     """https://discord.com/developers/docs/resources/sku#list-skus"""
@@ -3075,7 +3076,7 @@ async def _get_guild_sticker(
     return type_validate_python(Sticker, await _request(adapter, bot, request))
 
 
-async def _create_guild_sticker(
+async def _create_guild_sticker(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     guild_id: SnowflakeType,
@@ -3147,7 +3148,7 @@ async def _delete_guild_sticker(
 # see https://discord.com/developers/docs/resources/subscription
 
 
-async def _list_SKU_subscriptions(
+async def _list_SKU_subscriptions(  # noqa: N802, PLR0913
     adapter: "Adapter",
     bot: "Bot",
     sku_id: SnowflakeType,
@@ -3178,7 +3179,7 @@ async def _list_SKU_subscriptions(
     )
 
 
-async def _get_SKU_subscription(
+async def _get_SKU_subscription(  # noqa: N802
     adapter: "Adapter",
     bot: "Bot",
     sku_id: SnowflakeType,
@@ -3272,7 +3273,7 @@ async def _leave_guild(adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType) 
     await _request(adapter, bot, request)
 
 
-async def _create_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:
+async def _create_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:  # noqa: N802
     """https://discord.com/developers/docs/resources/user#create-dm"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -3284,7 +3285,7 @@ async def _create_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:
     return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
-async def _create_group_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:
+async def _create_group_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:  # noqa: N802
     """https://discord.com/developers/docs/resources/user#create-group-dm"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(

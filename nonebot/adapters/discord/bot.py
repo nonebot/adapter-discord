@@ -41,7 +41,7 @@ async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
         log("WARNING", f"Error when getting message reply info: {e!r}", e)
 
 
-def _check_at_me(bot: "Bot", event: MessageEvent) -> None:
+def _check_at_me(bot: "Bot", event: MessageEvent) -> None:  # noqa: C901
     if event.mentions is not None and bot.self_info.id in [
         user.id for user in event.mentions
     ]:
@@ -75,7 +75,7 @@ def _check_at_me(bot: "Bot", event: MessageEvent) -> None:
         if (
             last_msg_seg.type == "text"
             and not last_msg_seg.data["text"].strip()
-            and len(message) >= 2
+            and len(message) >= 2  # noqa: PLR2004
         ):
             i -= 1
             last_msg_seg = message[i]
@@ -172,10 +172,10 @@ class Bot(BaseBot, ApiClient):
         self,
         channel_id: SnowflakeType,
         message: Union[str, Message, MessageSegment],
-        tts: bool = False,
+        tts: bool = False,  # noqa: FBT001, FBT002
         nonce: Union[int, str, None] = None,
         allowed_mentions: Optional[AllowedMention] = None,
-    ):
+    ) -> MessageGet:
         message_data = parse_message(message)
 
         return await self.create_message(

@@ -1,5 +1,5 @@
 import inspect
-from typing import Annotated, Any, Optional, TypeVar
+from typing import Annotated, Any, Optional, TypeVar, Union
 from typing_extensions import get_args, get_origin, override
 
 from nonebot.dependencies import Param
@@ -33,7 +33,7 @@ class CommandOptionType:
 
 
 class OptionParam(Param):
-    def __init__(self, *args, key: str, **kwargs: Any) -> None:
+    def __init__(self, *args, key: str, **kwargs: Any) -> None:  # noqa: ANN002, ANN401
         super().__init__(*args, **kwargs)
         self.key = key
 
@@ -109,7 +109,9 @@ class OptionParam(Param):
         return None
 
 
-def get_command_message(event: ApplicationCommandInteractionEvent):
+def get_command_message(
+    event: ApplicationCommandInteractionEvent,
+) -> Union[MessageGet, None]:
     if (
         event.data.type == ApplicationCommandType.MESSAGE
         and event.data.target_id
@@ -120,7 +122,7 @@ def get_command_message(event: ApplicationCommandInteractionEvent):
     return None
 
 
-def get_command_user(event: ApplicationCommandInteractionEvent):
+def get_command_user(event: ApplicationCommandInteractionEvent) -> Union[User, None]:
     if (
         event.data.type == ApplicationCommandType.USER
         and event.data.target_id

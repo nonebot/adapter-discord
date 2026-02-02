@@ -11,6 +11,7 @@ from typing import (
     Union,
     final,
 )
+from typing_extensions import Self
 import warnings
 
 from nonebot.compat import PYDANTIC_V2
@@ -21,6 +22,7 @@ from pydantic import (
 
 if PYDANTIC_V2:
     GenericModel = BaseModel
+    from pydantic import GetCoreSchemaHandler
     from pydantic_core import CoreSchema, core_schema
 elif TYPE_CHECKING:
     GenericModel = BaseModel
@@ -122,11 +124,15 @@ class Snowflake(int):
     if PYDANTIC_V2:
 
         @classmethod
-        def __get_pydantic_core_schema__(cls, source, handler) -> CoreSchema:
+        def __get_pydantic_core_schema__(
+            cls,
+            source: Any,  # noqa: ANN401
+            handler: GetCoreSchemaHandler,
+        ) -> CoreSchema:
             return core_schema.with_info_plain_validator_function(cls.validate)
 
         @classmethod
-        def validate(cls, value: Any, _):
+        def validate(cls, value: Any, _) -> Self:  # noqa: ANN001, ANN401
             if isinstance(value, str) and value.isdigit():
                 value = int(value)
             if not isinstance(value, int):
@@ -137,11 +143,11 @@ class Snowflake(int):
     else:
 
         @classmethod
-        def __get_validators__(cls):
+        def __get_validators__(cls):  # noqa: ANN206
             yield cls.validate
 
         @classmethod
-        def validate(cls, value: Any):
+        def validate(cls, value: Any):  # noqa: ANN206, ANN401
             if isinstance(value, str) and value.isdigit():
                 value = int(value)
             if not isinstance(value, int):
@@ -2556,7 +2562,7 @@ class Invite(BaseModel):
     stage_instance: Missing["InviteStageInstance"] = UNSET
     guild_scheduled_event: Missing["GuildScheduledEvent"] = UNSET
 
-    def __init__(self, **data) -> None:
+    def __init__(self, **data) -> None:  # noqa: ANN003
         super().__init__(**data)
         if data.get("stage_instance", UNSET) is not UNSET:
             warnings.warn(
@@ -2610,7 +2616,7 @@ class InviteStageInstance(BaseModel):
     speaker_count: int
     topic: str
 
-    def __init__(self, **data) -> None:
+    def __init__(self, **data) -> None:  # noqa: ANN003
         super().__init__(**data)
         warnings.warn(
             "InviteStageInstance is deprecated by Discord",
@@ -4007,7 +4013,7 @@ class RecurrenceRule(BaseModel):
     """The total amount of times that the event is allowed to recur before stopping"""
 
 
-class GuildScheduledEventRecurrenceRuleN_WeekdayStructure(BaseModel):
+class GuildScheduledEventRecurrenceRuleN_WeekdayStructure(BaseModel):  # noqa: N801
     """Guild Scheduled Event Recurrence Rule - N_Weekday Structure
 
     see https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-nweekday-structure

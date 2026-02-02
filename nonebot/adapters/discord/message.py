@@ -105,7 +105,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
         return EmbedSegment("embed", {"embed": embed})
 
     @staticmethod
-    def component(component: Component):
+    def component(component: Component) -> "ComponentSegment":
         if isinstance(component, (Button, SelectMenu)):
             component_ = ActionRow(components=[component])
         else:
@@ -114,7 +114,9 @@ class MessageSegment(BaseMessageSegment["Message"]):
 
     @staticmethod
     def custom_emoji(
-        name: str, emoji_id: str, animated: Optional[bool] = None
+        name: str,
+        emoji_id: str,
+        animated: Optional[bool] = None,  # noqa: FBT001
     ) -> "CustomEmojiSegment":
         return CustomEmojiSegment(
             "custom_emoji", {"name": name, "id": emoji_id, "animated": animated}
@@ -160,7 +162,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
         reference: SnowflakeType,
         channel_id: Optional[SnowflakeType] = None,
         guild_id: Optional[SnowflakeType] = None,
-        fail_if_not_exists: Optional[bool] = None,
+        fail_if_not_exists: Optional[bool] = None,  # noqa: FBT001
     ) -> "ReferenceSegment": ...
 
     @staticmethod
@@ -168,7 +170,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
         reference: Union[SnowflakeType, MessageReference],
         channel_id: Optional[SnowflakeType] = None,
         guild_id: Optional[SnowflakeType] = None,
-        fail_if_not_exists: Optional[bool] = None,
+        fail_if_not_exists: Optional[bool] = None,  # noqa: FBT001
     ):
         if isinstance(reference, MessageReference):
             _reference = reference
@@ -192,15 +194,15 @@ class MessageSegment(BaseMessageSegment["Message"]):
 
     @classmethod
     @override
-    def _validate(cls, value) -> Self:
+    def _validate(cls, value) -> Self:  # noqa: ANN001
         if isinstance(value, cls):
             return value
         if isinstance(value, MessageSegment):
             msg = f"Type {type(value)} can not be converted to {cls}"
-            raise ValueError(msg)
+            raise TypeError(msg)
         if not isinstance(value, dict):
             msg = f"Expected dict for MessageSegment, got {type(value)}"
-            raise ValueError(msg)
+            raise TypeError(msg)
         if "type" not in value:
             msg = f"Expected dict with 'type' for MessageSegment, got {value}"
             raise ValueError(msg)
@@ -261,7 +263,7 @@ class ComponentSegment(MessageSegment):
 
     @classmethod
     @override
-    def _validate(cls, value) -> Self:
+    def _validate(cls, value) -> Self:  # noqa: ANN001
         instance = super()._validate(value)
         if "component" not in instance.data:
             msg = f"Expected dict with 'component' in 'data' for ComponentSegment, got {value}"
@@ -271,7 +273,7 @@ class ComponentSegment(MessageSegment):
         ):
             if not isinstance(component, dict):
                 msg = f"Expected dict for ComponentData, got {type(component)}"
-                raise ValueError(msg)
+                raise TypeError(msg)
             if "type" not in component:
                 msg = f"Expected dict with 'type' for ComponentData, got {component}"
                 raise ValueError(msg)
@@ -455,7 +457,7 @@ class EmbedSegment(MessageSegment):
 
     @classmethod
     @override
-    def _validate(cls, value) -> Self:
+    def _validate(cls, value) -> Self:  # noqa: ANN001
         instance = super()._validate(value)
         if "embed" not in instance.data:
             msg = f"Expected dict with 'embed' in 'data' for EmbedSegment, got {value}"
@@ -487,7 +489,7 @@ class AttachmentSegment(MessageSegment):
 
     @classmethod
     @override
-    def _validate(cls, value) -> Self:
+    def _validate(cls, value) -> Self:  # noqa: ANN001
         instance = super()._validate(value)
         if "attachment" not in instance.data:
             msg = f"Expected dict with 'attachment' in 'data' for AttachmentSegment, got {value}"
@@ -524,7 +526,7 @@ class ReferenceSegment(MessageSegment):
 
     @classmethod
     @override
-    def _validate(cls, value) -> Self:
+    def _validate(cls, value) -> Self:  # noqa: ANN001
         instance = super()._validate(value)
         if "reference" not in instance.data:
             msg = f"Expected dict with 'reference' in 'data' for ReferenceSegment, got {value}"
@@ -557,7 +559,7 @@ class PollSegment(MessageSegment):
 
     @classmethod
     @override
-    def _validate(cls, value) -> Self:
+    def _validate(cls, value) -> Self:  # noqa: ANN001
         instance = super()._validate(value)
         if "poll" not in instance.data:
             msg = f"Expected dict with 'poll' in 'data' for PollSegment, got {value}"
@@ -565,7 +567,7 @@ class PollSegment(MessageSegment):
         if not isinstance(poll := instance.data["poll"], (Poll, PollRequest)):
             if not isinstance(poll, dict):
                 msg = f"Expected dict for PollData, got {type(poll)}"
-                raise ValueError(msg)
+                raise TypeError(msg)
             if (
                 "expiry" in poll
                 or "results" in poll
@@ -618,7 +620,7 @@ class Message(BaseMessage[MessageSegment]):
 
     @staticmethod
     @override
-    def _construct(msg: str) -> Iterable[MessageSegment]:
+    def _construct(msg: str) -> Iterable[MessageSegment]:  # noqa: C901, PLR0912
         text_begin = 0
         for embed in re.finditer(
             r"<(?P<type>(@!|@&|@|#|/|:|a:|t:))(?P<param>[^<]+?)>",
@@ -637,13 +639,13 @@ class Message(BaseMessage[MessageSegment]):
                 # TODO: slash command
                 pass
             elif embed.group("type") in (":", "a:"):
-                if len(cut := embed.group("param").split(":")) == 2:
+                if len(cut := embed.group("param").split(":")) == 2:  # noqa: PLR2004
                     yield MessageSegment.custom_emoji(
                         cut[0], cut[1], embed.group("type") == "a:"
                     )
                 else:
                     yield MessageSegment.text(unescape(embed.group()))
-            elif len(cut := embed.group("param").split(":")) == 2 and cut[0].isdigit():
+            elif len(cut := embed.group("param").split(":")) == 2 and cut[0].isdigit():  # noqa: PLR2004
                 yield MessageSegment.timestamp(int(cut[0]), TimeStampStyle(cut[1]))
             elif embed.group().isdigit():
                 yield MessageSegment.timestamp(int(embed.group()))
