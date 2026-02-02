@@ -15,7 +15,7 @@ OPTION_KEY: Literal["_discord_application_command_options"] = (
 )
 
 
-async def sync_application_command(bot: Bot):
+async def sync_application_command(bot: Bot) -> None:  # noqa: C901, PLR0912
     commands_global: list[ApplicationCommandCreate] = []
     commands_guild: dict[Snowflake, list[ApplicationCommandCreate]] = defaultdict(list)
     if "*" in bot.bot_info.application_commands:

@@ -38,10 +38,10 @@ async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
         if msg.author.id == bot.self_info.id:
             event.to_me = True
     except Exception as e:
-        log("WARNING", f"Error when getting message reply info: {repr(e)}", e)
+        log("WARNING", f"Error when getting message reply info: {e!r}", e)
 
 
-def _check_at_me(bot: "Bot", event: MessageEvent) -> None:
+def _check_at_me(bot: "Bot", event: MessageEvent) -> None:  # noqa: C901
     if event.mentions is not None and bot.self_info.id in [
         user.id for user in event.mentions
     ]:
@@ -75,7 +75,7 @@ def _check_at_me(bot: "Bot", event: MessageEvent) -> None:
         if (
             last_msg_seg.type == "text"
             and not last_msg_seg.data["text"].strip()
-            and len(message) >= 2
+            and len(message) >= 2  # noqa: PLR2004
         ):
             i -= 1
             last_msg_seg = message[i]
@@ -96,7 +96,7 @@ class Bot(BaseBot, ApiClient):
     adapter: "Adapter"
 
     @override
-    def __init__(self, adapter: "Adapter", self_id: str, bot_info: BotInfo):
+    def __init__(self, adapter: "Adapter", self_id: str, bot_info: BotInfo) -> None:
         super().__init__(adapter, self_id)
         self.adapter = adapter
         self._bot_info: BotInfo = bot_info
@@ -124,7 +124,8 @@ class Bot(BaseBot, ApiClient):
     @property
     def session_id(self) -> str:
         if self._session_id is None:
-            raise RuntimeError(f"Bot {self.self_id} is not connected!")
+            msg = f"Bot {self.self_id} is not connected!"
+            raise RuntimeError(msg)
         return self._session_id
 
     @session_id.setter
@@ -134,7 +135,8 @@ class Bot(BaseBot, ApiClient):
     @property
     def self_info(self) -> User:
         if self._self_info is None:
-            raise RuntimeError(f"Bot {self.bot_info} is not connected!")
+            msg = f"Bot {self.bot_info} is not connected!"
+            raise RuntimeError(msg)
         return self._self_info
 
     @self_info.setter
@@ -148,7 +150,8 @@ class Bot(BaseBot, ApiClient):
     @property
     def sequence(self) -> int:
         if self._sequence is None:
-            raise RuntimeError(f"Bot {self.self_id} is not connected!")
+            msg = f"Bot {self.self_id} is not connected!"
+            raise RuntimeError(msg)
         return self._sequence
 
     @sequence.setter
@@ -169,10 +172,10 @@ class Bot(BaseBot, ApiClient):
         self,
         channel_id: SnowflakeType,
         message: Union[str, Message, MessageSegment],
-        tts: bool = False,
+        tts: bool = False,  # noqa: FBT001, FBT002
         nonce: Union[int, str, None] = None,
         allowed_mentions: Optional[AllowedMention] = None,
-    ):
+    ) -> MessageGet:
         message_data = parse_message(message)
 
         return await self.create_message(
@@ -238,7 +241,8 @@ class Bot(BaseBot, ApiClient):
             )
 
         if not isinstance(event, MessageEvent) or not event.channel_id or not event.id:
-            raise RuntimeError("Event cannot be replied to!")
+            msg = "Event cannot be replied to!"
+            raise RuntimeError(msg)
         message = message if isinstance(message, Message) else Message(message)
         if mention_sender or at_sender:
             message.insert(0, MessageSegment.mention_user(event.user_id))

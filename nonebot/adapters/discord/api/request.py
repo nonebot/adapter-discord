@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import json
 from typing import TYPE_CHECKING, Any
 
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
     from ..bot import Bot
 
 
-async def _request(adapter: "Adapter", bot: "Bot", request: Request) -> Any:
+async def _request(adapter: "Adapter", bot: "Bot", request: Request) -> Any:  # noqa: ANN401, ARG001 # TODO)): 验证bot参数是否需要, 重构为泛型函数, 接管type_validate部分
     try:
         request.timeout = adapter.discord_config.discord_api_timeout
         request.proxy = adapter.discord_config.discord_proxy
@@ -29,15 +30,17 @@ async def _request(adapter: "Adapter", bot: "Bot", request: Request) -> Any:
         )
         if data.status_code in (200, 201, 204):
             return data.content and json.loads(
-                decompress_data(data.content, adapter.discord_config.discord_compress)
+                decompress_data(
+                    data.content, compress=adapter.discord_config.discord_compress
+                )
             )
-        elif data.status_code in (401, 403):
-            raise UnauthorizedException(data)
-        elif data.status_code == 429:
-            raise RateLimitException(data)
-        else:
-            raise ActionFailed(data)
+        if data.status_code in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
+            raise UnauthorizedException(data)  # noqa: TRY301
+        if data.status_code == HTTPStatus.TOO_MANY_REQUESTS:
+            raise RateLimitException(data)  # noqa: TRY301
+        raise ActionFailed(data)  # noqa: TRY301
     except DiscordAdapterException:
         raise
     except Exception as e:
-        raise NetworkError("API request failed") from e
+        msg = "API request failed"
+        raise NetworkError(msg) from e

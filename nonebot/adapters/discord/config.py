@@ -28,7 +28,7 @@ class Intents(BaseModel):
     guild_message_polls: bool = True
     direct_message_polls: bool = True
 
-    def to_int(self):
+    def to_int(self) -> int:
         return (
             self.guilds << 0
             | self.guild_members << 1

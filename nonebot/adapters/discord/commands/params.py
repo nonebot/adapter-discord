@@ -1,5 +1,5 @@
 import inspect
-from typing import Annotated, Any, Optional, TypeVar
+from typing import Annotated, Any, Optional, TypeVar, Union
 from typing_extensions import get_args, get_origin, override
 
 from nonebot.dependencies import Param
@@ -33,7 +33,7 @@ class CommandOptionType:
 
 
 class OptionParam(Param):
-    def __init__(self, *args, key: str, **kwargs: Any) -> None:
+    def __init__(self, *args, key: str, **kwargs: Any) -> None:  # noqa: ANN002, ANN401
         super().__init__(*args, **kwargs)
         self.key = key
 
@@ -47,10 +47,11 @@ class OptionParam(Param):
     ) -> Optional["OptionParam"]:
         if isinstance(param.default, CommandOptionType):
             return cls(key=param.default.key or param.name, validate=True)
-        elif get_origin(param.annotation) is Annotated:
+        if get_origin(param.annotation) is Annotated:
             for arg in get_args(param.annotation):
                 if isinstance(arg, CommandOptionType):
                     return cls(key=arg.key or param.name, validate=True)
+        return None
 
     @override
     async def _solve(
@@ -83,13 +84,13 @@ class OptionParam(Param):
                                 )
                             )
                         ):
-                            return data[Snowflake(option.value)]  # type: ignore
-                        elif (
+                            return data[Snowflake(option.value)]
+                        if (
                             option.type == ApplicationCommandOptionType.MENTIONABLE
                             and event.data.resolved
                             and event.data.resolved.users
                         ):
-                            sid = Snowflake(option.value)  # type: ignore
+                            sid = Snowflake(option.value)
                             return (
                                 event.data.resolved.users.get(sid),
                                 (
@@ -98,7 +99,7 @@ class OptionParam(Param):
                                     else None
                                 ),
                             )
-                        elif option.type in (
+                        if option.type in (
                             ApplicationCommandOptionType.INTEGER,
                             ApplicationCommandOptionType.STRING,
                             ApplicationCommandOptionType.NUMBER,
@@ -108,7 +109,9 @@ class OptionParam(Param):
         return None
 
 
-def get_command_message(event: ApplicationCommandInteractionEvent):
+def get_command_message(
+    event: ApplicationCommandInteractionEvent,
+) -> Union[MessageGet, None]:
     if (
         event.data.type == ApplicationCommandType.MESSAGE
         and event.data.target_id
@@ -116,9 +119,10 @@ def get_command_message(event: ApplicationCommandInteractionEvent):
         and event.data.resolved.messages
     ):
         return event.data.resolved.messages.get(event.data.target_id)
+    return None
 
 
-def get_command_user(event: ApplicationCommandInteractionEvent):
+def get_command_user(event: ApplicationCommandInteractionEvent) -> Union[User, None]:
     if (
         event.data.type == ApplicationCommandType.USER
         and event.data.target_id
@@ -126,6 +130,7 @@ def get_command_user(event: ApplicationCommandInteractionEvent):
         and event.data.resolved.users
     ):
         return event.data.resolved.users.get(event.data.target_id)
+    return None
 
 
 CommandOption = Annotated[T, CommandOptionType()]

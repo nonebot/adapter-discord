@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from datetime import datetime, timedelta
-from typing import Any, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 from nonebot.adapters import MessageTemplate
 
@@ -58,21 +58,6 @@ class ApplicationCommandConfig(ApplicationCommandCreate):
     guild_ids: Optional[list[Snowflake]] = None
 
 
-# def _application_command_rule(event: ApplicationCommandInteractionEvent) -> bool:
-#     application_command = _application_command_storage.get(event.data.name)
-#     if not application_command or event.data.type != application_command.type:
-#         return False
-#     if not event.data.guild_id and application_command.guild_ids is None:
-#         return True
-#     if (
-#         event.data.guild_id
-#         and application_command.guild_ids
-#         and event.data.guild_id in application_command.guild_ids
-#     ):
-#         return True
-#     return False
-
-
 class ApplicationCommandMatcher(Matcher):
     application_command: ApplicationCommandConfig
 
@@ -83,7 +68,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)  # noqa: TRY004
         await bot.create_interaction_response(
             interaction_id=event.id,
             interaction_token=event.token,
@@ -105,7 +91,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)  # noqa: TRY004
         return await bot.get_origin_interaction_response(
             application_id=event.application_id,
             interaction_token=event.token,
@@ -122,7 +109,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)  # noqa: TRY004
         if isinstance(message, MessageTemplate):
             _message = message.format(**state)
         else:
@@ -141,7 +129,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)  # noqa: TRY004
         await bot.delete_origin_interaction_response(
             application_id=event.application_id,
             interaction_token=event.token,
@@ -159,7 +148,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)  # noqa: TRY004
         if isinstance(message, MessageTemplate):
             _message = message.format(**state)
         else:
@@ -174,13 +164,14 @@ class ApplicationCommandMatcher(Matcher):
         )
 
     @classmethod
-    async def get_followup_msg(cls, message_id: SnowflakeType):
+    async def get_followup_msg(cls, message_id: SnowflakeType) -> MessageGet:
         event = current_event.get()
         bot = current_bot.get()
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)  # noqa: TRY004
         return await bot.get_followup_message(
             application_id=event.application_id,
             interaction_token=event.token,
@@ -199,7 +190,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)  # noqa: TRY004
         if isinstance(message, MessageTemplate):
             _message = message.format(**state)
         else:
@@ -219,7 +211,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)  # noqa: TRY004
         await bot.delete_followup_message(
             application_id=event.application_id,
             interaction_token=event.token,
@@ -242,10 +235,12 @@ class SlashCommandMatcher(ApplicationCommandMatcher):
     @classmethod
     def handle_sub_command(
         cls, *commands: str, parameterless: Optional[Iterable[Any]] = None
-    ):
+    ) -> Callable[..., T_Handler]:
         def _sub_command_rule(
-            event: ApplicationCommandInteractionEvent, matcher: Matcher, state: T_State
-        ):
+            event: ApplicationCommandInteractionEvent,
+            matcher: Matcher,
+            state: T_State,  # noqa: ARG001 # TODO)): 验证state作用
+        ) -> None:
             if commands and not event.data.options:
                 matcher.skip()
             options = event.data.options
@@ -259,48 +254,6 @@ class SlashCommandMatcher(ApplicationCommandMatcher):
                 ):
                     matcher.skip()
                 options = options[0].options if options[0].options else None
-            # if options:
-            #     state[OPTION_KEY] = {}
-            #     for option in options:
-            #         if (
-            #             option.type
-            #             in (
-            #                 ApplicationCommandOptionType.USER,
-            #                 ApplicationCommandOptionType.CHANNEL,
-            #                 ApplicationCommandOptionType.ROLE,
-            #                 ApplicationCommandOptionType.ATTACHMENT,
-            #             )
-            #             and event.data.resolved
-            #             and (
-            #                 data := getattr(
-            #                     event.data.resolved, type_str_mapping[option.type]
-            #                 )
-            #             )
-            #         ):
-            #             state[OPTION_KEY][option.name] = data[
-            #                 Snowflake(option.value)  # type: ignore
-            #             ]
-            #         elif (
-            #             option.type == ApplicationCommandOptionType.MENTIONABLE
-            #             and event.data.resolved
-            #             and event.data.resolved.users
-            #         ):
-            #             sid = Snowflake(option.value)  # type: ignore
-            #             state[OPTION_KEY][option.name] = (
-            #                 event.data.resolved.users.get(sid),
-            #                 (
-            #                     event.data.resolved.members.get(sid)
-            #                     if event.data.resolved.members
-            #                     else None
-            #                 ),
-            #             )
-            #         elif option.type in (
-            #             ApplicationCommandOptionType.INTEGER,
-            #             ApplicationCommandOptionType.STRING,
-            #             ApplicationCommandOptionType.NUMBER,
-            #             ApplicationCommandOptionType.BOOLEAN,
-            #         ):
-            #             state[OPTION_KEY][option.name] = option.value
 
         parameterless = [Depends(_sub_command_rule), *(parameterless or [])]
 
@@ -315,7 +268,7 @@ class UserMessageCommandMatcher(ApplicationCommandMatcher):
     pass
 
 
-def on_slash_command(
+def on_slash_command(  # noqa: PLR0913
     name: str,
     description: str,
     options: Optional[list[AnyCommandOption]] = None,
@@ -369,13 +322,11 @@ def on_slash_command(
             return False
         if not event.data.guild_id and config.guild_ids is None:
             return True
-        if (
+        return bool(
             event.data.guild_id
             and config.guild_ids
             and event.data.guild_id in config.guild_ids
-        ):
-            return True
-        return False
+        )
 
     matcher.rule = matcher.rule & Rule(_application_command_rule)
 
@@ -384,7 +335,7 @@ def on_slash_command(
     return matcher
 
 
-def on_user_command(
+def on_user_command(  # noqa: PLR0913
     name: str,
     internal_id: Optional[str] = None,
     rule: Union[Rule, T_RuleChecker, None] = None,
@@ -432,13 +383,11 @@ def on_user_command(
             return False
         if not event.data.guild_id and config.guild_ids is None:
             return True
-        if (
+        return bool(
             event.data.guild_id
             and config.guild_ids
             and event.data.guild_id in config.guild_ids
-        ):
-            return True
-        return False
+        )
 
     matcher.rule = matcher.rule & Rule(_application_command_rule)
 
@@ -447,7 +396,7 @@ def on_user_command(
     return matcher
 
 
-def on_message_command(
+def on_message_command(  # noqa: PLR0913
     name: str,
     internal_id: Optional[str] = None,
     rule: Union[Rule, T_RuleChecker, None] = None,
@@ -495,13 +444,11 @@ def on_message_command(
             return False
         if not event.data.guild_id and config.guild_ids is None:
             return True
-        if (
+        return bool(
             event.data.guild_id
             and config.guild_ids
             and event.data.guild_id in config.guild_ids
-        ):
-            return True
-        return False
+        )
 
     matcher.rule = matcher.rule & Rule(_application_command_rule)
 

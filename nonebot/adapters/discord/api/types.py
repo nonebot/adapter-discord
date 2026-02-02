@@ -28,17 +28,19 @@ class Unset(Enum):
     def __bool__(self) -> Literal[False]:
         return False
 
-    def __copy__(self):
+    def __copy__(self):  # noqa: ANN204
         return self._UNSET
 
-    def __deepcopy__(self, memo: dict[int, Any]):
+    def __deepcopy__(self, memo: dict[int, Any]):  # noqa: ANN204
         return self._UNSET
 
     if PYDANTIC_V2:
 
         @classmethod
         def __get_pydantic_core_schema__(
-            cls, source_type: Any, handler: Any
+            cls,
+            source_type: Any,  # noqa: ANN401
+            handler: Any,  # noqa: ANN401
         ) -> core_schema.CoreSchema:
             return core_schema.with_info_plain_validator_function(
                 lambda value, _: cls._validate(value)
@@ -46,17 +48,18 @@ class Unset(Enum):
     else:
 
         @classmethod
-        def __get_validators__(cls):
+        def __get_validators__(cls):  # noqa: ANN206
             yield cls._validate
 
     @classmethod
-    def _validate(cls, value: Any):
+    def _validate(cls, value: Any):  # noqa: ANN206, ANN401
         if value is not cls._UNSET:
-            raise ValueError(f"{value!r} is not UNSET")
+            msg = f"{value!r} is not UNSET"
+            raise ValueError(msg)
         return value
 
 
-UNSET = Unset._UNSET
+UNSET = Unset._UNSET  # noqa: SLF001
 """UNSET means that the field maybe not given in the data.
 
 see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
@@ -517,7 +520,7 @@ class ConnectionServiceType(StrEnum):
     Battle_net = "battlenet"
     Bungie_net = "bungie"
     Domain = "domain"
-    eBay = "ebay"
+    eBay = "ebay"  # noqa: N815
     Epic_Games = "epicgames"
     Facebook = "facebook"
     GitHub = "github"
@@ -1411,10 +1414,6 @@ class TeamMemberRoleType(StrEnum):
 
     see https://discord.com/developers/docs/topics/teams#team-member-roles"""
 
-    # Owner = ""
-    # """Owners are the most permissible role, and can take destructive,
-    # irreversible actions like deleting team-owned apps or the team itself.
-    # Teams are limited to 1 owner."""
     Admin = "admin"
     """Admins have similar access as owners, except they cannot take
     destructive actions on the team or team-owned apps."""
@@ -1598,11 +1597,10 @@ class WebhookType(IntEnum):
 
 __all__ = [
     "UNSET",
-    "Missing",
-    "MissingOrNullable",
     "ActivityAssetImage",
     "ActivityFlags",
     "ActivityType",
+    "AllowedMentionType",
     "AnimationType",
     "ApplicationCommandOptionType",
     "ApplicationCommandPermissionsType",
@@ -1610,7 +1608,6 @@ __all__ = [
     "ApplicationFlag",
     "ApplicationIntegrationType",
     "ApplicationRoleConnectionMetadataType",
-    "AllowedMentionType",
     "AttachmentFlag",
     "AuditLogEventType",
     "AutoModerationActionType",
@@ -1631,22 +1628,24 @@ __all__ = [
     "GuildScheduledEventEntityType",
     "GuildScheduledEventPrivacyLevel",
     "GuildScheduledEventRecurrenceRuleFrequency",
-    "GuildScheduledEventRecurrenceRuleWeekday",
     "GuildScheduledEventRecurrenceRuleMonth",
+    "GuildScheduledEventRecurrenceRuleWeekday",
     "GuildScheduledEventStatus",
-    "InteractionContextType",
     "IntegrationExpireBehaviors",
-    "InteractionType",
     "InteractionCallbackType",
+    "InteractionContextType",
+    "InteractionType",
     "InviteTargetType",
     "InviteType",
     "KeywordPresetType",
+    "MFALevel",
+    "MembershipState",
     "MessageActivityType",
     "MessageFlag",
     "MessageReferenceType",
     "MessageType",
-    "MembershipState",
-    "MFALevel",
+    "Missing",
+    "MissingOrNullable",
     "MutableGuildFeature",
     "OnboardingMode",
     "OnboardingPromptType",

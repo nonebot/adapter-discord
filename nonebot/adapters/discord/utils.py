@@ -10,22 +10,23 @@ from .api.types import UNSET
 log = logger_wrapper("Discord")
 
 
-def exclude_unset_data(data: Any) -> Any:
+def exclude_unset_data(data: Any) -> Any:  # noqa: ANN401
     if isinstance(data, dict):
         return data.__class__(
             (k, exclude_unset_data(v)) for k, v in data.items() if v is not UNSET
         )
-    elif isinstance(data, list):
+    if isinstance(data, list):
         return data.__class__(exclude_unset_data(i) for i in data)
-    elif data is UNSET:
+    if data is UNSET:
         return None
     return data
 
 
-def model_dump(
+def model_dump(  # noqa: PLR0913
     model: BaseModel,
     include: Optional[set[str]] = None,
     exclude: Optional[set[str]] = None,
+    *,
     by_alias: bool = False,
     exclude_unset: bool = False,
     exclude_defaults: bool = False,
@@ -42,8 +43,7 @@ def model_dump(
     )
     if exclude_none or exclude_unset:
         return exclude_unset_data(data)
-    else:
-        return data
+    return data
 
 
 def escape(s: str) -> str:
@@ -54,5 +54,5 @@ def unescape(s: str) -> str:
     return s.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
 
 
-def decompress_data(data: Union[str, bytes], compress: bool) -> Union[str, bytes]:
-    return zlib.decompress(data) if compress else data  # type: ignore
+def decompress_data(data: Union[str, bytes], *, compress: bool) -> Union[str, bytes]:
+    return zlib.decompress(data) if compress else data

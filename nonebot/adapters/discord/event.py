@@ -9,7 +9,82 @@ from nonebot.compat import model_dump
 from nonebot.utils import escape_tag
 from pydantic import Field
 
-from .api.model import *
+from .api.model import (
+    ApplicationCommandData,
+    ApplicationCommandPermissions,
+    AutoModerationActionExecution,
+    AutoModerationRuleCreate,
+    AutoModerationRuleDelete,
+    AutoModerationRuleUpdate,
+    ChannelCreate,
+    ChannelDelete,
+    ChannelPinsUpdate,
+    ChannelUpdate,
+    EntitlementCreate,
+    EntitlementDelete,
+    EntitlementUpdate,
+    GuildAuditLogEntryCreate,
+    GuildBanAdd,
+    GuildBanRemove,
+    GuildCreate,
+    GuildDelete,
+    GuildEmojisUpdate,
+    GuildIntegrationsUpdate,
+    GuildMember,
+    GuildMemberAdd,
+    GuildMemberRemove,
+    GuildMembersChunk,
+    GuildMemberUpdate,
+    GuildRoleCreate,
+    GuildRoleDelete,
+    GuildRoleUpdate,
+    GuildScheduledEventCreate,
+    GuildScheduledEventDelete,
+    GuildScheduledEventUpdate,
+    GuildScheduledEventUserAdd,
+    GuildScheduledEventUserRemove,
+    GuildStickersUpdate,
+    GuildUpdate,
+    IntegrationCreate,
+    IntegrationDelete,
+    IntegrationUpdate,
+    InteractionCreate,
+    InviteCreate,
+    MessageComponentData,
+    MessageCreate,
+    MessageDelete,
+    MessageDeleteBulk,
+    MessageGet,
+    MessagePollVoteAdd,
+    MessagePollVoteRemove,
+    MessageReactionAdd,
+    MessageReactionRemove,
+    MessageReactionRemoveAll,
+    MessageReactionRemoveEmoji,
+    MessageUpdate,
+    ModalSubmitData,
+    PresenceUpdate,
+    Ready,
+    Snowflake,
+    StageInstanceCreate,
+    StageInstanceDelete,
+    StageInstanceUpdate,
+    SubscriptionCreate,
+    SubscriptionDelete,
+    SubscriptionUpdate,
+    ThreadCreate,
+    ThreadDelete,
+    ThreadListSync,
+    ThreadMembersUpdate,
+    ThreadMemberUpdate,
+    ThreadUpdate,
+    TypingStart,
+    UserUpdate,
+    VoiceChannelEffectSend,
+    VoiceServerUpdate,
+    VoiceStateUpdate,
+    WebhooksUpdate,
+)
 from .api.types import UNSET, InteractionType, Missing
 from .message import Message
 
@@ -157,15 +232,18 @@ class Event(BaseEvent):
 
     @override
     def get_message(self) -> Message:
-        raise ValueError("Event has no message!")
+        msg = "Event has no message!"
+        raise ValueError(msg)
 
     @override
     def get_user_id(self) -> str:
-        raise ValueError("Event has no context!")
+        msg = "Event has no context!"
+        raise ValueError(msg)
 
     @override
     def get_session_id(self) -> str:
-        raise ValueError("Event has no context!")
+        msg = "Event has no context!"
+        raise ValueError(msg)
 
     @override
     def is_tome(self) -> bool:
@@ -209,7 +287,7 @@ class MessageEvent(Event, MessageGet):
 
     @property
     def original_message(self) -> Message:
-        return getattr(self, "_original_message", self.get_message())  # type: ignore
+        return getattr(self, "_original_message", self.get_message())
 
     @override
     def get_type(self) -> str:
@@ -226,9 +304,9 @@ class MessageEvent(Event, MessageGet):
     @override
     def get_message(self) -> Message:
         if not hasattr(self, "_message"):
-            setattr(self, "_message", Message.from_guild_message(self))
-            setattr(self, "_original_message", Message.from_guild_message(self))
-        return getattr(self, "_message")
+            self._message = Message.from_guild_message(self)
+            self._original_message = Message.from_guild_message(self)
+        return self._message
 
     @override
     def is_tome(self) -> bool:
@@ -672,7 +750,8 @@ class InteractionCreateEvent(NoticeEvent, InteractionCreate):
     @override
     def get_user_id(self) -> str:
         if not self.user:
-            raise ValueError("Event has no context!")
+            msg = "Event has no context!"
+            raise ValueError(msg)
         return str(self.user.id)
 
 
@@ -1146,119 +1225,119 @@ event_classes: dict[str, type[Event]] = {
         DirectMessagePollVoteRemoveEvent,
         MessagePollVoteRemoveEvent,
     ],
-}  # type: ignore
+}
 
 __all__ = [
-    "EventType",
-    "Event",
-    "MetaEvent",
-    "NoticeEvent",
-    "RequestEvent",
-    "MessageEvent",
-    "HelloEvent",
-    "ReadyEvent",
-    "ResumedEvent",
-    "ReconnectEvent",
-    "InvalidSessionEvent",
+    "ApplicationCommandAutoCompleteInteractionEvent",
+    "ApplicationCommandInteractionEvent",
     "ApplicationCommandPermissionsUpdateEvent",
+    "AutoModerationActionExecutionEvent",
     "AutoModerationEvent",
     "AutoModerationRuleCreateEvent",
-    "AutoModerationRuleUpdateEvent",
     "AutoModerationRuleDeleteEvent",
-    "AutoModerationActionExecutionEvent",
-    "ChannelEvent",
+    "AutoModerationRuleUpdateEvent",
     "ChannelCreateEvent",
-    "ChannelUpdateEvent",
     "ChannelDeleteEvent",
+    "ChannelEvent",
     "ChannelPinsUpdateEvent",
-    "ThreadEvent",
-    "ThreadCreateEvent",
-    "ThreadUpdateEvent",
-    "ThreadDeleteEvent",
-    "ThreadListSyncEvent",
-    "ThreadMemberUpdateEvent",
-    "ThreadMembersUpdateEvent",
+    "ChannelUpdateEvent",
+    "DirectMessageCreateEvent",
+    "DirectMessageDeleteBulkEvent",
+    "DirectMessageDeleteEvent",
+    "DirectMessagePollVoteAddEvent",
+    "DirectMessagePollVoteRemoveEvent",
+    "DirectMessageReactionAddEvent",
+    "DirectMessageReactionRemoveAllEvent",
+    "DirectMessageReactionRemoveEmojiEvent",
+    "DirectMessageReactionRemoveEvent",
+    "DirectMessageUpdateEvent",
+    "DirectTypingStartEvent",
     "EntitlementCreateEvent",
-    "EntitlementUpdateEvent",
     "EntitlementDeleteEvent",
-    "GuildEvent",
-    "GuildCreateEvent",
-    "GuildUpdateEvent",
-    "GuildDeleteEvent",
+    "EntitlementUpdateEvent",
+    "Event",
+    "EventType",
     "GuildAuditLogEntryCreateEvent",
     "GuildBanAddEvent",
     "GuildBanRemoveEvent",
+    "GuildCreateEvent",
+    "GuildDeleteEvent",
     "GuildEmojisUpdateEvent",
-    "GuildStickersUpdateEvent",
+    "GuildEvent",
     "GuildIntegrationsUpdateEvent",
     "GuildMemberAddEvent",
     "GuildMemberRemoveEvent",
     "GuildMemberUpdateEvent",
     "GuildMembersChunkEvent",
+    "GuildMessageCreateEvent",
+    "GuildMessageDeleteBulkEvent",
+    "GuildMessageDeleteEvent",
+    "GuildMessagePollVoteAddEvent",
+    "GuildMessagePollVoteRemoveEvent",
+    "GuildMessageReactionAddEvent",
+    "GuildMessageReactionRemoveAllEvent",
+    "GuildMessageReactionRemoveEmojiEvent",
+    "GuildMessageReactionRemoveEvent",
+    "GuildMessageUpdateEvent",
     "GuildRoleCreateEvent",
-    "GuildRoleUpdateEvent",
     "GuildRoleDeleteEvent",
+    "GuildRoleUpdateEvent",
     "GuildScheduledEventCreateEvent",
-    "GuildScheduledEventUpdateEvent",
     "GuildScheduledEventDeleteEvent",
+    "GuildScheduledEventUpdateEvent",
     "GuildScheduledEventUserAddEvent",
     "GuildScheduledEventUserRemoveEvent",
-    "IntegrationEvent",
+    "GuildStickersUpdateEvent",
+    "GuildTypingStartEvent",
+    "GuildUpdateEvent",
+    "HelloEvent",
     "IntegrationCreateEvent",
-    "IntegrationUpdateEvent",
     "IntegrationDeleteEvent",
+    "IntegrationEvent",
+    "IntegrationUpdateEvent",
     "InteractionCreateEvent",
-    "PingInteractionEvent",
-    "ApplicationCommandInteractionEvent",
-    "ApplicationCommandAutoCompleteInteractionEvent",
-    "MessageComponentInteractionEvent",
-    "ModalSubmitInteractionEvent",
+    "InvalidSessionEvent",
     "InviteCreateEvent",
     "InviteDeleteEvent",
+    "MessageComponentInteractionEvent",
     "MessageCreateEvent",
-    "GuildMessageCreateEvent",
-    "DirectMessageCreateEvent",
-    "MessageUpdateEvent",
-    "GuildMessageUpdateEvent",
-    "DirectMessageUpdateEvent",
-    "MessageDeleteEvent",
-    "GuildMessageDeleteEvent",
-    "DirectMessageDeleteEvent",
     "MessageDeleteBulkEvent",
-    "GuildMessageDeleteBulkEvent",
-    "DirectMessageDeleteBulkEvent",
+    "MessageDeleteEvent",
+    "MessageEvent",
+    "MessagePollVoteAddEvent",
+    "MessagePollVoteRemoveEvent",
     "MessageReactionAddEvent",
-    "GuildMessageReactionAddEvent",
-    "DirectMessageReactionAddEvent",
-    "MessageReactionRemoveEvent",
-    "GuildMessageReactionRemoveEvent",
-    "DirectMessageReactionRemoveEvent",
     "MessageReactionRemoveAllEvent",
-    "GuildMessageReactionRemoveAllEvent",
-    "DirectMessageReactionRemoveAllEvent",
     "MessageReactionRemoveEmojiEvent",
-    "GuildMessageReactionRemoveEmojiEvent",
-    "DirectMessageReactionRemoveEmojiEvent",
+    "MessageReactionRemoveEvent",
+    "MessageUpdateEvent",
+    "MetaEvent",
+    "ModalSubmitInteractionEvent",
+    "NoticeEvent",
+    "PingInteractionEvent",
     "PresenceUpdateEvent",
+    "ReadyEvent",
+    "ReconnectEvent",
+    "RequestEvent",
+    "ResumedEvent",
     "StageInstanceCreateEvent",
-    "StageInstanceUpdateEvent",
     "StageInstanceDeleteEvent",
+    "StageInstanceUpdateEvent",
     "SubscriptionCreateEvent",
-    "SubscriptionUpdateEvent",
     "SubscriptionDeleteEvent",
+    "SubscriptionUpdateEvent",
+    "ThreadCreateEvent",
+    "ThreadDeleteEvent",
+    "ThreadEvent",
+    "ThreadListSyncEvent",
+    "ThreadMemberUpdateEvent",
+    "ThreadMembersUpdateEvent",
+    "ThreadUpdateEvent",
     "TypingStartEvent",
-    "GuildTypingStartEvent",
-    "DirectTypingStartEvent",
     "UserUpdateEvent",
     "VoiceChannelEffectSendEvent",
-    "VoiceStateUpdateEvent",
     "VoiceServerUpdateEvent",
+    "VoiceStateUpdateEvent",
     "WebhooksUpdateEvent",
-    "MessagePollVoteAddEvent",
-    "GuildMessagePollVoteAddEvent",
-    "DirectMessagePollVoteAddEvent",
-    "MessagePollVoteRemoveEvent",
-    "GuildMessagePollVoteRemoveEvent",
-    "DirectMessagePollVoteRemoveEvent",
     "event_classes",
 ]

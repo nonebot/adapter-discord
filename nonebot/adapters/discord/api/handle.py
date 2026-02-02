@@ -11,7 +11,71 @@ from urllib.parse import quote
 from nonebot.compat import type_validate_python
 from nonebot.drivers import Request
 
-from .model import *
+from .model import (
+    SKU,
+    ActivityInstance,
+    AnswerVoters,
+    Application,
+    ApplicationCommand,
+    ApplicationCommandCreate,
+    ApplicationCommandPermissions,
+    ApplicationEmojis,
+    ApplicationRoleConnection,
+    ApplicationRoleConnectionMetadata,
+    ArchivedThreadsResponse,
+    AuditLog,
+    AuthorizationResponse,
+    AutoModerationRule,
+    Ban,
+    BulkBan,
+    Channel,
+    Connection,
+    CreateAndModifyAutoModerationRuleParams,
+    CreateGuildChannelParams,
+    CreateGuildParams,
+    CreateGuildScheduledEventParams,
+    CurrentUserGuild,
+    Emoji,
+    Entitlement,
+    ExecuteWebhookParams,
+    File,
+    FollowedChannel,
+    Gateway,
+    GatewayBot,
+    Guild,
+    GuildApplicationCommandPermissions,
+    GuildMember,
+    GuildOnboarding,
+    GuildPreview,
+    GuildScheduledEvent,
+    GuildScheduledEventUser,
+    GuildTemplate,
+    GuildWidget,
+    GuildWidgetSettings,
+    Integration,
+    InteractionResponse,
+    Invite,
+    ListActiveGuildThreadsResponse,
+    MessageGet,
+    MessageSend,
+    ModifyChannelParams,
+    ModifyGuildOnboardingParams,
+    ModifyGuildParams,
+    ModifyGuildScheduledEventParams,
+    ModifyGuildWelcomeScreenParams,
+    Role,
+    SnowflakeType,
+    StageInstance,
+    Sticker,
+    StickerPack,
+    Subscription,
+    ThreadMember,
+    User,
+    VoiceRegion,
+    VoiceState,
+    Webhook,
+    WelcomeScreen,
+)
 from .request import _request
 from .utils import parse_data, parse_forum_thread_message, parse_interaction_response
 from ..utils import model_dump
@@ -20,6 +84,7 @@ if TYPE_CHECKING:
     from ..adapter import Adapter
     from ..bot import Bot
 
+# ruff: noqa: ANN003 # TODO)): 将所有params/kwargs类型补全
 
 # Application Commands
 # see https://discord.com/developers/docs/interactions/application-commands
@@ -95,7 +160,7 @@ async def _edit_global_application_command(
     application_id: SnowflakeType,
     command_id: SnowflakeType,
     **data,
-):
+) -> ApplicationCommand:
     """Edit a global command. Returns 200 and an application command object.
     All fields are optional, but any fields provided will entirely overwrite
     the existing values of those fields.
@@ -119,7 +184,7 @@ async def _delete_global_application_command(
     bot: "Bot",
     application_id: SnowflakeType,
     command_id: SnowflakeType,
-):
+) -> None:
     """Deletes a global command. Returns 204 No Content on success.
 
     see https://discord.com/developers/docs/interactions/application-commands#delete-global-application-command
@@ -243,7 +308,7 @@ async def _edit_guild_application_command(
     guild_id: SnowflakeType,
     command_id: SnowflakeType,
     **data,
-):
+) -> ApplicationCommand:
     """Edit a guild command.
     Updates for guild commands will be available immediately.
     Returns 200 and an application command object.
@@ -271,7 +336,7 @@ async def _delete_guild_application_command(
     application_id: SnowflakeType,
     guild_id: SnowflakeType,
     command_id: SnowflakeType,
-):
+) -> None:
     """Delete a guild command. Returns 204 No Content on success.
 
     see https://discord.com/developers/docs/interactions/application-commands#delete-guild-application-command
@@ -354,14 +419,14 @@ async def _get_application_command_permissions(
         headers=headers,
         method="GET",
         url=adapter.base_url
-        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",  # noqa: E501
+        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",
     )
     return type_validate_python(
         GuildApplicationCommandPermissions, await _request(adapter, bot, request)
     )
 
 
-async def _edit_application_command_permissions(
+async def _edit_application_command_permissions(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     application_id: SnowflakeType,
@@ -383,7 +448,7 @@ async def _edit_application_command_permissions(
         headers=headers,
         method="PUT",
         url=adapter.base_url
-        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",  # noqa: E501
+        / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",
         json={
             "permissions": [
                 model_dump(permission, exclude_unset=True) for permission in permissions
@@ -527,7 +592,7 @@ async def _edit_followup_message(
     interaction_token: str,
     message_id: SnowflakeType,
     **data,
-):
+) -> MessageGet:
     """Edits a followup message for an Interaction. Functions the same as Edit Webhook Message.
 
     see https://discord.com/developers/docs/interactions/receiving-and-responding#edit-followup-message
@@ -554,7 +619,7 @@ async def _delete_followup_message(
     application_id: SnowflakeType,
     interaction_token: str,
     message_id: SnowflakeType,
-):
+) -> None:
     """Deletes a followup message for an Interaction.
 
     see https://discord.com/developers/docs/interactions/receiving-and-responding#delete-followup-message
@@ -836,7 +901,7 @@ async def _get_channel(
     return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
-async def _modify_DM(
+async def _modify_DM(  # noqa: N802 # TODO)): 疑似与_modify_channel重复, 确认后弃用
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **data
 ) -> Channel:
     """modify channel
@@ -966,7 +1031,7 @@ async def _crosspost_message(
     return type_validate_python(MessageGet, await _request(adapter, bot, request))
 
 
-async def _create_reaction(
+async def _create_reaction(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
@@ -987,7 +1052,7 @@ async def _create_reaction(
     await _request(adapter, bot, request)
 
 
-async def _delete_own_reaction(
+async def _delete_own_reaction(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
@@ -1008,7 +1073,7 @@ async def _delete_own_reaction(
     await _request(adapter, bot, request)
 
 
-async def _delete_user_reaction(
+async def _delete_user_reaction(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
@@ -1025,12 +1090,12 @@ async def _delete_user_reaction(
         headers=headers,
         method="DELETE",
         url=adapter.base_url
-        / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/{user_id}",  # noqa: E501
+        / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/{user_id}",
     )
     await _request(adapter, bot, request)
 
 
-async def _get_reactions(
+async def _get_reactions(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
@@ -1058,7 +1123,7 @@ async def _delete_all_reactions(
     bot: "Bot",
     channel_id: SnowflakeType,
     message_id: SnowflakeType,
-):
+) -> None:
     """https://discord.com/developers/docs/resources/message#delete-all-reactions"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1069,14 +1134,14 @@ async def _delete_all_reactions(
     await _request(adapter, bot, request)
 
 
-async def _delete_all_reactions_for_emoji(
+async def _delete_all_reactions_for_emoji(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
     message_id: SnowflakeType,
     emoji: str,
     emoji_id: Optional[SnowflakeType] = None,
-):
+) -> None:
     """https://discord.com/developers/docs/resources/message#delete-all-reactions-for-emoji"""
     if emoji_id is not None:
         emoji = f"{emoji}:{emoji_id}"
@@ -1115,7 +1180,7 @@ async def _delete_message(
     channel_id: SnowflakeType,
     message_id: SnowflakeType,
     reason: Optional[str] = None,
-):
+) -> None:
     """https://discord.com/developers/docs/resources/message#delete-message"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
@@ -1130,7 +1195,7 @@ async def _delete_message(
 
 async def _bulk_delete_message(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, **data
-):
+) -> None:
     """https://discord.com/developers/docs/resources/message#bulk-delete-messages"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if data.get("reason"):
@@ -1150,7 +1215,7 @@ async def _edit_channel_permissions(
     channel_id: SnowflakeType,
     overwrite_id: SnowflakeType,
     reason: Optional[str] = None,
-):
+) -> None:
     """https://discord.com/developers/docs/resources/channel#edit-channel-permissions"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
@@ -1198,7 +1263,7 @@ async def _delete_channel_permission(
     channel_id: SnowflakeType,
     overwrite_id: SnowflakeType,
     reason: Optional[str] = None,
-):
+) -> None:
     """https://discord.com/developers/docs/resources/channel#delete-channel-permission"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
@@ -1229,7 +1294,7 @@ async def _follow_announcement_channel(
 
 async def _trigger_typing_indicator(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType
-):
+) -> None:
     """https://discord.com/developers/docs/resources/channel#trigger-typing-indicator"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1259,7 +1324,7 @@ async def _pin_message(
     channel_id: SnowflakeType,
     message_id: SnowflakeType,
     reason: Optional[str] = None,
-):
+) -> None:
     """https://discord.com/developers/docs/resources/channel#pin-message"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
@@ -1278,7 +1343,7 @@ async def _unpin_message(
     channel_id: SnowflakeType,
     message_id: SnowflakeType,
     reason: Optional[str] = None,
-):
+) -> None:
     """https://discord.com/developers/docs/resources/channel#unpin-message"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
@@ -1291,13 +1356,13 @@ async def _unpin_message(
     await _request(adapter, bot, request)
 
 
-async def _group_DM_add_recipient(
+async def _group_DM_add_recipient(  # noqa: N802
     adapter: "Adapter",
     bot: "Bot",
     channel_id: SnowflakeType,
     user_id: SnowflakeType,
     **data,
-):
+) -> None:
     """https://discord.com/developers/docs/resources/channel#group-dm-add-recipient"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1309,9 +1374,9 @@ async def _group_DM_add_recipient(
     await _request(adapter, bot, request)
 
 
-async def _group_DM_remove_recipient(
+async def _group_DM_remove_recipient(  # noqa: N802
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, user_id: SnowflakeType
-):
+) -> None:
     """https://discord.com/developers/docs/resources/channel#group-dm-remove-recipient"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1375,7 +1440,9 @@ async def _start_thread_in_forum_channel(
     return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
-async def _join_thread(adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType):
+async def _join_thread(
+    adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType
+) -> None:
     """https://discord.com/developers/docs/resources/channel#join-thread"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1388,7 +1455,7 @@ async def _join_thread(adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType
 
 async def _add_thread_member(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, user_id: SnowflakeType
-):
+) -> None:
     """https://discord.com/developers/docs/resources/channel#add-thread-member"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1399,7 +1466,9 @@ async def _add_thread_member(
     await _request(adapter, bot, request)
 
 
-async def _leave_thread(adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType):
+async def _leave_thread(
+    adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType
+) -> None:
     """https://discord.com/developers/docs/resources/channel#leave-thread"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1412,7 +1481,7 @@ async def _leave_thread(adapter: "Adapter", bot: "Bot", channel_id: SnowflakeTyp
 
 async def _remove_thread_member(
     adapter: "Adapter", bot: "Bot", channel_id: SnowflakeType, user_id: SnowflakeType
-):
+) -> None:
     """https://discord.com/developers/docs/resources/channel#remove-thread-member"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -1996,14 +2065,14 @@ async def _modify_current_user_nick(
     return type_validate_python(GuildMember, await _request(adapter, bot, request))
 
 
-async def _add_guild_member_role(
+async def _add_guild_member_role(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     guild_id: SnowflakeType,
     user_id: SnowflakeType,
     role_id: SnowflakeType,
     reason: Optional[str] = None,
-):
+) -> None:
     """https://discord.com/developers/docs/resources/guild#add-guild-member-role"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
@@ -2016,14 +2085,14 @@ async def _add_guild_member_role(
     await _request(adapter, bot, request)
 
 
-async def _remove_guild_member_role(
+async def _remove_guild_member_role(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     guild_id: SnowflakeType,
     user_id: SnowflakeType,
     role_id: SnowflakeType,
     reason: Optional[str] = None,
-):
+) -> None:
     """https://discord.com/developers/docs/resources/guild#remove-guild-member-role"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
@@ -2042,7 +2111,7 @@ async def _remove_guild_member(
     guild_id: SnowflakeType,
     user_id: SnowflakeType,
     reason: Optional[str] = None,
-):
+) -> None:
     """https://discord.com/developers/docs/resources/guild#remove-guild-member"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     if reason:
@@ -2218,7 +2287,7 @@ async def _modify_guild_role(
     return type_validate_python(Role, await _request(adapter, bot, request))
 
 
-async def _modify_guild_MFA_level(
+async def _modify_guild_MFA_level(  # noqa: N802 # TODO)): 验证接口是否还存在
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **data
 ) -> None:
     """https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level"""
@@ -2404,7 +2473,7 @@ async def _get_guild_vanity_url(
     return type_validate_python(Invite, await _request(adapter, bot, request))
 
 
-async def _get_guild_widget_image(
+async def _get_guild_widget_image(  # noqa: ANN202 # TODO)): 校验接口返回值并更新类型
     adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType, **params
 ):
     """https://discord.com/developers/docs/resources/guild#get-guild-widget-image"""
@@ -2853,7 +2922,7 @@ async def _end_poll(
 # see https://discord.com/developers/docs/resources/sku
 
 
-async def _list_SKUs(
+async def _list_SKUs(  # noqa: N802
     adapter: "Adapter", bot: "Bot", application_id: SnowflakeType
 ) -> list[SKU]:
     """https://discord.com/developers/docs/resources/sku#list-skus"""
@@ -2897,7 +2966,7 @@ async def _get_stage_instance(
         url=adapter.base_url / f"stage-instances/{channel_id}",
     )
     return type_validate_python(
-        Optional[StageInstance],  # type: ignore
+        Optional[StageInstance],
         await _request(adapter, bot, request),
     )
 
@@ -3007,7 +3076,7 @@ async def _get_guild_sticker(
     return type_validate_python(Sticker, await _request(adapter, bot, request))
 
 
-async def _create_guild_sticker(
+async def _create_guild_sticker(  # noqa: PLR0913
     adapter: "Adapter",
     bot: "Bot",
     guild_id: SnowflakeType,
@@ -3079,7 +3148,7 @@ async def _delete_guild_sticker(
 # see https://discord.com/developers/docs/resources/subscription
 
 
-async def _list_SKU_subscriptions(
+async def _list_SKU_subscriptions(  # noqa: N802, PLR0913
     adapter: "Adapter",
     bot: "Bot",
     sku_id: SnowflakeType,
@@ -3110,7 +3179,7 @@ async def _list_SKU_subscriptions(
     )
 
 
-async def _get_SKU_subscription(
+async def _get_SKU_subscription(  # noqa: N802
     adapter: "Adapter",
     bot: "Bot",
     sku_id: SnowflakeType,
@@ -3204,7 +3273,7 @@ async def _leave_guild(adapter: "Adapter", bot: "Bot", guild_id: SnowflakeType) 
     await _request(adapter, bot, request)
 
 
-async def _create_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:
+async def _create_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:  # noqa: N802
     """https://discord.com/developers/docs/resources/user#create-dm"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -3216,7 +3285,7 @@ async def _create_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:
     return type_validate_python(Channel, await _request(adapter, bot, request))
 
 
-async def _create_group_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:
+async def _create_group_DM(adapter: "Adapter", bot: "Bot", **data) -> Channel:  # noqa: N802
     """https://discord.com/developers/docs/resources/user#create-group-dm"""
     headers = {"Authorization": adapter.get_authorization(bot.bot_info)}
     request = Request(
@@ -3784,4 +3853,4 @@ API_HANDLERS: dict[str, Callable[..., Awaitable[Any]]] = {
     "get_gateway_bot": _get_gateway_bot,
     "get_current_bot_application_information": _get_current_bot_application_information,
     "get_current_authorization_information": _get_current_authorization_information,
-}  # type: ignore
+}
