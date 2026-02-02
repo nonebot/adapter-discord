@@ -6,6 +6,10 @@ from nonebot.adapters.discord.api import (
     Embed,
     File,
     MessageReference,
+    Poll,
+    PollAnswer,
+    PollMedia,
+    PollRequest,
 )
 from nonebot.adapters.discord.message import Message, MessageSegment, parse_message
 
@@ -91,6 +95,26 @@ def test_component_segment_text_input_from_dict() -> None:
     assert int(seg.data["component"].type) == int(ComponentType.TextInput)
 
 
+def test_poll_segment_from_dict() -> None:
+    seg = type_validate_python(
+        MessageSegment,
+        {
+            "type": "poll",
+            "data": {
+                "poll": {
+                    "question": {"text": "Q"},
+                    "answers": [{"poll_media": {"text": "A"}}],
+                    "duration": 24,
+                    "allow_multiselect": False,
+                    "layout_type": 1,
+                }
+            },
+        },
+    )
+    assert seg.type == "poll"
+    assert seg.data["poll"].question.text == "Q"
+
+
 def test_unknown_segment_type_raises() -> None:
     with pytest.raises(ValueError):  # noqa: PT011
         type_validate_python(MessageSegment, {"type": "unknown", "data": {}})
@@ -110,9 +134,19 @@ def test_parse_message_integration() -> None:
     )
     msg.append(MessageSegment.attachment("a.txt"))
 
+    poll = Poll(
+        question=PollMedia(text="Q"),
+        answers=[PollAnswer(answer_id=1, poll_media=PollMedia(text="A"))],
+        expiry=None,
+        allow_multiselect=False,
+        layout_type=1,
+    )
+    msg.append(MessageSegment.poll(poll))
+
     payload = parse_message(msg)
     assert payload["content"] == "hi"
     assert payload["embeds"][0].title == "t"
     assert int(payload["message_reference"].message_id) == 123
     assert int(payload["components"][0].type) == int(ComponentType.ActionRow)
     assert payload["attachments"][0].filename == "a.txt"
+    assert isinstance(payload["poll"], PollRequest)
