@@ -119,6 +119,17 @@ section-order = [
     "local-folder",
 ]
 
+[tool.pyright]
+pythonVersion = "3.9"
+pythonPlatform = "All"
+defineConstant = { PYDANTIC_V2 = true }
+typeCheckingMode = "standard"
+reportExplicitAny = 'hint'
+reportUnnecessaryTypeIgnoreComment = 'error'
+reportImplicitOverride = 'error'
+reportUnnecessaryComparison = 'error'
+enableTypeIgnoreComments = false
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 
