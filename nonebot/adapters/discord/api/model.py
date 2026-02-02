@@ -1,6 +1,5 @@
 import datetime
 import inspect
-import warnings
 import sys
 from typing import (
     TYPE_CHECKING,
@@ -12,6 +11,7 @@ from typing import (
     Union,
     final,
 )
+import warnings
 
 from nonebot.compat import PYDANTIC_V2
 from pydantic import (
