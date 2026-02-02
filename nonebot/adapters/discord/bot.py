@@ -96,7 +96,7 @@ class Bot(BaseBot, ApiClient):
     adapter: "Adapter"
 
     @override
-    def __init__(self, adapter: "Adapter", self_id: str, bot_info: BotInfo):
+    def __init__(self, adapter: "Adapter", self_id: str, bot_info: BotInfo) -> None:
         super().__init__(adapter, self_id)
         self.adapter = adapter
         self._bot_info: BotInfo = bot_info
@@ -124,7 +124,8 @@ class Bot(BaseBot, ApiClient):
     @property
     def session_id(self) -> str:
         if self._session_id is None:
-            raise RuntimeError(f"Bot {self.self_id} is not connected!")
+            msg = f"Bot {self.self_id} is not connected!"
+            raise RuntimeError(msg)
         return self._session_id
 
     @session_id.setter
@@ -134,7 +135,8 @@ class Bot(BaseBot, ApiClient):
     @property
     def self_info(self) -> User:
         if self._self_info is None:
-            raise RuntimeError(f"Bot {self.bot_info} is not connected!")
+            msg = f"Bot {self.bot_info} is not connected!"
+            raise RuntimeError(msg)
         return self._self_info
 
     @self_info.setter
@@ -148,7 +150,8 @@ class Bot(BaseBot, ApiClient):
     @property
     def sequence(self) -> int:
         if self._sequence is None:
-            raise RuntimeError(f"Bot {self.self_id} is not connected!")
+            msg = f"Bot {self.self_id} is not connected!"
+            raise RuntimeError(msg)
         return self._sequence
 
     @sequence.setter
@@ -238,7 +241,8 @@ class Bot(BaseBot, ApiClient):
             )
 
         if not isinstance(event, MessageEvent) or not event.channel_id or not event.id:
-            raise RuntimeError("Event cannot be replied to!")
+            msg = "Event cannot be replied to!"
+            raise RuntimeError(msg)
         message = message if isinstance(message, Message) else Message(message)
         if mention_sender or at_sender:
             message.insert(0, MessageSegment.mention_user(event.user_id))

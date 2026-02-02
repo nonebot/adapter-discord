@@ -39,7 +39,7 @@ RECONNECT_INTERVAL = 3.0
 
 class Adapter(BaseAdapter):
     @override
-    def __init__(self, driver: Driver, **kwargs: Any):
+    def __init__(self, driver: Driver, **kwargs: Any) -> None:
         super().__init__(driver, **kwargs)
         self.discord_config: Config = get_plugin_config(Config)
         self.tasks: list[asyncio.Task] = []
@@ -55,10 +55,13 @@ class Adapter(BaseAdapter):
 
     def setup(self) -> None:
         if not isinstance(self.driver, ForwardDriver):
-            raise RuntimeError(
+            msg = (
                 f"Current driver {self.config.driver} "
                 "doesn't support forward connections!"
-                "Discord Adapter need a ForwardDriver to work.",
+                "Discord Adapter need a ForwardDriver to work."
+            )
+            raise RuntimeError(
+                msg,
             )
         self.on_ready(self.startup)
         self.driver.on_shutdown(self.shutdown)
@@ -81,7 +84,8 @@ class Adapter(BaseAdapter):
         try:
             gateway_info = await self._get_gateway_bot(bot_info)
             if not gateway_info.url:
-                raise ValueError("Failed to get gateway url")
+                msg = "Failed to get gateway url"
+                raise ValueError(msg)
             ws_url = URL(gateway_info.url)
         except Exception as e:
             log(
@@ -133,7 +137,8 @@ class Adapter(BaseAdapter):
         )
         resp = await self.request(request)
         if not resp.content:
-            raise ValueError("Failed to get gateway info")
+            msg = "Failed to get gateway info"
+            raise ValueError(msg)
         return type_validate_json(GatewayBot, resp.content)
 
     async def _get_bot_user(self, bot_info: BotInfo) -> User:
@@ -147,7 +152,8 @@ class Adapter(BaseAdapter):
         )
         resp = await self.request(request)
         if not resp.content:
-            raise ValueError("Failed to get bot user info")
+            msg = "Failed to get bot user info"
+            raise ValueError(msg)
         return type_validate_json(User, resp.content)
 
     async def _forward_ws(
@@ -266,7 +272,7 @@ class Adapter(BaseAdapter):
                 e,
             )
 
-    async def _heartbeat_ack(self, ws: WebSocket):
+    async def _heartbeat_ack(self, ws: WebSocket) -> None:
         """检查是否收到心跳ACK事件
 
         见 https://discord.com/developers/docs/topics/gateway#sending-heartbeats"""
@@ -275,7 +281,7 @@ class Adapter(BaseAdapter):
             await ws.close(1003)  # 除了1000和1001都行
 
     @staticmethod
-    async def _heartbeat(ws: WebSocket, bot: Bot):
+    async def _heartbeat(ws: WebSocket, bot: Bot) -> None:
         """心跳"""
         log("TRACE", f"Heartbeat {bot.sequence if bot.has_sequence else ''}")
         payload = type_validate_python(
@@ -285,13 +291,17 @@ class Adapter(BaseAdapter):
         with contextlib.suppress(Exception):
             await ws.send(json.dumps(model_dump(payload, by_alias=True)))
 
-    async def _heartbeat_task(self, ws: WebSocket, bot: Bot, heartbeat_interval: int):
+    async def _heartbeat_task(
+        self, ws: WebSocket, bot: Bot, heartbeat_interval: int
+    ) -> None:
         """心跳任务"""
         while True:
             await self._heartbeat(ws, bot)
             await asyncio.sleep(heartbeat_interval / 1000.0)
 
-    async def _authenticate(self, bot: Bot, ws: WebSocket, shard: tuple[int, int]):
+    async def _authenticate(
+        self, bot: Bot, ws: WebSocket, shard: tuple[int, int]
+    ) -> Optional[bool]:
         """鉴权连接"""
         if not bot.ready:
             payload = type_validate_python(
@@ -373,7 +383,7 @@ class Adapter(BaseAdapter):
 
         return True
 
-    async def _loop(self, bot: Bot, ws: WebSocket):
+    async def _loop(self, bot: Bot, ws: WebSocket) -> None:
         """接收并处理事件"""
         while True:
             payload = await self.receive_payload(ws)

@@ -12,7 +12,7 @@ from nonebot.exception import (
 
 
 class DiscordAdapterException(AdapterException):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Discord")
 
 
@@ -21,7 +21,7 @@ class NoLogException(BaseNoLogException, DiscordAdapterException):
 
 
 class ActionFailed(BaseActionFailed, DiscordAdapterException):
-    def __init__(self, response: Response):
+    def __init__(self, response: Response) -> None:
         self.status_code: int = response.status_code
         self.code: Optional[int] = None
         self.message: Optional[str] = None
@@ -37,10 +37,10 @@ class ActionFailed(BaseActionFailed, DiscordAdapterException):
             f"message={self.message}, data={self.data}, errors={self.errors}>"
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
 
-    def _prepare_body(self, body: dict):
+    def _prepare_body(self, body: dict) -> None:
         self.code = body.get("code")
         self.message = body.get("message")
         self.errors = body.get("errors")
@@ -56,15 +56,15 @@ class RateLimitException(ActionFailed):
 
 
 class NetworkError(BaseNetworkError, DiscordAdapterException):
-    def __init__(self, msg: Optional[str] = None):
+    def __init__(self, msg: Optional[str] = None) -> None:
         super().__init__()
         self.msg: Optional[str] = msg
         """错误原因"""
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<NetWorkError message={self.msg}>"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
 
 

@@ -232,15 +232,18 @@ class Event(BaseEvent):
 
     @override
     def get_message(self) -> Message:
-        raise ValueError("Event has no message!")
+        msg = "Event has no message!"
+        raise ValueError(msg)
 
     @override
     def get_user_id(self) -> str:
-        raise ValueError("Event has no context!")
+        msg = "Event has no context!"
+        raise ValueError(msg)
 
     @override
     def get_session_id(self) -> str:
-        raise ValueError("Event has no context!")
+        msg = "Event has no context!"
+        raise ValueError(msg)
 
     @override
     def is_tome(self) -> bool:
@@ -747,7 +750,8 @@ class InteractionCreateEvent(NoticeEvent, InteractionCreate):
     @override
     def get_user_id(self) -> str:
         if not self.user:
-            raise ValueError("Event has no context!")
+            msg = "Event has no context!"
+            raise ValueError(msg)
         return str(self.user.id)
 
 

@@ -130,7 +130,8 @@ class Snowflake(int):
             if isinstance(value, str) and value.isdigit():
                 value = int(value)
             if not isinstance(value, int):
-                raise TypeError(f"{value!r} is not int or str of int")
+                msg = f"{value!r} is not int or str of int"
+                raise TypeError(msg)
             return cls(value)
 
     else:
@@ -144,7 +145,8 @@ class Snowflake(int):
             if isinstance(value, str) and value.isdigit():
                 value = int(value)
             if not isinstance(value, int):
-                raise TypeError(f"{value!r} is not int or str of int")
+                msg = f"{value!r} is not int or str of int"
+                raise TypeError(msg)
             return cls(value)
 
     @property
@@ -2554,7 +2556,7 @@ class Invite(BaseModel):
     stage_instance: Missing["InviteStageInstance"] = UNSET
     guild_scheduled_event: Missing["GuildScheduledEvent"] = UNSET
 
-    def __init__(self, **data):
+    def __init__(self, **data) -> None:
         super().__init__(**data)
         if data.get("stage_instance", UNSET) is not UNSET:
             warnings.warn(
@@ -2608,7 +2610,7 @@ class InviteStageInstance(BaseModel):
     speaker_count: int
     topic: str
 
-    def __init__(self, **data):
+    def __init__(self, **data) -> None:
         super().__init__(**data)
         warnings.warn(
             "InviteStageInstance is deprecated by Discord",
@@ -4205,7 +4207,7 @@ class MessagePollVoteRemove(BaseModel):
     answer_id: int
 
 
-for name, obj in inspect.getmembers(sys.modules[__name__]):
+for _, obj in inspect.getmembers(sys.modules[__name__]):
     if inspect.isclass(obj) and issubclass(obj, BaseModel) and obj is not BaseModel:
         if PYDANTIC_V2:
             obj.model_rebuild()

@@ -52,7 +52,8 @@ class Unset(Enum):
     @classmethod
     def _validate(cls, value: Any):
         if value is not cls._UNSET:
-            raise ValueError(f"{value!r} is not UNSET")
+            msg = f"{value!r} is not UNSET"
+            raise ValueError(msg)
         return value
 
 

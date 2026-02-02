@@ -83,7 +83,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)
         await bot.create_interaction_response(
             interaction_id=event.id,
             interaction_token=event.token,
@@ -105,7 +106,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)
         return await bot.get_origin_interaction_response(
             application_id=event.application_id,
             interaction_token=event.token,
@@ -122,7 +124,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)
         if isinstance(message, MessageTemplate):
             _message = message.format(**state)
         else:
@@ -141,7 +144,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)
         await bot.delete_origin_interaction_response(
             application_id=event.application_id,
             interaction_token=event.token,
@@ -159,7 +163,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)
         if isinstance(message, MessageTemplate):
             _message = message.format(**state)
         else:
@@ -180,7 +185,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)
         return await bot.get_followup_message(
             application_id=event.application_id,
             interaction_token=event.token,
@@ -199,7 +205,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)
         if isinstance(message, MessageTemplate):
             _message = message.format(**state)
         else:
@@ -219,7 +226,8 @@ class ApplicationCommandMatcher(Matcher):
         if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
             bot, Bot
         ):
-            raise ValueError("Invalid event or bot")
+            msg = "Invalid event or bot"
+            raise ValueError(msg)
         await bot.delete_followup_message(
             application_id=event.application_id,
             interaction_token=event.token,
@@ -245,7 +253,7 @@ class SlashCommandMatcher(ApplicationCommandMatcher):
     ):
         def _sub_command_rule(
             event: ApplicationCommandInteractionEvent, matcher: Matcher, state: T_State
-        ):
+        ) -> None:
             if commands and not event.data.options:
                 matcher.skip()
             options = event.data.options
@@ -369,13 +377,11 @@ def on_slash_command(
             return False
         if not event.data.guild_id and config.guild_ids is None:
             return True
-        if (
+        return bool(
             event.data.guild_id
             and config.guild_ids
             and event.data.guild_id in config.guild_ids
-        ):
-            return True
-        return False
+        )
 
     matcher.rule = matcher.rule & Rule(_application_command_rule)
 
@@ -432,13 +438,11 @@ def on_user_command(
             return False
         if not event.data.guild_id and config.guild_ids is None:
             return True
-        if (
+        return bool(
             event.data.guild_id
             and config.guild_ids
             and event.data.guild_id in config.guild_ids
-        ):
-            return True
-        return False
+        )
 
     matcher.rule = matcher.rule & Rule(_application_command_rule)
 
@@ -495,13 +499,11 @@ def on_message_command(
             return False
         if not event.data.guild_id and config.guild_ids is None:
             return True
-        if (
+        return bool(
             event.data.guild_id
             and config.guild_ids
             and event.data.guild_id in config.guild_ids
-        ):
-            return True
-        return False
+        )
 
     matcher.rule = matcher.rule & Rule(_application_command_rule)
 

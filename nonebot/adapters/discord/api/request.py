@@ -39,4 +39,5 @@ async def _request(adapter: "Adapter", bot: "Bot", request: Request) -> Any:
     except DiscordAdapterException:
         raise
     except Exception as e:
-        raise NetworkError("API request failed") from e
+        msg = "API request failed"
+        raise NetworkError(msg) from e

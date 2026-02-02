@@ -74,7 +74,8 @@ class MessageSegment(BaseMessageSegment["Message"]):
             _description = file.description
             _content = content
         else:
-            raise TypeError("file must be str, File or AttachmentSend")
+            msg = "file must be str, File or AttachmentSend"
+            raise TypeError(msg)
         if _content is None:
             return AttachmentSegment(
                 "attachment",
@@ -195,16 +196,18 @@ class MessageSegment(BaseMessageSegment["Message"]):
         if isinstance(value, cls):
             return value
         if isinstance(value, MessageSegment):
-            raise ValueError(f"Type {type(value)} can not be converted to {cls}")
+            msg = f"Type {type(value)} can not be converted to {cls}"
+            raise ValueError(msg)
         if not isinstance(value, dict):
-            raise ValueError(f"Expected dict for MessageSegment, got {type(value)}")
+            msg = f"Expected dict for MessageSegment, got {type(value)}"
+            raise ValueError(msg)
         if "type" not in value:
-            raise ValueError(
-                f"Expected dict with 'type' for MessageSegment, got {value}"
-            )
+            msg = f"Expected dict with 'type' for MessageSegment, got {value}"
+            raise ValueError(msg)
         _type = value["type"]
         if _type not in SEGMENT_TYPE_MAP:
-            raise ValueError(f"Invalid MessageSegment type: {_type}")
+            msg = f"Invalid MessageSegment type: {_type}"
+            raise ValueError(msg)
         segment_type = SEGMENT_TYPE_MAP[_type]
 
         # casting value to subclass of MessageSegment
@@ -213,7 +216,8 @@ class MessageSegment(BaseMessageSegment["Message"]):
         # init segment instance directly if type matched
         if cls is segment_type:
             return segment_type(type=_type, data=value.get("data", {}))
-        raise ValueError(f"Segment type {_type!r} can not be converted to {cls}")
+        msg = f"Segment type {_type!r} can not be converted to {cls}"
+        raise ValueError(msg)
 
 
 class StickerData(TypedDict):
@@ -260,26 +264,24 @@ class ComponentSegment(MessageSegment):
     def _validate(cls, value) -> Self:
         instance = super()._validate(value)
         if "component" not in instance.data:
-            raise ValueError(
-                f"Expected dict with 'component' in 'data' for ComponentSegment, got {value}"
-            )
+            msg = f"Expected dict with 'component' in 'data' for ComponentSegment, got {value}"
+            raise ValueError(msg)
         if not isinstance(
             component := instance.data["component"], (ActionRow, TextInput)
         ):
             if not isinstance(component, dict):
-                raise ValueError(
-                    f"Expected dict for ComponentData, got {type(component)}"
-                )
+                msg = f"Expected dict for ComponentData, got {type(component)}"
+                raise ValueError(msg)
             if "type" not in component:
-                raise ValueError(
-                    f"Expected dict with 'type' for ComponentData, got {component}"
-                )
+                msg = f"Expected dict with 'type' for ComponentData, got {component}"
+                raise ValueError(msg)
             if component["type"] == ComponentType.ActionRow:
                 instance.data["component"] = type_validate_python(ActionRow, component)
             elif component["type"] == ComponentType.TextInput:
                 instance.data["component"] = type_validate_python(TextInput, component)
             else:
-                raise ValueError(f"Invalid ComponentType: {component['type']}")
+                msg = f"Invalid ComponentType: {component['type']}"
+                raise ValueError(msg)
         return instance
 
 
@@ -456,9 +458,8 @@ class EmbedSegment(MessageSegment):
     def _validate(cls, value) -> Self:
         instance = super()._validate(value)
         if "embed" not in instance.data:
-            raise ValueError(
-                f"Expected dict with 'embed' in 'data' for EmbedSegment, got {value}"
-            )
+            msg = f"Expected dict with 'embed' in 'data' for EmbedSegment, got {value}"
+            raise ValueError(msg)
         if not isinstance(embed := instance.data["embed"], Embed):
             instance.data["embed"] = type_validate_python(Embed, embed)
         return instance
@@ -489,9 +490,8 @@ class AttachmentSegment(MessageSegment):
     def _validate(cls, value) -> Self:
         instance = super()._validate(value)
         if "attachment" not in instance.data:
-            raise ValueError(
-                f"Expected dict with 'attachment' in 'data' for AttachmentSegment, got {value}"
-            )
+            msg = f"Expected dict with 'attachment' in 'data' for AttachmentSegment, got {value}"
+            raise ValueError(msg)
         if not isinstance(attachment := instance.data["attachment"], AttachmentSend):
             instance.data["attachment"] = type_validate_python(
                 AttachmentSend, attachment
@@ -519,7 +519,7 @@ class ReferenceSegment(MessageSegment):
         data: ReferenceData
 
     @override
-    def __str__(self):
+    def __str__(self) -> str:
         return f"<Reference:{self.data['reference'].message_id}>"
 
     @classmethod
@@ -527,9 +527,8 @@ class ReferenceSegment(MessageSegment):
     def _validate(cls, value) -> Self:
         instance = super()._validate(value)
         if "reference" not in instance.data:
-            raise ValueError(
-                f"Expected dict with 'reference' in 'data' for ReferenceSegment, got {value}"
-            )
+            msg = f"Expected dict with 'reference' in 'data' for ReferenceSegment, got {value}"
+            raise ValueError(msg)
         if not isinstance(reference := instance.data["reference"], MessageReference):
             instance.data["reference"] = type_validate_python(
                 MessageReference, reference
@@ -561,12 +560,12 @@ class PollSegment(MessageSegment):
     def _validate(cls, value) -> Self:
         instance = super()._validate(value)
         if "poll" not in instance.data:
-            raise ValueError(
-                f"Expected dict with 'poll' in 'data' for PollSegment, got {value}"
-            )
+            msg = f"Expected dict with 'poll' in 'data' for PollSegment, got {value}"
+            raise ValueError(msg)
         if not isinstance(poll := instance.data["poll"], (Poll, PollRequest)):
             if not isinstance(poll, dict):
-                raise ValueError(f"Expected dict for PollData, got {type(poll)}")
+                msg = f"Expected dict for PollData, got {type(poll)}"
+                raise ValueError(msg)
             if (
                 "expiry" in poll
                 or "results" in poll

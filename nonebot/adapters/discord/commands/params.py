@@ -51,6 +51,7 @@ class OptionParam(Param):
             for arg in get_args(param.annotation):
                 if isinstance(arg, CommandOptionType):
                     return cls(key=arg.key or param.name, validate=True)
+        return None
 
     @override
     async def _solve(
@@ -116,6 +117,7 @@ def get_command_message(event: ApplicationCommandInteractionEvent):
         and event.data.resolved.messages
     ):
         return event.data.resolved.messages.get(event.data.target_id)
+    return None
 
 
 def get_command_user(event: ApplicationCommandInteractionEvent):
@@ -126,6 +128,7 @@ def get_command_user(event: ApplicationCommandInteractionEvent):
         and event.data.resolved.users
     ):
         return event.data.resolved.users.get(event.data.target_id)
+    return None
 
 
 CommandOption = Annotated[T, CommandOptionType()]
