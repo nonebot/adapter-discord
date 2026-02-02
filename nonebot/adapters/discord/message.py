@@ -33,6 +33,7 @@ from .api import (
     MessageGet,
     MessageReference,
     Poll,
+    PollAnswerRequest,
     PollRequest,
     SelectMenu,
     Snowflake,
@@ -44,6 +45,11 @@ from .utils import unescape
 
 
 class MessageSegment(BaseMessageSegment["Message"]):
+    """Message segment for Discord messages.
+
+    see https://discord.com/developers/docs/reference#message-formatting
+    """
+
     @classmethod
     @override
     def get_message_class(cls) -> type["Message"]:
@@ -217,6 +223,11 @@ class StickerData(TypedDict):
 
 @dataclass
 class StickerSegment(MessageSegment):
+    """Sticker segment.
+
+    see https://discord.com/developers/docs/resources/channel#create-message
+    """
+
     if TYPE_CHECKING:
         type: Literal["sticker"]
         data: StickerData
@@ -232,6 +243,11 @@ class ComponentData(TypedDict):
 
 @dataclass
 class ComponentSegment(MessageSegment):
+    """Component segment.
+
+    see https://discord.com/developers/docs/interactions/message-components
+    """
+
     if TYPE_CHECKING:
         type: Literal["component"]
         data: ComponentData
@@ -276,6 +292,11 @@ class CustomEmojiData(TypedDict):
 
 @dataclass
 class CustomEmojiSegment(MessageSegment):
+    """Custom emoji segment.
+
+    see https://discord.com/developers/docs/reference#message-formatting
+    """
+
     if TYPE_CHECKING:
         type: Literal["custom_emoji"]
         data: CustomEmojiData
@@ -294,6 +315,11 @@ class MentionUserData(TypedDict):
 
 @dataclass
 class MentionUserSegment(MessageSegment):
+    """Mention user segment.
+
+    see https://discord.com/developers/docs/reference#message-formatting
+    """
+
     if TYPE_CHECKING:
         type: Literal["mention_user"]
         data: MentionUserData
@@ -309,6 +335,11 @@ class MentionChannelData(TypedDict):
 
 @dataclass
 class MentionChannelSegment(MessageSegment):
+    """Mention channel segment.
+
+    see https://discord.com/developers/docs/reference#message-formatting
+    """
+
     if TYPE_CHECKING:
         type: Literal["mention_channel"]
         data: MentionChannelData
@@ -324,6 +355,11 @@ class MentionRoleData(TypedDict):
 
 @dataclass
 class MentionRoleSegment(MessageSegment):
+    """Mention role segment.
+
+    see https://discord.com/developers/docs/reference#message-formatting
+    """
+
     if TYPE_CHECKING:
         type: Literal["mention_role"]
         data: MentionRoleData
@@ -335,6 +371,11 @@ class MentionRoleSegment(MessageSegment):
 
 @dataclass
 class MentionEveryoneSegment(MessageSegment):
+    """Mention everyone segment.
+
+    see https://discord.com/developers/docs/reference#message-formatting
+    """
+
     if TYPE_CHECKING:
         type: Literal["mention_everyone"]
 
@@ -350,6 +391,11 @@ class TimestampData(TypedDict):
 
 @dataclass
 class TimestampSegment(MessageSegment):
+    """Timestamp segment.
+
+    see https://discord.com/developers/docs/reference#message-formatting-timestamp-styles
+    """
+
     if TYPE_CHECKING:
         type: Literal["timestamp"]
         data: TimestampData
@@ -374,6 +420,11 @@ class TextData(TypedDict):
 
 @dataclass
 class TextSegment(MessageSegment):
+    """Text segment.
+
+    see https://discord.com/developers/docs/resources/channel#create-message
+    """
+
     if TYPE_CHECKING:
         type: Literal["text"]
         data: TextData
@@ -389,6 +440,11 @@ class EmbedData(TypedDict):
 
 @dataclass
 class EmbedSegment(MessageSegment):
+    """Embed segment.
+
+    see https://discord.com/developers/docs/resources/message#embed-object
+    """
+
     if TYPE_CHECKING:
         type: Literal["embed"]
         data: EmbedData
@@ -417,6 +473,11 @@ class AttachmentData(TypedDict):
 
 @dataclass
 class AttachmentSegment(MessageSegment):
+    """Attachment segment.
+
+    see https://discord.com/developers/docs/reference#uploading-files
+    """
+
     if TYPE_CHECKING:
         type: Literal["attachment"]
         data: AttachmentData
@@ -450,6 +511,11 @@ class ReferenceData(TypedDict):
 
 @dataclass
 class ReferenceSegment(MessageSegment):
+    """Reference segment.
+
+    see https://discord.com/developers/docs/resources/message#message-reference-object
+    """
+
     if TYPE_CHECKING:
         type: Literal["reference"]
         data: ReferenceData
@@ -473,6 +539,47 @@ class ReferenceSegment(MessageSegment):
         return instance
 
 
+class PollData(TypedDict):
+    poll: Union[Poll, PollRequest]
+
+
+@dataclass
+class PollSegment(MessageSegment):
+    """Poll segment.
+
+    see https://discord.com/developers/docs/resources/poll#poll-object
+    """
+
+    if TYPE_CHECKING:
+        type: Literal["poll"]
+        data: PollData
+
+    @override
+    def __str__(self) -> str:
+        return f"<Poll:{self.data['poll'].question.text}>"
+
+    @classmethod
+    @override
+    def _validate(cls, value) -> Self:
+        instance = super()._validate(value)
+        if "poll" not in instance.data:
+            raise ValueError(
+                f"Expected dict with 'poll' in 'data' for PollSegment, got {value}"
+            )
+        if not isinstance(poll := instance.data["poll"], (Poll, PollRequest)):
+            if not isinstance(poll, dict):
+                raise ValueError(f"Expected dict for PollData, got {type(poll)}")
+            if (
+                "expiry" in poll
+                or "results" in poll
+                or any("answer_id" in answer for answer in poll.get("answers", []))
+            ):
+                instance.data["poll"] = type_validate_python(Poll, poll)
+            else:
+                instance.data["poll"] = type_validate_python(PollRequest, poll)
+        return instance
+
+
 SEGMENT_TYPE_MAP = {
     "attachment": AttachmentSegment,
     "sticker": StickerSegment,
@@ -486,22 +593,8 @@ SEGMENT_TYPE_MAP = {
     "text": TextSegment,
     "timestamp": TimestampSegment,
     "reference": ReferenceSegment,
+    "poll": PollSegment,
 }
-
-
-class PollData(TypedDict):
-    poll: Union[Poll, PollRequest]
-
-
-@dataclass
-class PollSegment(MessageSegment):
-    if TYPE_CHECKING:
-        type: Literal["poll"]
-        data: PollData
-
-    @override
-    def __str__(self) -> str:
-        return f"<Poll:{self.data['poll'].question.text}>"
 
 
 class Message(BaseMessage[MessageSegment]):
@@ -629,6 +722,16 @@ def parse_message(message: Union[Message, MessageSegment, str]) -> dict[str, Any
         sticker_ids = [sticker.data["id"] for sticker in sticker_ids]
     if poll := (message["poll"] or None):
         poll = poll[-1].data["poll"]
+        if isinstance(poll, Poll):
+            poll = PollRequest(
+                question=poll.question,
+                answers=[
+                    PollAnswerRequest(poll_media=answer.poll_media)
+                    for answer in poll.answers
+                ],
+                allow_multiselect=poll.allow_multiselect,
+                layout_type=poll.layout_type,
+            )
 
     attachments = None
     files = None
