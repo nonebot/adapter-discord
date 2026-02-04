@@ -1,65 +1,23 @@
 from enum import Enum, IntEnum, IntFlag
-from typing import Any, Literal, TypeVar, Union, final
-from typing_extensions import TypeAlias
-
-from nonebot.compat import PYDANTIC_V2
-
-if PYDANTIC_V2:
-    from pydantic_core import core_schema
+from typing import Literal, TypeVar, Union
+from typing_extensions import TypeAlias, override
 
 T = TypeVar("T")
 
 
-@final
-class Unset(Enum):
-    """Unset marker for optional fields.
-
-    see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields
-    """
-
-    _UNSET = "<UNSET>"
-
-    def __repr__(self) -> str:
+class _UNSET(type):
+    @override
+    def __str__(cls) -> Literal["<UNSET>"]:
         return "<UNSET>"
 
-    def __str__(self) -> str:
-        return self.__repr__()
-
-    def __bool__(self) -> Literal[False]:
-        return False
-
-    def __copy__(self):  # noqa: ANN204
-        return self._UNSET
-
-    def __deepcopy__(self, memo: dict[int, Any]):  # noqa: ANN204
-        return self._UNSET
-
-    if PYDANTIC_V2:
-
-        @classmethod
-        def __get_pydantic_core_schema__(
-            cls,
-            source_type: Any,  # noqa: ANN401
-            handler: Any,  # noqa: ANN401
-        ) -> core_schema.CoreSchema:
-            return core_schema.with_info_plain_validator_function(
-                lambda value, _: cls._validate(value)
-            )
-    else:
-
-        @classmethod
-        def __get_validators__(cls):  # noqa: ANN206
-            yield cls._validate
-
-    @classmethod
-    def _validate(cls, value: Any):  # noqa: ANN206, ANN401
-        if value is not cls._UNSET:
-            msg = f"{value!r} is not UNSET"
-            raise ValueError(msg)
-        return value
+    @override
+    def __repr__(cls) -> Literal["<UNSET>"]:
+        return "<UNSET>"
 
 
-UNSET = Unset._UNSET  # noqa: SLF001
+class UNSET(metaclass=_UNSET): ...
+
+
 """UNSET means that the field maybe not given in the data.
 
 see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
