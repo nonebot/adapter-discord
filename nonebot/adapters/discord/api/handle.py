@@ -24,6 +24,7 @@ from .model import (
     Application,
     ApplicationCommand,
     ApplicationCommandCreate,
+    ApplicationCommandEditParams,
     ApplicationCommandOption,
     ApplicationCommandPermissions,
     ApplicationEmojis,
@@ -44,10 +45,14 @@ from .model import (
     CreateAndModifyAutoModerationRuleParams,
     CreateGuildChannelParams,
     CreateGuildParams,
+    CreateGuildRoleParams,
     CreateGuildScheduledEventParams,
+    CreateGuildTemplateParams,
+    CreateWebhookParams,
     CurrentUserGuild,
     DefaultReaction,
     DirectComponent,
+    EditCurrentApplicationParams,
     Embed,
     Emoji,
     Entitlement,
@@ -73,21 +78,36 @@ from .model import (
     InteractionResponse,
     Invite,
     ListActiveGuildThreadsResponse,
+    MessageEditParams,
     MessageGet,
     MessageReference,
     MessageSend,
     ModifyChannelParams,
+    ModifyCurrentMemberParams,
+    ModifyCurrentUserParams,
+    ModifyCurrentUserVoiceStateParams,
+    ModifyGuildEmojiParams,
+    ModifyGuildMemberParams,
     ModifyGuildOnboardingParams,
     ModifyGuildParams,
+    ModifyGuildRoleParams,
     ModifyGuildScheduledEventParams,
+    ModifyGuildStickerParams,
+    ModifyGuildTemplateParams,
     ModifyGuildWelcomeScreenParams,
+    ModifyGuildWidgetParams,
+    ModifyThreadParams,
     OnboardingPrompt,
     Overwrite,
+    PartialOverwrite,
     PollRequest,
+    RecurrenceRule,
     Role,
     Snowflake,
     SnowflakeType,
     StageInstance,
+    StartThreadFromMessageParams,
+    StartThreadWithoutMessageParams,
     Sticker,
     StickerPack,
     Subscription,
@@ -97,10 +117,12 @@ from .model import (
     VoiceRegion,
     VoiceState,
     Webhook,
+    WebhookMessageEditParams,
     WelcomeScreen,
     WelcomeScreenChannel,
 )
 from .types import (
+    UNSET,
     ApplicationCommandType,
     ApplicationFlag,
     ApplicationIntegrationType,
@@ -117,6 +139,8 @@ from .types import (
     GuildScheduledEventPrivacyLevel,
     GuildScheduledEventStatus,
     MessageFlag,
+    Missing,
+    MissingOrNullable,
     OnboardingMode,
     OverwriteType,
     SortOrderTypes,
@@ -126,7 +150,12 @@ from .types import (
     VerificationLevel,
     VideoQualityMode,
 )
-from .utils import parse_data, parse_forum_thread_message, parse_interaction_response
+from .utils import (
+    omit_unset,
+    parse_data,
+    parse_forum_thread_message,
+    parse_interaction_response,
+)
 from ..config import BotInfo, Config
 from ..exception import (
     ActionFailed,
@@ -285,15 +314,15 @@ class HandleMixin:
         *,
         application_id: SnowflakeType,
         command_id: SnowflakeType,
-        name: Optional[str] = None,
-        name_localizations: Optional[dict[str, str]] = None,
-        description: Optional[str] = None,
-        description_localizations: Optional[dict[str, str]] = None,
-        options: Optional[list[ApplicationCommandOption]] = None,
-        default_member_permissions: Optional[str] = None,
-        dm_permission: Optional[bool] = None,
-        default_permission: Optional[bool] = None,
-        nsfw: Optional[bool] = None,
+        name: Missing[str] = UNSET,
+        name_localizations: MissingOrNullable[dict[str, str]] = UNSET,
+        description: Missing[str] = UNSET,
+        description_localizations: MissingOrNullable[dict[str, str]] = UNSET,
+        options: Missing[list[ApplicationCommandOption]] = UNSET,
+        default_member_permissions: MissingOrNullable[str] = UNSET,
+        dm_permission: Missing[bool] = UNSET,
+        default_permission: MissingOrNullable[bool] = UNSET,
+        nsfw: Missing[bool] = UNSET,
     ) -> ApplicationCommand:
         """Edit a global command. Returns 200 and an application command object.
         All fields are optional, but any fields provided will entirely overwrite
@@ -313,11 +342,15 @@ class HandleMixin:
             "default_permission": default_permission,
             "nsfw": nsfw,
         }
+        data = model_dump(
+            type_validate_python(ApplicationCommandEditParams, data),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"applications/{application_id}/commands/{command_id}",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(
             ApplicationCommand, await _request(self, bot, request)
@@ -477,14 +510,14 @@ class HandleMixin:
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
-        name: Optional[str] = None,
-        name_localizations: Optional[dict[str, str]] = None,
-        description: Optional[str] = None,
-        description_localizations: Optional[dict[str, str]] = None,
-        options: Optional[list[ApplicationCommandOption]] = None,
-        default_member_permissions: Optional[str] = None,
-        default_permission: Optional[bool] = None,
-        nsfw: Optional[bool] = None,
+        name: Missing[str] = UNSET,
+        name_localizations: MissingOrNullable[dict[str, str]] = UNSET,
+        description: Missing[str] = UNSET,
+        description_localizations: MissingOrNullable[dict[str, str]] = UNSET,
+        options: Missing[list[ApplicationCommandOption]] = UNSET,
+        default_member_permissions: MissingOrNullable[str] = UNSET,
+        default_permission: MissingOrNullable[bool] = UNSET,
+        nsfw: Missing[bool] = UNSET,
     ) -> ApplicationCommand:
         """Edit a guild command.
         Updates for guild commands will be available immediately.
@@ -505,12 +538,16 @@ class HandleMixin:
             "default_permission": default_permission,
             "nsfw": nsfw,
         }
+        data = model_dump(
+            type_validate_python(ApplicationCommandEditParams, data),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url
             / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(
             ApplicationCommand, await _request(self, bot, request)
@@ -699,27 +736,34 @@ class HandleMixin:
         application_id: SnowflakeType,
         interaction_token: str,
         thread_id: Optional[SnowflakeType] = None,
-        content: Optional[str] = None,
-        embeds: Optional[list[Embed]] = None,
-        allowed_mentions: Optional[AllowedMention] = None,
-        components: Optional[list[Component]] = None,
-        files: Optional[list[File]] = None,
-        attachments: Optional[list[AttachmentSend]] = None,
+        with_components: Optional[bool] = None,
+        content: MissingOrNullable[str] = UNSET,
+        embeds: MissingOrNullable[list[Embed]] = UNSET,
+        flags: MissingOrNullable[MessageFlag] = UNSET,
+        allowed_mentions: MissingOrNullable[AllowedMention] = UNSET,
+        components: MissingOrNullable[list[Component]] = UNSET,
+        files: Missing[list[File]] = UNSET,
+        attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
+        poll: MissingOrNullable[PollRequest] = UNSET,
     ) -> MessageGet:
         """https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response"""
-        params = {"thread_id": thread_id}
+        params: dict[str, Any] = {"thread_id": thread_id}
+        if with_components is not None:
+            params["with_components"] = str(with_components).lower()
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {
             "content": content,
             "embeds": embeds,
+            "flags": flags,
             "allowed_mentions": allowed_mentions,
             "components": components,
             "files": files,
             "attachments": attachments,
+            "poll": poll,
         }
         request_kwargs = parse_data(
-            {key: value for key, value in data.items() if value is not None},
-            ExecuteWebhookParams,
+            data,
+            WebhookMessageEditParams,
         )
         request = Request(
             headers=headers,
@@ -819,35 +863,45 @@ class HandleMixin:
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
-        content: Optional[str] = None,
-        embeds: Optional[list[Embed]] = None,
-        allowed_mentions: Optional[AllowedMention] = None,
-        components: Optional[list[Component]] = None,
-        files: Optional[list[File]] = None,
-        attachments: Optional[list[AttachmentSend]] = None,
+        thread_id: Optional[SnowflakeType] = None,
+        with_components: Optional[bool] = None,
+        content: MissingOrNullable[str] = UNSET,
+        embeds: MissingOrNullable[list[Embed]] = UNSET,
+        flags: MissingOrNullable[MessageFlag] = UNSET,
+        allowed_mentions: MissingOrNullable[AllowedMention] = UNSET,
+        components: MissingOrNullable[list[Component]] = UNSET,
+        files: Missing[list[File]] = UNSET,
+        attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
+        poll: MissingOrNullable[PollRequest] = UNSET,
     ) -> MessageGet:
         """Edits a followup message for an Interaction. Functions the same as Edit Webhook Message.
 
         see https://discord.com/developers/docs/interactions/receiving-and-responding#edit-followup-message
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        params: dict[str, Any] = {"thread_id": thread_id}
+        if with_components is not None:
+            params["with_components"] = str(with_components).lower()
         data = {
             "content": content,
             "embeds": embeds,
+            "flags": flags,
             "allowed_mentions": allowed_mentions,
             "components": components,
             "files": files,
             "attachments": attachments,
+            "poll": poll,
         }
         request_kwargs = parse_data(
-            {key: value for key, value in data.items() if value is not None},
-            ExecuteWebhookParams,
+            data,
+            WebhookMessageEditParams,
         )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url
             / f"webhooks/{application_id}/{interaction_token}/messages/{message_id}",
+            params={key: value for key, value in params.items() if value is not None},
             json=request_kwargs.get("json"),
             files=request_kwargs.get("files"),
         )
@@ -897,41 +951,47 @@ class HandleMixin:
         self: AdapterProtocol,
         bot: "Bot",
         *,
-        custom_install_url: Optional[str] = None,
-        description: Optional[str] = None,
-        role_connections_verification_url: Optional[str] = None,
-        install_params: Optional[InstallParams] = None,
-        integration_types_config: Optional[
+        custom_install_url: Missing[str] = UNSET,
+        description: Missing[str] = UNSET,
+        role_connections_verification_url: Missing[str] = UNSET,
+        install_params: Missing[InstallParams] = UNSET,
+        integration_types_config: Missing[
             dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfiguration]
-        ] = None,
-        flags: Optional[ApplicationFlag] = None,
-        icon: Optional[str] = None,
-        cover_image: Optional[str] = None,
-        interactions_endpoint_url: Optional[str] = None,
-        tags: Optional[list[str]] = None,
+        ] = UNSET,
+        flags: Missing[ApplicationFlag] = UNSET,
+        icon: MissingOrNullable[str] = UNSET,
+        cover_image: MissingOrNullable[str] = UNSET,
+        interactions_endpoint_url: Missing[str] = UNSET,
+        tags: Missing[list[str]] = UNSET,
     ) -> Application:
         """Edit properties of the app associated with the requesting bot user.
 
         see https://discord.com/developers/docs/resources/application#edit-current-application
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = {
-            "custom_install_url": custom_install_url,
-            "description": description,
-            "role_connections_verification_url": role_connections_verification_url,
-            "install_params": install_params,
-            "integration_types_config": integration_types_config,
-            "flags": flags,
-            "icon": icon,
-            "cover_image": cover_image,
-            "interactions_endpoint_url": interactions_endpoint_url,
-            "tags": tags,
-        }
+        data = model_dump(
+            type_validate_python(
+                EditCurrentApplicationParams,
+                {
+                    "custom_install_url": custom_install_url,
+                    "description": description,
+                    "role_connections_verification_url": role_connections_verification_url,
+                    "install_params": install_params,
+                    "integration_types_config": integration_types_config,
+                    "flags": flags,
+                    "icon": icon,
+                    "cover_image": cover_image,
+                    "interactions_endpoint_url": interactions_endpoint_url,
+                    "tags": tags,
+                },
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / "applications/@me",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(Application, await _request(self, bot, request))
 
@@ -1250,25 +1310,25 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        name: Optional[str] = None,
-        type: Optional[ChannelType] = None,  # noqa: A002
-        position: Optional[int] = None,
-        topic: Optional[str] = None,
-        nsfw: Optional[bool] = None,
-        rate_limit_per_user: Optional[int] = None,
-        bitrate: Optional[int] = None,
-        user_limit: Optional[int] = None,
-        permission_overwrites: Optional[list[Overwrite]] = None,
-        parent_id: Optional[SnowflakeType] = None,
-        rtc_region: Optional[str] = None,
-        video_quality_mode: Optional[VideoQualityMode] = None,
-        default_auto_archive_duration: Optional[int] = None,
-        flags: Optional[ChannelFlags] = None,
-        available_tags: Optional[list[ForumTag]] = None,
-        default_reaction_emoji: Optional[DefaultReaction] = None,
-        default_thread_rate_limit_per_user: Optional[int] = None,
-        default_sort_order: Optional[SortOrderTypes] = None,
-        default_forum_layout: Optional[ForumLayoutTypes] = None,
+        name: Missing[str] = UNSET,
+        type: Missing[ChannelType] = UNSET,  # noqa: A002
+        position: MissingOrNullable[int] = UNSET,
+        topic: MissingOrNullable[str] = UNSET,
+        nsfw: MissingOrNullable[bool] = UNSET,
+        rate_limit_per_user: MissingOrNullable[int] = UNSET,
+        bitrate: MissingOrNullable[int] = UNSET,
+        user_limit: MissingOrNullable[int] = UNSET,
+        permission_overwrites: MissingOrNullable[list[PartialOverwrite]] = UNSET,
+        parent_id: MissingOrNullable[SnowflakeType] = UNSET,
+        rtc_region: MissingOrNullable[str] = UNSET,
+        video_quality_mode: MissingOrNullable[VideoQualityMode] = UNSET,
+        default_auto_archive_duration: MissingOrNullable[int] = UNSET,
+        flags: Missing[ChannelFlags] = UNSET,
+        available_tags: Missing[list[ForumTag]] = UNSET,
+        default_reaction_emoji: MissingOrNullable[DefaultReaction] = UNSET,
+        default_thread_rate_limit_per_user: Missing[int] = UNSET,
+        default_sort_order: MissingOrNullable[SortOrderTypes] = UNSET,
+        default_forum_layout: Missing[ForumLayoutTypes] = UNSET,
         reason: Optional[str] = None,
     ) -> Channel:
         """https://discord.com/developers/docs/resources/channel#modify-channel"""
@@ -1299,7 +1359,7 @@ class HandleMixin:
         data = model_dump(
             type_validate_python(
                 ModifyChannelParams,
-                {key: value for key, value in data.items() if value is not None},
+                data,
             ),
             exclude_unset=True,
         )
@@ -1316,35 +1376,41 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        name: Optional[str] = None,
-        archived: Optional[bool] = None,
-        auto_archive_duration: Optional[int] = None,
-        locked: Optional[bool] = None,
-        invitable: Optional[bool] = None,
-        rate_limit_per_user: Optional[int] = None,
-        flags: Optional[ChannelFlags] = None,
-        applied_tags: Optional[list[SnowflakeType]] = None,
+        name: Missing[str] = UNSET,
+        archived: Missing[bool] = UNSET,
+        auto_archive_duration: Missing[int] = UNSET,
+        locked: Missing[bool] = UNSET,
+        invitable: Missing[bool] = UNSET,
+        rate_limit_per_user: MissingOrNullable[int] = UNSET,
+        flags: Missing[ChannelFlags] = UNSET,
+        applied_tags: Missing[list[SnowflakeType]] = UNSET,
         reason: Optional[str] = None,
     ) -> Channel:
         """https://discord.com/developers/docs/resources/channel#modify-channel"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {
-            "name": name,
-            "archived": archived,
-            "auto_archive_duration": auto_archive_duration,
-            "locked": locked,
-            "invitable": invitable,
-            "rate_limit_per_user": rate_limit_per_user,
-            "flags": flags,
-            "applied_tags": applied_tags,
-        }
+        data = model_dump(
+            type_validate_python(
+                ModifyThreadParams,
+                {
+                    "name": name,
+                    "archived": archived,
+                    "auto_archive_duration": auto_archive_duration,
+                    "locked": locked,
+                    "invitable": invitable,
+                    "rate_limit_per_user": rate_limit_per_user,
+                    "flags": flags,
+                    "applied_tags": applied_tags,
+                },
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"channels/{channel_id}",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(Channel, await _request(self, bot, request))
 
@@ -1610,13 +1676,15 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
-        content: Optional[str] = None,
-        embeds: Optional[list[Embed]] = None,
-        flags: Optional[MessageFlag] = None,
-        allowed_mentions: Optional[AllowedMention] = None,
-        components: Optional[list[DirectComponent]] = None,
-        files: Optional[list[File]] = None,
-        attachments: Optional[list[AttachmentSend]] = None,
+        content: MissingOrNullable[str] = UNSET,
+        embeds: MissingOrNullable[list[Embed]] = UNSET,
+        flags: MissingOrNullable[MessageFlag] = UNSET,
+        allowed_mentions: MissingOrNullable[AllowedMention] = UNSET,
+        components: MissingOrNullable[list[Component]] = UNSET,
+        files: Missing[list[File]] = UNSET,
+        attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
+        sticker_ids: Missing[list[SnowflakeType]] = UNSET,
+        poll: MissingOrNullable[PollRequest] = UNSET,
     ) -> MessageGet:
         """https://discord.com/developers/docs/resources/message#edit-message"""
         data = {
@@ -1627,10 +1695,12 @@ class HandleMixin:
             "components": components,
             "files": files,
             "attachments": attachments,
+            "sticker_ids": sticker_ids,
+            "poll": poll,
         }
         params = parse_data(
-            {key: value for key, value in data.items() if value is not None},
-            MessageSend,
+            data,
+            MessageEditParams,
         )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
@@ -1904,24 +1974,30 @@ class HandleMixin:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
         name: str,
-        auto_archive_duration: Optional[int] = None,
-        rate_limit_per_user: Optional[int] = None,
+        auto_archive_duration: Missing[int] = UNSET,
+        rate_limit_per_user: MissingOrNullable[int] = UNSET,
         reason: Optional[str] = None,
     ) -> Channel:
         """https://discord.com/developers/docs/resources/channel#start-thread-from-message"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {
-            "name": name,
-            "auto_archive_duration": auto_archive_duration,
-            "rate_limit_per_user": rate_limit_per_user,
-        }
+        data = model_dump(
+            type_validate_python(
+                StartThreadFromMessageParams,
+                {
+                    "name": name,
+                    "auto_archive_duration": auto_archive_duration,
+                    "rate_limit_per_user": rate_limit_per_user,
+                },
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="POST",
             url=self.base_url / f"channels/{channel_id}/messages/{message_id}/threads",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(Channel, await _request(self, bot, request))
 
@@ -1931,28 +2007,34 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         name: str,
-        auto_archive_duration: Optional[int] = None,
-        type: Optional[ChannelType] = None,  # noqa: A002
-        invitable: Optional[bool] = None,
-        rate_limit_per_user: Optional[int] = None,
+        auto_archive_duration: Missing[int] = UNSET,
+        type: Missing[ChannelType] = UNSET,  # noqa: A002
+        invitable: Missing[bool] = UNSET,
+        rate_limit_per_user: MissingOrNullable[int] = UNSET,
         reason: Optional[str] = None,
     ) -> Channel:
         """https://discord.com/developers/docs/resources/channel#start-thread-without-message"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {
-            "name": name,
-            "auto_archive_duration": auto_archive_duration,
-            "type": type,
-            "invitable": invitable,
-            "rate_limit_per_user": rate_limit_per_user,
-        }
+        data = model_dump(
+            type_validate_python(
+                StartThreadWithoutMessageParams,
+                {
+                    "name": name,
+                    "auto_archive_duration": auto_archive_duration,
+                    "type": type,
+                    "invitable": invitable,
+                    "rate_limit_per_user": rate_limit_per_user,
+                },
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="POST",
             url=self.base_url / f"channels/{channel_id}/threads",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(Channel, await _request(self, bot, request))
 
@@ -1962,9 +2044,9 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         name: str,
-        auto_archive_duration: Optional[int] = None,
-        rate_limit_per_user: Optional[int] = None,
-        applied_tags: Optional[list[SnowflakeType]] = None,
+        auto_archive_duration: Missing[int] = UNSET,
+        rate_limit_per_user: MissingOrNullable[int] = UNSET,
+        applied_tags: Missing[list[SnowflakeType]] = UNSET,
         content: Optional[str] = None,
         embeds: Optional[list[Embed]] = None,
         allowed_mentions: Optional[AllowedMention] = None,
@@ -2234,24 +2316,25 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         emoji_id: SnowflakeType,
-        name: str = ...,
-        roles: Optional[list[SnowflakeType]] = None,
+        name: Missing[str] = UNSET,
+        roles: MissingOrNullable[list[SnowflakeType]] = UNSET,
         reason: Optional[str] = None,
     ) -> Emoji:
         """https://discord.com/developers/docs/resources/emoji#modify-guild-emoji"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {"name": name, "roles": roles}
+        data = model_dump(
+            type_validate_python(
+                ModifyGuildEmojiParams, {"name": name, "roles": roles}
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/emojis/{emoji_id}",
-            json={
-                key: value
-                for key, value in data.items()
-                if value is not None and value is not ...
-            },
+            json=data,
         )
         return type_validate_python(Emoji, await _request(self, bot, request))
 
@@ -2531,26 +2614,29 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: str,
-        region: Optional[str] = None,
-        verification_level: Optional[VerificationLevel] = None,
-        default_message_notifications: Optional[DefaultMessageNotificationLevel] = None,
-        explicit_content_filter: Optional[ExplicitContentFilterLevel] = None,
-        afk_channel_id: Optional[Snowflake] = None,
-        afk_timeout: Optional[int] = None,
-        icon: Optional[str] = None,
-        owner_id: Optional[Snowflake] = None,
-        splash: Optional[str] = None,
-        discovery_splash: Optional[str] = None,
-        banner: Optional[str] = None,
-        system_channel_id: Optional[Snowflake] = None,
-        system_channel_flags: Optional[SystemChannelFlags] = None,
-        rules_channel_id: Optional[Snowflake] = None,
-        public_updates_channel_id: Optional[Snowflake] = None,
-        preferred_locale: Optional[str] = None,
-        features: Optional[list[GuildFeature]] = None,
-        description: Optional[str] = None,
-        premium_progress_bar_enabled: Optional[bool] = None,
+        name: Missing[str] = UNSET,
+        region: MissingOrNullable[str] = UNSET,
+        verification_level: MissingOrNullable[VerificationLevel] = UNSET,
+        default_message_notifications: MissingOrNullable[
+            DefaultMessageNotificationLevel
+        ] = UNSET,
+        explicit_content_filter: MissingOrNullable[ExplicitContentFilterLevel] = UNSET,
+        afk_channel_id: MissingOrNullable[Snowflake] = UNSET,
+        afk_timeout: Missing[int] = UNSET,
+        icon: MissingOrNullable[str] = UNSET,
+        owner_id: Missing[Snowflake] = UNSET,
+        splash: MissingOrNullable[str] = UNSET,
+        discovery_splash: MissingOrNullable[str] = UNSET,
+        banner: MissingOrNullable[str] = UNSET,
+        system_channel_id: MissingOrNullable[Snowflake] = UNSET,
+        system_channel_flags: Missing[SystemChannelFlags] = UNSET,
+        rules_channel_id: MissingOrNullable[Snowflake] = UNSET,
+        public_updates_channel_id: MissingOrNullable[Snowflake] = UNSET,
+        preferred_locale: MissingOrNullable[str] = UNSET,
+        features: Missing[list[GuildFeature]] = UNSET,
+        description: MissingOrNullable[str] = UNSET,
+        premium_progress_bar_enabled: Missing[bool] = UNSET,
+        safety_alerts_channel_id: MissingOrNullable[Snowflake] = UNSET,
         reason: Optional[str] = None,
     ) -> Guild:
         """https://discord.com/developers/docs/resources/guild#modify-guild"""
@@ -2578,11 +2664,12 @@ class HandleMixin:
             "features": features,
             "description": description,
             "premium_progress_bar_enabled": premium_progress_bar_enabled,
+            "safety_alerts_channel_id": safety_alerts_channel_id,
         }
         data = model_dump(
             type_validate_python(
                 ModifyGuildParams,
-                {key: value for key, value in data.items() if value is not None},
+                data,
             ),
             exclude_unset=True,
         )
@@ -2814,54 +2901,74 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        nick: Optional[str] = None,
-        roles: Optional[list[SnowflakeType]] = None,
-        mute: Optional[bool] = None,
-        deaf: Optional[bool] = None,
-        channel_id: Optional[SnowflakeType] = None,
-        communication_disabled_until: Optional[datetime] = None,
-        flags: Optional[GuildMemberFlags] = None,
+        nick: MissingOrNullable[str] = UNSET,
+        roles: MissingOrNullable[list[SnowflakeType]] = UNSET,
+        mute: MissingOrNullable[bool] = UNSET,
+        deaf: MissingOrNullable[bool] = UNSET,
+        channel_id: MissingOrNullable[SnowflakeType] = UNSET,
+        communication_disabled_until: MissingOrNullable[datetime] = UNSET,
+        flags: MissingOrNullable[GuildMemberFlags] = UNSET,
         reason: Optional[str] = None,
     ) -> GuildMember:
         """https://discord.com/developers/docs/resources/guild#modify-guild-member"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {
-            "nick": nick,
-            "roles": roles,
-            "mute": mute,
-            "deaf": deaf,
-            "channel_id": channel_id,
-            "communication_disabled_until": communication_disabled_until,
-            "flags": flags,
-        }
+        data = model_dump(
+            type_validate_python(
+                ModifyGuildMemberParams,
+                {
+                    "nick": nick,
+                    "roles": roles,
+                    "mute": mute,
+                    "deaf": deaf,
+                    "channel_id": channel_id,
+                    "communication_disabled_until": communication_disabled_until,
+                    "flags": flags,
+                },
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(GuildMember, await _request(self, bot, request))
 
-    async def _api_modify_current_member(
+    async def _api_modify_current_member(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        nick: Optional[str] = None,
+        nick: MissingOrNullable[str] = UNSET,
+        banner: MissingOrNullable[str] = UNSET,
+        avatar: MissingOrNullable[str] = UNSET,
+        bio: MissingOrNullable[str] = UNSET,
         reason: Optional[str] = None,
     ) -> GuildMember:
         """https://discord.com/developers/docs/resources/guild#modify-current-member"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {"nick": nick}
+        data = model_dump(
+            type_validate_python(
+                ModifyCurrentMemberParams,
+                {
+                    "nick": nick,
+                    "banner": banner,
+                    "avatar": avatar,
+                    "bio": bio,
+                },
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/members/@me",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(GuildMember, await _request(self, bot, request))
 
@@ -2870,7 +2977,7 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        nick: Optional[str] = None,
+        nick: MissingOrNullable[str] = UNSET,
         reason: Optional[str] = None,
     ) -> GuildMember:
         """Deprecated in favor of Modify Current Member.
@@ -2879,12 +2986,12 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {"nick": nick}
+        data = omit_unset({"nick": nick})
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/members/@me/nick",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(GuildMember, await _request(self, bot, request))
 
@@ -3086,33 +3193,39 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: Optional[str] = None,
-        permissions: Optional[str] = None,
-        color: Optional[int] = None,
-        hoist: Optional[bool] = None,
-        icon: Optional[str] = None,
-        unicode_emoji: Optional[str] = None,
-        mentionable: Optional[bool] = None,
+        name: Missing[str] = UNSET,
+        permissions: Missing[str] = UNSET,
+        color: Missing[int] = UNSET,
+        hoist: Missing[bool] = UNSET,
+        icon: MissingOrNullable[str] = UNSET,
+        unicode_emoji: MissingOrNullable[str] = UNSET,
+        mentionable: Missing[bool] = UNSET,
         reason: Optional[str] = None,
     ) -> Role:
         """https://discord.com/developers/docs/resources/guild#create-guild-role"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {
-            "name": name,
-            "permissions": permissions,
-            "color": color,
-            "hoist": hoist,
-            "icon": icon,
-            "unicode_emoji": unicode_emoji,
-            "mentionable": mentionable,
-        }
+        data = model_dump(
+            type_validate_python(
+                CreateGuildRoleParams,
+                {
+                    "name": name,
+                    "permissions": permissions,
+                    "color": color,
+                    "hoist": hoist,
+                    "icon": icon,
+                    "unicode_emoji": unicode_emoji,
+                    "mentionable": mentionable,
+                },
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/roles",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(Role, await _request(self, bot, request))
 
@@ -3145,33 +3258,39 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         role_id: SnowflakeType,
-        name: Optional[str] = None,
-        permissions: Optional[str] = None,
-        color: Optional[int] = None,
-        hoist: Optional[bool] = None,
-        icon: Optional[str] = None,
-        unicode_emoji: Optional[str] = None,
-        mentionable: Optional[bool] = None,
+        name: MissingOrNullable[str] = UNSET,
+        permissions: MissingOrNullable[str] = UNSET,
+        color: MissingOrNullable[int] = UNSET,
+        hoist: MissingOrNullable[bool] = UNSET,
+        icon: MissingOrNullable[str] = UNSET,
+        unicode_emoji: MissingOrNullable[str] = UNSET,
+        mentionable: MissingOrNullable[bool] = UNSET,
         reason: Optional[str] = None,
     ) -> Role:
         """https://discord.com/developers/docs/resources/guild#modify-guild-role"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {
-            "name": name,
-            "permissions": permissions,
-            "color": color,
-            "hoist": hoist,
-            "icon": icon,
-            "unicode_emoji": unicode_emoji,
-            "mentionable": mentionable,
-        }
+        data = model_dump(
+            type_validate_python(
+                ModifyGuildRoleParams,
+                {
+                    "name": name,
+                    "permissions": permissions,
+                    "color": color,
+                    "hoist": hoist,
+                    "icon": icon,
+                    "unicode_emoji": unicode_emoji,
+                    "mentionable": mentionable,
+                },
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/roles/{role_id}",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(Role, await _request(self, bot, request))
 
@@ -3342,20 +3461,26 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        enabled: Optional[bool] = None,
-        channel_id: Optional[SnowflakeType] = None,
+        enabled: Missing[bool] = UNSET,
+        channel_id: MissingOrNullable[SnowflakeType] = UNSET,
         reason: Optional[str] = None,
     ) -> GuildWidget:
         """https://discord.com/developers/docs/resources/guild#modify-guild-widget"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {"enabled": enabled, "channel_id": channel_id}
+        data = model_dump(
+            type_validate_python(
+                ModifyGuildWidgetParams,
+                {"enabled": enabled, "channel_id": channel_id},
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/widget",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(GuildWidget, await _request(self, bot, request))
 
@@ -3420,9 +3545,9 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        enabled: Optional[bool] = None,
-        welcome_channels: Optional[list[WelcomeScreenChannel]] = None,
-        description: Optional[str] = None,
+        enabled: MissingOrNullable[bool] = UNSET,
+        welcome_channels: MissingOrNullable[list[WelcomeScreenChannel]] = UNSET,
+        description: MissingOrNullable[str] = UNSET,
         reason: Optional[str] = None,
     ) -> WelcomeScreen:
         """https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen"""
@@ -3437,7 +3562,7 @@ class HandleMixin:
         data = model_dump(
             type_validate_python(
                 ModifyGuildWelcomeScreenParams,
-                {key: value for key, value in data.items() if value is not None},
+                data,
             ),
             exclude_unset=True,
         )
@@ -3543,22 +3668,28 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        channel_id: Optional[SnowflakeType] = None,
-        suppress: Optional[bool] = None,
-        request_to_speak_timestamp: Optional[datetime] = None,
+        channel_id: Missing[SnowflakeType] = UNSET,
+        suppress: Missing[bool] = UNSET,
+        request_to_speak_timestamp: MissingOrNullable[datetime] = UNSET,
     ) -> None:
         """https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = {
-            "channel_id": channel_id,
-            "suppress": suppress,
-            "request_to_speak_timestamp": request_to_speak_timestamp,
-        }
+        data = model_dump(
+            type_validate_python(
+                ModifyCurrentUserVoiceStateParams,
+                {
+                    "channel_id": channel_id,
+                    "suppress": suppress,
+                    "request_to_speak_timestamp": request_to_speak_timestamp,
+                },
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/voice-states/@me",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         await _request(self, bot, request)
 
@@ -3677,16 +3808,17 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         event_id: SnowflakeType,
-        channel_id: Optional[Snowflake] = None,
-        entity_metadata: Optional[GuildScheduledEventEntityMetadata] = None,
-        name: Optional[str] = None,
-        privacy_level: Optional[GuildScheduledEventPrivacyLevel] = None,
-        scheduled_start_time: Optional[datetime] = None,
-        scheduled_end_time: Optional[datetime] = None,
-        description: Optional[str] = None,
-        entity_type: Optional[GuildScheduledEventEntityType] = None,
-        status: Optional[GuildScheduledEventStatus] = None,
-        image: Optional[str] = None,
+        channel_id: MissingOrNullable[Snowflake] = UNSET,
+        entity_metadata: MissingOrNullable[GuildScheduledEventEntityMetadata] = UNSET,
+        name: Missing[str] = UNSET,
+        privacy_level: Missing[GuildScheduledEventPrivacyLevel] = UNSET,
+        scheduled_start_time: Missing[datetime] = UNSET,
+        scheduled_end_time: Missing[datetime] = UNSET,
+        description: MissingOrNullable[str] = UNSET,
+        entity_type: Missing[GuildScheduledEventEntityType] = UNSET,
+        status: Missing[GuildScheduledEventStatus] = UNSET,
+        image: Missing[str] = UNSET,
+        recurrence_rule: MissingOrNullable[RecurrenceRule] = UNSET,
         reason: Optional[str] = None,
     ) -> GuildScheduledEvent:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event"""
@@ -3704,11 +3836,12 @@ class HandleMixin:
             "entity_type": entity_type,
             "status": status,
             "image": image,
+            "recurrence_rule": recurrence_rule,
         }
         data = model_dump(
             type_validate_python(
                 ModifyGuildScheduledEventParams,
-                {key: value for key, value in data.items() if value is not None},
+                data,
             ),
             exclude_unset=True,
         )
@@ -3821,16 +3954,22 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         name: str,
-        description: Optional[str] = None,
+        description: MissingOrNullable[str] = UNSET,
     ) -> GuildTemplate:
         """https://discord.com/developers/docs/resources/guild-template#create-guild-template"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = {"name": name, "description": description}
+        data = model_dump(
+            type_validate_python(
+                CreateGuildTemplateParams,
+                {"name": name, "description": description},
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/templates",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(GuildTemplate, await _request(self, bot, request))
 
@@ -3856,17 +3995,23 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         template_code: str,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
+        name: Missing[str] = UNSET,
+        description: MissingOrNullable[str] = UNSET,
     ) -> GuildTemplate:
         """https://discord.com/developers/docs/resources/guild-template#modify-guild-template"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = {"name": name, "description": description}
+        data = model_dump(
+            type_validate_python(
+                ModifyGuildTemplateParams,
+                {"name": name, "description": description},
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/templates/{template_code}",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(GuildTemplate, await _request(self, bot, request))
 
@@ -4177,21 +4322,27 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         sticker_id: SnowflakeType,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        tags: Optional[str] = None,
+        name: Missing[str] = UNSET,
+        description: MissingOrNullable[str] = UNSET,
+        tags: Missing[str] = UNSET,
         reason: Optional[str] = None,
     ) -> Sticker:
         """https://discord.com/developers/docs/resources/sticker#modify-guild-sticker"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {"name": name, "description": description, "tags": tags}
+        data = model_dump(
+            type_validate_python(
+                ModifyGuildStickerParams,
+                {"name": name, "description": description, "tags": tags},
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/stickers/{sticker_id}",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(Sticker, await _request(self, bot, request))
 
@@ -4293,17 +4444,24 @@ class HandleMixin:
         self: AdapterProtocol,
         bot: "Bot",
         *,
-        username: Optional[str] = None,
-        avatar: Optional[str] = None,
+        username: Missing[str] = UNSET,
+        avatar: MissingOrNullable[str] = UNSET,
+        banner: MissingOrNullable[str] = UNSET,
     ) -> User:
         """https://discord.com/developers/docs/resources/user#modify-current-user"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = {"username": username, "avatar": avatar}
+        data = model_dump(
+            type_validate_python(
+                ModifyCurrentUserParams,
+                {"username": username, "avatar": avatar, "banner": banner},
+            ),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / "users/@me",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(User, await _request(self, bot, request))
 
@@ -4454,19 +4612,22 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         name: str,
-        avatar: Optional[str] = None,
+        avatar: MissingOrNullable[str] = UNSET,
         reason: Optional[str] = None,
     ) -> Webhook:
         """https://discord.com/developers/docs/resources/webhook#create-webhook"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {"name": name, "avatar": avatar}
+        data = model_dump(
+            type_validate_python(CreateWebhookParams, {"name": name, "avatar": avatar}),
+            exclude_unset=True,
+        )
         request = Request(
             headers=headers,
             method="POST",
             url=self.base_url / f"channels/{channel_id}/webhooks",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(Webhook, await _request(self, bot, request))
 
@@ -4521,21 +4682,21 @@ class HandleMixin:
         bot: "Bot",
         *,
         webhook_id: SnowflakeType,
-        name: Optional[str] = None,
-        avatar: Optional[str] = None,
-        channel_id: Optional[SnowflakeType] = None,
+        name: Missing[str] = UNSET,
+        avatar: MissingOrNullable[str] = UNSET,
+        channel_id: Missing[SnowflakeType] = UNSET,
         reason: Optional[str] = None,
     ) -> Webhook:
         """https://discord.com/developers/docs/resources/webhook#modify-webhook"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {"name": name, "avatar": avatar, "channel_id": channel_id}
+        data = omit_unset({"name": name, "avatar": avatar, "channel_id": channel_id})
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"webhooks/{webhook_id}",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(Webhook, await _request(self, bot, request))
 
@@ -4545,15 +4706,15 @@ class HandleMixin:
         *,
         webhook_id: SnowflakeType,
         token: str,
-        name: Optional[str] = None,
-        avatar: Optional[str] = None,
+        name: Missing[str] = UNSET,
+        avatar: MissingOrNullable[str] = UNSET,
     ) -> Webhook:
         """https://discord.com/developers/docs/resources/webhook#modify-webhook-with-token"""
-        data = {"name": name, "avatar": avatar}
+        data = omit_unset({"name": name, "avatar": avatar})
         request = Request(
             method="PATCH",
             url=self.base_url / f"webhooks/{webhook_id}/{token}",
-            json={key: value for key, value in data.items() if value is not None},
+            json=data,
         )
         return type_validate_python(Webhook, await _request(self, bot, request))
 
@@ -4721,20 +4882,25 @@ class HandleMixin:
         webhook_token: str,
         message_id: SnowflakeType,
         thread_id: Optional[SnowflakeType] = None,
-        content: Optional[str] = None,
-        embeds: Optional[list[Embed]] = None,
-        allowed_mentions: Optional[AllowedMention] = None,
-        components: Optional[list[Component]] = None,
-        files: Optional[list[File]] = None,
-        attachments: Optional[list[AttachmentSend]] = None,
-        poll: Optional[PollRequest] = None,
+        with_components: Optional[bool] = None,
+        content: MissingOrNullable[str] = UNSET,
+        embeds: MissingOrNullable[list[Embed]] = UNSET,
+        flags: MissingOrNullable[MessageFlag] = UNSET,
+        allowed_mentions: MissingOrNullable[AllowedMention] = UNSET,
+        components: MissingOrNullable[list[Component]] = UNSET,
+        files: Missing[list[File]] = UNSET,
+        attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
+        poll: MissingOrNullable[PollRequest] = UNSET,
     ) -> MessageGet:
         """https://discord.com/developers/docs/resources/webhook#edit-webhook-message"""
-        params = {"thread_id": thread_id}
+        params: dict[str, Any] = {"thread_id": thread_id}
+        if with_components is not None:
+            params["with_components"] = str(with_components).lower()
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {
             "content": content,
             "embeds": embeds,
+            "flags": flags,
             "allowed_mentions": allowed_mentions,
             "components": components,
             "files": files,
@@ -4742,8 +4908,8 @@ class HandleMixin:
             "poll": poll,
         }
         request_kwargs = parse_data(
-            {key: value for key, value in data.items() if value is not None},
-            ExecuteWebhookParams,
+            data,
+            WebhookMessageEditParams,
         )
         request = Request(
             headers=headers,

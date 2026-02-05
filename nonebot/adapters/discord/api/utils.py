@@ -7,7 +7,9 @@ from .model import (
     ExecuteWebhookParams,
     InteractionCallbackMessage,
     InteractionResponse,
+    MessageEditParams,
     MessageSend,
+    WebhookMessageEditParams,
 )
 from .types import UNSET
 from ..utils import model_dump
@@ -32,20 +34,32 @@ def omit_unset(data: Any) -> Any:  # noqa: ANN401
 
 
 def parse_data(
-    data: dict[str, Any], model_class: type[Union[MessageSend, ExecuteWebhookParams]]
+    data: dict[str, Any],
+    model_class: type[
+        Union[
+            ExecuteWebhookParams,
+            MessageEditParams,
+            MessageSend,
+            WebhookMessageEditParams,
+        ]
+    ],
 ) -> dict[Literal["files", "json"], Any]:
     model = type_validate_python(model_class, data)
-    payload: dict[str, Any] = model_dump(model, exclude={"files"}, exclude_none=True)
-    if model.files:
+    payload: dict[str, Any] = model_dump(model, exclude={"files"}, exclude_unset=True)
+    files = getattr(model, "files", None)
+    if files is not None and files is not UNSET and len(files) > 0:
         multipart: dict[str, Any] = {}
-        attachments: list[dict] = payload.pop("attachments", [])
-        for index, file in enumerate(model.files):
-            for attachment in attachments:
-                if attachment["filename"] == file.filename:
-                    attachment["id"] = index
-                    break
+        attachments = payload.get("attachments", [])
+        if isinstance(attachments, list):
+            attachments = payload.pop("attachments", [])
+        for index, file in enumerate(files):
+            if isinstance(attachments, list):
+                for attachment in attachments:
+                    if attachment.get("filename") == file.filename:
+                        attachment["id"] = index
+                        break
             multipart[f"files[{index}]"] = (file.filename, file.content)
-        if attachments:
+        if isinstance(attachments, list) and attachments:
             payload["attachments"] = attachments
         multipart["payload_json"] = (None, json.dumps(payload), "application/json")
         return {"files": multipart}
@@ -58,11 +72,14 @@ def parse_forum_thread_message(
     model = type_validate_python(MessageSend, data)
     payload: dict[str, Any] = {}
     content: dict[str, Any] = model_dump(model, exclude={"files"}, exclude_none=True)
-    if auto_archive_duration := data.pop("auto_archive_duration"):
+    auto_archive_duration = data.pop("auto_archive_duration", UNSET)
+    if auto_archive_duration is not UNSET and auto_archive_duration is not None:
         payload["auto_archive_duration"] = auto_archive_duration
-    if rate_limit_per_user := data.pop("rate_limit_per_user"):
+    rate_limit_per_user = data.pop("rate_limit_per_user", UNSET)
+    if rate_limit_per_user is not UNSET:
         payload["rate_limit_per_user"] = rate_limit_per_user
-    if applied_tags := data.pop("applied_tags"):
+    applied_tags = data.pop("applied_tags", UNSET)
+    if applied_tags is not UNSET and applied_tags is not None:
         payload["applied_tags"] = applied_tags
     payload["message"] = content
     if model.files:
@@ -71,9 +88,9 @@ def parse_forum_thread_message(
         for index, file in enumerate(model.files):
             for attachment in attachments:
                 if attachment["filename"] == file.filename:
-                    attachment["id"] = str(index)
+                    attachment["id"] = index
                     break
-            multipart[f"file[{index}]"] = (file.filename, file.content)
+            multipart[f"files[{index}]"] = (file.filename, file.content)
         if attachments:
             payload["attachments"] = attachments
         multipart["payload_json"] = (None, json.dumps(payload), "application/json")
