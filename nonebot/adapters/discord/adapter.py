@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import inspect
 import json
 import sys
 from typing import Any, Optional
@@ -13,7 +14,7 @@ from nonebot.exception import WebSocketClosed
 from nonebot.plugin import get_plugin_config
 from nonebot.utils import escape_tag
 
-from .api.handle import API_HANDLERS
+from .api.handle import HandleMixin
 from .api.model import GatewayBot, User
 from .bot import Bot
 from .commands import sync_application_command
@@ -37,7 +38,7 @@ from .utils import decompress_data, log, model_dump
 RECONNECT_INTERVAL = 3.0
 
 
-class Adapter(BaseAdapter):
+class Adapter(BaseAdapter, HandleMixin):
     @override
     def __init__(self, driver: Driver, **kwargs: Any) -> None:
         super().__init__(driver, **kwargs)
@@ -459,6 +460,26 @@ class Adapter(BaseAdapter):
     @override
     async def _call_api(self, bot: Bot, api: str, **data: Any) -> Any:
         log("DEBUG", f"Calling API <y>{api}</y>")
-        if (api_handler := API_HANDLERS.get(api)) is None:
+        api_handler = getattr(self, f"_api_{api}", None)
+        if api_handler is None:
             raise ApiNotAvailable
-        return await api_handler(self, bot, **data)
+        if data:
+            handler_params = inspect.signature(api_handler).parameters
+
+            def can_flatten(legacy_key: str) -> bool:
+                param = handler_params.get(legacy_key)
+                if param is None:
+                    return True
+                return param.kind is inspect.Parameter.VAR_KEYWORD
+
+            for legacy_key in ("params", "data"):
+                legacy_value = data.get(legacy_key)
+                if (
+                    isinstance(legacy_value, dict)
+                    and legacy_value
+                    and can_flatten(legacy_key)
+                ):
+                    for key, value in legacy_value.items():
+                        data.setdefault(key, value)
+                    data.pop(legacy_key, None)
+        return await api_handler(bot, **data)
