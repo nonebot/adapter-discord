@@ -125,7 +125,7 @@ class ApiClient:
         default_member_permissions: str | None = ...,
         dm_permission: bool | None = ...,
         default_permission: bool | None = ...,
-        type: ApplicationCommandType | None = ...,  # noqa: A002
+        type: ApplicationCommandType | None = ...,
         nsfw: bool | None = ...,
     ) -> ApplicationCommand:
         """Create a new global command.
@@ -207,7 +207,7 @@ class ApiClient:
         options: list[ApplicationCommandOption] | None = ...,
         default_member_permissions: str | None = ...,
         default_permission: bool | None = ...,
-        type: ApplicationCommandType | None = ...,  # noqa: A002
+        type: ApplicationCommandType | None = ...,
         nsfw: bool | None = ...,
     ) -> ApplicationCommand:
         """Create a new guild command.
@@ -558,7 +558,7 @@ class ApiClient:
 
         see https://discord.com/developers/docs/resources/channel#get-channel"""
 
-    async def modify_DM(  # noqa: N802
+    async def modify_DM(
         self,
         *,
         channel_id: SnowflakeType,
@@ -576,7 +576,7 @@ class ApiClient:
         *,
         channel_id: SnowflakeType,
         name: str | None = ...,
-        type: ChannelType | None = ...,  # noqa: A002
+        type: ChannelType | None = ...,
         position: int | None = ...,
         topic: str | None = ...,
         nsfw: bool | None = ...,
@@ -793,7 +793,7 @@ class ApiClient:
         overwrite_id: SnowflakeType,
         allow: str | None = ...,
         deny: str | None = ...,
-        type: OverwriteType | None = ...,  # noqa: A002
+        type: OverwriteType | None = ...,
         reason: str | None = ...,
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#edit-channel-permissions"""
@@ -860,7 +860,7 @@ class ApiClient:
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#unpin-message"""
 
-    async def group_DM_add_recipient(  # noqa: N802
+    async def group_DM_add_recipient(
         self,
         *,
         channel_id: SnowflakeType,
@@ -870,7 +870,7 @@ class ApiClient:
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#group-dm-add-recipient"""
 
-    async def group_DM_remove_recipient(  # noqa: N802
+    async def group_DM_remove_recipient(
         self, *, channel_id: SnowflakeType, user_id: SnowflakeType
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#group-dm-remove-recipient"""
@@ -893,7 +893,7 @@ class ApiClient:
         channel_id: SnowflakeType,
         name: str = ...,
         auto_archive_duration: int | None = ...,
-        type: ChannelType | None = ...,  # noqa: A002
+        type: ChannelType | None = ...,
         invitable: bool | None = ...,
         rate_limit_per_user: int | None = ...,
         reason: str | None = ...,
@@ -1152,7 +1152,7 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         name: str = ...,
-        type: ChannelType | None = ...,  # noqa: A002
+        type: ChannelType | None = ...,
         topic: str | None = ...,
         bitrate: int | None = ...,
         user_limit: int | None = ...,
@@ -1175,7 +1175,7 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        id: SnowflakeType = ...,  # noqa: A002
+        id: SnowflakeType = ...,
         position: int | None = ...,
         lock_permissions: bool | None = ...,
         parent_id: SnowflakeType | None = ...,
@@ -1358,7 +1358,7 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        id: SnowflakeType,  # noqa: A002
+        id: SnowflakeType,
         position: int | None = ...,
         reason: str | None = ...,
     ) -> list[Role]:
@@ -1380,7 +1380,7 @@ class ApiClient:
     ) -> Role:
         """https://discord.com/developers/docs/resources/guild#modify-guild-role"""
 
-    async def modify_guild_MFA_level(  # noqa: N802
+    async def modify_guild_MFA_level(
         self, *, guild_id: SnowflakeType, level: int, reason: str | None = ...
     ) -> None:
         """https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level"""
@@ -1666,7 +1666,7 @@ class ApiClient:
     ) -> MessageGet:
         """https://discord.com/developers/docs/resources/poll#end-poll"""
 
-    async def list_SKUs(self, *, application_id: SnowflakeType) -> list[SKU]:  # noqa: N802
+    async def list_SKUs(self, *, application_id: SnowflakeType) -> list[SKU]:
         """https://discord.com/developers/docs/resources/sku#list-skus"""
 
     async def create_stage_instance(
@@ -1750,7 +1750,7 @@ class ApiClient:
     ) -> None:
         """https://discord.com/developers/docs/resources/sticker#delete-guild-sticker"""
 
-    async def list_SKU_subscriptions(  # noqa: N802
+    async def list_SKU_subscriptions(
         self,
         *,
         sku_id: SnowflakeType,
@@ -1761,7 +1761,7 @@ class ApiClient:
     ) -> list[Subscription]:
         """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions"""
 
-    async def get_SKU_subscription(  # noqa: N802
+    async def get_SKU_subscription(
         self, *, sku_id: SnowflakeType, subscription_id: SnowflakeType
     ) -> Subscription:
         """https://discord.com/developers/docs/resources/subscription#get-sku-subscription"""
@@ -1794,10 +1794,10 @@ class ApiClient:
     async def leave_guild(self, *, guild_id: SnowflakeType) -> None:
         """https://discord.com/developers/docs/resources/user#leave-guild"""
 
-    async def create_DM(self, *, recipient_id: SnowflakeType) -> Channel:  # noqa: N802
+    async def create_DM(self, *, recipient_id: SnowflakeType) -> Channel:
         """https://discord.com/developers/docs/resources/user#create-dm"""
 
-    async def create_group_DM(  # noqa: N802
+    async def create_group_DM(
         self, *, access_tokens: list[str], nicks: dict[SnowflakeType, str]
     ) -> Channel:
         """https://discord.com/developers/docs/resources/user#create-group-dm"""
