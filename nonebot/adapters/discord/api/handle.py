@@ -207,6 +207,12 @@ async def _request(adapter: "AdapterProtocol", bot: "Bot", request: Request) -> 
         raise NetworkError(msg) from e
 
 
+def _bool_query(*, value: Optional[bool]) -> Optional[str]:
+    if value is None:
+        return None
+    return "true" if value else "false"
+
+
 class HandleMixin:
     # Application Commands
 
@@ -224,7 +230,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/interactions/application-commands#get-global-application-commands
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        params = {"with_localizations": with_localizations}
+        params = {"with_localizations": _bool_query(value=with_localizations)}
         request = Request(
             headers=headers,
             method="GET",
@@ -415,7 +421,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-commands
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        params = {"with_localizations": with_localizations}
+        params = {"with_localizations": _bool_query(value=with_localizations)}
         request = Request(
             headers=headers,
             method="GET",
@@ -2151,7 +2157,7 @@ class HandleMixin:
     ) -> ThreadMember:
         """https://discord.com/developers/docs/resources/channel#get-thread-member"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        params = {"with_member": with_member}
+        params = {"with_member": _bool_query(value=with_member)}
         request = Request(
             headers=headers,
             method="GET",
@@ -2171,7 +2177,11 @@ class HandleMixin:
     ) -> list[ThreadMember]:
         """https://discord.com/developers/docs/resources/channel#list-thread-members"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        params = {"with_member": with_member, "after": after, "limit": limit}
+        params = {
+            "with_member": _bool_query(value=with_member),
+            "after": after,
+            "limit": limit,
+        }
         request = Request(
             headers=headers,
             method="GET",
@@ -2465,7 +2475,7 @@ class HandleMixin:
             "after": after,
             "limit": limit,
             "guild_id": guild_id,
-            "exclude_ended": exclude_ended,
+            "exclude_ended": _bool_query(value=exclude_ended),
         }
         request = Request(
             headers=headers,
@@ -2588,7 +2598,7 @@ class HandleMixin:
     ) -> Guild:
         """https://discord.com/developers/docs/resources/guild#get-guild"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        params = {"with_counts": with_counts}
+        params = {"with_counts": _bool_query(value=with_counts)}
         request = Request(
             headers=headers,
             method="GET",
@@ -3725,7 +3735,7 @@ class HandleMixin:
     ) -> list[GuildScheduledEvent]:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#list-scheduled-events-for-guild"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        params = {"with_user_count": with_user_count}
+        params = {"with_user_count": _bool_query(value=with_user_count)}
         request = Request(
             headers=headers,
             method="GET",
@@ -3791,7 +3801,7 @@ class HandleMixin:
     ) -> GuildScheduledEvent:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#get-guild-scheduled-event"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        params = {"with_user_count": with_user_count}
+        params = {"with_user_count": _bool_query(value=with_user_count)}
         request = Request(
             headers=headers,
             method="GET",
@@ -3886,7 +3896,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "limit": limit,
-            "with_member": with_member,
+            "with_member": _bool_query(value=with_member),
             "before": before,
             "after": after,
         }
@@ -4046,8 +4056,8 @@ class HandleMixin:
         """https://discord.com/developers/docs/resources/invite#get-invite"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
-            "with_counts": with_counts,
-            "with_expiration": with_expiration,
+            "with_counts": _bool_query(value=with_counts),
+            "with_expiration": _bool_query(value=with_expiration),
             "guild_scheduled_event_id": guild_scheduled_event_id,
         }
         request = Request(
@@ -4825,7 +4835,7 @@ class HandleMixin:
     ) -> None:
         """https://discord.com/developers/docs/resources/webhook#execute-slackcompatible-webhook"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        params = {"thread_id": thread_id, "wait": wait}
+        params = {"thread_id": thread_id, "wait": _bool_query(value=wait)}
         request = Request(
             headers=headers,
             method="POST",
@@ -4845,7 +4855,7 @@ class HandleMixin:
     ) -> None:
         """https://discord.com/developers/docs/resources/webhook#execute-githubcompatible-webhook"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        params = {"thread_id": thread_id, "wait": wait}
+        params = {"thread_id": thread_id, "wait": _bool_query(value=wait)}
         request = Request(
             headers=headers,
             method="POST",
