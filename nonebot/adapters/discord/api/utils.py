@@ -9,7 +9,26 @@ from .model import (
     InteractionResponse,
     MessageSend,
 )
+from .types import UNSET
 from ..utils import model_dump
+
+
+def omit_unset(data: Any) -> Any:  # noqa: ANN401
+    """Recursively omit fields whose value is exactly ``UNSET``.
+
+    Notes:
+    - Keep ``None`` as-is to allow explicitly sending JSON ``null``.
+    - This helper is intended for handles that build request payloads via
+      plain ``dict``/``list`` instead of Pydantic models.
+    """
+
+    if isinstance(data, dict):
+        return data.__class__(
+            (k, omit_unset(v)) for k, v in data.items() if v is not UNSET
+        )
+    if isinstance(data, (list, tuple, set)):
+        return data.__class__(omit_unset(i) for i in data if i is not UNSET)
+    return data
 
 
 def parse_data(
