@@ -70,6 +70,7 @@ from .model import (
     StageInstance,
     Sticker,
     StickerPack,
+    StickerPacksResponse,
     Subscription,
     ThreadMember,
     TriggerMetadata,
@@ -359,7 +360,8 @@ class ApiClient:
         interaction_id: SnowflakeType,
         interaction_token: str,
         response: InteractionResponse,
-    ) -> None:
+        with_response: bool | None = ...,
+    ) -> InteractionResponse | None:
         """https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response"""
 
     async def get_origin_interaction_response(
@@ -1602,7 +1604,7 @@ class ApiClient:
         enabled: Missing[bool] = ...,
         channel_id: MissingOrNullable[SnowflakeType] = ...,
         reason: str | None = ...,
-    ) -> GuildWidget:
+    ) -> GuildWidgetSettings:
         """https://discord.com/developers/docs/resources/guild#modify-guild-widget"""
 
     async def get_guild_widget(
@@ -1624,7 +1626,7 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         style: Literal["shield", "banner1", "banner2", "banner3", "banner4"] | None = ...,
-    ) -> str:
+    ) -> bytes:
         """https://discord.com/developers/docs/resources/guild#get-guild-widget-image"""
 
     async def get_guild_welcome_screen(
@@ -1833,7 +1835,7 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         template_code: str,
-    ) -> None:
+    ) -> GuildTemplate:
         """https://discord.com/developers/docs/resources/guild-template#delete-guild-template"""
 
     async def get_invite(
@@ -1896,7 +1898,7 @@ class ApiClient:
         self,
         *,
         channel_id: SnowflakeType,
-    ) -> StageInstance | None:
+    ) -> StageInstance:
         """https://discord.com/developers/docs/resources/stage-instance#get-stage-instance"""
 
     async def modify_stage_instance(
@@ -1926,7 +1928,7 @@ class ApiClient:
 
     async def list_nitro_sticker_packs(
         self,
-    ) -> list[StickerPack]:
+    ) -> StickerPacksResponse:
         """https://discord.com/developers/docs/resources/sticker#list-sticker-packs"""
 
     async def get_sticker_packs(
@@ -2196,7 +2198,7 @@ class ApiClient:
         payload: dict[str, Any],
         thread_id: SnowflakeType | None = ...,
         wait: bool | None = ...,
-    ) -> None:
+    ) -> MessageGet | None:
         """https://discord.com/developers/docs/resources/webhook#execute-slack-compatible-webhook"""
 
     async def execute_github_compatible_webhook(
@@ -2207,7 +2209,7 @@ class ApiClient:
         payload: dict[str, Any],
         thread_id: SnowflakeType | None = ...,
         wait: bool | None = ...,
-    ) -> None:
+    ) -> MessageGet | None:
         """https://discord.com/developers/docs/resources/webhook#execute-github-compatible-webhook"""
 
     async def get_webhook_message(

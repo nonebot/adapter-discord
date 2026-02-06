@@ -3039,6 +3039,15 @@ class StickerPack(BaseModel):
     banner_asset_id: Missing[Snowflake] = UNSET
 
 
+class StickerPacksResponse(BaseModel):
+    """List Nitro Sticker Packs Response.
+
+    see https://discord.com/developers/docs/resources/sticker#list-sticker-packs
+    """
+
+    sticker_packs: list[StickerPack]
+
+
 # User
 # see https://discord.com/developers/docs/resources/user
 class User(BaseModel):
@@ -4812,6 +4821,7 @@ __all__ = [
     "Sticker",
     "StickerItem",
     "StickerPack",
+    "StickerPacksResponse",
     "StringOption",
     "SubCommandGroupOption",
     "SubCommandOption",

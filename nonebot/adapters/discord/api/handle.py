@@ -115,6 +115,7 @@ from .model import (
     StartThreadWithoutMessageParams,
     Sticker,
     StickerPack,
+    StickerPacksResponse,
     Subscription,
     ThreadMember,
     TriggerMetadata,
@@ -188,7 +189,13 @@ class AdapterProtocol(Protocol):
     async def request(self, setup: Request) -> Response: ...
 
 
-async def _request(adapter: "AdapterProtocol", bot: "Bot", request: Request) -> Any:  # noqa: ANN401, ARG001 # TODO)): 验证bot参数是否需要, 重构为泛型函数, 接管type_validate部分
+async def _request(
+    adapter: "AdapterProtocol",
+    bot: "Bot",
+    request: Request,
+    *,
+    parse_json: bool = True,
+) -> Any:  # noqa: ANN401, ARG001 # TODO)): 验证bot参数是否需要, 重构为泛型函数, 接管type_validate部分
     try:
         request.timeout = adapter.discord_config.discord_api_timeout
         request.proxy = adapter.discord_config.discord_proxy
@@ -198,7 +205,11 @@ async def _request(adapter: "AdapterProtocol", bot: "Bot", request: Request) -> 
             f"API code: {data.status_code} response: {escape_tag(str(data.content))}",
         )
         if data.status_code in (200, 201, 204):
-            return data.content and json.loads(
+            if not data.content:
+                return None
+            if not parse_json:
+                return data.content
+            return json.loads(
                 decompress_data(
                     data.content, compress=adapter.discord_config.discord_compress
                 )
@@ -790,19 +801,25 @@ class HandleMixin:
         interaction_id: SnowflakeType,
         interaction_token: str,
         response: InteractionResponse,
-    ) -> None:
+        with_response: Optional[bool] = None,
+    ) -> Optional[InteractionResponse]:
         """https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response"""
         params = parse_interaction_response(response)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        query = {"with_response": _bool_query(value=with_response)}
         request = Request(
             headers=headers,
             method="POST",
             url=self.base_url
             / f"interactions/{interaction_id}/{interaction_token}/callback",
+            params={key: value for key, value in query.items() if value is not None},
             json=params.get("json"),
             files=params.get("files"),
         )
-        await _request(self, bot, request)
+        resp = await _request(self, bot, request)
+        if resp is None:
+            return None
+        return type_validate_python(InteractionResponse, resp)
 
     async def _api_get_origin_interaction_response(
         self: AdapterProtocol,
@@ -2064,7 +2081,7 @@ class HandleMixin:
         request = Request(
             headers=headers,
             method="GET",
-            url=self.base_url / f"channels/{channel_id}/pins",
+            url=self.base_url / f"channels/{channel_id}/messages/pins",
         )
         return type_validate_python(
             list[MessageGet], await _request(self, bot, request)
@@ -3689,7 +3706,7 @@ class HandleMixin:
         enabled: Missing[bool] = UNSET,
         channel_id: MissingOrNullable[SnowflakeType] = UNSET,
         reason: Optional[str] = None,
-    ) -> GuildWidget:
+    ) -> GuildWidgetSettings:
         """https://discord.com/developers/docs/resources/guild#modify-guild-widget"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
@@ -3707,7 +3724,9 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/widget",
             json=data,
         )
-        return type_validate_python(GuildWidget, await _request(self, bot, request))
+        return type_validate_python(
+            GuildWidgetSettings, await _request(self, bot, request)
+        )
 
     async def _api_get_guild_widget(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -3741,7 +3760,7 @@ class HandleMixin:
         style: Optional[
             Literal["shield", "banner1", "banner2", "banner3", "banner4"]
         ] = None,
-    ) -> str:
+    ) -> bytes:
         """https://discord.com/developers/docs/resources/guild#get-guild-widget-image"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"style": style}
@@ -3751,7 +3770,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/widget.png",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return await _request(self, bot, request)
+        return await _request(self, bot, request, parse_json=False)
 
     async def _api_get_guild_welcome_screen(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -4246,7 +4265,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         template_code: str,
-    ) -> None:
+    ) -> GuildTemplate:
         """https://discord.com/developers/docs/resources/guild-template#delete-guild-template"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
@@ -4254,7 +4273,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}/templates/{template_code}",
         )
-        await _request(self, bot, request)
+        return type_validate_python(GuildTemplate, await _request(self, bot, request))
 
     # Invite
 
@@ -4392,7 +4411,7 @@ class HandleMixin:
 
     async def _api_get_stage_instance(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
-    ) -> Optional[StageInstance]:
+    ) -> StageInstance:
         """https://discord.com/developers/docs/resources/stage-instance#get-stage-instance"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
@@ -4400,10 +4419,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"stage-instances/{channel_id}",
         )
-        return type_validate_python(
-            Optional[StageInstance],
-            await _request(self, bot, request),
-        )
+        return type_validate_python(StageInstance, await _request(self, bot, request))
 
     async def _api_modify_stage_instance(
         self: AdapterProtocol,
@@ -4462,7 +4478,7 @@ class HandleMixin:
 
     async def _api_list_nitro_sticker_packs(
         self: AdapterProtocol, bot: "Bot"
-    ) -> list[StickerPack]:
+    ) -> StickerPacksResponse:
         """https://discord.com/developers/docs/resources/sticker#list-sticker-packs"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
@@ -4471,7 +4487,7 @@ class HandleMixin:
             url=self.base_url / "sticker-packs",
         )
         return type_validate_python(
-            list[StickerPack], await _request(self, bot, request)
+            StickerPacksResponse, await _request(self, bot, request)
         )
 
     async def _api_get_sticker_packs(
@@ -5052,9 +5068,9 @@ class HandleMixin:
             files=request_kwargs.get("files"),
         )
         resp = await _request(self, bot, request)
-        if resp:
-            return type_validate_python(MessageGet, resp)
-        return resp
+        if resp is None:
+            return None
+        return type_validate_python(MessageGet, resp)
 
     async def _api_execute_slack_compatible_webhook(
         self: AdapterProtocol,
@@ -5065,7 +5081,7 @@ class HandleMixin:
         payload: dict[str, Any],
         thread_id: Optional[SnowflakeType] = None,
         wait: Optional[bool] = None,
-    ) -> None:
+    ) -> Optional[MessageGet]:
         """https://discord.com/developers/docs/resources/webhook#execute-slack-compatible-webhook"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"thread_id": thread_id, "wait": _bool_query(value=wait)}
@@ -5076,7 +5092,10 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
             json=payload,
         )
-        await _request(self, bot, request)
+        resp = await _request(self, bot, request)
+        if resp is None:
+            return None
+        return type_validate_python(MessageGet, resp)
 
     async def _api_execute_github_compatible_webhook(
         self: AdapterProtocol,
@@ -5087,7 +5106,7 @@ class HandleMixin:
         payload: dict[str, Any],
         thread_id: Optional[SnowflakeType] = None,
         wait: Optional[bool] = None,
-    ) -> None:
+    ) -> Optional[MessageGet]:
         """https://discord.com/developers/docs/resources/webhook#execute-github-compatible-webhook"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"thread_id": thread_id, "wait": _bool_query(value=wait)}
@@ -5098,7 +5117,10 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
             json=payload,
         )
-        await _request(self, bot, request)
+        resp = await _request(self, bot, request)
+        if resp is None:
+            return None
+        return type_validate_python(MessageGet, resp)
 
     async def _api_get_webhook_message(
         self: AdapterProtocol,
