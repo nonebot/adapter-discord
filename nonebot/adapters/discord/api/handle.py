@@ -23,8 +23,8 @@ from .model import (
     AnswerVoters,
     Application,
     ApplicationCommand,
-    ApplicationCommandCreate,
     ApplicationCommandBulkOverwriteParams,
+    ApplicationCommandCreate,
     ApplicationCommandEditParams,
     ApplicationCommandOption,
     ApplicationCommandPermissions,
@@ -88,11 +88,11 @@ from .model import (
     ModifyCurrentMemberParams,
     ModifyCurrentUserParams,
     ModifyCurrentUserVoiceStateParams,
+    ModifyGuildChannelPositionParams,
     ModifyGuildEmojiParams,
     ModifyGuildMemberParams,
     ModifyGuildOnboardingParams,
     ModifyGuildParams,
-    ModifyGuildChannelPositionParams,
     ModifyGuildRoleParams,
     ModifyGuildRolePositionParams,
     ModifyGuildScheduledEventParams,
@@ -147,9 +147,9 @@ from .types import (
     InteractionContextType,
     InviteTargetType,
     MessageFlag,
+    MessageReferenceType,
     Missing,
     MissingOrNullable,
-    MessageReferenceType,
     OnboardingMode,
     OverwriteType,
     ReactionType,
@@ -196,7 +196,7 @@ async def _request(
     request: Request,
     *,
     parse_json: bool = True,
-) -> Any:  # noqa: ANN401, ARG001 # TODO)): 验证bot参数是否需要, 重构为泛型函数, 接管type_validate部分
+) -> Any:  # noqa: ANN401 # TODO)): 验证bot参数是否需要, 重构为泛型函数, 接管type_validate部分
     try:
         request.timeout = adapter.discord_config.discord_api_timeout
         request.proxy = adapter.discord_config.discord_proxy
@@ -4079,9 +4079,8 @@ class HandleMixin:
                 )
             if scheduled_end_time is None:
                 raise ValueError("scheduled_end_time is required for EXTERNAL events")
-        else:
-            if channel_id is None:
-                raise ValueError("channel_id is required for non-EXTERNAL events")
+        elif channel_id is None:
+            raise ValueError("channel_id is required for non-EXTERNAL events")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
