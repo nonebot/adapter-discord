@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from .model import (
     ActivityInstance,
@@ -476,7 +476,9 @@ class ApiClient:
         description: Missing[str] = ...,
         role_connections_verification_url: Missing[str] = ...,
         install_params: Missing[InstallParams] = ...,
-        integration_types_config: Missing[ dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfiguration] ] = ...,
+        integration_types_config: Missing[
+            dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfiguration]
+        ] = ...,
         flags: Missing[ApplicationFlag] = ...,
         icon: MissingOrNullable[str] = ...,
         cover_image: MissingOrNullable[str] = ...,
@@ -1175,9 +1177,9 @@ class ApiClient:
         self,
         *,
         application_id: SnowflakeType,
-        sku_id: str = ...,
-        owner_id: str = ...,
-        owner_type: int = ...,
+        sku_id: str,
+        owner_id: str,
+        owner_type: Literal[1, 2],
     ) -> Entitlement:
         """https://discord.com/developers/docs/resources/entitlement#create-test-entitlement"""
 
@@ -1192,7 +1194,7 @@ class ApiClient:
     async def create_guild(
         self,
         *,
-        name: str = ...,
+        name: str,
         region: str | None = ...,
         icon: str | None = ...,
         verification_level: VerificationLevel | None = ...,
@@ -1229,7 +1231,9 @@ class ApiClient:
         name: Missing[str] = ...,
         region: MissingOrNullable[str] = ...,
         verification_level: MissingOrNullable[VerificationLevel] = ...,
-        default_message_notifications: MissingOrNullable[ DefaultMessageNotificationLevel ] = ...,
+        default_message_notifications: MissingOrNullable[
+            DefaultMessageNotificationLevel
+        ] = ...,
         explicit_content_filter: MissingOrNullable[ExplicitContentFilterLevel] = ...,
         afk_channel_id: MissingOrNullable[Snowflake] = ...,
         afk_timeout: Missing[int] = ...,
@@ -1625,7 +1629,8 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        style: Literal["shield", "banner1", "banner2", "banner3", "banner4"] | None = ...,
+        style: Literal["shield", "banner1", "banner2", "banner3", "banner4"]
+        | None = ...,
     ) -> bytes:
         """https://discord.com/developers/docs/resources/guild#get-guild-widget-image"""
 
@@ -1727,6 +1732,7 @@ class ApiClient:
         description: str | None = ...,
         entity_type: GuildScheduledEventEntityType,
         image: str | None = ...,
+        recurrence_rule: RecurrenceRule | None = ...,
         reason: str | None = ...,
     ) -> GuildScheduledEvent:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event"""

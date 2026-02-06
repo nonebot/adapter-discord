@@ -2707,11 +2707,13 @@ class HandleMixin:
         bot: "Bot",
         *,
         application_id: SnowflakeType,
-        sku_id: str = "",
-        owner_id: str = "",
-        owner_type: int = 0,
+        sku_id: str,
+        owner_id: str,
+        owner_type: Literal[1, 2],
     ) -> Entitlement:
         """https://discord.com/developers/docs/resources/entitlement#create-test-entitlement"""
+        if owner_type not in (1, 2):
+            raise ValueError("owner_type must be 1 or 2")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {
             "sku_id": sku_id,
@@ -2750,7 +2752,7 @@ class HandleMixin:
         self: AdapterProtocol,
         bot: "Bot",
         *,
-        name: str = "",
+        name: str,
         region: Optional[str] = None,
         icon: Optional[str] = None,
         verification_level: Optional[VerificationLevel] = None,
@@ -2764,6 +2766,8 @@ class HandleMixin:
         system_channel_flags: Optional[SystemChannelFlags] = None,
     ) -> Guild:
         """https://discord.com/developers/docs/resources/guild#create-guild"""
+        if not name:
+            raise ValueError("name is required")
         data = {
             "name": name,
             "region": region,
@@ -3994,9 +3998,26 @@ class HandleMixin:
         description: Optional[str] = None,
         entity_type: GuildScheduledEventEntityType,
         image: Optional[str] = None,
+        recurrence_rule: Optional[RecurrenceRule] = None,
         reason: Optional[str] = None,
     ) -> GuildScheduledEvent:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event"""
+        if entity_type == GuildScheduledEventEntityType.EXTERNAL:
+            if channel_id is not None:
+                raise ValueError("channel_id must be None for EXTERNAL events")
+            if (
+                entity_metadata is None
+                or entity_metadata.location is UNSET
+                or entity_metadata.location == ""
+            ):
+                raise ValueError(
+                    "entity_metadata.location is required for EXTERNAL events"
+                )
+            if scheduled_end_time is None:
+                raise ValueError("scheduled_end_time is required for EXTERNAL events")
+        else:
+            if channel_id is None:
+                raise ValueError("channel_id is required for non-EXTERNAL events")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4010,6 +4031,7 @@ class HandleMixin:
             "description": description,
             "entity_type": entity_type,
             "image": image,
+            "recurrence_rule": recurrence_rule,
         }
         data = model_dump(
             type_validate_python(CreateGuildScheduledEventParams, data),
@@ -4334,6 +4356,8 @@ class HandleMixin:
         limit: Optional[int] = None,
     ) -> AnswerVoters:
         """https://discord.com/developers/docs/resources/poll#get-answer-voters"""
+        if limit is not None and not (1 <= limit <= 100):
+            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"after": after, "limit": limit}
         request = Request(
@@ -4625,6 +4649,10 @@ class HandleMixin:
 
         Note: user_id is required except for OAuth queries.
         """
+        if limit is not None and not (1 <= limit <= 100):
+            raise ValueError("limit must be between 1 and 100")
+        if user_id is None:
+            raise ValueError("user_id is required for bot token queries")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "before": before,
