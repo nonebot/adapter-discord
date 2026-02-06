@@ -152,6 +152,7 @@ from .types import (
     MessageReferenceType,
     OnboardingMode,
     OverwriteType,
+    ReactionType,
     SortOrderTypes,
     StagePrivacyLevel,
     SystemChannelFlags,
@@ -1225,6 +1226,10 @@ class HandleMixin:
         oldest entries).
 
         see https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log"""
+        if before is not None and after is not None:
+            raise ValueError("before and after are mutually exclusive")
+        if limit is not None and not (1 <= limit <= 100):
+            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {
             "user_id": user_id,
@@ -1592,6 +1597,10 @@ class HandleMixin:
         limit: Optional[int] = None,
     ) -> list[MessageGet]:
         """https://discord.com/developers/docs/resources/message#get-channel-messages"""
+        if sum(value is not None for value in (around, before, after)) > 1:
+            raise ValueError("around, before and after are mutually exclusive")
+        if limit is not None and not (1 <= limit <= 100):
+            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "around": around,
@@ -1781,14 +1790,17 @@ class HandleMixin:
         message_id: SnowflakeType,
         emoji: str,
         emoji_id: Optional[SnowflakeType] = None,
+        type: Optional[ReactionType] = None,  # noqa: A002
         after: Optional[SnowflakeType] = None,
         limit: Optional[int] = None,
     ) -> list[User]:
         """https://discord.com/developers/docs/resources/message#get-reactions"""
         if emoji_id is not None:
             emoji = f"{emoji}:{emoji_id}"
+        if limit is not None and not (1 <= limit <= 100):
+            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        params = {"after": after, "limit": limit}
+        params = {"after": after, "limit": limit, "type": type}
         request = Request(
             headers=headers,
             method="GET",
@@ -1906,6 +1918,8 @@ class HandleMixin:
         reason: Optional[str] = None,
     ) -> None:
         """https://discord.com/developers/docs/resources/message#bulk-delete-messages"""
+        if not 2 <= len(messages) <= 100:
+            raise ValueError("messages must contain 2-100 items")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2364,6 +2378,8 @@ class HandleMixin:
         limit: Optional[int] = None,
     ) -> list[ThreadMember]:
         """https://discord.com/developers/docs/resources/channel#list-thread-members"""
+        if limit is not None and not (1 <= limit <= 100):
+            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "with_member": _bool_query(value=with_member),
@@ -3053,6 +3069,8 @@ class HandleMixin:
         after: Optional[SnowflakeType] = None,
     ) -> list[GuildMember]:
         """https://discord.com/developers/docs/resources/guild#list-guild-members"""
+        if limit is not None and not (1 <= limit <= 1000):
+            raise ValueError("limit must be between 1 and 1000")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"limit": limit, "after": after}
         request = Request(
@@ -3287,6 +3305,10 @@ class HandleMixin:
         after: Optional[SnowflakeType] = None,
     ) -> list[Ban]:
         """https://discord.com/developers/docs/resources/guild#get-guild-bans"""
+        if before is not None and after is not None:
+            raise ValueError("before and after are mutually exclusive")
+        if limit is not None and not (1 <= limit <= 1000):
+            raise ValueError("limit must be between 1 and 1000")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"limit": limit, "before": before, "after": after}
         request = Request(
@@ -3328,6 +3350,12 @@ class HandleMixin:
             raise ValueError(
                 "delete_message_days and delete_message_seconds cannot both be set"
             )
+        if delete_message_days is not None and not (0 <= delete_message_days <= 7):
+            raise ValueError("delete_message_days must be between 0 and 7")
+        if delete_message_seconds is not None and not (
+            0 <= delete_message_seconds <= 604800
+        ):
+            raise ValueError("delete_message_seconds must be between 0 and 604800")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4149,6 +4177,8 @@ class HandleMixin:
         after: Optional[SnowflakeType] = None,
     ) -> list[GuildScheduledEventUser]:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#get-guild-scheduled-event-users"""
+        if limit is not None and not (1 <= limit <= 100):
+            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "limit": limit,

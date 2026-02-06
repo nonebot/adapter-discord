@@ -104,6 +104,7 @@ from .types import (
     MissingOrNullable,
     OnboardingMode,
     OverwriteType,
+    ReactionType,
     SortOrderTypes,
     StagePrivacyLevel,
     SystemChannelFlags,
@@ -780,6 +781,7 @@ class ApiClient:
         message_id: SnowflakeType,
         emoji: str,
         emoji_id: SnowflakeType | None = ...,
+        type: ReactionType | None = ...,
         after: SnowflakeType | None = ...,
         limit: int | None = ...,
     ) -> list[User]:
