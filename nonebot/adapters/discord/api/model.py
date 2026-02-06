@@ -290,6 +290,27 @@ class ApplicationCommandCreate(BaseModel):
     contexts: MissingOrNullable[list[InteractionContextType]] = UNSET
 
 
+class ApplicationCommandBulkOverwriteParams(BaseModel):
+    """Application Command Bulk Overwrite Params.
+
+    see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
+    """
+
+    id: Missing[Snowflake] = UNSET
+    type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
+    name: str
+    name_localizations: Optional[dict[str, str]] = None
+    description: Optional[str] = None
+    description_localizations: Optional[dict[str, str]] = None
+    options: Optional[list["AnyCommandOption"]] = None
+    default_member_permissions: Optional[str] = None
+    dm_permission: Optional[bool] = None
+    default_permission: Optional[bool] = None
+    nsfw: Optional[bool] = None
+    integration_types: Missing[list[ApplicationIntegrationType]] = UNSET
+    contexts: MissingOrNullable[list[InteractionContextType]] = UNSET
+
+
 class ApplicationCommandEditParams(BaseModel):
     """Application Command Edit Params.
 
@@ -305,6 +326,8 @@ class ApplicationCommandEditParams(BaseModel):
     dm_permission: Missing[bool] = UNSET
     default_permission: MissingOrNullable[bool] = UNSET
     nsfw: Missing[bool] = UNSET
+    integration_types: Missing[list[ApplicationIntegrationType]] = UNSET
+    contexts: MissingOrNullable[list[InteractionContextType]] = UNSET
 
 
 class CommandOptionBase(BaseModel):
@@ -383,7 +406,7 @@ class SubCommandOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.SUB_COMMAND] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.SUB_COMMAND, init=False
     )
     options: Optional[
@@ -409,7 +432,7 @@ class SubCommandGroupOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.SUB_COMMAND_GROUP] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.SUB_COMMAND_GROUP, init=False
     )
     options: Optional[list[SubCommandOption]] = None
@@ -421,7 +444,7 @@ class IntegerOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.INTEGER] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.INTEGER, init=False
     )
     choices: Optional[list[OptionChoice[int]]] = None
@@ -437,7 +460,7 @@ class StringOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.STRING] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.STRING, init=False
     )
     choices: Optional[list[OptionChoice[str]]] = None
@@ -453,7 +476,7 @@ class BooleanOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.BOOLEAN] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.BOOLEAN, init=False
     )
     required: bool = False
@@ -465,7 +488,7 @@ class UserOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.USER] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.USER, init=False
     )
     required: bool = False
@@ -477,7 +500,7 @@ class ChannelOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.CHANNEL] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.CHANNEL, init=False
     )
     channel_types: Optional[list[ChannelType]] = None
@@ -490,7 +513,7 @@ class RoleOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.ROLE] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.ROLE, init=False
     )
     required: bool = False
@@ -502,7 +525,7 @@ class MentionableOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.MENTIONABLE] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.MENTIONABLE, init=False
     )
     required: bool = False
@@ -514,7 +537,7 @@ class NumberOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.NUMBER] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.NUMBER, init=False
     )
     choices: Optional[list[OptionChoice[float]]] = None
@@ -528,7 +551,7 @@ class AttachmentOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.ATTACHMENT] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.ATTACHMENT, init=False
     )
     required: bool = False
@@ -1156,6 +1179,12 @@ class Application(BaseModel):
         UNSET  # return type not match the docs
     )
     """Role connection verification URL for the app"""
+    event_webhooks_url: MissingOrNullable[str] = UNSET
+    """Event webhooks URL for the app to receive webhook events"""
+    event_webhooks_status: Missing[int] = UNSET
+    """Status indicating whether event webhooks are enabled"""
+    event_webhooks_types: Missing[list[str]] = UNSET
+    """List of webhook event types the app subscribes to"""
     tags: Missing[list[str]] = UNSET
     """up to 5 tags describing the content and functionality of the application"""
     install_params: Missing["InstallParams"] = UNSET
@@ -1946,6 +1975,7 @@ class MessageSend(BaseModel):
 
     content: Optional[str] = None
     nonce: Optional[Union[int, str]] = None
+    enforce_nonce: Optional[bool] = None
     tts: Optional[bool] = None
     embeds: Optional[list[Embed]] = None
     allowed_mentions: Optional[AllowedMention] = None
@@ -2094,6 +2124,9 @@ class EditCurrentApplicationParams(BaseModel):
     cover_image: MissingOrNullable[str] = UNSET
     interactions_endpoint_url: Missing[str] = UNSET
     tags: Missing[list[str]] = UNSET
+    event_webhooks_url: Missing[str] = UNSET
+    event_webhooks_status: Missing[int] = UNSET
+    event_webhooks_types: Missing[list[str]] = UNSET
 
 
 class ModifyCurrentUserParams(BaseModel):
@@ -2501,7 +2534,6 @@ class ModifyGuildParams(BaseModel):
     afk_channel_id: MissingOrNullable[Snowflake] = UNSET
     afk_timeout: Missing[int] = UNSET
     icon: MissingOrNullable[str] = UNSET
-    owner_id: Missing[Snowflake] = UNSET
     splash: MissingOrNullable[str] = UNSET
     discovery_splash: MissingOrNullable[str] = UNSET
     banner: MissingOrNullable[str] = UNSET
@@ -2689,6 +2721,7 @@ class ModifyGuildRoleParams(BaseModel):
     name: MissingOrNullable[str] = UNSET
     permissions: MissingOrNullable[str] = UNSET
     color: MissingOrNullable[int] = UNSET
+    colors: Missing["RoleColors"] = UNSET
     hoist: MissingOrNullable[bool] = UNSET
     icon: MissingOrNullable[str] = UNSET
     unicode_emoji: MissingOrNullable[str] = UNSET
@@ -2704,6 +2737,7 @@ class CreateGuildRoleParams(BaseModel):
     name: Missing[str] = UNSET
     permissions: Missing[str] = UNSET
     color: Missing[int] = UNSET
+    colors: Missing["RoleColors"] = UNSET
     hoist: Missing[bool] = UNSET
     icon: MissingOrNullable[str] = UNSET
     unicode_emoji: MissingOrNullable[str] = UNSET
@@ -2871,6 +2905,11 @@ class Invite(BaseModel):
     expires_at: MissingOrNullable[datetime.datetime] = UNSET
     stage_instance: Missing["InviteStageInstance"] = UNSET
     guild_scheduled_event: Missing["GuildScheduledEvent"] = UNSET
+    uses: Missing[int] = UNSET
+    max_uses: Missing[int] = UNSET
+    max_age: Missing[int] = UNSET
+    temporary: Missing[bool] = UNSET
+    created_at: Missing[datetime.datetime] = UNSET
 
     def __init__(self, **data) -> None:  # noqa: ANN003
         super().__init__(**data)
@@ -3761,7 +3800,7 @@ class MessageUpdate(MessageGet):
     edited_timestamp: MissingOrNullable[datetime.datetime] = UNSET
     tts: Missing[bool] = UNSET
     mention_everyone: Missing[bool] = UNSET
-    mention_roles: Missing[list[str]] = UNSET
+    mention_roles: Missing[list[Snowflake]] = UNSET
     mention_channels: Missing[list["ChannelMention"]] = UNSET
     attachments: Missing[list["Attachment"]] = UNSET
     embeds: Missing[list["Embed"]] = UNSET
@@ -4085,6 +4124,19 @@ class StageInstanceDelete(StageInstance):
 
 # Permissions
 # see https://discord.com/developers/docs/topics/permissions
+
+
+class RoleColors(BaseModel):
+    """Role colors.
+
+    see https://discord.com/developers/docs/topics/permissions#role-object-role-colors-object
+    """
+
+    primary_color: int
+    secondary_color: Optional[int] = None
+    tertiary_color: Optional[int] = None
+
+
 class Role(BaseModel):
     """Role
 
@@ -4093,6 +4145,7 @@ class Role(BaseModel):
     id: Snowflake
     name: str
     color: int
+    colors: Missing[RoleColors] = UNSET
     hoist: bool
     icon: MissingOrNullable[str] = UNSET
     unicode_emoji: MissingOrNullable[str] = UNSET
@@ -4341,13 +4394,13 @@ class ModifyGuildOnboardingParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
     """
 
-    prompts: list[OnboardingPrompt]
+    prompts: Missing[list[OnboardingPrompt]] = UNSET
     """Prompts shown during onboarding and in customize community"""
-    default_channel_ids: list[Snowflake]
+    default_channel_ids: Missing[list[Snowflake]] = UNSET
     """Channel IDs that members get opted into automatically"""
-    enabled: bool
+    enabled: Missing[bool] = UNSET
     """Whether onboarding is enabled in the guild"""
-    mode: OnboardingMode
+    mode: Missing[OnboardingMode] = UNSET
     """Current mode of onboarding"""
 
 
@@ -4428,6 +4481,13 @@ class SKU(BaseModel):
     name: str
     slug: str
     flags: SKUFlag
+    dependent_sku_id: MissingOrNullable[Snowflake] = UNSET
+    manifest_labels: MissingOrNullable[list[str]] = UNSET
+    access_type: Missing[int] = UNSET
+    features: Missing[list[str]] = UNSET
+    release_date: MissingOrNullable[datetime.datetime] = UNSET
+    premium: Missing[bool] = UNSET
+    show_age_gate: Missing[bool] = UNSET
 
 
 class Subscription(BaseModel):
@@ -4548,6 +4608,7 @@ __all__ = [
     "Application",
     "ApplicationCommand",
     "ApplicationCommandCreate",
+    "ApplicationCommandBulkOverwriteParams",
     "ApplicationCommandData",
     "ApplicationCommandInteractionDataOption",
     "ApplicationCommandOption",
@@ -4733,6 +4794,7 @@ __all__ = [
     "ResolvedData",
     "Resume",
     "Role",
+    "RoleColors",
     "RoleOption",
     "RoleSubscriptionData",
     "RoleTags",

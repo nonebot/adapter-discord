@@ -24,6 +24,7 @@ from .model import (
     Application,
     ApplicationCommand,
     ApplicationCommandCreate,
+    ApplicationCommandBulkOverwriteParams,
     ApplicationCommandEditParams,
     ApplicationCommandOption,
     ApplicationCommandPermissions,
@@ -106,6 +107,7 @@ from .model import (
     PollRequest,
     RecurrenceRule,
     Role,
+    RoleColors,
     Snowflake,
     SnowflakeType,
     StageInstance,
@@ -142,9 +144,11 @@ from .types import (
     GuildScheduledEventPrivacyLevel,
     GuildScheduledEventStatus,
     InteractionContextType,
+    InviteTargetType,
     MessageFlag,
     Missing,
     MissingOrNullable,
+    MessageReferenceType,
     OnboardingMode,
     OverwriteType,
     SortOrderTypes,
@@ -217,6 +221,67 @@ def _bool_query(*, value: Optional[bool]) -> Optional[str]:
     return "true" if value else "false"
 
 
+def _normalize_command_description(
+    *,
+    command_type: Optional[ApplicationCommandType],
+    description: Optional[str],
+) -> str:
+    resolved_type = command_type or ApplicationCommandType.CHAT_INPUT
+    if resolved_type in (ApplicationCommandType.USER, ApplicationCommandType.MESSAGE):
+        if description not in (None, ""):
+            raise ValueError("description must be empty for USER or MESSAGE commands")
+        return ""
+    if description is None or description == "":
+        raise ValueError("description is required for CHAT_INPUT commands")
+    return description
+
+
+def _build_command_payloads(
+    commands: list[ApplicationCommandBulkOverwriteParams],
+) -> list[dict[str, Any]]:
+    payloads: list[dict[str, Any]] = []
+    for command in commands:
+        command_model = type_validate_python(
+            ApplicationCommandBulkOverwriteParams, command
+        )
+        description = _normalize_command_description(
+            command_type=command_model.type,
+            description=command_model.description,
+        )
+        command_data = model_dump(
+            command_model,
+            exclude_unset=True,
+            exclude_none=True,
+        )
+        command_data["description"] = description
+        payloads.append(command_data)
+    return payloads
+
+
+def _validate_auto_moderation_trigger(
+    *,
+    trigger_type: TriggerType,
+    trigger_metadata: Optional[TriggerMetadata],
+) -> None:
+    if trigger_type == TriggerType.SPAM:
+        if trigger_metadata is not None:
+            raise ValueError("trigger_metadata must be omitted for SPAM rules")
+        return
+    if trigger_metadata is None:
+        raise ValueError("trigger_metadata is required for this trigger_type")
+
+
+def _validate_auto_moderation_exemptions(
+    *,
+    exempt_roles: Optional[list[SnowflakeType]],
+    exempt_channels: Optional[list[SnowflakeType]],
+) -> None:
+    if exempt_roles is not None and len(exempt_roles) > 20:
+        raise ValueError("exempt_roles must be 20 items or fewer")
+    if exempt_channels is not None and len(exempt_channels) > 50:
+        raise ValueError("exempt_channels must be 50 items or fewer")
+
+
 class HandleMixin:
     # Application Commands
 
@@ -271,6 +336,10 @@ class HandleMixin:
         see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        description = _normalize_command_description(
+            command_type=type,
+            description=description,
+        )
         data = {
             "name": name,
             "name_localizations": name_localizations,
@@ -338,6 +407,8 @@ class HandleMixin:
         dm_permission: Missing[bool] = UNSET,
         default_permission: MissingOrNullable[bool] = UNSET,
         nsfw: Missing[bool] = UNSET,
+        integration_types: Missing[list[ApplicationIntegrationType]] = UNSET,
+        contexts: MissingOrNullable[list[InteractionContextType]] = UNSET,
     ) -> ApplicationCommand:
         """Edit a global command. Returns 200 and an application command object.
         All fields are optional, but any fields provided will entirely overwrite
@@ -356,6 +427,8 @@ class HandleMixin:
             "dm_permission": dm_permission,
             "default_permission": default_permission,
             "nsfw": nsfw,
+            "integration_types": integration_types,
+            "contexts": contexts,
         }
         data = model_dump(
             type_validate_python(ApplicationCommandEditParams, data),
@@ -395,7 +468,7 @@ class HandleMixin:
         bot: "Bot",
         *,
         application_id: SnowflakeType,
-        commands: list[ApplicationCommandCreate],
+        commands: list[ApplicationCommandBulkOverwriteParams],
     ) -> list[ApplicationCommand]:
         """Takes a list of application commands,
         overwriting the existing global command list for this application.
@@ -406,11 +479,12 @@ class HandleMixin:
         see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        payload = _build_command_payloads(commands)
         request = Request(
             headers=headers,
             method="PUT",
             url=self.base_url / f"applications/{application_id}/commands",
-            json=[model_dump(command, exclude_unset=True) for command in commands],
+            json=payload,
         )
         return type_validate_python(
             list[ApplicationCommand], await _request(self, bot, request)
@@ -467,6 +541,10 @@ class HandleMixin:
         see https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        description = _normalize_command_description(
+            command_type=type,
+            description=description,
+        )
         data = {
             "name": name,
             "name_localizations": name_localizations,
@@ -596,7 +674,7 @@ class HandleMixin:
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
-        commands: list[ApplicationCommandCreate],
+        commands: list[ApplicationCommandBulkOverwriteParams],
     ) -> list[ApplicationCommand]:
         """Takes a list of application commands,
         overwriting the existing command list for this application for the targeted guild.
@@ -605,12 +683,13 @@ class HandleMixin:
         see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-guild-application-commands
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        payload = _build_command_payloads(commands)
         request = Request(
             headers=headers,
             method="PUT",
             url=self.base_url
             / f"applications/{application_id}/guilds/{guild_id}/commands",
-            json=[model_dump(command, exclude_unset=True) for command in commands],
+            json=payload,
         )
         return type_validate_python(
             list[ApplicationCommand], await _request(self, bot, request)
@@ -823,9 +902,18 @@ class HandleMixin:
         files: Optional[list[File]] = None,
         attachments: Optional[list[AttachmentSend]] = None,
         flags: Optional[int] = None,
-        thread_name: Optional[str] = None,
     ) -> MessageGet:
         """https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message"""
+        has_payload = any(
+            [
+                bool(content),
+                bool(embeds),
+                bool(components),
+                bool(files),
+            ]
+        )
+        if not has_payload:
+            raise ValueError("content/embeds/components/files is required")
         data = {
             "content": content,
             "tts": tts,
@@ -835,7 +923,6 @@ class HandleMixin:
             "files": files,
             "attachments": attachments,
             "flags": flags,
-            "thread_name": thread_name,
         }
         request_kwargs = parse_data(
             {key: value for key, value in data.items() if value is not None},
@@ -979,6 +1066,9 @@ class HandleMixin:
         cover_image: MissingOrNullable[str] = UNSET,
         interactions_endpoint_url: Missing[str] = UNSET,
         tags: Missing[list[str]] = UNSET,
+        event_webhooks_url: Missing[str] = UNSET,
+        event_webhooks_status: Missing[int] = UNSET,
+        event_webhooks_types: Missing[list[str]] = UNSET,
     ) -> Application:
         """Edit properties of the app associated with the requesting bot user.
 
@@ -999,6 +1089,9 @@ class HandleMixin:
                     "cover_image": cover_image,
                     "interactions_endpoint_url": interactions_endpoint_url,
                     "tags": tags,
+                    "event_webhooks_url": event_webhooks_url,
+                    "event_webhooks_status": event_webhooks_status,
+                    "event_webhooks_types": event_webhooks_types,
                 },
             ),
             exclude_unset=True,
@@ -1057,18 +1150,32 @@ class HandleMixin:
         )
 
     async def _api_update_application_role_connection_metadata_records(
-        self: AdapterProtocol, bot: "Bot", *, application_id: SnowflakeType
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        application_id: SnowflakeType,
+        records: list[ApplicationRoleConnectionMetadata],
     ) -> list[ApplicationRoleConnectionMetadata]:
         """update application role connection metadata records
 
         see https://discord.com/developers/docs/resources/application-role-connection-metadata#update-application-role-connection-metadata-records
         """
+        if len(records) > 5:
+            raise ValueError("metadata records must be 0-5 items")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        payload = [
+            model_dump(
+                type_validate_python(ApplicationRoleConnectionMetadata, record),
+                exclude_unset=True,
+            )
+            for record in records
+        ]
         request = Request(
             headers=headers,
             method="PUT",
             url=self.base_url
             / f"applications/{application_id}/role-connections/metadata",
+            json=payload,
         )
         return type_validate_python(
             list[ApplicationRoleConnectionMetadata],
@@ -1177,6 +1284,14 @@ class HandleMixin:
 
         see https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
         """
+        _validate_auto_moderation_trigger(
+            trigger_type=trigger_type,
+            trigger_metadata=trigger_metadata,
+        )
+        _validate_auto_moderation_exemptions(
+            exempt_roles=exempt_roles,
+            exempt_channels=exempt_channels,
+        )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -1210,27 +1325,29 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         rule_id: SnowflakeType,
-        name: str,
-        event_type: AutoModerationRuleEventType,
-        trigger_type: TriggerType,
+        name: Optional[str] = None,
+        event_type: Optional[AutoModerationRuleEventType] = None,
         trigger_metadata: Optional[TriggerMetadata] = None,
-        actions: list[AutoModerationAction] = ...,
+        actions: Optional[list[AutoModerationAction]] = None,
         enabled: Optional[bool] = None,
-        exempt_roles: list[SnowflakeType] = ...,
-        exempt_channels: list[SnowflakeType] = ...,
+        exempt_roles: Optional[list[SnowflakeType]] = None,
+        exempt_channels: Optional[list[SnowflakeType]] = None,
         reason: Optional[str] = None,
     ) -> AutoModerationRule:
         """modify auto moderation rule
 
         see https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
         """
+        _validate_auto_moderation_exemptions(
+            exempt_roles=exempt_roles,
+            exempt_channels=exempt_channels,
+        )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
         data = {
             "name": name,
             "event_type": event_type,
-            "trigger_type": trigger_type,
             "trigger_metadata": trigger_metadata,
             "actions": actions,
             "enabled": enabled,
@@ -1240,11 +1357,7 @@ class HandleMixin:
         data = model_dump(
             type_validate_python(
                 CreateAndModifyAutoModerationRuleParams,
-                {
-                    key: value
-                    for key, value in data.items()
-                    if value is not None and value is not ...
-                },
+                {key: value for key, value in data.items() if value is not None},
             ),
             exclude_none=True,
         )
@@ -1502,6 +1615,7 @@ class HandleMixin:
         channel_id: SnowflakeType,
         content: Optional[str] = None,
         nonce: Optional[Union[int, str]] = None,
+        enforce_nonce: Optional[bool] = None,
         tts: Optional[bool] = None,
         embeds: Optional[list[Embed]] = None,
         allowed_mentions: Optional[AllowedMention] = None,
@@ -1514,9 +1628,28 @@ class HandleMixin:
         poll: Optional[PollRequest] = None,
     ) -> MessageGet:
         """https://discord.com/developers/docs/resources/message#create-message"""
+        has_payload = any(
+            [
+                bool(content),
+                bool(embeds),
+                bool(sticker_ids),
+                bool(components),
+                bool(files),
+                poll is not None,
+            ]
+        )
+        if not has_payload:
+            if (
+                message_reference is None
+                or message_reference.type != MessageReferenceType.FORWARD
+            ):
+                raise ValueError(
+                    "content/embeds/sticker_ids/components/files/poll is required"
+                )
         data = {
             "content": content,
             "nonce": nonce,
+            "enforce_nonce": enforce_nonce,
             "tts": tts,
             "embeds": embeds,
             "allowed_mentions": allowed_mentions,
@@ -1776,7 +1909,7 @@ class HandleMixin:
         overwrite_id: SnowflakeType,
         allow: Optional[str] = None,
         deny: Optional[str] = None,
-        type: Optional[OverwriteType] = None,  # noqa: A002
+        type: OverwriteType,  # noqa: A002
         reason: Optional[str] = None,
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#edit-channel-permissions"""
@@ -1817,15 +1950,26 @@ class HandleMixin:
         max_uses: Optional[int] = None,
         temporary: Optional[bool] = None,
         unique: Optional[bool] = None,
-        target_type: Optional[int] = None,
+        target_type: Optional[InviteTargetType] = None,
         target_user_id: Optional[SnowflakeType] = None,
         target_application_id: Optional[SnowflakeType] = None,
+        target_users_file: Optional[File] = None,
+        role_ids: Optional[list[SnowflakeType]] = None,
         reason: Optional[str] = None,
     ) -> Invite:
         """https://discord.com/developers/docs/resources/channel#create-channel-invite"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
+        if target_type == InviteTargetType.STREAM and target_user_id is None:
+            raise ValueError("target_user_id is required when target_type is STREAM")
+        if (
+            target_type == InviteTargetType.EMBEDDED_APPLICATION
+            and target_application_id is None
+        ):
+            raise ValueError(
+                "target_application_id is required when target_type is EMBEDDED_APPLICATION"
+            )
         data = {
             "max_age": max_age,
             "max_uses": max_uses,
@@ -1834,13 +1978,30 @@ class HandleMixin:
             "target_type": target_type,
             "target_user_id": target_user_id,
             "target_application_id": target_application_id,
+            "role_ids": role_ids,
         }
-        request = Request(
-            headers=headers,
-            method="POST",
-            url=self.base_url / f"channels/{channel_id}/invites",
-            json={key: value for key, value in data.items() if value is not None},
-        )
+        payload = {key: value for key, value in data.items() if value is not None}
+        if target_users_file is not None:
+            multipart = {
+                "target_users_file": (
+                    target_users_file.filename,
+                    target_users_file.content,
+                ),
+                "payload_json": (None, json.dumps(payload), "application/json"),
+            }
+            request = Request(
+                headers=headers,
+                method="POST",
+                url=self.base_url / f"channels/{channel_id}/invites",
+                files=multipart,
+            )
+        else:
+            request = Request(
+                headers=headers,
+                method="POST",
+                url=self.base_url / f"channels/{channel_id}/invites",
+                json=payload,
+            )
         return type_validate_python(Invite, await _request(self, bot, request))
 
     async def _api_delete_channel_permission(
@@ -1954,7 +2115,7 @@ class HandleMixin:
         channel_id: SnowflakeType,
         user_id: SnowflakeType,
         access_token: str,
-        nick: str = "",
+        nick: str,
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#group-dm-add-recipient"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
@@ -2308,8 +2469,8 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: str = "",
-        image: str = "",
+        name: str,
+        image: str,
         roles: Optional[list[SnowflakeType]] = None,
         reason: Optional[str] = None,
     ) -> Emoji:
@@ -2317,6 +2478,10 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
+        if not name:
+            raise ValueError("name is required")
+        if not image:
+            raise ValueError("image is required")
         data = {
             "name": name,
             "image": image,
@@ -2412,11 +2577,15 @@ class HandleMixin:
         bot: "Bot",
         *,
         application_id: SnowflakeType,
-        name: str = "",
-        image: str = "",
+        name: str,
+        image: str,
     ) -> Emoji:
         """https://discord.com/developers/docs/resources/emoji#create-application-emoji"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        if not name:
+            raise ValueError("name is required")
+        if not image:
+            raise ValueError("image is required")
         data = {"name": name, "image": image}
         request = Request(
             headers=headers,
@@ -2475,6 +2644,7 @@ class HandleMixin:
         limit: Optional[int] = None,
         guild_id: Optional[SnowflakeType] = None,
         exclude_ended: Optional[bool] = None,
+        exclude_deleted: Optional[bool] = None,
     ) -> list[Entitlement]:
         """https://discord.com/developers/docs/resources/entitlement#list-entitlements"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
@@ -2486,6 +2656,7 @@ class HandleMixin:
             "limit": limit,
             "guild_id": guild_id,
             "exclude_ended": _bool_query(value=exclude_ended),
+            "exclude_deleted": _bool_query(value=exclude_deleted),
         }
         request = Request(
             headers=headers,
@@ -2644,7 +2815,6 @@ class HandleMixin:
         afk_channel_id: MissingOrNullable[Snowflake] = UNSET,
         afk_timeout: Missing[int] = UNSET,
         icon: MissingOrNullable[str] = UNSET,
-        owner_id: Missing[Snowflake] = UNSET,
         splash: MissingOrNullable[str] = UNSET,
         discovery_splash: MissingOrNullable[str] = UNSET,
         banner: MissingOrNullable[str] = UNSET,
@@ -2672,7 +2842,6 @@ class HandleMixin:
             "afk_channel_id": afk_channel_id,
             "afk_timeout": afk_timeout,
             "icon": icon,
-            "owner_id": owner_id,
             "splash": splash,
             "discovery_splash": discovery_splash,
             "banner": banner,
@@ -2730,7 +2899,7 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: str = "",
+        name: str,
         type: Optional[ChannelType] = None,  # noqa: A002
         topic: Optional[str] = None,
         bitrate: Optional[int] = None,
@@ -2752,6 +2921,8 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
+        if not name:
+            raise ValueError("name is required")
         data = {
             "name": name,
             "type": type,
@@ -2905,7 +3076,7 @@ class HandleMixin:
         roles: Optional[list[SnowflakeType]] = None,
         mute: Optional[bool] = None,
         deaf: Optional[bool] = None,
-    ) -> GuildMember:
+    ) -> Optional[GuildMember]:
         """https://discord.com/developers/docs/resources/guild#add-guild-member"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {
@@ -2921,7 +3092,10 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}",
             json={key: value for key, value in data.items() if value is not None},
         )
-        return type_validate_python(GuildMember, await _request(self, bot, request))
+        resp = await _request(self, bot, request)
+        if resp:
+            return type_validate_python(GuildMember, resp)
+        return None
 
     async def _api_modify_guild_member(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -3129,6 +3303,10 @@ class HandleMixin:
         reason: Optional[str] = None,
     ) -> None:
         """https://discord.com/developers/docs/resources/guild#create-guild-ban"""
+        if delete_message_days is not None and delete_message_seconds is not None:
+            raise ValueError(
+                "delete_message_days and delete_message_seconds cannot both be set"
+            )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3224,6 +3402,7 @@ class HandleMixin:
         name: Missing[str] = UNSET,
         permissions: Missing[str] = UNSET,
         color: Missing[int] = UNSET,
+        colors: Missing[RoleColors] = UNSET,
         hoist: Missing[bool] = UNSET,
         icon: MissingOrNullable[str] = UNSET,
         unicode_emoji: MissingOrNullable[str] = UNSET,
@@ -3241,6 +3420,7 @@ class HandleMixin:
                     "name": name,
                     "permissions": permissions,
                     "color": color,
+                    "colors": colors,
                     "hoist": hoist,
                     "icon": icon,
                     "unicode_emoji": unicode_emoji,
@@ -3302,6 +3482,7 @@ class HandleMixin:
         name: MissingOrNullable[str] = UNSET,
         permissions: MissingOrNullable[str] = UNSET,
         color: MissingOrNullable[int] = UNSET,
+        colors: Missing[RoleColors] = UNSET,
         hoist: MissingOrNullable[bool] = UNSET,
         icon: MissingOrNullable[str] = UNSET,
         unicode_emoji: MissingOrNullable[str] = UNSET,
@@ -3319,6 +3500,7 @@ class HandleMixin:
                     "name": name,
                     "permissions": permissions,
                     "color": color,
+                    "colors": colors,
                     "hoist": hoist,
                     "icon": icon,
                     "unicode_emoji": unicode_emoji,
@@ -3380,18 +3562,22 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        days: int,
-        include_roles: list[SnowflakeType],
+        days: Optional[int] = None,
+        include_roles: Optional[list[SnowflakeType]] = None,
     ) -> dict[Literal["pruned"], int]:
         """https://discord.com/developers/docs/resources/guild#get-guild-prune-count"""
-        data = {"days": days, "include_roles": include_roles}
-        data["include_roles"] = ",".join(str(role) for role in include_roles)
+        data = {
+            "days": days,
+            "include_roles": ",".join(str(role) for role in include_roles)
+            if include_roles
+            else None,
+        }
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/prune",
-            params=data,
+            params={key: value for key, value in data.items() if value is not None},
         )
         return await _request(self, bot, request)
 
@@ -3414,8 +3600,6 @@ class HandleMixin:
             "compute_prune_count": compute_prune_count,
             "include_roles": include_roles,
         }
-        if include_roles:
-            data["include_roles"] = ",".join(str(role) for role in include_roles)
         request = Request(
             headers=headers,
             method="POST",
@@ -3632,10 +3816,10 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        prompts: list[OnboardingPrompt],
-        default_channel_ids: list[Snowflake],
-        enabled: bool,
-        mode: OnboardingMode,
+        prompts: Missing[list[OnboardingPrompt]] = UNSET,
+        default_channel_ids: Missing[list[Snowflake]] = UNSET,
+        enabled: Missing[bool] = UNSET,
+        mode: Missing[OnboardingMode] = UNSET,
         reason: Optional[str] = None,
     ) -> GuildOnboarding:
         """https://discord.com/developers/docs/resources/guild#modify-guild-onboarding"""
@@ -3740,7 +3924,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        channel_id: SnowflakeType,
+        channel_id: Optional[SnowflakeType] = None,
         suppress: Optional[bool] = None,
     ) -> None:
         """https://discord.com/developers/docs/resources/voice#modify-user-voice-state"""
@@ -4184,6 +4368,7 @@ class HandleMixin:
         topic: str,
         privacy_level: Optional[StagePrivacyLevel] = None,
         send_start_notification: Optional[bool] = None,
+        guild_scheduled_event_id: Optional[SnowflakeType] = None,
         reason: Optional[str] = None,
     ) -> StageInstance:
         """https://discord.com/developers/docs/resources/stage-instance#create-stage-instance"""
@@ -4195,6 +4380,7 @@ class HandleMixin:
             "topic": topic,
             "privacy_level": privacy_level,
             "send_start_notification": send_start_notification,
+            "guild_scheduled_event_id": guild_scheduled_event_id,
         }
         request = Request(
             headers=headers,
@@ -4513,10 +4699,16 @@ class HandleMixin:
         before: Optional[SnowflakeType] = None,
         after: Optional[SnowflakeType] = None,
         limit: Optional[int] = None,
+        with_counts: Optional[bool] = None,
     ) -> list[CurrentUserGuild]:
         """https://discord.com/developers/docs/resources/user#get-current-user-guilds"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        params = {"before": before, "after": after, "limit": limit}
+        params = {
+            "before": before,
+            "after": after,
+            "limit": limit,
+            "with_counts": _bool_query(value=with_counts),
+        }
         request = Request(
             headers=headers,
             method="GET",
@@ -4622,7 +4814,7 @@ class HandleMixin:
         application_id: SnowflakeType,
         platform_name: Optional[str] = None,
         platform_username: Optional[str] = None,
-        metadata: Optional[ApplicationRoleConnectionMetadata] = None,
+        metadata: Optional[dict[str, str]] = None,
     ) -> ApplicationRoleConnection:
         """https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection"""
         data = {
@@ -4630,12 +4822,10 @@ class HandleMixin:
             "platform_username": platform_username,
             "metadata": metadata,
         }
-        if data["metadata"] is not None:
-            data["metadata"] = model_dump(data["metadata"], exclude_unset=True)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
-            method="PATCH",
+            method="PUT",
             url=self.base_url
             / f"users/@me/applications/{application_id}/role-connection",
             json={key: value for key, value in data.items() if value is not None},
@@ -4815,6 +5005,17 @@ class HandleMixin:
         poll: Optional[PollRequest] = None,
     ) -> Optional[MessageGet]:
         """https://discord.com/developers/docs/resources/webhook#execute-webhook"""
+        has_payload = any(
+            [
+                bool(content),
+                bool(embeds),
+                bool(components),
+                bool(files),
+                poll is not None,
+            ]
+        )
+        if not has_payload:
+            raise ValueError("content/embeds/components/files/poll is required")
         params = {}
         if wait is not None:
             params["wait"] = str(wait).lower()
@@ -4861,10 +5062,11 @@ class HandleMixin:
         *,
         webhook_id: SnowflakeType,
         token: str,
+        payload: dict[str, Any],
         thread_id: Optional[SnowflakeType] = None,
         wait: Optional[bool] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/webhook#execute-slackcompatible-webhook"""
+        """https://discord.com/developers/docs/resources/webhook#execute-slack-compatible-webhook"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"thread_id": thread_id, "wait": _bool_query(value=wait)}
         request = Request(
@@ -4872,6 +5074,7 @@ class HandleMixin:
             method="POST",
             url=self.base_url / f"webhooks/{webhook_id}/{token}/slack",
             params={key: value for key, value in params.items() if value is not None},
+            json=payload,
         )
         await _request(self, bot, request)
 
@@ -4881,10 +5084,11 @@ class HandleMixin:
         *,
         webhook_id: SnowflakeType,
         token: str,
+        payload: dict[str, Any],
         thread_id: Optional[SnowflakeType] = None,
         wait: Optional[bool] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/webhook#execute-githubcompatible-webhook"""
+        """https://discord.com/developers/docs/resources/webhook#execute-github-compatible-webhook"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"thread_id": thread_id, "wait": _bool_query(value=wait)}
         request = Request(
@@ -4892,6 +5096,7 @@ class HandleMixin:
             method="POST",
             url=self.base_url / f"webhooks/{webhook_id}/{token}/github",
             params={key: value for key, value in params.items() if value is not None},
+            json=payload,
         )
         await _request(self, bot, request)
 
