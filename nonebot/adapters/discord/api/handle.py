@@ -71,6 +71,7 @@ from .model import (
     GuildScheduledEventEntityMetadata,
     GuildScheduledEventUser,
     GuildTemplate,
+    GuildVanityURL,
     GuildWidget,
     GuildWidgetSettings,
     InstallParams,
@@ -90,7 +91,9 @@ from .model import (
     ModifyGuildMemberParams,
     ModifyGuildOnboardingParams,
     ModifyGuildParams,
+    ModifyGuildChannelPositionParams,
     ModifyGuildRoleParams,
+    ModifyGuildRolePositionParams,
     ModifyGuildScheduledEventParams,
     ModifyGuildStickerParams,
     ModifyGuildTemplateParams,
@@ -138,6 +141,7 @@ from .types import (
     GuildScheduledEventEntityType,
     GuildScheduledEventPrivacyLevel,
     GuildScheduledEventStatus,
+    InteractionContextType,
     MessageFlag,
     Missing,
     MissingOrNullable,
@@ -256,6 +260,8 @@ class HandleMixin:
         default_permission: Optional[bool] = None,
         type: Optional[ApplicationCommandType] = None,  # noqa: A002
         nsfw: Optional[bool] = None,
+        integration_types: Optional[list[ApplicationIntegrationType]] = None,
+        contexts: Optional[list[InteractionContextType]] = None,
     ) -> ApplicationCommand:
         """Create a new global command.
         Returns 201 if a command with the same name does not already exist,
@@ -276,7 +282,10 @@ class HandleMixin:
             "default_permission": default_permission,
             "type": type,
             "nsfw": nsfw,
+            "integration_types": integration_types,
+            "contexts": contexts,
         }
+        data = {key: value for key, value in data.items() if value is not None}
         payload = model_dump(
             type_validate_python(ApplicationCommandCreate, data),
             exclude_unset=True,
@@ -469,6 +478,7 @@ class HandleMixin:
             "type": type,
             "nsfw": nsfw,
         }
+        data = {key: value for key, value in data.items() if value is not None}
         payload = model_dump(
             type_validate_python(ApplicationCommandCreate, data),
             exclude_unset=True,
@@ -2776,25 +2786,33 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        id: SnowflakeType = ...,  # noqa: A002
-        position: Optional[int] = None,
-        lock_permissions: Optional[bool] = None,
-        parent_id: Optional[SnowflakeType] = None,
-    ) -> Guild:
+        channels: Optional[list[ModifyGuildChannelPositionParams]] = None,
+        id: Optional[SnowflakeType] = None,  # noqa: A002
+        position: MissingOrNullable[int] = UNSET,
+        lock_permissions: MissingOrNullable[bool] = UNSET,
+        parent_id: MissingOrNullable[SnowflakeType] = UNSET,
+    ) -> None:
         """https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = {
-            "id": id,
-            "position": position,
-            "lock_permissions": lock_permissions,
-            "parent_id": parent_id,
-        }
+        if channels is None:
+            if id is None:
+                raise ValueError("channels or id must be provided")
+            channel = type_validate_python(
+                ModifyGuildChannelPositionParams,
+                {
+                    "id": id,
+                    "position": position,
+                    "lock_permissions": lock_permissions,
+                    "parent_id": parent_id,
+                },
+            )
+            channels = [channel]
         payload = [
-            {
-                key: value
-                for key, value in data.items()
-                if value is not None and value is not ...
-            }
+            model_dump(
+                type_validate_python(ModifyGuildChannelPositionParams, channel),
+                exclude_unset=True,
+            )
+            for channel in channels
         ]
         request = Request(
             headers=headers,
@@ -2802,7 +2820,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/channels",
             json=payload,
         )
-        return type_validate_python(Guild, await _request(self, bot, request))
+        await _request(self, bot, request)
 
     async def _api_list_active_guild_threads(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -3244,21 +3262,34 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        id: SnowflakeType,  # noqa: A002
-        position: Optional[int] = None,
+        roles: Optional[list[ModifyGuildRolePositionParams]] = None,
+        id: Optional[SnowflakeType] = None,  # noqa: A002
+        position: MissingOrNullable[int] = UNSET,
         reason: Optional[str] = None,
     ) -> list[Role]:
         """https://discord.com/developers/docs/resources/guild#modify-guild-role-positions"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {"id": id, "position": position}
-        payload = {key: value for key, value in data.items() if value is not None}
+        if roles is None:
+            if id is None:
+                raise ValueError("roles or id must be provided")
+            role = type_validate_python(
+                ModifyGuildRolePositionParams, {"id": id, "position": position}
+            )
+            roles = [role]
+        payload = [
+            model_dump(
+                type_validate_python(ModifyGuildRolePositionParams, role),
+                exclude_unset=True,
+            )
+            for role in roles
+        ]
         request = Request(
             headers=headers,
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/roles",
-            json=[payload],
+            json=payload,
         )
         return type_validate_python(list[Role], await _request(self, bot, request))
 
@@ -3508,7 +3539,7 @@ class HandleMixin:
 
     async def _api_get_guild_vanity_url(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
-    ) -> Invite:
+    ) -> GuildVanityURL:
         """https://discord.com/developers/docs/resources/guild#get-guild-vanity-url"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
@@ -3516,7 +3547,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/vanity-url",
         )
-        return type_validate_python(Invite, await _request(self, bot, request))
+        return type_validate_python(GuildVanityURL, await _request(self, bot, request))
 
     async def _api_get_guild_widget_image(  # TODO)): 校验接口返回值并更新类型
         self: AdapterProtocol,

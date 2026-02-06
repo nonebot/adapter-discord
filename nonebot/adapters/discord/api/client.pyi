@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Literal
 
 from .model import (
-    SKU,
     ActivityInstance,
     AllowedMention,
     AnswerVoters,
@@ -46,6 +45,7 @@ from .model import (
     GuildScheduledEventEntityMetadata,
     GuildScheduledEventUser,
     GuildTemplate,
+    GuildVanityURL,
     GuildWidget,
     GuildWidgetSettings,
     InstallParams,
@@ -55,12 +55,15 @@ from .model import (
     ListActiveGuildThreadsResponse,
     MessageGet,
     MessageReference,
+    ModifyGuildChannelPositionParams,
+    ModifyGuildRolePositionParams,
     OnboardingPrompt,
     Overwrite,
     PartialOverwrite,
     PollRequest,
     RecurrenceRule,
     Role,
+    SKU,
     Snowflake,
     SnowflakeType,
     StageInstance,
@@ -92,6 +95,7 @@ from .types import (
     GuildScheduledEventEntityType,
     GuildScheduledEventPrivacyLevel,
     GuildScheduledEventStatus,
+    InteractionContextType,
     MessageFlag,
     Missing,
     MissingOrNullable,
@@ -132,6 +136,8 @@ class ApiClient:
         default_permission: bool | None = ...,
         type: ApplicationCommandType | None = ...,
         nsfw: bool | None = ...,
+        integration_types: list[ApplicationIntegrationType] | None = ...,
+        contexts: list[InteractionContextType] | None = ...,
     ) -> ApplicationCommand:
         """Create a new global command.
         Returns 201 if a command with the same name does not already exist,
@@ -1275,11 +1281,12 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        id: SnowflakeType = ...,
-        position: int | None = ...,
-        lock_permissions: bool | None = ...,
-        parent_id: SnowflakeType | None = ...,
-    ) -> Guild:
+        channels: list[ModifyGuildChannelPositionParams] | None = ...,
+        id: SnowflakeType | None = ...,
+        position: MissingOrNullable[int] = ...,
+        lock_permissions: MissingOrNullable[bool] = ...,
+        parent_id: MissingOrNullable[SnowflakeType] = ...,
+    ) -> None:
         """https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions"""
 
     async def list_active_guild_threads(
@@ -1479,8 +1486,9 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        id: SnowflakeType,
-        position: int | None = ...,
+        roles: list[ModifyGuildRolePositionParams] | None = ...,
+        id: SnowflakeType | None = ...,
+        position: MissingOrNullable[int] = ...,
         reason: str | None = ...,
     ) -> list[Role]:
         """https://discord.com/developers/docs/resources/guild#modify-guild-role-positions"""
@@ -1597,7 +1605,7 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-    ) -> Invite:
+    ) -> GuildVanityURL:
         """https://discord.com/developers/docs/resources/guild#get-guild-vanity-url"""
 
     async def get_guild_widget_image(

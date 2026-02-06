@@ -286,6 +286,8 @@ class ApplicationCommandCreate(BaseModel):
     dm_permission: Optional[bool] = None
     default_permission: Optional[bool] = None
     nsfw: Optional[bool] = None
+    integration_types: Missing[list[ApplicationIntegrationType]] = UNSET
+    contexts: MissingOrNullable[list[InteractionContextType]] = UNSET
 
 
 class ApplicationCommandEditParams(BaseModel):
@@ -2062,6 +2064,18 @@ class StartThreadWithoutMessageParams(BaseModel):
     rate_limit_per_user: MissingOrNullable[int] = UNSET
 
 
+class ModifyGuildChannelPositionParams(BaseModel):
+    """Modify Guild Channel Position Params.
+
+    see https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions
+    """
+
+    id: Snowflake
+    position: MissingOrNullable[int] = UNSET
+    lock_permissions: MissingOrNullable[bool] = UNSET
+    parent_id: MissingOrNullable[Snowflake] = UNSET
+
+
 class EditCurrentApplicationParams(BaseModel):
     """Edit Current Application Params.
 
@@ -2264,6 +2278,16 @@ class GuildWidget(BaseModel):
     channels: list["GuildWidgetChannel"]
     members: list["GuildWidgetUser"]
     presence_count: int
+
+
+class GuildVanityURL(BaseModel):
+    """Guild Vanity URL.
+
+    see https://discord.com/developers/docs/resources/guild#get-guild-vanity-url
+    """
+
+    code: Optional[str] = None
+    uses: int
 
 
 class GuildWidgetChannel(BaseModel):
@@ -2684,6 +2708,16 @@ class CreateGuildRoleParams(BaseModel):
     icon: MissingOrNullable[str] = UNSET
     unicode_emoji: MissingOrNullable[str] = UNSET
     mentionable: Missing[bool] = UNSET
+
+
+class ModifyGuildRolePositionParams(BaseModel):
+    """Modify Guild Role Position Params.
+
+    see https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
+    """
+
+    id: Snowflake
+    position: MissingOrNullable[int] = UNSET
 
 
 class CreateWebhookParams(BaseModel):
