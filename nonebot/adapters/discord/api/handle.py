@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from http import HTTPStatus
 import json
 from typing import (
@@ -2234,6 +2234,14 @@ class HandleMixin:
         reason: Optional[str] = None,
     ) -> Channel:
         """https://discord.com/developers/docs/resources/channel#start-thread-without-message"""
+        if type is not UNSET and type not in (
+            ChannelType.ANNOUNCEMENT_THREAD,
+            ChannelType.PUBLIC_THREAD,
+            ChannelType.PRIVATE_THREAD,
+        ):
+            raise ValueError(
+                "type must be ANNOUNCEMENT_THREAD, PUBLIC_THREAD or PRIVATE_THREAD"
+            )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2419,7 +2427,14 @@ class HandleMixin:
         """https://discord.com/developers/docs/resources/channel#list-public-archived-threads"""
         params = {"before": before, "limit": limit}
         if params["before"]:
-            params["before"] = params["before"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            before_utc = params["before"]
+            if before_utc.tzinfo is None:
+                before_utc = before_utc.replace(tzinfo=timezone.utc)
+            else:
+                before_utc = before_utc.astimezone(timezone.utc)
+            params["before"] = before_utc.isoformat(timespec="milliseconds").replace(
+                "+00:00", "Z"
+            )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2442,7 +2457,14 @@ class HandleMixin:
         """https://discord.com/developers/docs/resources/channel#list-private-archived-threads"""
         params = {"before": before, "limit": limit}
         if params["before"]:
-            params["before"] = params["before"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            before_utc = params["before"]
+            if before_utc.tzinfo is None:
+                before_utc = before_utc.replace(tzinfo=timezone.utc)
+            else:
+                before_utc = before_utc.astimezone(timezone.utc)
+            params["before"] = before_utc.isoformat(timespec="milliseconds").replace(
+                "+00:00", "Z"
+            )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -3098,10 +3120,14 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        query: Optional[str] = None,
+        query: str,
         limit: Optional[int] = None,
     ) -> list[GuildMember]:
         """https://discord.com/developers/docs/resources/guild#search-guild-members"""
+        if query == "":
+            raise ValueError("query is required")
+        if limit is not None and not (1 <= limit <= 1000):
+            raise ValueError("limit must be between 1 and 1000")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"query": query, "limit": limit}
         request = Request(

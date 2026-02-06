@@ -1340,7 +1340,7 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        query: str | None = ...,
+        query: str,
         limit: int | None = ...,
     ) -> list[GuildMember]:
         """https://discord.com/developers/docs/resources/guild#search-guild-members"""
