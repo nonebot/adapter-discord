@@ -1773,6 +1773,18 @@ class ForumTag(BaseModel):
     emoji_name: Optional[str] = None
 
 
+class ForumTagRequest(BaseModel):
+    """Forum tag request.
+
+    see https://discord.com/developers/docs/resources/channel#forum-tag-object"""
+
+    id: Missing[Snowflake] = UNSET
+    name: str
+    moderated: Missing[bool] = UNSET
+    emoji_id: MissingOrNullable[Snowflake] = UNSET
+    emoji_name: MissingOrNullable[str] = UNSET
+
+
 class Embed(BaseModel):
     """Embed
 
@@ -1964,8 +1976,9 @@ class AttachmentSend(BaseModel):
 
     see https://discord.com/developers/docs/resources/channel#attachment-object"""
 
-    filename: str
-    description: Optional[str] = None
+    id: Missing[int] = UNSET
+    filename: Missing[str] = UNSET
+    description: MissingOrNullable[str] = UNSET
 
 
 class MessageSend(BaseModel):
@@ -2047,7 +2060,7 @@ class ModifyChannelParams(BaseModel):
     video_quality_mode: MissingOrNullable[VideoQualityMode] = UNSET
     default_auto_archive_duration: MissingOrNullable[int] = UNSET
     flags: Missing[ChannelFlags] = UNSET
-    available_tags: Missing[list[ForumTag]] = UNSET
+    available_tags: Missing[list[ForumTagRequest]] = UNSET
     default_reaction_emoji: MissingOrNullable[DefaultReaction] = UNSET
     default_thread_rate_limit_per_user: Missing[int] = UNSET
     default_sort_order: MissingOrNullable[SortOrderTypes] = UNSET
@@ -2567,7 +2580,7 @@ class CreateGuildChannelParams(BaseModel):
     video_quality_mode: Optional[VideoQualityMode] = None
     default_auto_archive_duration: Optional[int] = None
     default_reaction_emoji: Optional[DefaultReaction] = None
-    available_tags: Optional[list[ForumTag]] = None
+    available_tags: Optional[list[ForumTagRequest]] = None
     default_sort_order: Optional[SortOrderTypes] = None
     default_forum_layout: Optional[ForumLayoutTypes] = None
     default_thread_rate_limit_per_user: Optional[int] = None
@@ -4687,6 +4700,7 @@ __all__ = [
     "File",
     "FollowedChannel",
     "ForumTag",
+    "ForumTagRequest",
     "Gateway",
     "GatewayBot",
     "Guild",
