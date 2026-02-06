@@ -713,6 +713,7 @@ class HandleMixin:
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
+        access_token: str,
     ) -> list[GuildApplicationCommandPermissions]:
         """
         Fetches permissions for all commands for your application in a guild.
@@ -720,7 +721,7 @@ class HandleMixin:
 
         see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command-permissions
         """
-        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
             method="GET",
@@ -739,6 +740,7 @@ class HandleMixin:
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
+        access_token: str,
     ) -> GuildApplicationCommandPermissions:
         """
         Fetches permissions for a specific command for your application in a guild.
@@ -746,7 +748,7 @@ class HandleMixin:
 
         see https://discord.com/developers/docs/interactions/application-commands#get-application-command-permissions
         """
-        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
             method="GET",
@@ -764,6 +766,7 @@ class HandleMixin:
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
+        access_token: str,
         permissions: list[ApplicationCommandPermissions],
     ) -> GuildApplicationCommandPermissions:
         """
@@ -775,7 +778,7 @@ class HandleMixin:
 
         see https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions
         """
-        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
             method="PUT",
@@ -895,14 +898,17 @@ class HandleMixin:
         *,
         application_id: SnowflakeType,
         interaction_token: str,
+        thread_id: Optional[SnowflakeType] = None,
     ) -> None:
         """https://discord.com/developers/docs/interactions/receiving-and-responding#delete-original-interaction-response"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        params = {"thread_id": thread_id}
         request = Request(
             headers=headers,
             method="DELETE",
             url=self.base_url
             / f"webhooks/{application_id}/{interaction_token}/messages/@original",
+            params={key: value for key, value in params.items() if value is not None},
         )
         await _request(self, bot, request)
 
@@ -963,17 +969,20 @@ class HandleMixin:
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
+        thread_id: Optional[SnowflakeType] = None,
     ) -> MessageGet:
         """Returns a followup message for an Interaction. Functions the same as Get Webhook Message.
 
         see https://discord.com/developers/docs/interactions/receiving-and-responding#get-followup-message
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        params = {"thread_id": thread_id}
         request = Request(
             headers=headers,
             method="GET",
             url=self.base_url
             / f"webhooks/{application_id}/{interaction_token}/messages/{message_id}",
+            params={key: value for key, value in params.items() if value is not None},
         )
         return type_validate_python(MessageGet, await _request(self, bot, request))
 
@@ -1035,17 +1044,20 @@ class HandleMixin:
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
+        thread_id: Optional[SnowflakeType] = None,
     ) -> None:
         """Deletes a followup message for an Interaction.
 
         see https://discord.com/developers/docs/interactions/receiving-and-responding#delete-followup-message
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        params = {"thread_id": thread_id}
         request = Request(
             headers=headers,
             method="DELETE",
             url=self.base_url
             / f"webhooks/{application_id}/{interaction_token}/messages/{message_id}",
+            params={key: value for key, value in params.items() if value is not None},
         )
         await _request(self, bot, request)
 
@@ -2116,7 +2128,7 @@ class HandleMixin:
         request = Request(
             headers=headers,
             method="PUT",
-            url=self.base_url / f"channels/{channel_id}/pins/{message_id}",
+            url=self.base_url / f"channels/{channel_id}/messages/pins/{message_id}",
         )
         await _request(self, bot, request)
 
@@ -2135,7 +2147,7 @@ class HandleMixin:
         request = Request(
             headers=headers,
             method="DELETE",
-            url=self.base_url / f"channels/{channel_id}/pins/{message_id}",
+            url=self.base_url / f"channels/{channel_id}/messages/pins/{message_id}",
         )
         await _request(self, bot, request)
 
@@ -2447,13 +2459,11 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        before: Optional[datetime] = None,
+        before: Optional[SnowflakeType] = None,
         limit: Optional[int] = None,
     ) -> ArchivedThreadsResponse:
         """https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads"""
         params = {"before": before, "limit": limit}
-        if params["before"]:
-            params["before"] = params["before"].strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4606,9 +4616,9 @@ class HandleMixin:
         if reason:
             headers["X-Audit-Log-Reason"] = reason
         request = Request(
+            headers=headers,
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/stickers",
-            json={"name": name, "description": description, "tags": tags},
             files=form,
         )
         return type_validate_python(Sticker, await _request(self, bot, request))
@@ -4770,13 +4780,14 @@ class HandleMixin:
         self: AdapterProtocol,
         bot: "Bot",
         *,
+        access_token: str,
         before: Optional[SnowflakeType] = None,
         after: Optional[SnowflakeType] = None,
         limit: Optional[int] = None,
         with_counts: Optional[bool] = None,
     ) -> list[CurrentUserGuild]:
         """https://discord.com/developers/docs/resources/user#get-current-user-guilds"""
-        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        headers = {"Authorization": f"Bearer {access_token}"}
         params = {
             "before": before,
             "after": after,
@@ -4794,10 +4805,14 @@ class HandleMixin:
         )
 
     async def _api_get_current_user_guild_member(
-        self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        access_token: str,
     ) -> GuildMember:
         """https://discord.com/developers/docs/resources/user#get-current-user-guild-member"""
-        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
             method="GET",
@@ -4854,9 +4869,11 @@ class HandleMixin:
     async def _api_get_user_connections(
         self: AdapterProtocol,
         bot: "Bot",
+        *,
+        access_token: str,
     ) -> list[Connection]:
         """https://discord.com/developers/docs/resources/user#get-current-user-connections"""
-        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
             method="GET",
@@ -4867,10 +4884,14 @@ class HandleMixin:
         )
 
     async def _api_get_user_application_role_connection(
-        self: AdapterProtocol, bot: "Bot", *, application_id: SnowflakeType
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        application_id: SnowflakeType,
+        access_token: str,
     ) -> ApplicationRoleConnection:
         """https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection"""
-        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
             method="GET",
@@ -4886,6 +4907,7 @@ class HandleMixin:
         bot: "Bot",
         *,
         application_id: SnowflakeType,
+        access_token: str,
         platform_name: Optional[str] = None,
         platform_username: Optional[str] = None,
         metadata: Optional[dict[str, str]] = None,
@@ -4896,7 +4918,7 @@ class HandleMixin:
             "platform_username": platform_username,
             "metadata": metadata,
         }
-        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
             method="PUT",
@@ -5273,9 +5295,7 @@ class HandleMixin:
     # see https://discord.com/developers/docs/topics/gateway
     async def _api_get_gateway(self: AdapterProtocol, bot: "Bot") -> Gateway:
         """https://discord.com/developers/docs/topics/gateway#get-gateway"""
-        headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
-            headers=headers,
             method="GET",
             url=self.base_url / "gateway",
         )
@@ -5307,10 +5327,13 @@ class HandleMixin:
         return type_validate_python(Application, await _request(self, bot, request))
 
     async def _api_get_current_authorization_information(
-        self: AdapterProtocol, bot: "Bot"
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        access_token: str,
     ) -> AuthorizationResponse:
         """https://discord.com/developers/docs/topics/oauth2#get-current-authorization-information"""
-        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
             method="GET",

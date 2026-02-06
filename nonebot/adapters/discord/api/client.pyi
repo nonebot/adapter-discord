@@ -318,6 +318,7 @@ class ApiClient:
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
+        access_token: str,
     ) -> list[GuildApplicationCommandPermissions]:
         """Fetches permissions for all commands for your application in a guild.
         Returns an array of guild application command permissions objects.
@@ -331,6 +332,7 @@ class ApiClient:
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
+        access_token: str,
     ) -> GuildApplicationCommandPermissions:
         """Fetches permissions for a specific command for your application in a guild.
         Returns a guild application command permissions object.
@@ -344,6 +346,7 @@ class ApiClient:
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
+        access_token: str,
         permissions: list[ApplicationCommandPermissions],
     ) -> GuildApplicationCommandPermissions:
         """Edits command permissions for a specific command for your application in a guild
@@ -397,6 +400,7 @@ class ApiClient:
         *,
         application_id: SnowflakeType,
         interaction_token: str,
+        thread_id: SnowflakeType | None = ...,
     ) -> None:
         """https://discord.com/developers/docs/interactions/receiving-and-responding#delete-original-interaction-response"""
 
@@ -422,6 +426,7 @@ class ApiClient:
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
+        thread_id: SnowflakeType | None = ...,
     ) -> MessageGet:
         """Returns a followup message for an Interaction. Functions the same as Get Webhook Message.
 
@@ -456,6 +461,7 @@ class ApiClient:
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
+        thread_id: SnowflakeType | None = ...,
     ) -> None:
         """Deletes a followup message for an Interaction.
 
@@ -1060,7 +1066,7 @@ class ApiClient:
         self,
         *,
         channel_id: SnowflakeType,
-        before: datetime | None = ...,
+        before: SnowflakeType | None = ...,
         limit: int | None = ...,
     ) -> ArchivedThreadsResponse:
         """https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads"""
@@ -2040,6 +2046,7 @@ class ApiClient:
     async def get_current_user_guilds(
         self,
         *,
+        access_token: str,
         before: SnowflakeType | None = ...,
         after: SnowflakeType | None = ...,
         limit: int | None = ...,
@@ -2051,6 +2058,7 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
+        access_token: str,
     ) -> GuildMember:
         """https://discord.com/developers/docs/resources/user#get-current-user-guild-member"""
 
@@ -2078,6 +2086,8 @@ class ApiClient:
 
     async def get_user_connections(
         self,
+        *,
+        access_token: str,
     ) -> list[Connection]:
         """https://discord.com/developers/docs/resources/user#get-current-user-connections"""
 
@@ -2085,6 +2095,7 @@ class ApiClient:
         self,
         *,
         application_id: SnowflakeType,
+        access_token: str,
     ) -> ApplicationRoleConnection:
         """https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection"""
 
@@ -2092,6 +2103,7 @@ class ApiClient:
         self,
         *,
         application_id: SnowflakeType,
+        access_token: str,
         platform_name: str | None = ...,
         platform_username: str | None = ...,
         metadata: dict[str, str] | None = ...,
@@ -2276,5 +2288,7 @@ class ApiClient:
 
     async def get_current_authorization_information(
         self,
+        *,
+        access_token: str,
     ) -> AuthorizationResponse:
         """https://discord.com/developers/docs/topics/oauth2#get-current-authorization-information"""

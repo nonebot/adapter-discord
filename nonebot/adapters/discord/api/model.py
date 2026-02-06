@@ -2820,7 +2820,7 @@ class GuildTemplate(BaseModel):
     name: str
     description: Optional[str] = None
     usage_count: int
-    creator_id: str
+    creator_id: Snowflake
     creator: "User"
     created_at: datetime.datetime
     updated_at: datetime.datetime
