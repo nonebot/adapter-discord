@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any, Literal
 
 from .model import (
+    SKU,
     ActivityInstance,
     AllowedMention,
     AnswerVoters,
@@ -64,7 +65,6 @@ from .model import (
     RecurrenceRule,
     Role,
     RoleColors,
-    SKU,
     Snowflake,
     SnowflakeType,
     StageInstance,

@@ -11,6 +11,8 @@ import ast
 from pathlib import Path
 import re
 
+LINE_LENGTH = 88
+
 
 def _get_source_segment(source: str, node: ast.AST | None) -> str | None:
     if node is None:
@@ -42,6 +44,12 @@ def _format_annotation(annotation: str | None) -> str:
         return ""
 
     annotation = " ".join(annotation.split())
+    annotation = re.sub(r"\[\s+", "[", annotation)
+    annotation = re.sub(r"\s+\]", "]", annotation)
+    annotation = re.sub(r"\(\s+", "(", annotation)
+    annotation = re.sub(r"\s+\)", ")", annotation)
+    annotation = re.sub(r"\s+,", ",", annotation)
+    annotation = re.sub(r",\s*", ", ", annotation)
 
     stripped = annotation.strip()
     if (
@@ -221,16 +229,22 @@ def _append_import_block(lines: list[str], module: str, imports: list[str]) -> N
     lines.append(")")
 
 
+def _import_sort_key(name: str) -> tuple[int, str]:
+    return (0 if name.isupper() else 1, name)
+
+
 def _build_import_lines(
     methods: list[tuple[str, list[str], str | None, str | None, bool]],
     actual_imports: dict[str, str],
 ) -> list[str]:
     lines: list[str] = []
     model_imports = sorted(
-        name for name, cat in actual_imports.items() if cat == "model"
+        (name for name, cat in actual_imports.items() if cat == "model"),
+        key=_import_sort_key,
     )
     type_imports = sorted(
-        name for name, cat in actual_imports.items() if cat == "types"
+        (name for name, cat in actual_imports.items() if cat == "types"),
+        key=_import_sort_key,
     )
 
     texts = _annotation_texts(methods)
@@ -280,7 +294,8 @@ def _build_method_stub(
 
     if has_kwonly:
         lines.append("        *,")
-    lines.extend(f"        {param}," for param in params)
+    for param in params:
+        lines.extend(_render_param_lines(param))
 
     ret_ann = _format_annotation(returns) if returns else "None"
     lines.append(f"    ) -> {ret_ann}:")
@@ -290,6 +305,35 @@ def _build_method_stub(
         lines.append("        ...")
     lines.append("")
     return lines
+
+
+def _render_param_lines(param: str) -> list[str]:
+    single_line = f"        {param},"
+    if len(single_line) <= LINE_LENGTH or ": " not in param:
+        return [single_line]
+
+    name, rest = param.split(": ", 1)
+    has_default = rest.endswith(" = ...")
+    annotation = rest[:-6] if has_default else rest
+    default = " = ..." if has_default else ""
+
+    if " | " in annotation:
+        left, right = annotation.rsplit(" | ", 1)
+        return [
+            f"        {name}: {left}",
+            f"        | {right}{default},",
+        ]
+
+    if "[" in annotation and "]" in annotation:
+        base, inner = annotation.split("[", 1)
+        inner_content = inner.rsplit("]", 1)[0]
+        return [
+            f"        {name}: {base}[",
+            f"            {inner_content}",
+            f"        ]{default},",
+        ]
+
+    return [single_line]
 
 
 def _build_class_lines(
