@@ -1,5 +1,5 @@
-import datetime
-from typing import Literal, overload
+from datetime import datetime
+from typing import Any, Literal
 
 from .model import (
     SKU,
@@ -8,7 +8,7 @@ from .model import (
     AnswerVoters,
     Application,
     ApplicationCommand,
-    ApplicationCommandCreate,
+    ApplicationCommandBulkOverwriteParams,
     ApplicationCommandOption,
     ApplicationCommandPermissions,
     ApplicationEmojis,
@@ -34,7 +34,7 @@ from .model import (
     Entitlement,
     File,
     FollowedChannel,
-    ForumTag,
+    ForumTagRequest,
     Gateway,
     GatewayBot,
     Guild,
@@ -46,6 +46,7 @@ from .model import (
     GuildScheduledEventEntityMetadata,
     GuildScheduledEventUser,
     GuildTemplate,
+    GuildVanityURL,
     GuildWidget,
     GuildWidgetSettings,
     InstallParams,
@@ -55,15 +56,21 @@ from .model import (
     ListActiveGuildThreadsResponse,
     MessageGet,
     MessageReference,
+    ModifyGuildChannelPositionParams,
+    ModifyGuildRolePositionParams,
     OnboardingPrompt,
     Overwrite,
+    PartialOverwrite,
     PollRequest,
+    RecurrenceRule,
     Role,
+    RoleColors,
     Snowflake,
     SnowflakeType,
     StageInstance,
     Sticker,
     StickerPack,
+    StickerPacksResponse,
     Subscription,
     ThreadMember,
     TriggerMetadata,
@@ -90,9 +97,14 @@ from .types import (
     GuildScheduledEventEntityType,
     GuildScheduledEventPrivacyLevel,
     GuildScheduledEventStatus,
+    InteractionContextType,
+    InviteTargetType,
     MessageFlag,
+    Missing,
+    MissingOrNullable,
     OnboardingMode,
     OverwriteType,
+    ReactionType,
     SortOrderTypes,
     StagePrivacyLevel,
     SystemChannelFlags,
@@ -101,11 +113,12 @@ from .types import (
     VideoQualityMode,
 )
 
-# ruff: noqa: ANN003 # TODO)): 将所有params/kwargs类型补全
-
 class ApiClient:
     async def get_global_application_commands(
-        self, *, application_id: SnowflakeType, with_localizations: bool | None = ...
+        self,
+        *,
+        application_id: SnowflakeType,
+        with_localizations: bool | None = ...,
     ) -> list[ApplicationCommand]:
         """Fetch global commands for your application.
         Returns an array of application command objects.
@@ -125,18 +138,24 @@ class ApiClient:
         default_member_permissions: str | None = ...,
         dm_permission: bool | None = ...,
         default_permission: bool | None = ...,
-        type: ApplicationCommandType | None = ...,  # noqa: A002
+        type: ApplicationCommandType | None = ...,
         nsfw: bool | None = ...,
+        integration_types: list[ApplicationIntegrationType] | None = ...,
+        contexts: list[InteractionContextType] | None = ...,
     ) -> ApplicationCommand:
         """Create a new global command.
         Returns 201 if a command with the same name does not already exist,
         or a 200 if it does (in which case the previous command will be overwritten).
         Both responses include an application command object.
+
         see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
         """
 
     async def get_global_application_command(
-        self, *, application_id: SnowflakeType, command_id: SnowflakeType
+        self,
+        *,
+        application_id: SnowflakeType,
+        command_id: SnowflakeType,
     ) -> ApplicationCommand:
         """Fetch a global command for your application.
         Returns an application command object.
@@ -149,17 +168,26 @@ class ApiClient:
         *,
         application_id: SnowflakeType,
         command_id: SnowflakeType,
-        name: str | None = ...,
-        name_localizations: dict[str, str] | None = ...,
-        description: str | None = ...,
-        description_localizations: dict[str, str] | None = ...,
-        options: list[ApplicationCommandOption] | None = ...,
-        default_member_permissions: str | None = ...,
-        dm_permission: bool | None = ...,
-        default_permission: bool | None = ...,
-        nsfw: bool | None = ...,
-    ) -> ApplicationCommand: ...
-    async def _delete_global_application_command(
+        name: Missing[str] = ...,
+        name_localizations: MissingOrNullable[dict[str, str]] = ...,
+        description: Missing[str] = ...,
+        description_localizations: MissingOrNullable[dict[str, str]] = ...,
+        options: Missing[list[ApplicationCommandOption]] = ...,
+        default_member_permissions: MissingOrNullable[str] = ...,
+        dm_permission: Missing[bool] = ...,
+        default_permission: MissingOrNullable[bool] = ...,
+        nsfw: Missing[bool] = ...,
+        integration_types: Missing[list[ApplicationIntegrationType]] = ...,
+        contexts: MissingOrNullable[list[InteractionContextType]] = ...,
+    ) -> ApplicationCommand:
+        """Edit a global command. Returns 200 and an application command object.
+        All fields are optional, but any fields provided will entirely overwrite
+        the existing values of those fields.
+
+        see https://discord.com/developers/docs/interactions/application-commands#edit-global-application-command
+        """
+
+    async def delete_global_application_command(
         self,
         *,
         application_id: SnowflakeType,
@@ -171,7 +199,10 @@ class ApiClient:
         """
 
     async def bulk_overwrite_global_application_commands(
-        self, *, application_id: SnowflakeType, commands: list[ApplicationCommandCreate]
+        self,
+        *,
+        application_id: SnowflakeType,
+        commands: list[ApplicationCommandBulkOverwriteParams],
     ) -> list[ApplicationCommand]:
         """Takes a list of application commands,
         overwriting the existing global command list for this application.
@@ -207,7 +238,7 @@ class ApiClient:
         options: list[ApplicationCommandOption] | None = ...,
         default_member_permissions: str | None = ...,
         default_permission: bool | None = ...,
-        type: ApplicationCommandType | None = ...,  # noqa: A002
+        type: ApplicationCommandType | None = ...,
         nsfw: bool | None = ...,
     ) -> ApplicationCommand:
         """Create a new guild command.
@@ -238,14 +269,14 @@ class ApiClient:
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
-        name: str | None = ...,
-        name_localizations: dict[str, str] | None = ...,
-        description: str | None = ...,
-        description_localizations: dict[str, str] | None = ...,
-        options: list[ApplicationCommandOption] | None = ...,
-        default_member_permissions: str | None = ...,
-        default_permission: bool | None = ...,
-        nsfw: bool | None = ...,
+        name: Missing[str] = ...,
+        name_localizations: MissingOrNullable[dict[str, str]] = ...,
+        description: Missing[str] = ...,
+        description_localizations: MissingOrNullable[dict[str, str]] = ...,
+        options: Missing[list[ApplicationCommandOption]] = ...,
+        default_member_permissions: MissingOrNullable[str] = ...,
+        default_permission: MissingOrNullable[bool] = ...,
+        nsfw: Missing[bool] = ...,
     ) -> ApplicationCommand:
         """Edit a guild command.
         Updates for guild commands will be available immediately.
@@ -273,7 +304,7 @@ class ApiClient:
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
-        commands: list[ApplicationCommandCreate],
+        commands: list[ApplicationCommandBulkOverwriteParams],
     ) -> list[ApplicationCommand]:
         """Takes a list of application commands,
         overwriting the existing command list for this application for the targeted guild.
@@ -287,9 +318,9 @@ class ApiClient:
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
-    ) -> GuildApplicationCommandPermissions:
-        """
-        Fetches permissions for all commands for your application in a guild.
+        access_token: str,
+    ) -> list[GuildApplicationCommandPermissions]:
+        """Fetches permissions for all commands for your application in a guild.
         Returns an array of guild application command permissions objects.
 
         see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command-permissions
@@ -301,9 +332,9 @@ class ApiClient:
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
+        access_token: str,
     ) -> GuildApplicationCommandPermissions:
-        """
-        Fetches permissions for a specific command for your application in a guild.
+        """Fetches permissions for a specific command for your application in a guild.
         Returns a guild application command permissions object.
 
         see https://discord.com/developers/docs/interactions/application-commands#get-application-command-permissions
@@ -315,10 +346,10 @@ class ApiClient:
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
+        access_token: str,
         permissions: list[ApplicationCommandPermissions],
     ) -> GuildApplicationCommandPermissions:
-        """
-        Edits command permissions for a specific command for your application in a guild
+        """Edits command permissions for a specific command for your application in a guild
         and returns a guild application command permissions object.
         Fires an Application Command Permissions Update Gateway event.
 
@@ -333,7 +364,8 @@ class ApiClient:
         interaction_id: SnowflakeType,
         interaction_token: str,
         response: InteractionResponse,
-    ) -> None:
+        with_response: bool | None = ...,
+    ) -> InteractionResponse | None:
         """https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response"""
 
     async def get_origin_interaction_response(
@@ -351,12 +383,15 @@ class ApiClient:
         application_id: SnowflakeType,
         interaction_token: str,
         thread_id: SnowflakeType | None = ...,
-        content: str | None = ...,
-        embeds: list[Embed] | None = ...,
-        allowed_mentions: AllowedMention | None = ...,
-        components: list[Component] | None = ...,
-        files: list[File] | None = ...,
-        attachments: list[AttachmentSend] | None = ...,
+        with_components: bool | None = ...,
+        content: MissingOrNullable[str] = ...,
+        embeds: MissingOrNullable[list[Embed]] = ...,
+        flags: MissingOrNullable[MessageFlag] = ...,
+        allowed_mentions: MissingOrNullable[AllowedMention] = ...,
+        components: MissingOrNullable[list[Component]] = ...,
+        files: Missing[list[File]] = ...,
+        attachments: MissingOrNullable[list[AttachmentSend]] = ...,
+        poll: MissingOrNullable[PollRequest] = ...,
     ) -> MessageGet:
         """https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response"""
 
@@ -365,6 +400,7 @@ class ApiClient:
         *,
         application_id: SnowflakeType,
         interaction_token: str,
+        thread_id: SnowflakeType | None = ...,
     ) -> None:
         """https://discord.com/developers/docs/interactions/receiving-and-responding#delete-original-interaction-response"""
 
@@ -381,7 +417,6 @@ class ApiClient:
         files: list[File] | None = ...,
         attachments: list[AttachmentSend] | None = ...,
         flags: int | None = ...,
-        thread_name: str | None = ...,
     ) -> MessageGet:
         """https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message"""
 
@@ -391,6 +426,7 @@ class ApiClient:
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
+        thread_id: SnowflakeType | None = ...,
     ) -> MessageGet:
         """Returns a followup message for an Interaction. Functions the same as Get Webhook Message.
 
@@ -404,12 +440,15 @@ class ApiClient:
         interaction_token: str,
         message_id: SnowflakeType,
         thread_id: SnowflakeType | None = ...,
-        content: str | None = ...,
-        embeds: list[Embed] | None = ...,
-        allowed_mentions: AllowedMention | None = ...,
-        components: list[Component] | None = ...,
-        files: list[File] | None = ...,
-        attachments: list[AttachmentSend] | None = ...,
+        with_components: bool | None = ...,
+        content: MissingOrNullable[str] = ...,
+        embeds: MissingOrNullable[list[Embed]] = ...,
+        flags: MissingOrNullable[MessageFlag] = ...,
+        allowed_mentions: MissingOrNullable[AllowedMention] = ...,
+        components: MissingOrNullable[list[Component]] = ...,
+        files: Missing[list[File]] = ...,
+        attachments: MissingOrNullable[list[AttachmentSend]] = ...,
+        poll: MissingOrNullable[PollRequest] = ...,
     ) -> MessageGet:
         """Edits a followup message for an Interaction. Functions the same as Edit Webhook Message.
 
@@ -422,14 +461,17 @@ class ApiClient:
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
+        thread_id: SnowflakeType | None = ...,
     ) -> None:
         """Deletes a followup message for an Interaction.
 
         see https://discord.com/developers/docs/interactions/receiving-and-responding#delete-followup-message
         """
 
-    async def get_current_application(self) -> Application:
-        """Returns the application object associated with the requesting bot user
+    async def get_current_application(
+        self,
+    ) -> Application:
+        """Returns the application object associated with the requesting bot user.
 
         see https://discord.com/developers/docs/resources/application#get-current-application
         """
@@ -437,22 +479,21 @@ class ApiClient:
     async def edit_current_application(
         self,
         *,
-        custom_install_url: str | None = ...,
-        description: str | None = ...,
-        role_connections_verification_url: str | None = ...,
-        install_params: InstallParams | None = ...,
-        integration_types_config: (
-            dict[
-                ApplicationIntegrationType,
-                ApplicationIntegrationTypeConfiguration,
-            ]
-            | None
-        ) = ...,
-        flags: ApplicationFlag | None = ...,
-        icon: str | None = ...,
-        cover_image: str | None = ...,
-        interactions_endpoint_url: str | None = ...,
-        tags: list[str] | None = ...,
+        custom_install_url: Missing[str] = ...,
+        description: Missing[str] = ...,
+        role_connections_verification_url: Missing[str] = ...,
+        install_params: Missing[InstallParams] = ...,
+        integration_types_config: Missing[
+            dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfiguration]
+        ] = ...,
+        flags: Missing[ApplicationFlag] = ...,
+        icon: MissingOrNullable[str] = ...,
+        cover_image: MissingOrNullable[str] = ...,
+        interactions_endpoint_url: Missing[str] = ...,
+        tags: Missing[list[str]] = ...,
+        event_webhooks_url: Missing[str] = ...,
+        event_webhooks_status: Missing[int] = ...,
+        event_webhooks_types: Missing[list[str]] = ...,
     ) -> Application:
         """Edit properties of the app associated with the requesting bot user.
 
@@ -460,14 +501,21 @@ class ApiClient:
         """
 
     async def get_application_activity_instance(
-        self, *, application_id: SnowflakeType, instance_id: str
+        self,
+        *,
+        application_id: SnowflakeType,
+        instance_id: str,
     ) -> ActivityInstance:
-        """Returns a serialized activity instance, if it exists. Useful for preventing unwanted activity sessions.
+        """Returns a serialized activity instance, if it exists.
+        Useful for preventing unwanted activity sessions.
 
         see https://discord.com/developers/docs/resources/application#get-application-activity-instance
         """
+
     async def get_application_role_connection_metadata_records(
-        self, *, application_id: SnowflakeType
+        self,
+        *,
+        application_id: SnowflakeType,
     ) -> list[ApplicationRoleConnectionMetadata]:
         """get application role connection metadata records
 
@@ -475,7 +523,10 @@ class ApiClient:
         """
 
     async def update_application_role_connection_metadata_records(
-        self, *, application_id: SnowflakeType
+        self,
+        *,
+        application_id: SnowflakeType,
+        records: list[ApplicationRoleConnectionMetadata],
     ) -> list[ApplicationRoleConnectionMetadata]:
         """update application role connection metadata records
 
@@ -492,13 +543,24 @@ class ApiClient:
         after: SnowflakeType | None = ...,
         limit: int | None = ...,
     ) -> AuditLog:
-        """get guild audit log
+        """Returns an audit log object for the guild.
+        Requires the VIEW_AUDIT_LOG permission.
+
+        The returned list of audit log entries is ordered based on whether you use
+        before or after. When using before, the list is ordered by the audit log entry
+        ID descending (newer entries first). If after is used, the list is reversed and
+        appears in ascending order (older entries first). Omitting both before and after
+        defaults to before the current timestamp and will show the most recent entries
+        in descending order by ID, the opposite can be achieved using after=0 (showing
+        oldest entries).
 
         see https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log
         """
 
     async def list_auto_moderation_rules_for_guild(
-        self, *, guild_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
     ) -> list[AutoModerationRule]:
         """list auto moderation rules for guild
 
@@ -506,7 +568,10 @@ class ApiClient:
         """
 
     async def get_auto_moderation_rule(
-        self, *, guild_id: SnowflakeType, rule_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
+        rule_id: SnowflakeType,
     ) -> AutoModerationRule:
         """get auto moderation rule
 
@@ -514,7 +579,18 @@ class ApiClient:
         """
 
     async def create_auto_moderation_rule(
-        self, *, guild_id: SnowflakeType, **data
+        self,
+        *,
+        guild_id: SnowflakeType,
+        name: str,
+        event_type: AutoModerationRuleEventType,
+        trigger_type: TriggerType,
+        actions: list[AutoModerationAction],
+        trigger_metadata: TriggerMetadata | None = ...,
+        enabled: bool | None = ...,
+        exempt_roles: list[SnowflakeType] | None = ...,
+        exempt_channels: list[SnowflakeType] | None = ...,
+        reason: str | None = ...,
     ) -> AutoModerationRule:
         """create auto moderation rule
 
@@ -526,14 +602,13 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         rule_id: SnowflakeType,
-        name: str,
-        event_type: AutoModerationRuleEventType,
-        trigger_type: TriggerType,
+        name: str | None = ...,
+        event_type: AutoModerationRuleEventType | None = ...,
         trigger_metadata: TriggerMetadata | None = ...,
-        actions: list[AutoModerationAction] = ...,
+        actions: list[AutoModerationAction] | None = ...,
         enabled: bool | None = ...,
-        exempt_roles: list[SnowflakeType] = ...,
-        exempt_channels: list[SnowflakeType] = ...,
+        exempt_roles: list[SnowflakeType] | None = ...,
+        exempt_channels: list[SnowflakeType] | None = ...,
         reason: str | None = ...,
     ) -> AutoModerationRule:
         """modify auto moderation rule
@@ -553,79 +628,79 @@ class ApiClient:
         see https://discord.com/developers/docs/resources/auto-moderation#delete-auto-moderation-rule
         """
 
-    async def get_channel(self, *, channel_id: SnowflakeType) -> Channel:
-        """get channel
-
-        see https://discord.com/developers/docs/resources/channel#get-channel"""
-
-    async def modify_DM(  # noqa: N802
+    async def get_channel(
         self,
         *,
         channel_id: SnowflakeType,
-        name: str = ...,
-        icon: bytes = ...,
+    ) -> Channel:
+        """get channel
+
+        see https://discord.com/developers/docs/resources/channel#get-channel
+        """
+
+    async def modify_DM(
+        self,
+        *,
+        channel_id: SnowflakeType,
+        name: str | None = ...,
+        icon: bytes | None = ...,
         reason: str | None = ...,
     ) -> Channel:
-        """modify DM
+        """modify channel
 
-        see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-group-dm
+        see https://discord.com/developers/docs/resources/channel#modify-channel
         """
 
     async def modify_channel(
         self,
         *,
         channel_id: SnowflakeType,
-        name: str | None = ...,
-        type: ChannelType | None = ...,  # noqa: A002
-        position: int | None = ...,
-        topic: str | None = ...,
-        nsfw: bool | None = ...,
-        rate_limit_per_user: int | None = ...,
-        bitrate: int | None = ...,
-        user_limit: int | None = ...,
-        permission_overwrites: list[Overwrite] | None = ...,
-        parent_id: SnowflakeType | None = ...,
-        rtc_region: str | None = ...,
-        video_quality_mode: VideoQualityMode | None = ...,
-        default_auto_archive_duration: int | None = ...,
-        flags: ChannelFlags | None = ...,
-        available_tags: list[ForumTag] | None = ...,
-        default_reaction_emoji: DefaultReaction | None = ...,
-        default_thread_rate_limit_per_user: int | None = ...,
-        default_sort_order: SortOrderTypes | None = ...,
-        default_forum_layout: ForumLayoutTypes | None = ...,
+        name: Missing[str] = ...,
+        type: Missing[ChannelType] = ...,
+        position: MissingOrNullable[int] = ...,
+        topic: MissingOrNullable[str] = ...,
+        nsfw: MissingOrNullable[bool] = ...,
+        rate_limit_per_user: MissingOrNullable[int] = ...,
+        bitrate: MissingOrNullable[int] = ...,
+        user_limit: MissingOrNullable[int] = ...,
+        permission_overwrites: MissingOrNullable[list[PartialOverwrite]] = ...,
+        parent_id: MissingOrNullable[SnowflakeType] = ...,
+        rtc_region: MissingOrNullable[str] = ...,
+        video_quality_mode: MissingOrNullable[VideoQualityMode] = ...,
+        default_auto_archive_duration: MissingOrNullable[int] = ...,
+        flags: Missing[ChannelFlags] = ...,
+        available_tags: Missing[list[ForumTagRequest]] = ...,
+        default_reaction_emoji: MissingOrNullable[DefaultReaction] = ...,
+        default_thread_rate_limit_per_user: Missing[int] = ...,
+        default_sort_order: MissingOrNullable[SortOrderTypes] = ...,
+        default_forum_layout: Missing[ForumLayoutTypes] = ...,
         reason: str | None = ...,
     ) -> Channel:
-        """modify channel
-
-        see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
-        """
+        """https://discord.com/developers/docs/resources/channel#modify-channel"""
 
     async def modify_thread(
         self,
         *,
         channel_id: SnowflakeType,
-        name: str = ...,
-        archived: bool = ...,
-        auto_archive_duration: int = ...,
-        locked: bool = ...,
-        invitable: bool = ...,
-        rate_limit_per_user: int | None = ...,
-        flags: ChannelFlags | None = ...,
-        applied_tags: list[SnowflakeType] | None = ...,
+        name: Missing[str] = ...,
+        archived: Missing[bool] = ...,
+        auto_archive_duration: Missing[int] = ...,
+        locked: Missing[bool] = ...,
+        invitable: Missing[bool] = ...,
+        rate_limit_per_user: MissingOrNullable[int] = ...,
+        flags: Missing[ChannelFlags] = ...,
+        applied_tags: Missing[list[SnowflakeType]] = ...,
         reason: str | None = ...,
     ) -> Channel:
-        """modify thread
-
-        see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-thread
-        """
+        """https://discord.com/developers/docs/resources/channel#modify-channel"""
 
     async def delete_channel(
-        self, *, channel_id: SnowflakeType, reason: str | None = ...
+        self,
+        *,
+        channel_id: SnowflakeType,
+        reason: str | None = ...,
     ) -> Channel:
-        """delete channel
-
-        see https://discord.com/developers/docs/resources/channel#deleteclose-channel"""
+        """https://discord.com/developers/docs/resources/channel#deleteclose-channel"""
 
     async def get_channel_messages(
         self,
@@ -636,17 +711,15 @@ class ApiClient:
         after: SnowflakeType | None = ...,
         limit: int | None = ...,
     ) -> list[MessageGet]:
-        """get channel messages
-
-        see https://discord.com/developers/docs/resources/message#get-channel-messages
-        """
+        """https://discord.com/developers/docs/resources/message#get-channel-messages"""
 
     async def get_channel_message(
-        self, *, channel_id: SnowflakeType, message_id: SnowflakeType
+        self,
+        *,
+        channel_id: SnowflakeType,
+        message_id: SnowflakeType,
     ) -> MessageGet:
-        """get channel message
-
-        see https://discord.com/developers/docs/resources/message#get-channel-message"""
+        """https://discord.com/developers/docs/resources/message#get-channel-message"""
 
     async def create_message(
         self,
@@ -654,6 +727,7 @@ class ApiClient:
         channel_id: SnowflakeType,
         content: str | None = ...,
         nonce: int | str | None = ...,
+        enforce_nonce: bool | None = ...,
         tts: bool | None = ...,
         embeds: list[Embed] | None = ...,
         allowed_mentions: AllowedMention | None = ...,
@@ -665,17 +739,15 @@ class ApiClient:
         flags: MessageFlag | None = ...,
         poll: PollRequest | None = ...,
     ) -> MessageGet:
-        """create message
-
-        see https://discord.com/developers/docs/resources/message#create-message
-        """
+        """https://discord.com/developers/docs/resources/message#create-message"""
 
     async def crosspost_message(
-        self, *, channel_id: SnowflakeType, message_id: SnowflakeType
+        self,
+        *,
+        channel_id: SnowflakeType,
+        message_id: SnowflakeType,
     ) -> MessageGet:
-        """crosspost message
-
-        see https://discord.com/developers/docs/resources/message#crosspost-message"""
+        """https://discord.com/developers/docs/resources/message#crosspost-message"""
 
     async def create_reaction(
         self,
@@ -683,11 +755,9 @@ class ApiClient:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
         emoji: str,
-        emoji_id: SnowflakeType | None = None,
+        emoji_id: SnowflakeType | None = ...,
     ) -> None:
-        """create reaction
-
-        see https://discord.com/developers/docs/resources/message#create-reaction"""
+        """https://discord.com/developers/docs/resources/message#create-reaction"""
 
     async def delete_own_reaction(
         self,
@@ -695,11 +765,9 @@ class ApiClient:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
         emoji: str,
-        emoji_id: SnowflakeType | None = None,
+        emoji_id: SnowflakeType | None = ...,
     ) -> None:
-        """delete own reaction
-
-        see https://discord.com/developers/docs/resources/message#delete-own-reaction"""
+        """https://discord.com/developers/docs/resources/message#delete-own-reaction"""
 
     async def delete_user_reaction(
         self,
@@ -708,12 +776,9 @@ class ApiClient:
         message_id: SnowflakeType,
         user_id: SnowflakeType,
         emoji: str,
-        emoji_id: SnowflakeType | None = None,
+        emoji_id: SnowflakeType | None = ...,
     ) -> None:
-        """delete user reaction
-
-        see https://discord.com/developers/docs/resources/message#delete-user-reaction
-        """
+        """https://discord.com/developers/docs/resources/message#delete-user-reaction"""
 
     async def get_reactions(
         self,
@@ -721,13 +786,12 @@ class ApiClient:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
         emoji: str,
-        emoji_id: SnowflakeType | None = None,
+        emoji_id: SnowflakeType | None = ...,
+        type: ReactionType | None = ...,
         after: SnowflakeType | None = ...,
         limit: int | None = ...,
     ) -> list[User]:
-        """get reactions
-
-        see https://discord.com/developers/docs/resources/message#get-reactions"""
+        """https://discord.com/developers/docs/resources/message#get-reactions"""
 
     async def delete_all_reactions(
         self,
@@ -735,10 +799,7 @@ class ApiClient:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
     ) -> None:
-        """
-
-        see https://discord.com/developers/docs/resources/message#delete-all-reactions
-        """
+        """https://discord.com/developers/docs/resources/message#delete-all-reactions"""
 
     async def delete_all_reactions_for_emoji(
         self,
@@ -746,27 +807,26 @@ class ApiClient:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
         emoji: str,
-        emoji_id: SnowflakeType | None = None,
+        emoji_id: SnowflakeType | None = ...,
     ) -> None:
-        """
-
-        see https://discord.com/developers/docs/resources/message#delete-all-reactions-for-emoji
-        """
+        """https://discord.com/developers/docs/resources/message#delete-all-reactions-for-emoji"""
 
     async def edit_message(
         self,
         *,
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
-        content: str | None = ...,
-        embeds: list[Embed] | None = ...,
-        flags: MessageFlag | None = ...,
-        allowed_mentions: AllowedMention | None = ...,
-        components: list[DirectComponent] | None = ...,
-        files: list[File] | None = ...,
-        attachments: list[AttachmentSend] | None = ...,
+        content: MissingOrNullable[str] = ...,
+        embeds: MissingOrNullable[list[Embed]] = ...,
+        flags: MissingOrNullable[MessageFlag] = ...,
+        allowed_mentions: MissingOrNullable[AllowedMention] = ...,
+        components: MissingOrNullable[list[Component]] = ...,
+        files: Missing[list[File]] = ...,
+        attachments: MissingOrNullable[list[AttachmentSend]] = ...,
+        sticker_ids: Missing[list[SnowflakeType]] = ...,
+        poll: MissingOrNullable[PollRequest] = ...,
     ) -> MessageGet:
-        """see https://discord.com/developers/docs/resources/message#edit-message"""
+        """https://discord.com/developers/docs/resources/message#edit-message"""
 
     async def delete_message(
         self,
@@ -793,12 +853,16 @@ class ApiClient:
         overwrite_id: SnowflakeType,
         allow: str | None = ...,
         deny: str | None = ...,
-        type: OverwriteType | None = ...,  # noqa: A002
+        type: OverwriteType,
         reason: str | None = ...,
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#edit-channel-permissions"""
 
-    async def get_channel_invites(self, *, channel_id: SnowflakeType) -> list[Invite]:
+    async def get_channel_invites(
+        self,
+        *,
+        channel_id: SnowflakeType,
+    ) -> list[Invite]:
         """https://discord.com/developers/docs/resources/channel#get-channel-invites"""
 
     async def create_channel_invite(
@@ -809,9 +873,11 @@ class ApiClient:
         max_uses: int | None = ...,
         temporary: bool | None = ...,
         unique: bool | None = ...,
-        target_type: int | None = ...,
+        target_type: InviteTargetType | None = ...,
         target_user_id: SnowflakeType | None = ...,
         target_application_id: SnowflakeType | None = ...,
+        target_users_file: File | None = ...,
+        role_ids: list[SnowflakeType] | None = ...,
         reason: str | None = ...,
     ) -> Invite:
         """https://discord.com/developers/docs/resources/channel#create-channel-invite"""
@@ -829,16 +895,22 @@ class ApiClient:
         self,
         *,
         channel_id: SnowflakeType,
-        webhook_channel_id: SnowflakeType = ...,
+        webhook_channel_id: SnowflakeType,
         reason: str | None = ...,
     ) -> FollowedChannel:
         """https://discord.com/developers/docs/resources/channel#follow-announcement-channel"""
 
-    async def trigger_typing_indicator(self, *, channel_id: SnowflakeType) -> None:
+    async def trigger_typing_indicator(
+        self,
+        *,
+        channel_id: SnowflakeType,
+    ) -> None:
         """https://discord.com/developers/docs/resources/channel#trigger-typing-indicator"""
 
     async def get_pinned_messages(
-        self, *, channel_id: SnowflakeType
+        self,
+        *,
+        channel_id: SnowflakeType,
     ) -> list[MessageGet]:
         """https://discord.com/developers/docs/resources/channel#get-pinned-messages"""
 
@@ -860,18 +932,21 @@ class ApiClient:
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#unpin-message"""
 
-    async def group_DM_add_recipient(  # noqa: N802
+    async def group_DM_add_recipient(
         self,
         *,
         channel_id: SnowflakeType,
         user_id: SnowflakeType,
-        access_token: str = ...,
-        nick: str = ...,
+        access_token: str,
+        nick: str,
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#group-dm-add-recipient"""
 
-    async def group_DM_remove_recipient(  # noqa: N802
-        self, *, channel_id: SnowflakeType, user_id: SnowflakeType
+    async def group_DM_remove_recipient(
+        self,
+        *,
+        channel_id: SnowflakeType,
+        user_id: SnowflakeType,
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#group-dm-remove-recipient"""
 
@@ -880,9 +955,9 @@ class ApiClient:
         *,
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
-        name: str = ...,
-        auto_archive_duration: int | None = ...,
-        rate_limit_per_user: int | None = ...,
+        name: str,
+        auto_archive_duration: Missing[int] = ...,
+        rate_limit_per_user: MissingOrNullable[int] = ...,
         reason: str | None = ...,
     ) -> Channel:
         """https://discord.com/developers/docs/resources/channel#start-thread-from-message"""
@@ -891,25 +966,23 @@ class ApiClient:
         self,
         *,
         channel_id: SnowflakeType,
-        name: str = ...,
-        auto_archive_duration: int | None = ...,
-        type: ChannelType | None = ...,  # noqa: A002
-        invitable: bool | None = ...,
-        rate_limit_per_user: int | None = ...,
+        name: str,
+        auto_archive_duration: Missing[int] = ...,
+        type: Missing[ChannelType] = ...,
+        invitable: Missing[bool] = ...,
+        rate_limit_per_user: MissingOrNullable[int] = ...,
         reason: str | None = ...,
     ) -> Channel:
         """https://discord.com/developers/docs/resources/channel#start-thread-without-message"""
-
-        # TODO: Returns a channel, with a nested message object, on success
 
     async def start_thread_in_forum_channel(
         self,
         *,
         channel_id: SnowflakeType,
-        name: str = ...,
-        auto_archive_duration: int | None = ...,
-        rate_limit_per_user: int | None = ...,
-        applied_tags: list[SnowflakeType] | None = ...,
+        name: str,
+        auto_archive_duration: Missing[int] = ...,
+        rate_limit_per_user: MissingOrNullable[int] = ...,
+        applied_tags: Missing[list[SnowflakeType]] = ...,
         content: str | None = ...,
         embeds: list[Embed] | None = ...,
         allowed_mentions: AllowedMention | None = ...,
@@ -922,19 +995,33 @@ class ApiClient:
     ) -> Channel:
         """https://discord.com/developers/docs/resources/channel#start-thread-in-forum-or-media-channel"""
 
-    async def join_thread(self, *, channel_id: SnowflakeType) -> None:
+    async def join_thread(
+        self,
+        *,
+        channel_id: SnowflakeType,
+    ) -> None:
         """https://discord.com/developers/docs/resources/channel#join-thread"""
 
     async def add_thread_member(
-        self, *, channel_id: SnowflakeType, user_id: SnowflakeType
+        self,
+        *,
+        channel_id: SnowflakeType,
+        user_id: SnowflakeType,
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#add-thread-member"""
 
-    async def leave_thread(self, *, channel_id: SnowflakeType) -> None:
+    async def leave_thread(
+        self,
+        *,
+        channel_id: SnowflakeType,
+    ) -> None:
         """https://discord.com/developers/docs/resources/channel#leave-thread"""
 
     async def remove_thread_member(
-        self, *, channel_id: SnowflakeType, user_id: SnowflakeType
+        self,
+        *,
+        channel_id: SnowflakeType,
+        user_id: SnowflakeType,
     ) -> None:
         """https://discord.com/developers/docs/resources/channel#remove-thread-member"""
 
@@ -961,7 +1048,7 @@ class ApiClient:
         self,
         *,
         channel_id: SnowflakeType,
-        before: datetime.datetime | None = ...,
+        before: datetime | None = ...,
         limit: int | None = ...,
     ) -> ArchivedThreadsResponse:
         """https://discord.com/developers/docs/resources/channel#list-public-archived-threads"""
@@ -970,7 +1057,7 @@ class ApiClient:
         self,
         *,
         channel_id: SnowflakeType,
-        before: datetime.datetime | None = ...,
+        before: datetime | None = ...,
         limit: int | None = ...,
     ) -> ArchivedThreadsResponse:
         """https://discord.com/developers/docs/resources/channel#list-private-archived-threads"""
@@ -979,16 +1066,23 @@ class ApiClient:
         self,
         *,
         channel_id: SnowflakeType,
-        before: datetime.datetime | None = ...,
+        before: SnowflakeType | None = ...,
         limit: int | None = ...,
     ) -> ArchivedThreadsResponse:
         """https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads"""
 
-    async def list_guild_emojis(self, *, guild_id: SnowflakeType) -> list[Emoji]:
+    async def list_guild_emojis(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> list[Emoji]:
         """https://discord.com/developers/docs/resources/emoji#list-guild-emojis"""
 
     async def get_guild_emoji(
-        self, *, guild_id: SnowflakeType, emoji_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
+        emoji_id: SnowflakeType,
     ) -> Emoji:
         """https://discord.com/developers/docs/resources/emoji#get-guild-emoji"""
 
@@ -996,9 +1090,9 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        name: str = ...,
-        image: str = ...,
-        roles: list[SnowflakeType] = ...,
+        name: str,
+        image: str,
+        roles: list[SnowflakeType] | None = ...,
         reason: str | None = ...,
     ) -> Emoji:
         """https://discord.com/developers/docs/resources/emoji#create-guild-emoji"""
@@ -1007,20 +1101,26 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        emoji_id: str,
-        name: str = ...,
-        roles: list[SnowflakeType] | None = ...,
+        emoji_id: SnowflakeType,
+        name: Missing[str] = ...,
+        roles: MissingOrNullable[list[SnowflakeType]] = ...,
         reason: str | None = ...,
     ) -> Emoji:
         """https://discord.com/developers/docs/resources/emoji#modify-guild-emoji"""
 
     async def delete_guild_emoji(
-        self, *, guild_id: SnowflakeType, emoji_id: str, reason: str | None = ...
+        self,
+        *,
+        guild_id: SnowflakeType,
+        emoji_id: SnowflakeType,
+        reason: str | None = ...,
     ) -> None:
         """https://discord.com/developers/docs/resources/emoji#delete-guild-emoji"""
 
     async def list_application_emojis(
-        self, *, application_id: SnowflakeType
+        self,
+        *,
+        application_id: SnowflakeType,
     ) -> ApplicationEmojis:
         """https://discord.com/developers/docs/resources/emoji#list-application-emojis"""
 
@@ -1033,17 +1133,28 @@ class ApiClient:
         """https://discord.com/developers/docs/resources/emoji#get-application-emoji"""
 
     async def create_application_emoji(
-        self, *, application_id: SnowflakeType, name: str = ..., image: str = ...
+        self,
+        *,
+        application_id: SnowflakeType,
+        name: str,
+        image: str,
     ) -> Emoji:
         """https://discord.com/developers/docs/resources/emoji#create-application-emoji"""
 
     async def modify_application_emoji(
-        self, *, application_id: SnowflakeType, emoji_id: SnowflakeType, name: str = ...
+        self,
+        *,
+        application_id: SnowflakeType,
+        emoji_id: SnowflakeType,
+        name: str,
     ) -> Emoji:
         """https://discord.com/developers/docs/resources/emoji#modify-application-emoji"""
 
     async def delete_application_emoji(
-        self, *, application_id: SnowflakeType, emoji_id: SnowflakeType
+        self,
+        *,
+        application_id: SnowflakeType,
+        emoji_id: SnowflakeType,
     ) -> None:
         """https://discord.com/developers/docs/resources/emoji#delete-application-emoji"""
 
@@ -1058,6 +1169,7 @@ class ApiClient:
         limit: int | None = ...,
         guild_id: SnowflakeType | None = ...,
         exclude_ended: bool | None = ...,
+        exclude_deleted: bool | None = ...,
     ) -> list[Entitlement]:
         """https://discord.com/developers/docs/resources/entitlement#list-entitlements"""
 
@@ -1073,9 +1185,9 @@ class ApiClient:
         self,
         *,
         application_id: SnowflakeType,
-        sku_id: str = ...,
-        owner_id: str = ...,
-        owner_type: int = ...,
+        sku_id: str,
+        owner_id: str,
+        owner_type: Literal[1, 2],
     ) -> Entitlement:
         """https://discord.com/developers/docs/resources/entitlement#create-test-entitlement"""
 
@@ -1090,7 +1202,7 @@ class ApiClient:
     async def create_guild(
         self,
         *,
-        name: str = ...,
+        name: str,
         region: str | None = ...,
         icon: str | None = ...,
         verification_level: VerificationLevel | None = ...,
@@ -1106,53 +1218,70 @@ class ApiClient:
         """https://discord.com/developers/docs/resources/guild#create-guild"""
 
     async def get_guild(
-        self, *, guild_id: SnowflakeType, with_counts: bool | None = ...
+        self,
+        *,
+        guild_id: SnowflakeType,
+        with_counts: bool | None = ...,
     ) -> Guild:
         """https://discord.com/developers/docs/resources/guild#get-guild"""
 
-    async def get_guild_preview(self, *, guild_id: SnowflakeType) -> GuildPreview:
+    async def get_guild_preview(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> GuildPreview:
         """https://discord.com/developers/docs/resources/guild#get-guild-preview"""
 
     async def modify_guild(
         self,
         *,
         guild_id: SnowflakeType,
-        name: str = ...,
-        region: str | None = ...,
-        verification_level: VerificationLevel | None = ...,
-        default_message_notifications: DefaultMessageNotificationLevel | None = ...,
-        explicit_content_filter: ExplicitContentFilterLevel | None = ...,
-        afk_channel_id: Snowflake | None = ...,
-        afk_timeout: int | None = ...,
-        icon: str | None = ...,
-        owner_id: Snowflake | None = ...,
-        splash: str | None = ...,
-        discovery_splash: str | None = ...,
-        banner: str | None = ...,
-        system_channel_id: Snowflake | None = ...,
-        system_channel_flags: SystemChannelFlags | None = ...,
-        rules_channel_id: Snowflake | None = ...,
-        public_updates_channel_id: Snowflake | None = ...,
-        preferred_locale: str | None = ...,
-        features: list[GuildFeature] | None = ...,
-        description: str | None = ...,
-        premium_progress_bar_enabled: bool | None = ...,
+        name: Missing[str] = ...,
+        region: MissingOrNullable[str] = ...,
+        verification_level: MissingOrNullable[VerificationLevel] = ...,
+        default_message_notifications: MissingOrNullable[
+            DefaultMessageNotificationLevel
+        ] = ...,
+        explicit_content_filter: MissingOrNullable[ExplicitContentFilterLevel] = ...,
+        afk_channel_id: MissingOrNullable[Snowflake] = ...,
+        afk_timeout: Missing[int] = ...,
+        icon: MissingOrNullable[str] = ...,
+        splash: MissingOrNullable[str] = ...,
+        discovery_splash: MissingOrNullable[str] = ...,
+        banner: MissingOrNullable[str] = ...,
+        system_channel_id: MissingOrNullable[Snowflake] = ...,
+        system_channel_flags: Missing[SystemChannelFlags] = ...,
+        rules_channel_id: MissingOrNullable[Snowflake] = ...,
+        public_updates_channel_id: MissingOrNullable[Snowflake] = ...,
+        preferred_locale: MissingOrNullable[str] = ...,
+        features: Missing[list[GuildFeature]] = ...,
+        description: MissingOrNullable[str] = ...,
+        premium_progress_bar_enabled: Missing[bool] = ...,
+        safety_alerts_channel_id: MissingOrNullable[Snowflake] = ...,
         reason: str | None = ...,
     ) -> Guild:
         """https://discord.com/developers/docs/resources/guild#modify-guild"""
 
-    async def delete_guild(self, *, guild_id: SnowflakeType) -> None:
+    async def delete_guild(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> None:
         """https://discord.com/developers/docs/resources/guild#delete-guild"""
 
-    async def get_guild_channels(self, *, guild_id: SnowflakeType) -> list[Channel]:
+    async def get_guild_channels(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> list[Channel]:
         """https://discord.com/developers/docs/resources/guild#get-guild-channels"""
 
     async def create_guild_channel(
         self,
         *,
         guild_id: SnowflakeType,
-        name: str = ...,
-        type: ChannelType | None = ...,  # noqa: A002
+        name: str,
+        type: ChannelType | None = ...,
         topic: str | None = ...,
         bitrate: int | None = ...,
         user_limit: int | None = ...,
@@ -1165,7 +1294,7 @@ class ApiClient:
         video_quality_mode: VideoQualityMode | None = ...,
         default_auto_archive_duration: int | None = ...,
         default_reaction_emoji: DefaultReaction | None = ...,
-        available_tags: list[ForumTag] | None = ...,
+        available_tags: list[ForumTagRequest] | None = ...,
         default_sort_order: SortOrderTypes | None = ...,
         reason: str | None = ...,
     ) -> Channel:
@@ -1175,20 +1304,26 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        id: SnowflakeType = ...,  # noqa: A002
-        position: int | None = ...,
-        lock_permissions: bool | None = ...,
-        parent_id: SnowflakeType | None = ...,
-    ) -> Guild:
+        channels: list[ModifyGuildChannelPositionParams] | None = ...,
+        id: SnowflakeType | None = ...,
+        position: MissingOrNullable[int] = ...,
+        lock_permissions: MissingOrNullable[bool] = ...,
+        parent_id: MissingOrNullable[SnowflakeType] = ...,
+    ) -> None:
         """https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions"""
 
     async def list_active_guild_threads(
-        self, *, guild_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
     ) -> ListActiveGuildThreadsResponse:
         """https://discord.com/developers/docs/resources/guild#list-active-guild-threads"""
 
     async def get_guild_member(
-        self, *, guild_id: SnowflakeType, user_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
+        user_id: SnowflakeType,
     ) -> GuildMember:
         """https://discord.com/developers/docs/resources/guild#get-guild-member"""
 
@@ -1205,7 +1340,7 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        query: str | None = ...,
+        query: str,
         limit: int | None = ...,
     ) -> list[GuildMember]:
         """https://discord.com/developers/docs/resources/guild#search-guild-members"""
@@ -1215,12 +1350,12 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        access_token: str = ...,
+        access_token: str,
         nick: str | None = ...,
         roles: list[SnowflakeType] | None = ...,
         mute: bool | None = ...,
         deaf: bool | None = ...,
-    ) -> GuildMember:
+    ) -> GuildMember | None:
         """https://discord.com/developers/docs/resources/guild#add-guild-member"""
 
     async def modify_guild_member(
@@ -1228,13 +1363,13 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        nick: str | None = ...,
-        roles: list[SnowflakeType] | None = ...,
-        mute: bool | None = ...,
-        deaf: bool | None = ...,
-        channel_id: SnowflakeType | None = ...,
-        communication_disabled_until: datetime.datetime | None = ...,
-        flags: GuildMemberFlags | None = ...,
+        nick: MissingOrNullable[str] = ...,
+        roles: MissingOrNullable[list[SnowflakeType]] = ...,
+        mute: MissingOrNullable[bool] = ...,
+        deaf: MissingOrNullable[bool] = ...,
+        channel_id: MissingOrNullable[SnowflakeType] = ...,
+        communication_disabled_until: MissingOrNullable[datetime] = ...,
+        flags: MissingOrNullable[GuildMemberFlags] = ...,
         reason: str | None = ...,
     ) -> GuildMember:
         """https://discord.com/developers/docs/resources/guild#modify-guild-member"""
@@ -1243,7 +1378,10 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        nick: str | None = ...,
+        nick: MissingOrNullable[str] = ...,
+        banner: MissingOrNullable[str] = ...,
+        avatar: MissingOrNullable[str] = ...,
+        bio: MissingOrNullable[str] = ...,
         reason: str | None = ...,
     ) -> GuildMember:
         """https://discord.com/developers/docs/resources/guild#modify-current-member"""
@@ -1252,10 +1390,13 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        nick: str | None = ...,
+        nick: MissingOrNullable[str] = ...,
         reason: str | None = ...,
     ) -> GuildMember:
-        """https://discord.com/developers/docs/resources/guild#modify-current-user-nick"""
+        """Deprecated in favor of Modify Current Member.
+
+        https://discord.com/developers/docs/resources/guild#modify-current-user-nick
+        """
 
     async def add_guild_member_role(
         self,
@@ -1297,7 +1438,10 @@ class ApiClient:
         """https://discord.com/developers/docs/resources/guild#get-guild-bans"""
 
     async def get_guild_ban(
-        self, *, guild_id: SnowflakeType, user_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
+        user_id: SnowflakeType,
     ) -> Ban:
         """https://discord.com/developers/docs/resources/guild#get-guild-ban"""
 
@@ -1325,17 +1469,24 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        user_ids: list[SnowflakeType] = ...,
+        user_ids: list[SnowflakeType],
         delete_message_seconds: int | None = ...,
         reason: str | None = ...,
     ) -> BulkBan:
         """https://discord.com/developers/docs/resources/guild#bulk-guild-ban"""
 
-    async def get_guild_roles(self, *, guild_id: SnowflakeType) -> list[Role]:
+    async def get_guild_roles(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> list[Role]:
         """https://discord.com/developers/docs/resources/guild#get-guild-roles"""
 
     async def get_guild_role(
-        self, *, guild_id: SnowflakeType, role_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
+        role_id: SnowflakeType,
     ) -> Role:
         """https://discord.com/developers/docs/resources/guild#get-guild-role"""
 
@@ -1343,13 +1494,14 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        name: str | None = ...,
-        permissions: str | None = ...,
-        color: int | None = ...,
-        hoist: bool | None = ...,
-        icon: str | None = ...,
-        unicode_emoji: str | None = ...,
-        mentionable: bool | None = ...,
+        name: Missing[str] = ...,
+        permissions: Missing[str] = ...,
+        color: Missing[int] = ...,
+        colors: Missing[RoleColors] = ...,
+        hoist: Missing[bool] = ...,
+        icon: MissingOrNullable[str] = ...,
+        unicode_emoji: MissingOrNullable[str] = ...,
+        mentionable: Missing[bool] = ...,
         reason: str | None = ...,
     ) -> Role:
         """https://discord.com/developers/docs/resources/guild#create-guild-role"""
@@ -1358,8 +1510,9 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        id: SnowflakeType,  # noqa: A002
-        position: int | None = ...,
+        roles: list[ModifyGuildRolePositionParams] | None = ...,
+        id: SnowflakeType | None = ...,
+        position: MissingOrNullable[int] = ...,
         reason: str | None = ...,
     ) -> list[Role]:
         """https://discord.com/developers/docs/resources/guild#modify-guild-role-positions"""
@@ -1369,19 +1522,24 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         role_id: SnowflakeType,
-        name: str | None = ...,
-        permissions: str | None = ...,
-        color: int | None = ...,
-        hoist: bool | None = ...,
-        icon: str | None = ...,
-        unicode_emoji: str | None = ...,
-        mentionable: bool | None = ...,
+        name: MissingOrNullable[str] = ...,
+        permissions: MissingOrNullable[str] = ...,
+        color: MissingOrNullable[int] = ...,
+        colors: Missing[RoleColors] = ...,
+        hoist: MissingOrNullable[bool] = ...,
+        icon: MissingOrNullable[str] = ...,
+        unicode_emoji: MissingOrNullable[str] = ...,
+        mentionable: MissingOrNullable[bool] = ...,
         reason: str | None = ...,
     ) -> Role:
         """https://discord.com/developers/docs/resources/guild#modify-guild-role"""
 
-    async def modify_guild_MFA_level(  # noqa: N802
-        self, *, guild_id: SnowflakeType, level: int, reason: str | None = ...
+    async def modify_guild_MFA_level(
+        self,
+        *,
+        guild_id: SnowflakeType,
+        level: int,
+        reason: str | None = ...,
     ) -> None:
         """https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level"""
 
@@ -1395,7 +1553,11 @@ class ApiClient:
         """https://discord.com/developers/docs/resources/guild#delete-guild-role"""
 
     async def get_guild_prune_count(
-        self, *, guild_id: SnowflakeType, days: int, include_roles: list[SnowflakeType]
+        self,
+        *,
+        guild_id: SnowflakeType,
+        days: int | None = ...,
+        include_roles: list[SnowflakeType] | None = ...,
     ) -> dict[Literal["pruned"], int]:
         """https://discord.com/developers/docs/resources/guild#get-guild-prune-count"""
 
@@ -1411,15 +1573,23 @@ class ApiClient:
         """https://discord.com/developers/docs/resources/guild#begin-guild-prune"""
 
     async def get_guild_voice_regions(
-        self, *, guild_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
     ) -> list[VoiceRegion]:
         """https://discord.com/developers/docs/resources/guild#get-guild-voice-regions"""
 
-    async def get_guild_invites(self, *, guild_id: SnowflakeType) -> list[Invite]:
+    async def get_guild_invites(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> list[Invite]:
         """https://discord.com/developers/docs/resources/guild#get-guild-invites"""
 
     async def get_guild_integrations(
-        self, *, guild_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
     ) -> list[Integration]:
         """https://discord.com/developers/docs/resources/guild#get-guild-integrations"""
 
@@ -1433,7 +1603,9 @@ class ApiClient:
         """https://discord.com/developers/docs/resources/guild#delete-guild-integration"""
 
     async def get_guild_widget_settings(
-        self, *, guild_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
     ) -> GuildWidgetSettings:
         """https://discord.com/developers/docs/resources/guild#get-guild-widget-settings"""
 
@@ -1441,30 +1613,39 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        enabled: bool | None = ...,
-        channel_id: SnowflakeType | None = ...,
+        enabled: Missing[bool] = ...,
+        channel_id: MissingOrNullable[SnowflakeType] = ...,
         reason: str | None = ...,
-    ) -> GuildWidget:
+    ) -> GuildWidgetSettings:
         """https://discord.com/developers/docs/resources/guild#modify-guild-widget"""
 
-    async def get_guild_widget(self, *, guild_id: SnowflakeType) -> GuildWidget:
+    async def get_guild_widget(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> GuildWidget:
         """https://discord.com/developers/docs/resources/guild#get-guild-widget"""
 
-    async def get_guild_vanity_url(self, *, guild_id: SnowflakeType) -> Invite:
+    async def get_guild_vanity_url(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> GuildVanityURL:
         """https://discord.com/developers/docs/resources/guild#get-guild-vanity-url"""
 
     async def get_guild_widget_image(
         self,
         *,
         guild_id: SnowflakeType,
-        style: (
-            Literal["shield", "banner1", "banner2", "banner3", "banner4"] | None
-        ) = ...,
-    ) -> str:
+        style: Literal["shield", "banner1", "banner2", "banner3", "banner4"]
+        | None = ...,
+    ) -> bytes:
         """https://discord.com/developers/docs/resources/guild#get-guild-widget-image"""
 
     async def get_guild_welcome_screen(
-        self, *, guild_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
     ) -> WelcomeScreen:
         """https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen"""
 
@@ -1472,38 +1653,49 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        enabled: bool | None = ...,
-        welcome_channels: list[WelcomeScreenChannel] | None = ...,
-        description: str | None = ...,
+        enabled: MissingOrNullable[bool] = ...,
+        welcome_channels: MissingOrNullable[list[WelcomeScreenChannel]] = ...,
+        description: MissingOrNullable[str] = ...,
         reason: str | None = ...,
     ) -> WelcomeScreen:
         """https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen"""
 
-    async def get_guild_onboarding(self, *, guild_id: SnowflakeType) -> GuildOnboarding:
+    async def get_guild_onboarding(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> GuildOnboarding:
         """https://discord.com/developers/docs/resources/guild#get-guild-onboarding"""
 
     async def modify_guild_onboarding(
         self,
         *,
         guild_id: SnowflakeType,
-        prompts: list[OnboardingPrompt] = ...,
-        default_channel_ids: list[Snowflake] = ...,
-        enabled: bool = ...,
-        mode: OnboardingMode = ...,
+        prompts: Missing[list[OnboardingPrompt]] = ...,
+        default_channel_ids: Missing[list[Snowflake]] = ...,
+        enabled: Missing[bool] = ...,
+        mode: Missing[OnboardingMode] = ...,
         reason: str | None = ...,
     ) -> GuildOnboarding:
         """https://discord.com/developers/docs/resources/guild#modify-guild-onboarding"""
 
-    async def list_voice_regions(self) -> list[VoiceRegion]:
+    async def list_voice_regions(
+        self,
+    ) -> list[VoiceRegion]:
         """https://discord.com/developers/docs/resources/voice#list-voice-regions"""
 
     async def get_current_user_voice_state(
-        self, *, guild_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
     ) -> VoiceState:
         """https://discord.com/developers/docs/resources/voice#get-current-user-voice-state"""
 
     async def get_user_voice_state(
-        self, *, guild_id: SnowflakeType, user_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
+        user_id: SnowflakeType,
     ) -> VoiceState:
         """https://discord.com/developers/docs/resources/voice#get-user-voice-state"""
 
@@ -1511,9 +1703,9 @@ class ApiClient:
         self,
         *,
         guild_id: SnowflakeType,
-        channel_id: SnowflakeType | None = ...,
-        suppress: bool | None = ...,
-        request_to_speak_timestamp: datetime.datetime | None = ...,
+        channel_id: Missing[SnowflakeType] = ...,
+        suppress: Missing[bool] = ...,
+        request_to_speak_timestamp: MissingOrNullable[datetime] = ...,
     ) -> None:
         """https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state"""
 
@@ -1522,13 +1714,16 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        channel_id: SnowflakeType,
+        channel_id: SnowflakeType | None = ...,
         suppress: bool | None = ...,
     ) -> None:
         """https://discord.com/developers/docs/resources/voice#modify-user-voice-state"""
 
     async def list_scheduled_events_for_guild(
-        self, *, guild_id: SnowflakeType, with_user_count: bool | None = ...
+        self,
+        *,
+        guild_id: SnowflakeType,
+        with_user_count: bool | None = ...,
     ) -> list[GuildScheduledEvent]:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#list-scheduled-events-for-guild"""
 
@@ -1540,11 +1735,12 @@ class ApiClient:
         entity_metadata: GuildScheduledEventEntityMetadata | None = ...,
         name: str,
         privacy_level: GuildScheduledEventPrivacyLevel,
-        scheduled_start_time: datetime.datetime,
-        scheduled_end_time: datetime.datetime | None = ...,
+        scheduled_start_time: datetime,
+        scheduled_end_time: datetime | None = ...,
         description: str | None = ...,
         entity_type: GuildScheduledEventEntityType,
         image: str | None = ...,
+        recurrence_rule: RecurrenceRule | None = ...,
         reason: str | None = ...,
     ) -> GuildScheduledEvent:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event"""
@@ -1563,22 +1759,26 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         event_id: SnowflakeType,
-        channel_id: Snowflake | None = ...,
-        entity_metadata: GuildScheduledEventEntityMetadata | None = ...,
-        name: str | None = ...,
-        privacy_level: GuildScheduledEventPrivacyLevel | None = ...,
-        scheduled_start_time: datetime.datetime | None = ...,
-        scheduled_end_time: datetime.datetime | None = ...,
-        description: str | None = ...,
-        entity_type: GuildScheduledEventEntityType | None = ...,
-        status: GuildScheduledEventStatus | None = ...,
-        image: str | None = ...,
+        channel_id: MissingOrNullable[Snowflake] = ...,
+        entity_metadata: MissingOrNullable[GuildScheduledEventEntityMetadata] = ...,
+        name: Missing[str] = ...,
+        privacy_level: Missing[GuildScheduledEventPrivacyLevel] = ...,
+        scheduled_start_time: Missing[datetime] = ...,
+        scheduled_end_time: Missing[datetime] = ...,
+        description: MissingOrNullable[str] = ...,
+        entity_type: Missing[GuildScheduledEventEntityType] = ...,
+        status: Missing[GuildScheduledEventStatus] = ...,
+        image: Missing[str] = ...,
+        recurrence_rule: MissingOrNullable[RecurrenceRule] = ...,
         reason: str | None = ...,
     ) -> GuildScheduledEvent:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event"""
 
     async def delete_guild_scheduled_event(
-        self, *, guild_id: SnowflakeType, event_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
+        event_id: SnowflakeType,
     ) -> None:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#delete-guild-scheduled-event"""
 
@@ -1594,26 +1794,43 @@ class ApiClient:
     ) -> list[GuildScheduledEventUser]:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#get-guild-scheduled-event-users"""
 
-    async def get_guild_template(self, *, template_code: str) -> GuildTemplate:
+    async def get_guild_template(
+        self,
+        *,
+        template_code: str,
+    ) -> GuildTemplate:
         """https://discord.com/developers/docs/resources/guild-template#get-guild-template"""
 
     async def create_guild_from_guild_template(
-        self, *, template_code: str, name: str, icon: str | None = ...
+        self,
+        *,
+        template_code: str,
+        name: str,
+        icon: str | None = ...,
     ) -> Guild:
         """https://discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template"""
 
     async def get_guild_templates(
-        self, *, guild_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
     ) -> list[GuildTemplate]:
         """https://discord.com/developers/docs/resources/guild-template#get-guild-templates"""
 
     async def create_guild_template(
-        self, *, guild_id: SnowflakeType, name: str, description: str | None = ...
+        self,
+        *,
+        guild_id: SnowflakeType,
+        name: str,
+        description: MissingOrNullable[str] = ...,
     ) -> GuildTemplate:
         """https://discord.com/developers/docs/resources/guild-template#create-guild-template"""
 
     async def sync_guild_template(
-        self, *, guild_id: SnowflakeType, template_code: str
+        self,
+        *,
+        guild_id: SnowflakeType,
+        template_code: str,
     ) -> GuildTemplate:
         """https://discord.com/developers/docs/resources/guild-template#sync-guild-template"""
 
@@ -1622,14 +1839,17 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         template_code: str,
-        name: str | None = ...,
-        description: str | None = ...,
+        name: Missing[str] = ...,
+        description: MissingOrNullable[str] = ...,
     ) -> GuildTemplate:
         """https://discord.com/developers/docs/resources/guild-template#modify-guild-template"""
 
     async def delete_guild_template(
-        self, *, guild_id: SnowflakeType, template_code: str
-    ) -> None:
+        self,
+        *,
+        guild_id: SnowflakeType,
+        template_code: str,
+    ) -> GuildTemplate:
         """https://discord.com/developers/docs/resources/guild-template#delete-guild-template"""
 
     async def get_invite(
@@ -1643,7 +1863,10 @@ class ApiClient:
         """https://discord.com/developers/docs/resources/invite#get-invite"""
 
     async def delete_invite(
-        self, *, invite_code: str, reason: str | None = ...
+        self,
+        *,
+        invite_code: str,
+        reason: str | None = ...,
     ) -> Invite:
         """https://discord.com/developers/docs/resources/invite#delete-invite"""
 
@@ -1666,7 +1889,11 @@ class ApiClient:
     ) -> MessageGet:
         """https://discord.com/developers/docs/resources/poll#end-poll"""
 
-    async def list_SKUs(self, *, application_id: SnowflakeType) -> list[SKU]:  # noqa: N802
+    async def list_SKUs(
+        self,
+        *,
+        application_id: SnowflakeType,
+    ) -> list[SKU]:
         """https://discord.com/developers/docs/resources/sku#list-skus"""
 
     async def create_stage_instance(
@@ -1676,13 +1903,16 @@ class ApiClient:
         topic: str,
         privacy_level: StagePrivacyLevel | None = ...,
         send_start_notification: bool | None = ...,
+        guild_scheduled_event_id: SnowflakeType | None = ...,
         reason: str | None = ...,
     ) -> StageInstance:
         """https://discord.com/developers/docs/resources/stage-instance#create-stage-instance"""
 
     async def get_stage_instance(
-        self, *, channel_id: SnowflakeType
-    ) -> StageInstance | None:
+        self,
+        *,
+        channel_id: SnowflakeType,
+    ) -> StageInstance:
         """https://discord.com/developers/docs/resources/stage-instance#get-stage-instance"""
 
     async def modify_stage_instance(
@@ -1696,24 +1926,44 @@ class ApiClient:
         """https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance"""
 
     async def delete_stage_instance(
-        self, *, channel_id: SnowflakeType, reason: str | None = ...
+        self,
+        *,
+        channel_id: SnowflakeType,
+        reason: str | None = ...,
     ) -> None:
         """https://discord.com/developers/docs/resources/stage-instance#delete-stage-instance"""
 
-    async def get_sticker(self, *, sticker_id: SnowflakeType) -> Sticker:
+    async def get_sticker(
+        self,
+        *,
+        sticker_id: SnowflakeType,
+    ) -> Sticker:
         """https://discord.com/developers/docs/resources/sticker#get-sticker"""
 
-    async def list_nitro_sticker_packs(self) -> list[StickerPack]:
+    async def list_nitro_sticker_packs(
+        self,
+    ) -> StickerPacksResponse:
         """https://discord.com/developers/docs/resources/sticker#list-sticker-packs"""
 
-    async def get_sticker_packs(self, *, pack_id: SnowflakeType) -> StickerPack:
+    async def get_sticker_packs(
+        self,
+        *,
+        pack_id: SnowflakeType,
+    ) -> StickerPack:
         """https://discord.com/developers/docs/resources/sticker#get-sticker-pack"""
 
-    async def list_guild_stickers(self, *, guild_id: SnowflakeType) -> list[Sticker]:
+    async def list_guild_stickers(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> list[Sticker]:
         """https://discord.com/developers/docs/resources/sticker#list-guild-stickers"""
 
     async def get_guild_sticker(
-        self, *, guild_id: SnowflakeType, sticker_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
+        sticker_id: SnowflakeType,
     ) -> Sticker:
         """https://discord.com/developers/docs/resources/sticker#get-guild-sticker"""
 
@@ -1725,7 +1975,7 @@ class ApiClient:
         description: str,
         tags: str,
         file: File,
-        reason: str | None = None,
+        reason: str | None = ...,
     ) -> Sticker:
         """https://discord.com/developers/docs/resources/sticker#create-guild-sticker"""
 
@@ -1734,9 +1984,9 @@ class ApiClient:
         *,
         guild_id: SnowflakeType,
         sticker_id: SnowflakeType,
-        name: str | None = ...,
-        description: str | None = ...,
-        tags: str | None = ...,
+        name: Missing[str] = ...,
+        description: MissingOrNullable[str] = ...,
+        tags: Missing[str] = ...,
         reason: str | None = ...,
     ) -> Sticker:
         """https://discord.com/developers/docs/resources/sticker#modify-guild-sticker"""
@@ -1750,7 +2000,7 @@ class ApiClient:
     ) -> None:
         """https://discord.com/developers/docs/resources/sticker#delete-guild-sticker"""
 
-    async def list_SKU_subscriptions(  # noqa: N802
+    async def list_SKU_subscriptions(
         self,
         *,
         sku_id: SnowflakeType,
@@ -1759,54 +2009,93 @@ class ApiClient:
         limit: int | None = ...,
         user_id: SnowflakeType | None = ...,
     ) -> list[Subscription]:
-        """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions"""
+        """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions
 
-    async def get_SKU_subscription(  # noqa: N802
-        self, *, sku_id: SnowflakeType, subscription_id: SnowflakeType
+        Note: user_id is required except for OAuth queries.
+        """
+
+    async def get_SKU_subscription(
+        self,
+        *,
+        sku_id: SnowflakeType,
+        subscription_id: SnowflakeType,
     ) -> Subscription:
         """https://discord.com/developers/docs/resources/subscription#get-sku-subscription"""
 
-    async def get_current_user(self) -> User:
+    async def get_current_user(
+        self,
+    ) -> User:
         """https://discord.com/developers/docs/resources/user#get-current-user"""
 
-    async def get_user(self, *, user_id: SnowflakeType) -> User:
+    async def get_user(
+        self,
+        *,
+        user_id: SnowflakeType,
+    ) -> User:
         """https://discord.com/developers/docs/resources/user#get-user"""
 
     async def modify_current_user(
-        self, *, username: str | None = ..., avatar: str | None = ...
+        self,
+        *,
+        username: Missing[str] = ...,
+        avatar: MissingOrNullable[str] = ...,
+        banner: MissingOrNullable[str] = ...,
     ) -> User:
         """https://discord.com/developers/docs/resources/user#modify-current-user"""
 
     async def get_current_user_guilds(
         self,
         *,
+        access_token: str,
         before: SnowflakeType | None = ...,
         after: SnowflakeType | None = ...,
         limit: int | None = ...,
+        with_counts: bool | None = ...,
     ) -> list[CurrentUserGuild]:
         """https://discord.com/developers/docs/resources/user#get-current-user-guilds"""
 
     async def get_current_user_guild_member(
-        self, *, guild_id: SnowflakeType
+        self,
+        *,
+        guild_id: SnowflakeType,
+        access_token: str,
     ) -> GuildMember:
         """https://discord.com/developers/docs/resources/user#get-current-user-guild-member"""
 
-    async def leave_guild(self, *, guild_id: SnowflakeType) -> None:
+    async def leave_guild(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> None:
         """https://discord.com/developers/docs/resources/user#leave-guild"""
 
-    async def create_DM(self, *, recipient_id: SnowflakeType) -> Channel:  # noqa: N802
+    async def create_DM(
+        self,
+        *,
+        recipient_id: SnowflakeType,
+    ) -> Channel:
         """https://discord.com/developers/docs/resources/user#create-dm"""
 
-    async def create_group_DM(  # noqa: N802
-        self, *, access_tokens: list[str], nicks: dict[SnowflakeType, str]
+    async def create_group_DM(
+        self,
+        *,
+        access_tokens: list[str],
+        nicks: dict[SnowflakeType, str],
     ) -> Channel:
         """https://discord.com/developers/docs/resources/user#create-group-dm"""
 
-    async def get_user_connections(self) -> list[Connection]:
+    async def get_user_connections(
+        self,
+        *,
+        access_token: str,
+    ) -> list[Connection]:
         """https://discord.com/developers/docs/resources/user#get-current-user-connections"""
 
     async def get_user_application_role_connection(
-        self, *, application_id: SnowflakeType
+        self,
+        *,
+        application_id: SnowflakeType,
+        access_token: str,
     ) -> ApplicationRoleConnection:
         """https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection"""
 
@@ -1814,33 +2103,49 @@ class ApiClient:
         self,
         *,
         application_id: SnowflakeType,
+        access_token: str,
         platform_name: str | None = ...,
         platform_username: str | None = ...,
-        metadata: ApplicationRoleConnectionMetadata | None = ...,
+        metadata: dict[str, str] | None = ...,
     ) -> ApplicationRoleConnection:
-        """https://discord.com/developers/docs/resources/user#modify-current-user"""
+        """https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection"""
 
     async def create_webhook(
         self,
         *,
         channel_id: SnowflakeType,
         name: str,
-        avatar: str | None = ...,
+        avatar: MissingOrNullable[str] = ...,
         reason: str | None = ...,
     ) -> Webhook:
         """https://discord.com/developers/docs/resources/webhook#create-webhook"""
 
-    async def get_channel_webhooks(self, *, channel_id: SnowflakeType) -> list[Webhook]:
+    async def get_channel_webhooks(
+        self,
+        *,
+        channel_id: SnowflakeType,
+    ) -> list[Webhook]:
         """https://discord.com/developers/docs/resources/webhook#get-channel-webhooks"""
 
-    async def get_guild_webhooks(self, *, guild_id: SnowflakeType) -> list[Webhook]:
+    async def get_guild_webhooks(
+        self,
+        *,
+        guild_id: SnowflakeType,
+    ) -> list[Webhook]:
         """https://discord.com/developers/docs/resources/webhook#get-guild-webhooks"""
 
-    async def get_webhook(self, *, webhook_id: SnowflakeType) -> Webhook:
+    async def get_webhook(
+        self,
+        *,
+        webhook_id: SnowflakeType,
+    ) -> Webhook:
         """https://discord.com/developers/docs/resources/webhook#get-webhook"""
 
     async def get_webhook_with_token(
-        self, *, webhook_id: SnowflakeType, token: str
+        self,
+        *,
+        webhook_id: SnowflakeType,
+        token: str,
     ) -> Webhook:
         """https://discord.com/developers/docs/resources/webhook#get-webhook-with-token"""
 
@@ -1848,9 +2153,9 @@ class ApiClient:
         self,
         *,
         webhook_id: SnowflakeType,
-        name: str | None = ...,
-        avatar: str | None = ...,
-        channel_id: SnowflakeType | None = ...,
+        name: Missing[str] = ...,
+        avatar: MissingOrNullable[str] = ...,
+        channel_id: Missing[SnowflakeType] = ...,
         reason: str | None = ...,
     ) -> Webhook:
         """https://discord.com/developers/docs/resources/webhook#modify-webhook"""
@@ -1860,67 +2165,27 @@ class ApiClient:
         *,
         webhook_id: SnowflakeType,
         token: str,
-        name: str | None = ...,
-        avatar: str | None = ...,
+        name: Missing[str] = ...,
+        avatar: MissingOrNullable[str] = ...,
     ) -> Webhook:
         """https://discord.com/developers/docs/resources/webhook#modify-webhook-with-token"""
 
     async def delete_webhook(
-        self, *, webhook_id: SnowflakeType, reason: str | None = ...
+        self,
+        *,
+        webhook_id: SnowflakeType,
+        reason: str | None = ...,
     ) -> None:
         """https://discord.com/developers/docs/resources/webhook#delete-webhook"""
 
     async def delete_webhook_with_token(
-        self, *, webhook_id: SnowflakeType, token: str
+        self,
+        *,
+        webhook_id: SnowflakeType,
+        token: str,
     ) -> None:
         """https://discord.com/developers/docs/resources/webhook#delete-webhook-with-token"""
 
-    @overload
-    async def execute_webhook(
-        self,
-        *,
-        webhook_id: SnowflakeType,
-        token: str,
-        wait: Literal[False] | None = ...,
-        thread_id: SnowflakeType | None = ...,
-        content: str | None = ...,
-        username: str | None = ...,
-        avatar_url: str | None = ...,
-        tts: bool | None = ...,
-        embeds: list[Embed] | None = ...,
-        allowed_mentions: AllowedMention | None = ...,
-        components: list[Component] | None = ...,
-        files: list[File] | None = ...,
-        attachments: list[AttachmentSend] | None = ...,
-        flags: int | None = ...,
-        thread_name: str | None = ...,
-        applied_tags: list[SnowflakeType] | None = ...,
-        poll: PollRequest | None = ...,
-        **data,
-    ) -> None: ...
-    @overload
-    async def execute_webhook(
-        self,
-        *,
-        webhook_id: SnowflakeType,
-        token: str,
-        wait: Literal[True] = ...,
-        thread_id: SnowflakeType | None = ...,
-        content: str | None = ...,
-        username: str | None = ...,
-        avatar_url: str | None = ...,
-        tts: bool | None = ...,
-        embeds: list[Embed] | None = ...,
-        allowed_mentions: AllowedMention | None = ...,
-        components: list[Component] | None = ...,
-        files: list[File] | None = ...,
-        attachments: list[AttachmentSend] | None = ...,
-        flags: int | None = ...,
-        thread_name: str | None = ...,
-        applied_tags: list[SnowflakeType] | None = ...,
-        poll: PollRequest | None = ...,
-        **data,
-    ) -> MessageGet: ...
     async def execute_webhook(
         self,
         *,
@@ -1928,6 +2193,7 @@ class ApiClient:
         token: str,
         wait: bool | None = ...,
         thread_id: SnowflakeType | None = ...,
+        with_components: bool | None = ...,
         content: str | None = ...,
         username: str | None = ...,
         avatar_url: str | None = ...,
@@ -1941,7 +2207,6 @@ class ApiClient:
         thread_name: str | None = ...,
         applied_tags: list[SnowflakeType] | None = ...,
         poll: PollRequest | None = ...,
-        **data,
     ) -> MessageGet | None:
         """https://discord.com/developers/docs/resources/webhook#execute-webhook"""
 
@@ -1950,20 +2215,22 @@ class ApiClient:
         *,
         webhook_id: SnowflakeType,
         token: str,
+        payload: dict[str, Any],
         thread_id: SnowflakeType | None = ...,
         wait: bool | None = ...,
-    ) -> None:
-        """https://discord.com/developers/docs/resources/webhook#execute-slackcompatible-webhook"""
+    ) -> MessageGet | None:
+        """https://discord.com/developers/docs/resources/webhook#execute-slack-compatible-webhook"""
 
     async def execute_github_compatible_webhook(
         self,
         *,
         webhook_id: SnowflakeType,
         token: str,
+        payload: dict[str, Any],
         thread_id: SnowflakeType | None = ...,
         wait: bool | None = ...,
-    ) -> None:
-        """https://discord.com/developers/docs/resources/webhook#execute-githubcompatible-webhook"""
+    ) -> MessageGet | None:
+        """https://discord.com/developers/docs/resources/webhook#execute-github-compatible-webhook"""
 
     async def get_webhook_message(
         self,
@@ -1980,14 +2247,17 @@ class ApiClient:
         *,
         webhook_id: SnowflakeType,
         webhook_token: str,
+        message_id: SnowflakeType,
         thread_id: SnowflakeType | None = ...,
-        content: str | None = ...,
-        embeds: list[Embed] | None = ...,
-        allowed_mentions: AllowedMention | None = ...,
-        components: list[Component] | None = ...,
-        files: list[File] | None = ...,
-        attachments: list[AttachmentSend] | None = ...,
-        poll: PollRequest | None = ...,
+        with_components: bool | None = ...,
+        content: MissingOrNullable[str] = ...,
+        embeds: MissingOrNullable[list[Embed]] = ...,
+        flags: MissingOrNullable[MessageFlag] = ...,
+        allowed_mentions: MissingOrNullable[AllowedMention] = ...,
+        components: MissingOrNullable[list[Component]] = ...,
+        files: Missing[list[File]] = ...,
+        attachments: MissingOrNullable[list[AttachmentSend]] = ...,
+        poll: MissingOrNullable[PollRequest] = ...,
     ) -> MessageGet:
         """https://discord.com/developers/docs/resources/webhook#edit-webhook-message"""
 
@@ -2001,14 +2271,24 @@ class ApiClient:
     ) -> None:
         """https://discord.com/developers/docs/resources/webhook#delete-webhook-message"""
 
-    async def get_gateway(self) -> Gateway:
+    async def get_gateway(
+        self,
+    ) -> Gateway:
         """https://discord.com/developers/docs/topics/gateway#get-gateway"""
 
-    async def get_gateway_bot(self) -> GatewayBot:
+    async def get_gateway_bot(
+        self,
+    ) -> GatewayBot:
         """https://discord.com/developers/docs/topics/gateway#get-gateway-bot"""
 
-    async def get_current_bot_application_information(self) -> Application:
+    async def get_current_bot_application_information(
+        self,
+    ) -> Application:
         """https://discord.com/developers/docs/topics/oauth2#get-current-bot-application-information"""
 
-    async def get_current_authorization_information(self) -> AuthorizationResponse:
+    async def get_current_authorization_information(
+        self,
+        *,
+        access_token: str,
+    ) -> AuthorizationResponse:
         """https://discord.com/developers/docs/topics/oauth2#get-current-authorization-information"""

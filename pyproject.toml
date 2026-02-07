@@ -109,6 +109,10 @@ flake8-quotes = { inline-quotes = "double", multiline-quotes = "double" }
     "S101",    # assert
     "PLR2004", # magic-value-comparison
 ]
+"nonebot/adapters/discord/api/client.pyi" = [
+    "A002", # argument shadowing builtin (type, id from Discord API)
+    "N802", # function name should be lowercase (DM, SKU, MFA are Discord terms)
+]
 
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
