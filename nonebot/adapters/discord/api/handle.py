@@ -10,7 +10,7 @@ from typing import (
     Union,
     overload,
 )
-from typing_extensions import Protocol
+from typing_extensions import Protocol, deprecated
 from urllib.parse import quote
 
 from nonebot.compat import type_validate_python
@@ -2960,6 +2960,11 @@ class HandleMixin:
     # Guild
 
     # see https://discord.com/developers/docs/resources/guild
+    @deprecated(
+        "_api_create_guild (POST /guilds) is deprecated because Discord removed "
+        "the endpoint from official bot-facing docs in 2025 "
+        "(discord-api-docs #7715/#7720/#7722)."
+    )
     async def _api_create_guild(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -3104,6 +3109,11 @@ class HandleMixin:
         )
         return type_validate_python(Guild, await _request(self, bot, request))
 
+    @deprecated(
+        "_api_delete_guild (DELETE /guilds/{guild_id}) is deprecated because "
+        "Discord removed the endpoint from official bot-facing docs in 2025 "
+        "(discord-api-docs #7715/#7720/#7722)."
+    )
     async def _api_delete_guild(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> None:
@@ -3849,6 +3859,11 @@ class HandleMixin:
         )
         return type_validate_python(Role, await _request(self, bot, request))
 
+    @deprecated(
+        "_api_modify_guild_MFA_level (PATCH /guilds/{guild_id}/mfa) is "
+        "deprecated because Discord removed the endpoint from official "
+        "bot-facing docs in 2025 (discord-api-docs #7715/#7720/#7722)."
+    )
     async def _api_modify_guild_MFA_level(  # noqa: N802 # TODO)): 验证接口是否还存在
         self: AdapterProtocol,
         bot: "Bot",
@@ -4497,6 +4512,12 @@ class HandleMixin:
         )
         return type_validate_python(GuildTemplate, await _request(self, bot, request))
 
+    @deprecated(
+        "_api_create_guild_from_guild_template "
+        "(POST /guilds/templates/{template_code}) is deprecated because Discord "
+        "removed the endpoint from official bot-facing docs in 2025 "
+        "(discord-api-docs #7715/#7720/#7722)."
+    )
     async def _api_create_guild_from_guild_template(
         self: AdapterProtocol,
         bot: "Bot",
