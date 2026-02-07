@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime, timezone
 from http import HTTPStatus
 import json
@@ -240,6 +241,23 @@ def _bool_query(*, value: Optional[bool]) -> Optional[str]:
     if value is None:
         return None
     return "true" if value else "false"
+
+
+def _detect_image_mime_type(*, image: bytes) -> str:
+    if image.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "image/png"
+    if image.startswith(b"\xff\xd8\xff"):
+        return "image/jpeg"
+    if image.startswith((b"GIF87a", b"GIF89a")):
+        return "image/gif"
+    msg = "unsupported image format for icon bytes"
+    raise ValueError(msg)
+
+
+def _encode_image_data_uri(*, image: bytes) -> str:
+    mime_type = _detect_image_mime_type(image=image)
+    encoded = base64.b64encode(image).decode("ascii")
+    return f"data:{mime_type};base64,{encoded}"
 
 
 def _normalize_command_description(
@@ -1559,7 +1577,10 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = {"name": name, "icon": icon}
+        data = {
+            "name": name,
+            "icon": _encode_image_data_uri(image=icon) if icon is not None else None,
+        }
         request = Request(
             headers=headers,
             method="PATCH",
