@@ -1562,7 +1562,7 @@ class HandleMixin:
         )
         return type_validate_python(Channel, await _request(self, bot, request))
 
-    async def _api_modify_DM(  # noqa: N802 # TODO)): 疑似与_modify_channel重复, 确认后弃用
+    async def _api_modify_DM(  # noqa: N802
         self: AdapterProtocol,
         bot: "Bot",
         *,
@@ -3885,7 +3885,7 @@ class HandleMixin:
         "deprecated because Discord removed the endpoint from official "
         "bot-facing docs in 2025 (discord-api-docs #7715/#7720/#7722)."
     )
-    async def _api_modify_guild_MFA_level(  # noqa: N802 # TODO)): 验证接口是否还存在
+    async def _api_modify_guild_MFA_level(  # noqa: N802
         self: AdapterProtocol,
         bot: "Bot",
         *,
@@ -4103,7 +4103,7 @@ class HandleMixin:
         )
         return type_validate_python(GuildVanityURL, await _request(self, bot, request))
 
-    async def _api_get_guild_widget_image(  # TODO)): 校验接口返回值并更新类型
+    async def _api_get_guild_widget_image(
         self: AdapterProtocol,
         bot: "Bot",
         *,
