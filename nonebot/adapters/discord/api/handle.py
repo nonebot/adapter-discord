@@ -1,12 +1,18 @@
 from datetime import datetime, timezone
+from functools import wraps
 from http import HTTPStatus
+import inspect
 import json
 from typing import (
     TYPE_CHECKING,
+    Annotated,
     Any,
+    Callable,
     Literal,
     Optional,
     Union,
+    get_args,
+    get_origin,
 )
 from typing_extensions import Protocol
 from urllib.parse import quote
@@ -14,6 +20,7 @@ from urllib.parse import quote
 from nonebot.compat import type_validate_python
 from nonebot.drivers import Request, Response
 from nonebot.utils import escape_tag
+from pydantic import ValidationError
 from yarl import URL
 
 from .model import (
@@ -233,6 +240,124 @@ def _bool_query(*, value: Optional[bool]) -> Optional[str]:
     return "true" if value else "false"
 
 
+class Range:
+    def __init__(
+        self,
+        *,
+        message: str,
+        ge: Optional[int] = None,
+        le: Optional[int] = None,
+        min_length: Optional[int] = None,
+        max_length: Optional[int] = None,
+    ) -> None:
+        self.message = message
+        self.ge = ge
+        self.le = le
+        self.min_length = min_length
+        self.max_length = max_length
+
+
+def _is_annotated_constraint(annotation: object) -> bool:
+    if get_origin(annotation) is not Annotated:
+        return False
+    metadata = get_args(annotation)[1:]
+    return any(isinstance(item, Range) for item in metadata)
+
+
+def _collect_annotated_validators(
+    signature: inspect.Signature,
+) -> dict[str, tuple[object, list[Range]]]:
+    validators: dict[str, tuple[object, list[Range]]] = {}
+    for name, parameter in signature.parameters.items():
+        annotation = parameter.annotation
+        if not _is_annotated_constraint(annotation):
+            continue
+        args = get_args(annotation)
+        base_type = args[0]
+        ranges = [item for item in args[1:] if isinstance(item, Range)]
+        validators[name] = (base_type, ranges)
+    return validators
+
+
+def _validate_range(value: object, range_meta: Range) -> None:
+    if value is None:
+        return
+
+    msg = range_meta.message
+
+    if range_meta.min_length is not None or range_meta.max_length is not None:
+        if not isinstance(value, (str, bytes, list, tuple, dict, set)):
+            raise ValueError(msg)
+        size = len(value)
+        if range_meta.min_length is not None and size < range_meta.min_length:
+            raise ValueError(msg)
+        if range_meta.max_length is not None and size > range_meta.max_length:
+            raise ValueError(msg)
+
+    if range_meta.ge is not None or range_meta.le is not None:
+        if not isinstance(value, (int, float)):
+            raise ValueError(msg)
+        if range_meta.ge is not None and value < range_meta.ge:
+            raise ValueError(msg)
+        if range_meta.le is not None and value > range_meta.le:
+            raise ValueError(msg)
+
+
+def _validate_annotated_argument(
+    *,
+    value: object,
+    base_type: Any,  # noqa: ANN401
+    ranges: list[Range],
+) -> None:
+    converted = value
+    try:
+        converted = type_validate_python(base_type, value)
+    except ValidationError as exception:
+        msg = ranges[0].message
+        raise ValueError(msg) from exception
+
+    for range_meta in ranges:
+        _validate_range(converted, range_meta)
+
+
+def _validate_annotated_bound(
+    *,
+    bound: inspect.BoundArguments,
+    validators: dict[str, tuple[object, list[Range]]],
+) -> None:
+    for name, (base_type, ranges) in validators.items():
+        _validate_annotated_argument(
+            value=bound.arguments[name],
+            base_type=base_type,
+            ranges=ranges,
+        )
+
+
+def _validate_annotated_params(func: Callable[..., Any]) -> Callable[..., Any]:
+    signature = inspect.signature(func)
+    validators = _collect_annotated_validators(signature)
+
+    if inspect.iscoroutinefunction(func):
+
+        @wraps(func)
+        async def async_wrapper(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
+            bound = signature.bind(*args, **kwargs)
+            bound.apply_defaults()
+            _validate_annotated_bound(bound=bound, validators=validators)
+            return await func(*args, **kwargs)
+
+        return async_wrapper
+
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
+        bound = signature.bind(*args, **kwargs)
+        bound.apply_defaults()
+        _validate_annotated_bound(bound=bound, validators=validators)
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
 def _normalize_command_description(
     *,
     command_type: Optional[ApplicationCommandType],
@@ -281,17 +406,6 @@ def _validate_auto_moderation_trigger(
         return
     if trigger_metadata is None:
         raise ValueError("trigger_metadata is required for this trigger_type")
-
-
-def _validate_auto_moderation_exemptions(
-    *,
-    exempt_roles: Optional[list[SnowflakeType]],
-    exempt_channels: Optional[list[SnowflakeType]],
-) -> None:
-    if exempt_roles is not None and len(exempt_roles) > 20:
-        raise ValueError("exempt_roles must be 20 items or fewer")
-    if exempt_channels is not None and len(exempt_channels) > 50:
-        raise ValueError("exempt_channels must be 50 items or fewer")
 
 
 class HandleMixin:
@@ -759,7 +873,7 @@ class HandleMixin:
             GuildApplicationCommandPermissions, await _request(self, bot, request)
         )
 
-    async def _api_edit_application_command_permissions(
+    async def _api_edit_application_command_permissions(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
         *,
@@ -1179,19 +1293,21 @@ class HandleMixin:
             await _request(self, bot, request),
         )
 
+    @_validate_annotated_params
     async def _api_update_application_role_connection_metadata_records(
         self: AdapterProtocol,
         bot: "Bot",
         *,
         application_id: SnowflakeType,
-        records: list[ApplicationRoleConnectionMetadata],
+        records: Annotated[
+            list[ApplicationRoleConnectionMetadata],
+            Range(message="metadata records must be 0-5 items", max_length=5),
+        ],
     ) -> list[ApplicationRoleConnectionMetadata]:
         """update application role connection metadata records
 
         see https://discord.com/developers/docs/resources/application-role-connection-metadata#update-application-role-connection-metadata-records
         """
-        if len(records) > 5:
-            raise ValueError("metadata records must be 0-5 items")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         payload = [
             model_dump(
@@ -1215,6 +1331,7 @@ class HandleMixin:
     # Audit Logs
 
     # see https://discord.com/developers/docs/resources/audit-log
+    @_validate_annotated_params
     async def _api_get_guild_audit_log(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -1224,7 +1341,10 @@ class HandleMixin:
         action_type: Optional[AuditLogEventType] = None,
         before: Optional[SnowflakeType] = None,
         after: Optional[SnowflakeType] = None,
-        limit: Optional[int] = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
     ) -> AuditLog:
         """Returns an audit log object for the guild.
         Requires the VIEW_AUDIT_LOG permission.
@@ -1240,8 +1360,6 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log"""
         if before is not None and after is not None:
             raise ValueError("before and after are mutually exclusive")
-        if limit is not None and not (1 <= limit <= 100):
-            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {
             "user_id": user_id,
@@ -1299,6 +1417,7 @@ class HandleMixin:
             AutoModerationRule, await _request(self, bot, request)
         )
 
+    @_validate_annotated_params
     async def _api_create_auto_moderation_rule(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -1310,8 +1429,14 @@ class HandleMixin:
         actions: list[AutoModerationAction],
         trigger_metadata: Optional[TriggerMetadata] = None,
         enabled: Optional[bool] = None,
-        exempt_roles: Optional[list[SnowflakeType]] = None,
-        exempt_channels: Optional[list[SnowflakeType]] = None,
+        exempt_roles: Annotated[
+            Optional[list[SnowflakeType]],
+            Range(message="exempt_roles must be 20 items or fewer", max_length=20),
+        ] = None,
+        exempt_channels: Annotated[
+            Optional[list[SnowflakeType]],
+            Range(message="exempt_channels must be 50 items or fewer", max_length=50),
+        ] = None,
         reason: Optional[str] = None,
     ) -> AutoModerationRule:
         """create auto moderation rule
@@ -1321,10 +1446,6 @@ class HandleMixin:
         _validate_auto_moderation_trigger(
             trigger_type=trigger_type,
             trigger_metadata=trigger_metadata,
-        )
-        _validate_auto_moderation_exemptions(
-            exempt_roles=exempt_roles,
-            exempt_channels=exempt_channels,
         )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
@@ -1353,6 +1474,7 @@ class HandleMixin:
             AutoModerationRule, await _request(self, bot, request)
         )
 
+    @_validate_annotated_params
     async def _api_modify_auto_moderation_rule(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -1364,18 +1486,20 @@ class HandleMixin:
         trigger_metadata: Optional[TriggerMetadata] = None,
         actions: Optional[list[AutoModerationAction]] = None,
         enabled: Optional[bool] = None,
-        exempt_roles: Optional[list[SnowflakeType]] = None,
-        exempt_channels: Optional[list[SnowflakeType]] = None,
+        exempt_roles: Annotated[
+            Optional[list[SnowflakeType]],
+            Range(message="exempt_roles must be 20 items or fewer", max_length=20),
+        ] = None,
+        exempt_channels: Annotated[
+            Optional[list[SnowflakeType]],
+            Range(message="exempt_channels must be 50 items or fewer", max_length=50),
+        ] = None,
         reason: Optional[str] = None,
     ) -> AutoModerationRule:
         """modify auto moderation rule
 
         see https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
         """
-        _validate_auto_moderation_exemptions(
-            exempt_roles=exempt_roles,
-            exempt_channels=exempt_channels,
-        )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -1598,6 +1722,7 @@ class HandleMixin:
     # Messages
 
     # see https://discord.com/developers/docs/resources/message
+    @_validate_annotated_params
     async def _api_get_channel_messages(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -1606,13 +1731,14 @@ class HandleMixin:
         around: Optional[SnowflakeType] = None,
         before: Optional[SnowflakeType] = None,
         after: Optional[SnowflakeType] = None,
-        limit: Optional[int] = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
     ) -> list[MessageGet]:
         """https://discord.com/developers/docs/resources/message#get-channel-messages"""
         if sum(value is not None for value in (around, before, after)) > 1:
             raise ValueError("around, before and after are mutually exclusive")
-        if limit is not None and not (1 <= limit <= 100):
-            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "around": around,
@@ -1676,14 +1802,11 @@ class HandleMixin:
                 poll is not None,
             ]
         )
-        if not has_payload:
-            if (
-                message_reference is None
-                or message_reference.type != MessageReferenceType.FORWARD
-            ):
-                raise ValueError(
-                    "content/embeds/sticker_ids/components/files/poll is required"
-                )
+        if not has_payload and (
+            message_reference is None
+            or message_reference.type != MessageReferenceType.FORWARD
+        ):
+            raise ValueError("content/embeds/sticker_ids/components/files/poll is required")
         data = {
             "content": content,
             "nonce": nonce,
@@ -1794,6 +1917,7 @@ class HandleMixin:
         )
         await _request(self, bot, request)
 
+    @_validate_annotated_params
     async def _api_get_reactions(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -1804,13 +1928,14 @@ class HandleMixin:
         emoji_id: Optional[SnowflakeType] = None,
         type: Optional[ReactionType] = None,  # noqa: A002
         after: Optional[SnowflakeType] = None,
-        limit: Optional[int] = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
     ) -> list[User]:
         """https://discord.com/developers/docs/resources/message#get-reactions"""
         if emoji_id is not None:
             emoji = f"{emoji}:{emoji_id}"
-        if limit is not None and not (1 <= limit <= 100):
-            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"after": after, "limit": limit, "type": type}
         request = Request(
@@ -1921,17 +2046,23 @@ class HandleMixin:
         )
         await _request(self, bot, request)
 
+    @_validate_annotated_params
     async def _api_bulk_delete_message(
         self: AdapterProtocol,
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        messages: list[SnowflakeType],
+        messages: Annotated[
+            list[SnowflakeType],
+            Range(
+                message="messages must contain 2-100 items",
+                min_length=2,
+                max_length=100,
+            ),
+        ],
         reason: Optional[str] = None,
     ) -> None:
         """https://discord.com/developers/docs/resources/message#bulk-delete-messages"""
-        if not 2 <= len(messages) <= 100:
-            raise ValueError("messages must contain 2-100 items")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2010,9 +2141,7 @@ class HandleMixin:
             target_type == InviteTargetType.EMBEDDED_APPLICATION
             and target_application_id is None
         ):
-            raise ValueError(
-                "target_application_id is required when target_type is EMBEDDED_APPLICATION"
-            )
+            raise ValueError("target_application_id is required when target_type is EMBEDDED_APPLICATION")
         data = {
             "max_age": max_age,
             "max_uses": max_uses,
@@ -2239,9 +2368,7 @@ class HandleMixin:
             ChannelType.PUBLIC_THREAD,
             ChannelType.PRIVATE_THREAD,
         ):
-            raise ValueError(
-                "type must be ANNOUNCEMENT_THREAD, PUBLIC_THREAD or PRIVATE_THREAD"
-            )
+            raise ValueError("type must be ANNOUNCEMENT_THREAD, PUBLIC_THREAD or PRIVATE_THREAD")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2388,6 +2515,7 @@ class HandleMixin:
         )
         return type_validate_python(ThreadMember, await _request(self, bot, request))
 
+    @_validate_annotated_params
     async def _api_list_thread_members(
         self: AdapterProtocol,
         bot: "Bot",
@@ -2395,11 +2523,12 @@ class HandleMixin:
         channel_id: SnowflakeType,
         with_member: Optional[bool] = None,
         after: Optional[SnowflakeType] = None,
-        limit: Optional[int] = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
     ) -> list[ThreadMember]:
         """https://discord.com/developers/docs/resources/channel#list-thread-members"""
-        if limit is not None and not (1 <= limit <= 100):
-            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "with_member": _bool_query(value=with_member),
@@ -3092,17 +3221,19 @@ class HandleMixin:
         )
         return type_validate_python(GuildMember, await _request(self, bot, request))
 
+    @_validate_annotated_params
     async def _api_list_guild_members(
         self: AdapterProtocol,
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        limit: Optional[int] = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 1000", ge=1, le=1000),
+        ] = None,
         after: Optional[SnowflakeType] = None,
     ) -> list[GuildMember]:
         """https://discord.com/developers/docs/resources/guild#list-guild-members"""
-        if limit is not None and not (1 <= limit <= 1000):
-            raise ValueError("limit must be between 1 and 1000")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"limit": limit, "after": after}
         request = Request(
@@ -3115,19 +3246,19 @@ class HandleMixin:
             list[GuildMember], await _request(self, bot, request)
         )
 
+    @_validate_annotated_params
     async def _api_search_guild_members(
         self: AdapterProtocol,
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        query: str,
-        limit: Optional[int] = None,
+        query: Annotated[str, Range(message="query is required", min_length=1)],
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 1000", ge=1, le=1000),
+        ] = None,
     ) -> list[GuildMember]:
         """https://discord.com/developers/docs/resources/guild#search-guild-members"""
-        if query == "":
-            raise ValueError("query is required")
-        if limit is not None and not (1 <= limit <= 1000):
-            raise ValueError("limit must be between 1 and 1000")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"query": query, "limit": limit}
         request = Request(
@@ -3331,20 +3462,22 @@ class HandleMixin:
         )
         await _request(self, bot, request)
 
+    @_validate_annotated_params
     async def _api_get_guild_bans(
         self: AdapterProtocol,
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        limit: Optional[int] = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 1000", ge=1, le=1000),
+        ] = None,
         before: Optional[SnowflakeType] = None,
         after: Optional[SnowflakeType] = None,
     ) -> list[Ban]:
         """https://discord.com/developers/docs/resources/guild#get-guild-bans"""
         if before is not None and after is not None:
             raise ValueError("before and after are mutually exclusive")
-        if limit is not None and not (1 <= limit <= 1000):
-            raise ValueError("limit must be between 1 and 1000")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"limit": limit, "before": before, "after": after}
         request = Request(
@@ -3371,27 +3504,30 @@ class HandleMixin:
         )
         return type_validate_python(Ban, await _request(self, bot, request))
 
+    @_validate_annotated_params
     async def _api_create_guild_ban(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        delete_message_days: Optional[int] = None,
-        delete_message_seconds: Optional[int] = None,
+        delete_message_days: Annotated[
+            Optional[int],
+            Range(message="delete_message_days must be between 0 and 7", ge=0, le=7),
+        ] = None,
+        delete_message_seconds: Annotated[
+            Optional[int],
+            Range(
+                message="delete_message_seconds must be between 0 and 604800",
+                ge=0,
+                le=604800,
+            ),
+        ] = None,
         reason: Optional[str] = None,
     ) -> None:
         """https://discord.com/developers/docs/resources/guild#create-guild-ban"""
         if delete_message_days is not None and delete_message_seconds is not None:
-            raise ValueError(
-                "delete_message_days and delete_message_seconds cannot both be set"
-            )
-        if delete_message_days is not None and not (0 <= delete_message_days <= 7):
-            raise ValueError("delete_message_days must be between 0 and 7")
-        if delete_message_seconds is not None and not (
-            0 <= delete_message_seconds <= 604800
-        ):
-            raise ValueError("delete_message_seconds must be between 0 and 604800")
+            raise ValueError("delete_message_days and delete_message_seconds cannot both be set")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3522,7 +3658,7 @@ class HandleMixin:
         )
         return type_validate_python(Role, await _request(self, bot, request))
 
-    async def _api_modify_guild_role_positions(
+    async def _api_modify_guild_role_positions(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
         *,
@@ -4074,9 +4210,7 @@ class HandleMixin:
                 or entity_metadata.location is UNSET
                 or entity_metadata.location == ""
             ):
-                raise ValueError(
-                    "entity_metadata.location is required for EXTERNAL events"
-                )
+                raise ValueError("entity_metadata.location is required for EXTERNAL events")
             if scheduled_end_time is None:
                 raise ValueError("scheduled_end_time is required for EXTERNAL events")
         elif channel_id is None:
@@ -4200,20 +4334,22 @@ class HandleMixin:
         )
         await _request(self, bot, request)
 
+    @_validate_annotated_params
     async def _api_get_guild_scheduled_event_users(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         event_id: SnowflakeType,
-        limit: Optional[int] = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
         with_member: Optional[bool] = None,
         before: Optional[SnowflakeType] = None,
         after: Optional[SnowflakeType] = None,
     ) -> list[GuildScheduledEventUser]:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#get-guild-scheduled-event-users"""
-        if limit is not None and not (1 <= limit <= 100):
-            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "limit": limit,
@@ -4410,6 +4546,7 @@ class HandleMixin:
     # Poll
 
     # see https://discord.com/developers/docs/resources/poll
+    @_validate_annotated_params
     async def _api_get_answer_voters(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -4418,11 +4555,12 @@ class HandleMixin:
         message_id: SnowflakeType,
         answer_id: int,
         after: Optional[SnowflakeType] = None,
-        limit: Optional[int] = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
     ) -> AnswerVoters:
         """https://discord.com/developers/docs/resources/poll#get-answer-voters"""
-        if limit is not None and not (1 <= limit <= 100):
-            raise ValueError("limit must be between 1 and 100")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"after": after, "limit": limit}
         request = Request(
@@ -4700,6 +4838,7 @@ class HandleMixin:
     # Subscription
 
     # see https://discord.com/developers/docs/resources/subscription
+    @_validate_annotated_params
     async def _api_list_SKU_subscriptions(  # noqa: N802, PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -4707,15 +4846,16 @@ class HandleMixin:
         sku_id: SnowflakeType,
         before: Optional[SnowflakeType] = None,
         after: Optional[SnowflakeType] = None,
-        limit: Optional[int] = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
         user_id: Optional[SnowflakeType] = None,
     ) -> list[Subscription]:
         """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions
 
         Note: user_id is required except for OAuth queries.
         """
-        if limit is not None and not (1 <= limit <= 100):
-            raise ValueError("limit must be between 1 and 100")
         if user_id is None:
             raise ValueError("user_id is required for bot token queries")
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
@@ -4801,7 +4941,7 @@ class HandleMixin:
         )
         return type_validate_python(User, await _request(self, bot, request))
 
-    async def _api_get_current_user_guilds(
+    async def _api_get_current_user_guilds(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
         *,
@@ -4927,7 +5067,7 @@ class HandleMixin:
             ApplicationRoleConnection, await _request(self, bot, request)
         )
 
-    async def _api_update_user_application_role_connection(
+    async def _api_update_user_application_role_connection(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
         *,
@@ -5177,7 +5317,7 @@ class HandleMixin:
             return None
         return type_validate_python(MessageGet, resp)
 
-    async def _api_execute_slack_compatible_webhook(
+    async def _api_execute_slack_compatible_webhook(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
         *,
@@ -5202,7 +5342,7 @@ class HandleMixin:
             return None
         return type_validate_python(MessageGet, resp)
 
-    async def _api_execute_github_compatible_webhook(
+    async def _api_execute_github_compatible_webhook(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
         *,
