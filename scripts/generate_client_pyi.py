@@ -59,6 +59,14 @@ def _format_annotation(annotation: str | None) -> str:
     ):
         annotation = stripped[1:-1]
 
+    annotated_pattern = r"Annotated\[(.+)\]"
+    annotated_match = re.match(annotated_pattern, annotation.strip())
+    if annotated_match:
+        inner = annotated_match.group(1)
+        parts = _split_union_args(inner)
+        if parts:
+            return _format_annotation(parts[0])
+
     optional_pattern = r"Optional\[(.+)\]"
     match = re.match(optional_pattern, annotation.strip())
     if match:
@@ -194,10 +202,22 @@ def _find_handle_mixin(mod: ast.Module) -> ast.ClassDef:
 def _collect_method_signatures(
     source: str, mixin_class: ast.ClassDef
 ) -> list[tuple[str, list[str], str | None, str | None, bool]]:
+    def is_overload(node: ast.AsyncFunctionDef) -> bool:
+        for decorator in node.decorator_list:
+            if isinstance(decorator, ast.Name) and decorator.id == "overload":
+                return True
+            if isinstance(decorator, ast.Attribute) and decorator.attr == "overload":
+                return True
+        return False
+
     return [
         _extract_method_signature(source, node)
         for node in mixin_class.body
-        if isinstance(node, ast.AsyncFunctionDef) and node.name.startswith("_api_")
+        if (
+            isinstance(node, ast.AsyncFunctionDef)
+            and node.name.startswith("_api_")
+            and not is_overload(node)
+        )
     ]
 
 
