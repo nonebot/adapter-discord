@@ -13,6 +13,7 @@ from typing import (
     Union,
     get_args,
     get_origin,
+    overload,
 )
 from typing_extensions import Protocol
 from urllib.parse import quote
@@ -410,6 +411,14 @@ def _validate_auto_moderation_trigger(
     if trigger_metadata is None:
         msg = "trigger_metadata is required for this trigger_type"
         raise ValueError(msg)
+
+
+NonSpamTriggerType = Literal[
+    TriggerType.KEYWORD,
+    TriggerType.KEYWORD_PRESET,
+    TriggerType.MENTION_SPAM,
+    TriggerType.MEMBER_PROFILE,
+]
 
 
 class HandleMixin:
@@ -1336,6 +1345,38 @@ class HandleMixin:
     # Audit Logs
 
     # see https://discord.com/developers/docs/resources/audit-log
+    @overload
+    async def _api_get_guild_audit_log(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        user_id: Optional[SnowflakeType] = None,
+        action_type: Optional[AuditLogEventType] = None,
+        before: Optional[SnowflakeType] = None,
+        after: None = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
+    ) -> AuditLog: ...
+
+    @overload
+    async def _api_get_guild_audit_log(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        user_id: Optional[SnowflakeType] = None,
+        action_type: Optional[AuditLogEventType] = None,
+        before: None = None,
+        after: Optional[SnowflakeType] = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
+    ) -> AuditLog: ...
+
     @_validate_annotated_params
     async def _api_get_guild_audit_log(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -1422,6 +1463,52 @@ class HandleMixin:
         return type_validate_python(
             AutoModerationRule, await _request(self, bot, request)
         )
+
+    @overload
+    async def _api_create_auto_moderation_rule(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        name: str,
+        event_type: AutoModerationRuleEventType,
+        trigger_type: Literal[TriggerType.SPAM],
+        actions: list[AutoModerationAction],
+        trigger_metadata: None = None,
+        enabled: Optional[bool] = None,
+        exempt_roles: Annotated[
+            Optional[list[SnowflakeType]],
+            Range(message="exempt_roles must be 20 items or fewer", max_length=20),
+        ] = None,
+        exempt_channels: Annotated[
+            Optional[list[SnowflakeType]],
+            Range(message="exempt_channels must be 50 items or fewer", max_length=50),
+        ] = None,
+        reason: Optional[str] = None,
+    ) -> AutoModerationRule: ...
+
+    @overload
+    async def _api_create_auto_moderation_rule(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        name: str,
+        event_type: AutoModerationRuleEventType,
+        trigger_type: NonSpamTriggerType,
+        actions: list[AutoModerationAction],
+        trigger_metadata: TriggerMetadata,
+        enabled: Optional[bool] = None,
+        exempt_roles: Annotated[
+            Optional[list[SnowflakeType]],
+            Range(message="exempt_roles must be 20 items or fewer", max_length=20),
+        ] = None,
+        exempt_channels: Annotated[
+            Optional[list[SnowflakeType]],
+            Range(message="exempt_channels must be 50 items or fewer", max_length=50),
+        ] = None,
+        reason: Optional[str] = None,
+    ) -> AutoModerationRule: ...
 
     @_validate_annotated_params
     async def _api_create_auto_moderation_rule(  # noqa: PLR0913
@@ -1728,6 +1815,51 @@ class HandleMixin:
     # Messages
 
     # see https://discord.com/developers/docs/resources/message
+    @overload
+    async def _api_get_channel_messages(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        channel_id: SnowflakeType,
+        around: Optional[SnowflakeType] = None,
+        before: None = None,
+        after: None = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
+    ) -> list[MessageGet]: ...
+
+    @overload
+    async def _api_get_channel_messages(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        channel_id: SnowflakeType,
+        around: None = None,
+        before: Optional[SnowflakeType] = None,
+        after: None = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
+    ) -> list[MessageGet]: ...
+
+    @overload
+    async def _api_get_channel_messages(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        channel_id: SnowflakeType,
+        around: None = None,
+        before: None = None,
+        after: Optional[SnowflakeType] = None,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 100", ge=1, le=100),
+        ] = None,
+    ) -> list[MessageGet]: ...
+
     @_validate_annotated_params
     async def _api_get_channel_messages(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -3481,6 +3613,34 @@ class HandleMixin:
         )
         await _request(self, bot, request)
 
+    @overload
+    async def _api_get_guild_bans(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 1000", ge=1, le=1000),
+        ] = None,
+        before: Optional[SnowflakeType] = None,
+        after: None = None,
+    ) -> list[Ban]: ...
+
+    @overload
+    async def _api_get_guild_bans(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        limit: Annotated[
+            Optional[int],
+            Range(message="limit must be between 1 and 1000", ge=1, le=1000),
+        ] = None,
+        before: None = None,
+        after: Optional[SnowflakeType] = None,
+    ) -> list[Ban]: ...
+
     @_validate_annotated_params
     async def _api_get_guild_bans(
         self: AdapterProtocol,
@@ -3523,6 +3683,40 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/bans/{user_id}",
         )
         return type_validate_python(Ban, await _request(self, bot, request))
+
+    @overload
+    async def _api_create_guild_ban(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        user_id: SnowflakeType,
+        delete_message_days: Annotated[
+            Optional[int],
+            Range(message="delete_message_days must be between 0 and 7", ge=0, le=7),
+        ] = None,
+        delete_message_seconds: None = None,
+        reason: Optional[str] = None,
+    ) -> None: ...
+
+    @overload
+    async def _api_create_guild_ban(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        user_id: SnowflakeType,
+        delete_message_days: None = None,
+        delete_message_seconds: Annotated[
+            Optional[int],
+            Range(
+                message="delete_message_seconds must be between 0 and 604800",
+                ge=0,
+                le=604800,
+            ),
+        ] = None,
+        reason: Optional[str] = None,
+    ) -> None: ...
 
     @_validate_annotated_params
     async def _api_create_guild_ban(  # noqa: PLR0913
