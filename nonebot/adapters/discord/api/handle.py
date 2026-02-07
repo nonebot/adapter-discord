@@ -366,10 +366,12 @@ def _normalize_command_description(
     resolved_type = command_type or ApplicationCommandType.CHAT_INPUT
     if resolved_type in (ApplicationCommandType.USER, ApplicationCommandType.MESSAGE):
         if description not in (None, ""):
-            raise ValueError("description must be empty for USER or MESSAGE commands")
+            msg = "description must be empty for USER or MESSAGE commands"
+            raise ValueError(msg)
         return ""
     if description is None or description == "":
-        raise ValueError("description is required for CHAT_INPUT commands")
+        msg = "description is required for CHAT_INPUT commands"
+        raise ValueError(msg)
     return description
 
 
@@ -402,10 +404,12 @@ def _validate_auto_moderation_trigger(
 ) -> None:
     if trigger_type == TriggerType.SPAM:
         if trigger_metadata is not None:
-            raise ValueError("trigger_metadata must be omitted for SPAM rules")
+            msg = "trigger_metadata must be omitted for SPAM rules"
+            raise ValueError(msg)
         return
     if trigger_metadata is None:
-        raise ValueError("trigger_metadata is required for this trigger_type")
+        msg = "trigger_metadata is required for this trigger_type"
+        raise ValueError(msg)
 
 
 class HandleMixin:
@@ -1051,7 +1055,8 @@ class HandleMixin:
             ]
         )
         if not has_payload:
-            raise ValueError("content/embeds/components/files is required")
+            msg = "content/embeds/components/files is required"
+            raise ValueError(msg)
         data = {
             "content": content,
             "tts": tts,
@@ -1359,7 +1364,8 @@ class HandleMixin:
 
         see https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log"""
         if before is not None and after is not None:
-            raise ValueError("before and after are mutually exclusive")
+            msg = "before and after are mutually exclusive"
+            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {
             "user_id": user_id,
@@ -1738,7 +1744,8 @@ class HandleMixin:
     ) -> list[MessageGet]:
         """https://discord.com/developers/docs/resources/message#get-channel-messages"""
         if sum(value is not None for value in (around, before, after)) > 1:
-            raise ValueError("around, before and after are mutually exclusive")
+            msg = "around, before and after are mutually exclusive"
+            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "around": around,
@@ -1806,7 +1813,8 @@ class HandleMixin:
             message_reference is None
             or message_reference.type != MessageReferenceType.FORWARD
         ):
-            raise ValueError("content/embeds/sticker_ids/components/files/poll is required")
+            msg = "content/embeds/sticker_ids/components/files/poll is required"
+            raise ValueError(msg)
         data = {
             "content": content,
             "nonce": nonce,
@@ -2136,12 +2144,14 @@ class HandleMixin:
         if reason:
             headers["X-Audit-Log-Reason"] = reason
         if target_type == InviteTargetType.STREAM and target_user_id is None:
-            raise ValueError("target_user_id is required when target_type is STREAM")
+            msg = "target_user_id is required when target_type is STREAM"
+            raise ValueError(msg)
         if (
             target_type == InviteTargetType.EMBEDDED_APPLICATION
             and target_application_id is None
         ):
-            raise ValueError("target_application_id is required when target_type is EMBEDDED_APPLICATION")
+            msg = "target_application_id is required when target_type is EMBEDDED_APPLICATION"
+            raise ValueError(msg)
         data = {
             "max_age": max_age,
             "max_uses": max_uses,
@@ -2368,7 +2378,8 @@ class HandleMixin:
             ChannelType.PUBLIC_THREAD,
             ChannelType.PRIVATE_THREAD,
         ):
-            raise ValueError("type must be ANNOUNCEMENT_THREAD, PUBLIC_THREAD or PRIVATE_THREAD")
+            msg = "type must be ANNOUNCEMENT_THREAD, PUBLIC_THREAD or PRIVATE_THREAD"
+            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2673,9 +2684,11 @@ class HandleMixin:
         if reason:
             headers["X-Audit-Log-Reason"] = reason
         if not name:
-            raise ValueError("name is required")
+            msg = "name is required"
+            raise ValueError(msg)
         if not image:
-            raise ValueError("image is required")
+            msg = "image is required"
+            raise ValueError(msg)
         data = {
             "name": name,
             "image": image,
@@ -2777,9 +2790,11 @@ class HandleMixin:
         """https://discord.com/developers/docs/resources/emoji#create-application-emoji"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if not name:
-            raise ValueError("name is required")
+            msg = "name is required"
+            raise ValueError(msg)
         if not image:
-            raise ValueError("image is required")
+            msg = "image is required"
+            raise ValueError(msg)
         data = {"name": name, "image": image}
         request = Request(
             headers=headers,
@@ -2890,7 +2905,8 @@ class HandleMixin:
     ) -> Entitlement:
         """https://discord.com/developers/docs/resources/entitlement#create-test-entitlement"""
         if owner_type not in (1, 2):
-            raise ValueError("owner_type must be 1 or 2")
+            msg = "owner_type must be 1 or 2"
+            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {
             "sku_id": sku_id,
@@ -2944,7 +2960,8 @@ class HandleMixin:
     ) -> Guild:
         """https://discord.com/developers/docs/resources/guild#create-guild"""
         if not name:
-            raise ValueError("name is required")
+            msg = "name is required"
+            raise ValueError(msg)
         data = {
             "name": name,
             "region": region,
@@ -3120,7 +3137,8 @@ class HandleMixin:
         if reason:
             headers["X-Audit-Log-Reason"] = reason
         if not name:
-            raise ValueError("name is required")
+            msg = "name is required"
+            raise ValueError(msg)
         data = {
             "name": name,
             "type": type,
@@ -3165,7 +3183,8 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if channels is None:
             if id is None:
-                raise ValueError("channels or id must be provided")
+                msg = "channels or id must be provided"
+                raise ValueError(msg)
             channel = type_validate_python(
                 ModifyGuildChannelPositionParams,
                 {
@@ -3477,7 +3496,8 @@ class HandleMixin:
     ) -> list[Ban]:
         """https://discord.com/developers/docs/resources/guild#get-guild-bans"""
         if before is not None and after is not None:
-            raise ValueError("before and after are mutually exclusive")
+            msg = "before and after are mutually exclusive"
+            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"limit": limit, "before": before, "after": after}
         request = Request(
@@ -3527,7 +3547,8 @@ class HandleMixin:
     ) -> None:
         """https://discord.com/developers/docs/resources/guild#create-guild-ban"""
         if delete_message_days is not None and delete_message_seconds is not None:
-            raise ValueError("delete_message_days and delete_message_seconds cannot both be set")
+            msg = "delete_message_days and delete_message_seconds cannot both be set"
+            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3674,7 +3695,8 @@ class HandleMixin:
             headers["X-Audit-Log-Reason"] = reason
         if roles is None:
             if id is None:
-                raise ValueError("roles or id must be provided")
+                msg = "roles or id must be provided"
+                raise ValueError(msg)
             role = type_validate_python(
                 ModifyGuildRolePositionParams, {"id": id, "position": position}
             )
@@ -4204,17 +4226,21 @@ class HandleMixin:
         """https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event"""
         if entity_type == GuildScheduledEventEntityType.EXTERNAL:
             if channel_id is not None:
-                raise ValueError("channel_id must be None for EXTERNAL events")
+                msg = "channel_id must be None for EXTERNAL events"
+                raise ValueError(msg)
             if (
                 entity_metadata is None
                 or entity_metadata.location is UNSET
                 or entity_metadata.location == ""
             ):
-                raise ValueError("entity_metadata.location is required for EXTERNAL events")
+                msg = "entity_metadata.location is required for EXTERNAL events"
+                raise ValueError(msg)
             if scheduled_end_time is None:
-                raise ValueError("scheduled_end_time is required for EXTERNAL events")
+                msg = "scheduled_end_time is required for EXTERNAL events"
+                raise ValueError(msg)
         elif channel_id is None:
-            raise ValueError("channel_id is required for non-EXTERNAL events")
+            msg = "channel_id is required for non-EXTERNAL events"
+            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4857,7 +4883,8 @@ class HandleMixin:
         Note: user_id is required except for OAuth queries.
         """
         if user_id is None:
-            raise ValueError("user_id is required for bot token queries")
+            msg = "user_id is required for bot token queries"
+            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "before": before,
@@ -5276,7 +5303,8 @@ class HandleMixin:
             ]
         )
         if not has_payload:
-            raise ValueError("content/embeds/components/files/poll is required")
+            msg = "content/embeds/components/files/poll is required"
+            raise ValueError(msg)
         params = {}
         if wait is not None:
             params["wait"] = str(wait).lower()
