@@ -1,18 +1,13 @@
 from datetime import datetime, timezone
-from functools import wraps
 from http import HTTPStatus
-import inspect
 import json
 from typing import (
     TYPE_CHECKING,
     Annotated,
     Any,
-    Callable,
     Literal,
     Optional,
     Union,
-    get_args,
-    get_origin,
     overload,
 )
 from typing_extensions import Protocol
@@ -21,7 +16,6 @@ from urllib.parse import quote
 from nonebot.compat import type_validate_python
 from nonebot.drivers import Request, Response
 from nonebot.utils import escape_tag
-from pydantic import ValidationError
 from yarl import URL
 
 from .model import (
@@ -174,6 +168,13 @@ from .utils import (
     parse_forum_thread_message,
     parse_interaction_response,
 )
+from .validation import (
+    AtMostOne,
+    ForbidIfEquals,
+    Range,
+    RequireIfNotEquals,
+    validate,
+)
 from ..config import BotInfo, Config
 from ..exception import (
     ActionFailed,
@@ -241,124 +242,6 @@ def _bool_query(*, value: Optional[bool]) -> Optional[str]:
     return "true" if value else "false"
 
 
-class Range:
-    def __init__(
-        self,
-        *,
-        message: str,
-        ge: Optional[int] = None,
-        le: Optional[int] = None,
-        min_length: Optional[int] = None,
-        max_length: Optional[int] = None,
-    ) -> None:
-        self.message = message
-        self.ge = ge
-        self.le = le
-        self.min_length = min_length
-        self.max_length = max_length
-
-
-def _is_annotated_constraint(annotation: object) -> bool:
-    if get_origin(annotation) is not Annotated:
-        return False
-    metadata = get_args(annotation)[1:]
-    return any(isinstance(item, Range) for item in metadata)
-
-
-def _collect_annotated_validators(
-    signature: inspect.Signature,
-) -> dict[str, tuple[object, list[Range]]]:
-    validators: dict[str, tuple[object, list[Range]]] = {}
-    for name, parameter in signature.parameters.items():
-        annotation = parameter.annotation
-        if not _is_annotated_constraint(annotation):
-            continue
-        args = get_args(annotation)
-        base_type = args[0]
-        ranges = [item for item in args[1:] if isinstance(item, Range)]
-        validators[name] = (base_type, ranges)
-    return validators
-
-
-def _validate_range(value: object, range_meta: Range) -> None:
-    if value is None:
-        return
-
-    msg = range_meta.message
-
-    if range_meta.min_length is not None or range_meta.max_length is not None:
-        if not isinstance(value, (str, bytes, list, tuple, dict, set)):
-            raise ValueError(msg)
-        size = len(value)
-        if range_meta.min_length is not None and size < range_meta.min_length:
-            raise ValueError(msg)
-        if range_meta.max_length is not None and size > range_meta.max_length:
-            raise ValueError(msg)
-
-    if range_meta.ge is not None or range_meta.le is not None:
-        if not isinstance(value, (int, float)):
-            raise ValueError(msg)
-        if range_meta.ge is not None and value < range_meta.ge:
-            raise ValueError(msg)
-        if range_meta.le is not None and value > range_meta.le:
-            raise ValueError(msg)
-
-
-def _validate_annotated_argument(
-    *,
-    value: object,
-    base_type: Any,  # noqa: ANN401
-    ranges: list[Range],
-) -> None:
-    converted = value
-    try:
-        converted = type_validate_python(base_type, value)
-    except ValidationError as exception:
-        msg = ranges[0].message
-        raise ValueError(msg) from exception
-
-    for range_meta in ranges:
-        _validate_range(converted, range_meta)
-
-
-def _validate_annotated_bound(
-    *,
-    bound: inspect.BoundArguments,
-    validators: dict[str, tuple[object, list[Range]]],
-) -> None:
-    for name, (base_type, ranges) in validators.items():
-        _validate_annotated_argument(
-            value=bound.arguments[name],
-            base_type=base_type,
-            ranges=ranges,
-        )
-
-
-def _validate_annotated_params(func: Callable[..., Any]) -> Callable[..., Any]:
-    signature = inspect.signature(func)
-    validators = _collect_annotated_validators(signature)
-
-    if inspect.iscoroutinefunction(func):
-
-        @wraps(func)
-        async def async_wrapper(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
-            bound = signature.bind(*args, **kwargs)
-            bound.apply_defaults()
-            _validate_annotated_bound(bound=bound, validators=validators)
-            return await func(*args, **kwargs)
-
-        return async_wrapper
-
-    @wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
-        bound = signature.bind(*args, **kwargs)
-        bound.apply_defaults()
-        _validate_annotated_bound(bound=bound, validators=validators)
-        return func(*args, **kwargs)
-
-    return wrapper
-
-
 def _normalize_command_description(
     *,
     command_type: Optional[ApplicationCommandType],
@@ -396,21 +279,6 @@ def _build_command_payloads(
         command_data["description"] = description
         payloads.append(command_data)
     return payloads
-
-
-def _validate_auto_moderation_trigger(
-    *,
-    trigger_type: TriggerType,
-    trigger_metadata: Optional[TriggerMetadata],
-) -> None:
-    if trigger_type == TriggerType.SPAM:
-        if trigger_metadata is not None:
-            msg = "trigger_metadata must be omitted for SPAM rules"
-            raise ValueError(msg)
-        return
-    if trigger_metadata is None:
-        msg = "trigger_metadata is required for this trigger_type"
-        raise ValueError(msg)
 
 
 NonSpamTriggerType = Literal[
@@ -1307,7 +1175,7 @@ class HandleMixin:
             await _request(self, bot, request),
         )
 
-    @_validate_annotated_params
+    @validate
     async def _api_update_application_role_connection_metadata_records(
         self: AdapterProtocol,
         bot: "Bot",
@@ -1377,7 +1245,14 @@ class HandleMixin:
         ] = None,
     ) -> AuditLog: ...
 
-    @_validate_annotated_params
+    @validate(
+        cross_rules=(
+            AtMostOne(
+                fields=("before", "after"),
+                message="before and after are mutually exclusive",
+            ),
+        )
+    )
     async def _api_get_guild_audit_log(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -1404,9 +1279,6 @@ class HandleMixin:
         oldest entries).
 
         see https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log"""
-        if before is not None and after is not None:
-            msg = "before and after are mutually exclusive"
-            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {
             "user_id": user_id,
@@ -1510,7 +1382,22 @@ class HandleMixin:
         reason: Optional[str] = None,
     ) -> AutoModerationRule: ...
 
-    @_validate_annotated_params
+    @validate(
+        cross_rules=(
+            ForbidIfEquals(
+                field="trigger_metadata",
+                when_field="trigger_type",
+                equals=TriggerType.SPAM,
+                message="trigger_metadata must be omitted for SPAM rules",
+            ),
+            RequireIfNotEquals(
+                field="trigger_metadata",
+                when_field="trigger_type",
+                equals=TriggerType.SPAM,
+                message="trigger_metadata is required for this trigger_type",
+            ),
+        )
+    )
     async def _api_create_auto_moderation_rule(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -1536,10 +1423,6 @@ class HandleMixin:
 
         see https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
         """
-        _validate_auto_moderation_trigger(
-            trigger_type=trigger_type,
-            trigger_metadata=trigger_metadata,
-        )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -1567,7 +1450,7 @@ class HandleMixin:
             AutoModerationRule, await _request(self, bot, request)
         )
 
-    @_validate_annotated_params
+    @validate
     async def _api_modify_auto_moderation_rule(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -1860,7 +1743,14 @@ class HandleMixin:
         ] = None,
     ) -> list[MessageGet]: ...
 
-    @_validate_annotated_params
+    @validate(
+        cross_rules=(
+            AtMostOne(
+                fields=("around", "before", "after"),
+                message="around, before and after are mutually exclusive",
+            ),
+        )
+    )
     async def _api_get_channel_messages(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -1875,9 +1765,6 @@ class HandleMixin:
         ] = None,
     ) -> list[MessageGet]:
         """https://discord.com/developers/docs/resources/message#get-channel-messages"""
-        if sum(value is not None for value in (around, before, after)) > 1:
-            msg = "around, before and after are mutually exclusive"
-            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "around": around,
@@ -2057,7 +1944,7 @@ class HandleMixin:
         )
         await _request(self, bot, request)
 
-    @_validate_annotated_params
+    @validate
     async def _api_get_reactions(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -2186,7 +2073,7 @@ class HandleMixin:
         )
         await _request(self, bot, request)
 
-    @_validate_annotated_params
+    @validate
     async def _api_bulk_delete_message(
         self: AdapterProtocol,
         bot: "Bot",
@@ -2658,7 +2545,7 @@ class HandleMixin:
         )
         return type_validate_python(ThreadMember, await _request(self, bot, request))
 
-    @_validate_annotated_params
+    @validate
     async def _api_list_thread_members(
         self: AdapterProtocol,
         bot: "Bot",
@@ -3372,7 +3259,7 @@ class HandleMixin:
         )
         return type_validate_python(GuildMember, await _request(self, bot, request))
 
-    @_validate_annotated_params
+    @validate
     async def _api_list_guild_members(
         self: AdapterProtocol,
         bot: "Bot",
@@ -3397,7 +3284,7 @@ class HandleMixin:
             list[GuildMember], await _request(self, bot, request)
         )
 
-    @_validate_annotated_params
+    @validate
     async def _api_search_guild_members(
         self: AdapterProtocol,
         bot: "Bot",
@@ -3641,7 +3528,14 @@ class HandleMixin:
         after: Optional[SnowflakeType] = None,
     ) -> list[Ban]: ...
 
-    @_validate_annotated_params
+    @validate(
+        cross_rules=(
+            AtMostOne(
+                fields=("before", "after"),
+                message="before and after are mutually exclusive",
+            ),
+        )
+    )
     async def _api_get_guild_bans(
         self: AdapterProtocol,
         bot: "Bot",
@@ -3655,9 +3549,6 @@ class HandleMixin:
         after: Optional[SnowflakeType] = None,
     ) -> list[Ban]:
         """https://discord.com/developers/docs/resources/guild#get-guild-bans"""
-        if before is not None and after is not None:
-            msg = "before and after are mutually exclusive"
-            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"limit": limit, "before": before, "after": after}
         request = Request(
@@ -3718,7 +3609,14 @@ class HandleMixin:
         reason: Optional[str] = None,
     ) -> None: ...
 
-    @_validate_annotated_params
+    @validate(
+        cross_rules=(
+            AtMostOne(
+                fields=("delete_message_days", "delete_message_seconds"),
+                message="delete_message_days and delete_message_seconds cannot both be set",
+            ),
+        )
+    )
     async def _api_create_guild_ban(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -3740,9 +3638,6 @@ class HandleMixin:
         reason: Optional[str] = None,
     ) -> None:
         """https://discord.com/developers/docs/resources/guild#create-guild-ban"""
-        if delete_message_days is not None and delete_message_seconds is not None:
-            msg = "delete_message_days and delete_message_seconds cannot both be set"
-            raise ValueError(msg)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4554,7 +4449,7 @@ class HandleMixin:
         )
         await _request(self, bot, request)
 
-    @_validate_annotated_params
+    @validate
     async def _api_get_guild_scheduled_event_users(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -4766,7 +4661,7 @@ class HandleMixin:
     # Poll
 
     # see https://discord.com/developers/docs/resources/poll
-    @_validate_annotated_params
+    @validate
     async def _api_get_answer_voters(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
@@ -5058,7 +4953,7 @@ class HandleMixin:
     # Subscription
 
     # see https://discord.com/developers/docs/resources/subscription
-    @_validate_annotated_params
+    @validate
     async def _api_list_SKU_subscriptions(  # noqa: N802, PLR0913
         self: AdapterProtocol,
         bot: "Bot",
