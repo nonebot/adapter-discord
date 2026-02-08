@@ -202,11 +202,10 @@ class AdapterProtocol(Protocol):
 
 async def _request(
     adapter: "AdapterProtocol",
-    bot: "Bot",
     request: Request,
     *,
     parse_json: bool = True,
-) -> Any:  # noqa: ANN401 # TODO)): 验证bot参数是否需要, 重构为泛型函数, 接管type_validate部分
+) -> Any:  # noqa: ANN401 # TODO)): 重构为泛型函数, 接管type_validate部分
     try:
         request.timeout = adapter.discord_config.discord_api_timeout
         request.proxy = adapter.discord_config.discord_proxy
@@ -332,7 +331,7 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
         )
         return type_validate_python(
-            list[ApplicationCommand], await _request(self, bot, request)
+            list[ApplicationCommand], await _request(self, request)
         )
 
     async def _api_create_global_application_command(  # noqa: PLR0913
@@ -391,9 +390,7 @@ class HandleMixin:
             url=self.base_url / f"applications/{application_id}/commands",
             json=payload,
         )
-        return type_validate_python(
-            ApplicationCommand, await _request(self, bot, request)
-        )
+        return type_validate_python(ApplicationCommand, await _request(self, request))
 
     async def _api_get_global_application_command(
         self: AdapterProtocol,
@@ -413,9 +410,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"applications/{application_id}/commands/{command_id}",
         )
-        return type_validate_python(
-            ApplicationCommand, await _request(self, bot, request)
-        )
+        return type_validate_python(ApplicationCommand, await _request(self, request))
 
     async def _api_edit_global_application_command(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -465,9 +460,7 @@ class HandleMixin:
             url=self.base_url / f"applications/{application_id}/commands/{command_id}",
             json=data,
         )
-        return type_validate_python(
-            ApplicationCommand, await _request(self, bot, request)
-        )
+        return type_validate_python(ApplicationCommand, await _request(self, request))
 
     async def _api_delete_global_application_command(
         self: AdapterProtocol,
@@ -486,7 +479,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"applications/{application_id}/commands/{command_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_bulk_overwrite_global_application_commands(
         self: AdapterProtocol,
@@ -512,7 +505,7 @@ class HandleMixin:
             json=payload,
         )
         return type_validate_python(
-            list[ApplicationCommand], await _request(self, bot, request)
+            list[ApplicationCommand], await _request(self, request)
         )
 
     async def _api_get_guild_application_commands(
@@ -538,7 +531,7 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
         )
         return type_validate_python(
-            list[ApplicationCommand], await _request(self, bot, request)
+            list[ApplicationCommand], await _request(self, request)
         )
 
     async def _api_create_guild_application_command(  # noqa: PLR0913
@@ -594,9 +587,7 @@ class HandleMixin:
             / f"applications/{application_id}/guilds/{guild_id}/commands",
             json=payload,
         )
-        return type_validate_python(
-            ApplicationCommand, await _request(self, bot, request)
-        )
+        return type_validate_python(ApplicationCommand, await _request(self, request))
 
     async def _api_get_guild_application_command(
         self: AdapterProtocol,
@@ -618,9 +609,7 @@ class HandleMixin:
             url=self.base_url
             / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
         )
-        return type_validate_python(
-            ApplicationCommand, await _request(self, bot, request)
-        )
+        return type_validate_python(ApplicationCommand, await _request(self, request))
 
     async def _api_edit_guild_application_command(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -668,9 +657,7 @@ class HandleMixin:
             / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
             json=data,
         )
-        return type_validate_python(
-            ApplicationCommand, await _request(self, bot, request)
-        )
+        return type_validate_python(ApplicationCommand, await _request(self, request))
 
     async def _api_delete_guild_application_command(
         self: AdapterProtocol,
@@ -691,7 +678,7 @@ class HandleMixin:
             url=self.base_url
             / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_bulk_overwrite_guild_application_commands(
         self: AdapterProtocol,
@@ -717,12 +704,12 @@ class HandleMixin:
             json=payload,
         )
         return type_validate_python(
-            list[ApplicationCommand], await _request(self, bot, request)
+            list[ApplicationCommand], await _request(self, request)
         )
 
     async def _api_get_guild_application_command_permissions(
         self: AdapterProtocol,
-        bot: "Bot",
+        bot: "Bot",  # noqa: ARG002
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
@@ -743,12 +730,12 @@ class HandleMixin:
         )
         return type_validate_python(
             list[GuildApplicationCommandPermissions],
-            await _request(self, bot, request),
+            await _request(self, request),
         )
 
     async def _api_get_application_command_permissions(
         self: AdapterProtocol,
-        bot: "Bot",
+        bot: "Bot",  # noqa: ARG002
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
@@ -769,12 +756,12 @@ class HandleMixin:
             / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",
         )
         return type_validate_python(
-            GuildApplicationCommandPermissions, await _request(self, bot, request)
+            GuildApplicationCommandPermissions, await _request(self, request)
         )
 
     async def _api_edit_application_command_permissions(  # noqa: PLR0913
         self: AdapterProtocol,
-        bot: "Bot",
+        bot: "Bot",  # noqa: ARG002
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
@@ -805,7 +792,7 @@ class HandleMixin:
             },
         )
         return type_validate_python(
-            GuildApplicationCommandPermissions, await _request(self, bot, request)
+            GuildApplicationCommandPermissions, await _request(self, request)
         )
 
     # Receiving and Responding
@@ -833,7 +820,7 @@ class HandleMixin:
             json=params.get("json"),
             files=params.get("files"),
         )
-        resp = await _request(self, bot, request)
+        resp = await _request(self, request)
         if resp is None:
             return None
         return type_validate_python(InteractionResponse, resp)
@@ -856,7 +843,7 @@ class HandleMixin:
             / f"webhooks/{application_id}/{interaction_token}/messages/@original",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     async def _api_edit_origin_interaction_response(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -903,7 +890,7 @@ class HandleMixin:
             json=request_kwargs.get("json"),
             files=request_kwargs.get("files"),
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     async def _api_delete_origin_interaction_response(
         self: AdapterProtocol,
@@ -923,7 +910,7 @@ class HandleMixin:
             / f"webhooks/{application_id}/{interaction_token}/messages/@original",
             params={key: value for key, value in params.items() if value is not None},
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_create_followup_message(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -974,7 +961,7 @@ class HandleMixin:
             json=request_kwargs.get("json"),
             files=request_kwargs.get("files"),
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     async def _api_get_followup_message(
         self: AdapterProtocol,
@@ -998,7 +985,7 @@ class HandleMixin:
             / f"webhooks/{application_id}/{interaction_token}/messages/{message_id}",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     async def _api_edit_followup_message(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -1049,7 +1036,7 @@ class HandleMixin:
             json=request_kwargs.get("json"),
             files=request_kwargs.get("files"),
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     async def _api_delete_followup_message(
         self: AdapterProtocol,
@@ -1073,7 +1060,7 @@ class HandleMixin:
             / f"webhooks/{application_id}/{interaction_token}/messages/{message_id}",
             params={key: value for key, value in params.items() if value is not None},
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     # Application
 
@@ -1092,7 +1079,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / "applications/@me",
         )
-        return type_validate_python(Application, await _request(self, bot, request))
+        return type_validate_python(Application, await _request(self, request))
 
     async def _api_edit_current_application(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -1146,7 +1133,7 @@ class HandleMixin:
             url=self.base_url / "applications/@me",
             json=data,
         )
-        return type_validate_python(Application, await _request(self, bot, request))
+        return type_validate_python(Application, await _request(self, request))
 
     async def _api_get_application_activity_instance(
         self: AdapterProtocol,
@@ -1167,9 +1154,7 @@ class HandleMixin:
             url=self.base_url
             / f"applications/{application_id}/activity-instances/{instance_id}",
         )
-        return type_validate_python(
-            ActivityInstance, await _request(self, bot, request)
-        )
+        return type_validate_python(ActivityInstance, await _request(self, request))
 
     # Application Role Connection Metadata
 
@@ -1190,7 +1175,7 @@ class HandleMixin:
         )
         return type_validate_python(
             list[ApplicationRoleConnectionMetadata],
-            await _request(self, bot, request),
+            await _request(self, request),
         )
 
     @validate
@@ -1225,7 +1210,7 @@ class HandleMixin:
         )
         return type_validate_python(
             list[ApplicationRoleConnectionMetadata],
-            await _request(self, bot, request),
+            await _request(self, request),
         )
 
     # Audit Logs
@@ -1311,7 +1296,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/audit-logs",
             params={key: value for key, value in data.items() if value is not None},
         )
-        return type_validate_python(AuditLog, await _request(self, bot, request))
+        return type_validate_python(AuditLog, await _request(self, request))
 
     # Auto Moderation
 
@@ -1330,7 +1315,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/auto-moderation/rules",
         )
         return type_validate_python(
-            list[AutoModerationRule], await _request(self, bot, request)
+            list[AutoModerationRule], await _request(self, request)
         )
 
     async def _api_get_auto_moderation_rule(
@@ -1350,9 +1335,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/auto-moderation/rules/{rule_id}",
         )
-        return type_validate_python(
-            AutoModerationRule, await _request(self, bot, request)
-        )
+        return type_validate_python(AutoModerationRule, await _request(self, request))
 
     @overload
     async def _api_create_auto_moderation_rule(
@@ -1464,9 +1447,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/auto-moderation/rules",
             json=data,
         )
-        return type_validate_python(
-            AutoModerationRule, await _request(self, bot, request)
-        )
+        return type_validate_python(AutoModerationRule, await _request(self, request))
 
     @validate
     async def _api_modify_auto_moderation_rule(  # noqa: PLR0913
@@ -1519,9 +1500,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/auto-moderation/rules/{rule_id}",
             json=data,
         )
-        return type_validate_python(
-            AutoModerationRule, await _request(self, bot, request)
-        )
+        return type_validate_python(AutoModerationRule, await _request(self, request))
 
     async def _api_delete_auto_moderation_rule(
         self: AdapterProtocol,
@@ -1543,7 +1522,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}/auto-moderation/rules/{rule_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     # Channels
 
@@ -1560,7 +1539,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"channels/{channel_id}",
         )
-        return type_validate_python(Channel, await _request(self, bot, request))
+        return type_validate_python(Channel, await _request(self, request))
 
     async def _api_modify_DM(  # noqa: N802
         self: AdapterProtocol,
@@ -1587,7 +1566,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}",
             json={key: value for key, value in data.items() if value is not None},
         )
-        return type_validate_python(Channel, await _request(self, bot, request))
+        return type_validate_python(Channel, await _request(self, request))
 
     async def _api_modify_channel(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -1653,7 +1632,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}",
             json=data,
         )
-        return type_validate_python(Channel, await _request(self, bot, request))
+        return type_validate_python(Channel, await _request(self, request))
 
     async def _api_modify_thread(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -1696,7 +1675,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}",
             json=data,
         )
-        return type_validate_python(Channel, await _request(self, bot, request))
+        return type_validate_python(Channel, await _request(self, request))
 
     async def _api_delete_channel(
         self: AdapterProtocol,
@@ -1714,7 +1693,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"channels/{channel_id}",
         )
-        return type_validate_python(Channel, await _request(self, bot, request))
+        return type_validate_python(Channel, await _request(self, request))
 
     # Messages
 
@@ -1799,9 +1778,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}/messages",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(
-            list[MessageGet], await _request(self, bot, request)
-        )
+        return type_validate_python(list[MessageGet], await _request(self, request))
 
     async def _api_get_channel_message(
         self: AdapterProtocol,
@@ -1817,7 +1794,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"channels/{channel_id}/messages/{message_id}",
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     async def _api_create_message(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -1882,7 +1859,7 @@ class HandleMixin:
             json=params.get("json"),
             files=params.get("files"),
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     async def _api_crosspost_message(
         self: AdapterProtocol,
@@ -1899,7 +1876,7 @@ class HandleMixin:
             url=self.base_url
             / f"channels/{channel_id}/messages/{message_id}/crosspost",
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     async def _api_create_reaction(
         self: AdapterProtocol,
@@ -1920,7 +1897,7 @@ class HandleMixin:
             url=self.base_url
             / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/@me",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_delete_own_reaction(
         self: AdapterProtocol,
@@ -1941,7 +1918,7 @@ class HandleMixin:
             url=self.base_url
             / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/@me",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_delete_user_reaction(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -1963,7 +1940,7 @@ class HandleMixin:
             url=self.base_url
             / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/{user_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     @validate
     async def _api_get_reactions(  # noqa: PLR0913
@@ -1993,7 +1970,7 @@ class HandleMixin:
             / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(list[User], await _request(self, bot, request))
+        return type_validate_python(list[User], await _request(self, request))
 
     async def _api_delete_all_reactions(
         self: AdapterProtocol,
@@ -2010,7 +1987,7 @@ class HandleMixin:
             url=self.base_url
             / f"channels/{channel_id}/messages/{message_id}/reactions",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_delete_all_reactions_for_emoji(
         self: AdapterProtocol,
@@ -2031,7 +2008,7 @@ class HandleMixin:
             url=self.base_url
             / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_edit_message(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -2073,7 +2050,7 @@ class HandleMixin:
             json=params.get("json"),
             files=params.get("files"),
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     async def _api_delete_message(
         self: AdapterProtocol,
@@ -2092,7 +2069,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"channels/{channel_id}/messages/{message_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     @validate
     async def _api_bulk_delete_message(
@@ -2121,7 +2098,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}/messages/bulk-delete",
             json=data,
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_edit_channel_permissions(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -2149,7 +2126,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}/permissions/{overwrite_id}",
             json={key: value for key, value in data.items() if value is not None},
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_get_channel_invites(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
@@ -2161,7 +2138,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"channels/{channel_id}/invites",
         )
-        return type_validate_python(list[Invite], await _request(self, bot, request))
+        return type_validate_python(list[Invite], await _request(self, request))
 
     async def _api_create_channel_invite(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -2224,7 +2201,7 @@ class HandleMixin:
                 url=self.base_url / f"channels/{channel_id}/invites",
                 json=payload,
             )
-        return type_validate_python(Invite, await _request(self, bot, request))
+        return type_validate_python(Invite, await _request(self, request))
 
     async def _api_delete_channel_permission(
         self: AdapterProtocol,
@@ -2243,7 +2220,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"channels/{channel_id}/permissions/{overwrite_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_follow_announcement_channel(
         self: AdapterProtocol,
@@ -2264,7 +2241,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}/followers",
             json=data,
         )
-        return type_validate_python(FollowedChannel, await _request(self, bot, request))
+        return type_validate_python(FollowedChannel, await _request(self, request))
 
     async def _api_trigger_typing_indicator(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
@@ -2276,7 +2253,7 @@ class HandleMixin:
             method="POST",
             url=self.base_url / f"channels/{channel_id}/typing",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_get_pinned_messages(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
@@ -2288,9 +2265,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"channels/{channel_id}/messages/pins",
         )
-        return type_validate_python(
-            list[MessageGet], await _request(self, bot, request)
-        )
+        return type_validate_python(list[MessageGet], await _request(self, request))
 
     async def _api_pin_message(
         self: AdapterProtocol,
@@ -2309,7 +2284,7 @@ class HandleMixin:
             method="PUT",
             url=self.base_url / f"channels/{channel_id}/messages/pins/{message_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_unpin_message(
         self: AdapterProtocol,
@@ -2328,7 +2303,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"channels/{channel_id}/messages/pins/{message_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_group_DM_add_recipient(  # noqa: N802
         self: AdapterProtocol,
@@ -2348,7 +2323,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}/recipients/{user_id}",
             json=data,
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_group_DM_remove_recipient(  # noqa: N802
         self: AdapterProtocol,
@@ -2364,7 +2339,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"channels/{channel_id}/recipients/{user_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_start_thread_from_message(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -2398,7 +2373,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}/messages/{message_id}/threads",
             json=data,
         )
-        return type_validate_python(Channel, await _request(self, bot, request))
+        return type_validate_python(Channel, await _request(self, request))
 
     async def _api_start_thread_without_message(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -2442,7 +2417,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}/threads",
             json=data,
         )
-        return type_validate_python(Channel, await _request(self, bot, request))
+        return type_validate_python(Channel, await _request(self, request))
 
     async def _api_start_thread_in_forum_channel(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -2489,7 +2464,7 @@ class HandleMixin:
             json=params.get("json"),
             files=params.get("files"),
         )
-        return type_validate_python(Channel, await _request(self, bot, request))
+        return type_validate_python(Channel, await _request(self, request))
 
     async def _api_join_thread(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
@@ -2501,7 +2476,7 @@ class HandleMixin:
             method="PUT",
             url=self.base_url / f"channels/{channel_id}/thread-members/@me",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_add_thread_member(
         self: AdapterProtocol,
@@ -2517,7 +2492,7 @@ class HandleMixin:
             method="PUT",
             url=self.base_url / f"channels/{channel_id}/thread-members/{user_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_leave_thread(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
@@ -2529,7 +2504,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"channels/{channel_id}/thread-members/@me",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_remove_thread_member(
         self: AdapterProtocol,
@@ -2545,7 +2520,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"channels/{channel_id}/thread-members/{user_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_get_thread_member(
         self: AdapterProtocol,
@@ -2564,7 +2539,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}/thread-members/{user_id}",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(ThreadMember, await _request(self, bot, request))
+        return type_validate_python(ThreadMember, await _request(self, request))
 
     @validate
     async def _api_list_thread_members(
@@ -2592,9 +2567,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}/thread-members",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(
-            list[ThreadMember], await _request(self, bot, request)
-        )
+        return type_validate_python(list[ThreadMember], await _request(self, request))
 
     async def _api_list_public_archived_threads(
         self: AdapterProtocol,
@@ -2623,7 +2596,7 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
         )
         return type_validate_python(
-            ArchivedThreadsResponse, await _request(self, bot, request)
+            ArchivedThreadsResponse, await _request(self, request)
         )
 
     async def _api_list_private_archived_threads(
@@ -2653,7 +2626,7 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
         )
         return type_validate_python(
-            ArchivedThreadsResponse, await _request(self, bot, request)
+            ArchivedThreadsResponse, await _request(self, request)
         )
 
     async def _api_list_joined_private_archived_threads(
@@ -2675,7 +2648,7 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
         )
         return type_validate_python(
-            ArchivedThreadsResponse, await _request(self, bot, request)
+            ArchivedThreadsResponse, await _request(self, request)
         )
 
     # Emoji
@@ -2691,7 +2664,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/emojis",
         )
-        return type_validate_python(list[Emoji], await _request(self, bot, request))
+        return type_validate_python(list[Emoji], await _request(self, request))
 
     async def _api_get_guild_emoji(
         self: AdapterProtocol,
@@ -2707,7 +2680,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/emojis/{emoji_id}",
         )
-        return type_validate_python(Emoji, await _request(self, bot, request))
+        return type_validate_python(Emoji, await _request(self, request))
 
     async def _api_create_guild_emoji(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -2740,7 +2713,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/emojis",
             json={key: value for key, value in data.items() if value is not None},
         )
-        return type_validate_python(Emoji, await _request(self, bot, request))
+        return type_validate_python(Emoji, await _request(self, request))
 
     async def _api_modify_guild_emoji(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -2768,7 +2741,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/emojis/{emoji_id}",
             json=data,
         )
-        return type_validate_python(Emoji, await _request(self, bot, request))
+        return type_validate_python(Emoji, await _request(self, request))
 
     async def _api_delete_guild_emoji(
         self: AdapterProtocol,
@@ -2787,7 +2760,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}/emojis/{emoji_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_list_application_emojis(
         self: AdapterProtocol, bot: "Bot", *, application_id: SnowflakeType
@@ -2799,9 +2772,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"applications/{application_id}/emojis",
         )
-        return type_validate_python(
-            ApplicationEmojis, await _request(self, bot, request)
-        )
+        return type_validate_python(ApplicationEmojis, await _request(self, request))
 
     async def _api_get_application_emoji(
         self: AdapterProtocol,
@@ -2817,7 +2788,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"applications/{application_id}/emojis/{emoji_id}",
         )
-        return type_validate_python(Emoji, await _request(self, bot, request))
+        return type_validate_python(Emoji, await _request(self, request))
 
     async def _api_create_application_emoji(
         self: AdapterProtocol,
@@ -2842,7 +2813,7 @@ class HandleMixin:
             url=self.base_url / f"applications/{application_id}/emojis",
             json=data,
         )
-        return type_validate_python(Emoji, await _request(self, bot, request))
+        return type_validate_python(Emoji, await _request(self, request))
 
     async def _api_modify_application_emoji(
         self: AdapterProtocol,
@@ -2860,7 +2831,7 @@ class HandleMixin:
             url=self.base_url / f"applications/{application_id}/emojis/{emoji_id}",
             json={"name": name},
         )
-        return type_validate_python(Emoji, await _request(self, bot, request))
+        return type_validate_python(Emoji, await _request(self, request))
 
     async def _api_delete_application_emoji(
         self: AdapterProtocol,
@@ -2876,7 +2847,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"applications/{application_id}/emojis/{emoji_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     # Entitlements
 
@@ -2913,9 +2884,7 @@ class HandleMixin:
             url=self.base_url / f"applications/{application_id}/entitlements",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(
-            list[Entitlement], await _request(self, bot, request)
-        )
+        return type_validate_python(list[Entitlement], await _request(self, request))
 
     async def _api_consume_an_entitlement(
         self: AdapterProtocol,
@@ -2932,7 +2901,7 @@ class HandleMixin:
             url=self.base_url
             / f"applications/{application_id}/entitlements/{entitlement_id}/consume",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_create_test_entitlement(
         self: AdapterProtocol,
@@ -2959,7 +2928,7 @@ class HandleMixin:
             url=self.base_url / f"applications/{application_id}/entitlements",
             json=data,
         )
-        return type_validate_python(Entitlement, await _request(self, bot, request))
+        return type_validate_python(Entitlement, await _request(self, request))
 
     async def _api_delete_test_entitlement(
         self: AdapterProtocol,
@@ -2976,7 +2945,7 @@ class HandleMixin:
             url=self.base_url
             / f"applications/{application_id}/entitlements/{entitlement_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     # Guild
 
@@ -3028,7 +2997,7 @@ class HandleMixin:
         request = Request(
             headers=headers, method="POST", url=self.base_url / "guilds", json=data
         )
-        return type_validate_python(Guild, await _request(self, bot, request))
+        return type_validate_python(Guild, await _request(self, request))
 
     async def _api_get_guild(
         self: AdapterProtocol,
@@ -3046,7 +3015,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(Guild, await _request(self, bot, request))
+        return type_validate_python(Guild, await _request(self, request))
 
     async def _api_get_guild_preview(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -3058,7 +3027,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/preview",
         )
-        return type_validate_python(GuildPreview, await _request(self, bot, request))
+        return type_validate_python(GuildPreview, await _request(self, request))
 
     async def _api_modify_guild(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -3128,7 +3097,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}",
             json=data,
         )
-        return type_validate_python(Guild, await _request(self, bot, request))
+        return type_validate_python(Guild, await _request(self, request))
 
     @deprecated(
         "_api_delete_guild (DELETE /guilds/{guild_id}) is deprecated because "
@@ -3145,7 +3114,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_get_guild_channels(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -3157,7 +3126,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/channels",
         )
-        return type_validate_python(list[Channel], await _request(self, bot, request))
+        return type_validate_python(list[Channel], await _request(self, request))
 
     async def _api_create_guild_channel(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -3216,7 +3185,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/channels",
             json=data,
         )
-        return type_validate_python(Channel, await _request(self, bot, request))
+        return type_validate_python(Channel, await _request(self, request))
 
     async def _api_modify_guild_channel_positions(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -3258,7 +3227,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/channels",
             json=payload,
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_list_active_guild_threads(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -3271,7 +3240,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/threads/active",
         )
         return type_validate_python(
-            ListActiveGuildThreadsResponse, await _request(self, bot, request)
+            ListActiveGuildThreadsResponse, await _request(self, request)
         )
 
     async def _api_get_guild_member(
@@ -3288,7 +3257,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}",
         )
-        return type_validate_python(GuildMember, await _request(self, bot, request))
+        return type_validate_python(GuildMember, await _request(self, request))
 
     @validate
     async def _api_list_guild_members(
@@ -3311,9 +3280,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/members",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(
-            list[GuildMember], await _request(self, bot, request)
-        )
+        return type_validate_python(list[GuildMember], await _request(self, request))
 
     @validate
     async def _api_search_guild_members(
@@ -3336,9 +3303,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/members/search",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(
-            list[GuildMember], await _request(self, bot, request)
-        )
+        return type_validate_python(list[GuildMember], await _request(self, request))
 
     async def _api_add_guild_member(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -3367,7 +3332,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}",
             json={key: value for key, value in data.items() if value is not None},
         )
-        resp = await _request(self, bot, request)
+        resp = await _request(self, request)
         if resp:
             return type_validate_python(GuildMember, resp)
         return None
@@ -3412,7 +3377,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}",
             json=data,
         )
-        return type_validate_python(GuildMember, await _request(self, bot, request))
+        return type_validate_python(GuildMember, await _request(self, request))
 
     async def _api_modify_current_member(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -3447,7 +3412,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/members/@me",
             json=data,
         )
-        return type_validate_python(GuildMember, await _request(self, bot, request))
+        return type_validate_python(GuildMember, await _request(self, request))
 
     async def _api_modify_current_user_nick(
         self: AdapterProtocol,
@@ -3470,7 +3435,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/members/@me/nick",
             json=data,
         )
-        return type_validate_python(GuildMember, await _request(self, bot, request))
+        return type_validate_python(GuildMember, await _request(self, request))
 
     async def _api_add_guild_member_role(
         self: AdapterProtocol,
@@ -3490,7 +3455,7 @@ class HandleMixin:
             method="PUT",
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}/roles/{role_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_remove_guild_member_role(
         self: AdapterProtocol,
@@ -3510,7 +3475,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}/roles/{role_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_remove_guild_member(
         self: AdapterProtocol,
@@ -3529,7 +3494,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     @overload
     async def _api_get_guild_bans(
@@ -3588,7 +3553,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/bans",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(list[Ban], await _request(self, bot, request))
+        return type_validate_python(list[Ban], await _request(self, request))
 
     async def _api_get_guild_ban(
         self: AdapterProtocol,
@@ -3604,7 +3569,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/bans/{user_id}",
         )
-        return type_validate_python(Ban, await _request(self, bot, request))
+        return type_validate_python(Ban, await _request(self, request))
 
     @overload
     async def _api_create_guild_ban(
@@ -3682,7 +3647,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/bans/{user_id}",
             json={key: value for key, value in data.items() if value is not None},
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_remove_guild_ban(
         self: AdapterProtocol,
@@ -3701,7 +3666,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}/bans/{user_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_bulk_guild_ban(
         self: AdapterProtocol,
@@ -3726,7 +3691,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/bulk-ban",
             json={key: value for key, value in data.items() if value is not None},
         )
-        return type_validate_python(BulkBan, await _request(self, bot, request))
+        return type_validate_python(BulkBan, await _request(self, request))
 
     async def _api_get_guild_roles(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -3738,7 +3703,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/roles",
         )
-        return type_validate_python(list[Role], await _request(self, bot, request))
+        return type_validate_python(list[Role], await _request(self, request))
 
     async def _api_get_guild_role(
         self: AdapterProtocol,
@@ -3754,7 +3719,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/roles/{role_id}",
         )
-        return type_validate_python(Role, await _request(self, bot, request))
+        return type_validate_python(Role, await _request(self, request))
 
     async def _api_create_guild_role(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -3797,7 +3762,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/roles",
             json=data,
         )
-        return type_validate_python(Role, await _request(self, bot, request))
+        return type_validate_python(Role, await _request(self, request))
 
     async def _api_modify_guild_role_positions(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -3834,7 +3799,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/roles",
             json=payload,
         )
-        return type_validate_python(list[Role], await _request(self, bot, request))
+        return type_validate_python(list[Role], await _request(self, request))
 
     async def _api_modify_guild_role(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -3878,7 +3843,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/roles/{role_id}",
             json=data,
         )
-        return type_validate_python(Role, await _request(self, bot, request))
+        return type_validate_python(Role, await _request(self, request))
 
     @deprecated(
         "_api_modify_guild_MFA_level (PATCH /guilds/{guild_id}/mfa) is "
@@ -3904,7 +3869,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/mfa",
             json=data,
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_delete_guild_role(
         self: AdapterProtocol,
@@ -3923,7 +3888,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}/roles/{role_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_get_guild_prune_count(
         self: AdapterProtocol,
@@ -3947,7 +3912,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/prune",
             params={key: value for key, value in data.items() if value is not None},
         )
-        return await _request(self, bot, request)
+        return await _request(self, request)
 
     async def _api_begin_guild_prune(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -3974,7 +3939,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/prune",
             json={key: value for key, value in data.items() if value is not None},
         )
-        return await _request(self, bot, request)
+        return await _request(self, request)
 
     async def _api_get_guild_voice_regions(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -3986,9 +3951,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/regions",
         )
-        return type_validate_python(
-            list[VoiceRegion], await _request(self, bot, request)
-        )
+        return type_validate_python(list[VoiceRegion], await _request(self, request))
 
     async def _api_get_guild_invites(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -4000,7 +3963,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/invites",
         )
-        return type_validate_python(list[Invite], await _request(self, bot, request))
+        return type_validate_python(list[Invite], await _request(self, request))
 
     async def _api_get_guild_integrations(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -4012,9 +3975,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/integrations",
         )
-        return type_validate_python(
-            list[Integration], await _request(self, bot, request)
-        )
+        return type_validate_python(list[Integration], await _request(self, request))
 
     async def _api_delete_guild_integration(
         self: AdapterProtocol,
@@ -4033,7 +3994,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}/integrations/{integration_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_get_guild_widget_settings(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -4045,9 +4006,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/widget",
         )
-        return type_validate_python(
-            GuildWidgetSettings, await _request(self, bot, request)
-        )
+        return type_validate_python(GuildWidgetSettings, await _request(self, request))
 
     async def _api_modify_guild_widget(
         self: AdapterProtocol,
@@ -4075,9 +4034,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/widget",
             json=data,
         )
-        return type_validate_python(
-            GuildWidgetSettings, await _request(self, bot, request)
-        )
+        return type_validate_python(GuildWidgetSettings, await _request(self, request))
 
     async def _api_get_guild_widget(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -4089,7 +4046,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/widget.json",
         )
-        return type_validate_python(GuildWidget, await _request(self, bot, request))
+        return type_validate_python(GuildWidget, await _request(self, request))
 
     async def _api_get_guild_vanity_url(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -4101,7 +4058,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/vanity-url",
         )
-        return type_validate_python(GuildVanityURL, await _request(self, bot, request))
+        return type_validate_python(GuildVanityURL, await _request(self, request))
 
     async def _api_get_guild_widget_image(
         self: AdapterProtocol,
@@ -4121,7 +4078,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/widget.png",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return await _request(self, bot, request, parse_json=False)
+        return await _request(self, request, parse_json=False)
 
     async def _api_get_guild_welcome_screen(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -4133,7 +4090,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/welcome-screen",
         )
-        return type_validate_python(WelcomeScreen, await _request(self, bot, request))
+        return type_validate_python(WelcomeScreen, await _request(self, request))
 
     async def _api_modify_guild_welcome_screen(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -4167,7 +4124,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/welcome-screen",
             json=data,
         )
-        return type_validate_python(WelcomeScreen, await _request(self, bot, request))
+        return type_validate_python(WelcomeScreen, await _request(self, request))
 
     async def _api_get_guild_onboarding(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -4179,7 +4136,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/onboarding",
         )
-        return type_validate_python(GuildOnboarding, await _request(self, bot, request))
+        return type_validate_python(GuildOnboarding, await _request(self, request))
 
     async def _api_modify_guild_onboarding(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -4211,7 +4168,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/onboarding",
             json=data,
         )
-        return type_validate_python(GuildOnboarding, await _request(self, bot, request))
+        return type_validate_python(GuildOnboarding, await _request(self, request))
 
     # Voice
 
@@ -4226,9 +4183,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / "voice/regions",
         )
-        return type_validate_python(
-            list[VoiceRegion], await _request(self, bot, request)
-        )
+        return type_validate_python(list[VoiceRegion], await _request(self, request))
 
     async def _api_get_current_user_voice_state(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -4240,7 +4195,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/voice-states/@me",
         )
-        return type_validate_python(VoiceState, await _request(self, bot, request))
+        return type_validate_python(VoiceState, await _request(self, request))
 
     async def _api_get_user_voice_state(
         self: AdapterProtocol,
@@ -4256,7 +4211,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/voice-states/{user_id}",
         )
-        return type_validate_python(VoiceState, await _request(self, bot, request))
+        return type_validate_python(VoiceState, await _request(self, request))
 
     async def _api_modify_current_user_voice_state(
         self: AdapterProtocol,
@@ -4286,7 +4241,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/voice-states/@me",
             json=data,
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_modify_user_voice_state(
         self: AdapterProtocol,
@@ -4306,7 +4261,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/voice-states/{user_id}",
             json={key: value for key, value in data.items() if value is not None},
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     # Guild Scheduled Event
 
@@ -4328,7 +4283,7 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
         )
         return type_validate_python(
-            list[GuildScheduledEvent], await _request(self, bot, request)
+            list[GuildScheduledEvent], await _request(self, request)
         )
 
     async def _api_create_guild_schedule_event(  # noqa: PLR0913
@@ -4391,9 +4346,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/scheduled-events",
             json=data,
         )
-        return type_validate_python(
-            GuildScheduledEvent, await _request(self, bot, request)
-        )
+        return type_validate_python(GuildScheduledEvent, await _request(self, request))
 
     async def _api_get_guild_scheduled_event(
         self: AdapterProtocol,
@@ -4412,9 +4365,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/scheduled-events/{event_id}",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(
-            GuildScheduledEvent, await _request(self, bot, request)
-        )
+        return type_validate_python(GuildScheduledEvent, await _request(self, request))
 
     async def _api_modify_guild_scheduled_event(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -4465,9 +4416,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/scheduled-events/{event_id}",
             json=data,
         )
-        return type_validate_python(
-            GuildScheduledEvent, await _request(self, bot, request)
-        )
+        return type_validate_python(GuildScheduledEvent, await _request(self, request))
 
     async def _api_delete_guild_scheduled_event(
         self: AdapterProtocol,
@@ -4483,7 +4432,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}/scheduled-events/{event_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     @validate
     async def _api_get_guild_scheduled_event_users(  # noqa: PLR0913
@@ -4515,7 +4464,7 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
         )
         return type_validate_python(
-            list[GuildScheduledEventUser], await _request(self, bot, request)
+            list[GuildScheduledEventUser], await _request(self, request)
         )
 
     # Guild Template
@@ -4531,7 +4480,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/templates/{template_code}",
         )
-        return type_validate_python(GuildTemplate, await _request(self, bot, request))
+        return type_validate_python(GuildTemplate, await _request(self, request))
 
     @deprecated(
         "_api_create_guild_from_guild_template "
@@ -4556,7 +4505,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/templates/{template_code}",
             json={key: value for key, value in data.items() if value is not None},
         )
-        return type_validate_python(Guild, await _request(self, bot, request))
+        return type_validate_python(Guild, await _request(self, request))
 
     async def _api_get_guild_templates(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -4568,9 +4517,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/templates",
         )
-        return type_validate_python(
-            list[GuildTemplate], await _request(self, bot, request)
-        )
+        return type_validate_python(list[GuildTemplate], await _request(self, request))
 
     async def _api_create_guild_template(
         self: AdapterProtocol,
@@ -4595,7 +4542,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/templates",
             json=data,
         )
-        return type_validate_python(GuildTemplate, await _request(self, bot, request))
+        return type_validate_python(GuildTemplate, await _request(self, request))
 
     async def _api_sync_guild_template(
         self: AdapterProtocol,
@@ -4611,7 +4558,7 @@ class HandleMixin:
             method="PUT",
             url=self.base_url / f"guilds/{guild_id}/templates/{template_code}",
         )
-        return type_validate_python(GuildTemplate, await _request(self, bot, request))
+        return type_validate_python(GuildTemplate, await _request(self, request))
 
     async def _api_modify_guild_template(
         self: AdapterProtocol,
@@ -4637,7 +4584,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/templates/{template_code}",
             json=data,
         )
-        return type_validate_python(GuildTemplate, await _request(self, bot, request))
+        return type_validate_python(GuildTemplate, await _request(self, request))
 
     async def _api_delete_guild_template(
         self: AdapterProtocol,
@@ -4653,7 +4600,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}/templates/{template_code}",
         )
-        return type_validate_python(GuildTemplate, await _request(self, bot, request))
+        return type_validate_python(GuildTemplate, await _request(self, request))
 
     # Invite
 
@@ -4680,7 +4627,7 @@ class HandleMixin:
             url=self.base_url / f"invites/{invite_code}",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(Invite, await _request(self, bot, request))
+        return type_validate_python(Invite, await _request(self, request))
 
     async def _api_delete_invite(
         self: AdapterProtocol,
@@ -4698,7 +4645,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"invites/{invite_code}",
         )
-        return type_validate_python(Invite, await _request(self, bot, request))
+        return type_validate_python(Invite, await _request(self, request))
 
     # Poll
 
@@ -4727,7 +4674,7 @@ class HandleMixin:
             / f"channels/{channel_id}/polls/{message_id}/answers/{answer_id}",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(AnswerVoters, await _request(self, bot, request))
+        return type_validate_python(AnswerVoters, await _request(self, request))
 
     async def _api_end_poll(
         self: AdapterProtocol,
@@ -4743,7 +4690,7 @@ class HandleMixin:
             method="POST",
             url=self.base_url / f"channels/{channel_id}/polls/{message_id}/expire",
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     # SKU
 
@@ -4758,7 +4705,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"applications/{application_id}/skus",
         )
-        return type_validate_python(list[SKU], await _request(self, bot, request))
+        return type_validate_python(list[SKU], await _request(self, request))
 
     # Stage Instance
 
@@ -4791,7 +4738,7 @@ class HandleMixin:
             url=self.base_url / "stage-instances",
             json={key: value for key, value in data.items() if value is not None},
         )
-        return type_validate_python(StageInstance, await _request(self, bot, request))
+        return type_validate_python(StageInstance, await _request(self, request))
 
     async def _api_get_stage_instance(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
@@ -4803,7 +4750,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"stage-instances/{channel_id}",
         )
-        return type_validate_python(StageInstance, await _request(self, bot, request))
+        return type_validate_python(StageInstance, await _request(self, request))
 
     async def _api_modify_stage_instance(
         self: AdapterProtocol,
@@ -4825,7 +4772,7 @@ class HandleMixin:
             url=self.base_url / f"stage-instances/{channel_id}",
             json={key: value for key, value in data.items() if value is not None},
         )
-        return type_validate_python(StageInstance, await _request(self, bot, request))
+        return type_validate_python(StageInstance, await _request(self, request))
 
     async def _api_delete_stage_instance(
         self: AdapterProtocol,
@@ -4843,7 +4790,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"stage-instances/{channel_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     # Sticker
 
@@ -4858,7 +4805,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"stickers/{sticker_id}",
         )
-        return type_validate_python(Sticker, await _request(self, bot, request))
+        return type_validate_python(Sticker, await _request(self, request))
 
     async def _api_list_nitro_sticker_packs(
         self: AdapterProtocol, bot: "Bot"
@@ -4870,9 +4817,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / "sticker-packs",
         )
-        return type_validate_python(
-            StickerPacksResponse, await _request(self, bot, request)
-        )
+        return type_validate_python(StickerPacksResponse, await _request(self, request))
 
     async def _api_get_sticker_packs(
         self: AdapterProtocol, bot: "Bot", *, pack_id: SnowflakeType
@@ -4884,7 +4829,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"sticker-packs/{pack_id}",
         )
-        return type_validate_python(StickerPack, await _request(self, bot, request))
+        return type_validate_python(StickerPack, await _request(self, request))
 
     async def _api_list_guild_stickers(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -4896,7 +4841,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/stickers",
         )
-        return type_validate_python(list[Sticker], await _request(self, bot, request))
+        return type_validate_python(list[Sticker], await _request(self, request))
 
     async def _api_get_guild_sticker(
         self: AdapterProtocol,
@@ -4912,7 +4857,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/stickers/{sticker_id}",
         )
-        return type_validate_python(Sticker, await _request(self, bot, request))
+        return type_validate_python(Sticker, await _request(self, request))
 
     async def _api_create_guild_sticker(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -4941,7 +4886,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/stickers",
             files=form,
         )
-        return type_validate_python(Sticker, await _request(self, bot, request))
+        return type_validate_python(Sticker, await _request(self, request))
 
     async def _api_modify_guild_sticker(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -4971,7 +4916,7 @@ class HandleMixin:
             url=self.base_url / f"guilds/{guild_id}/stickers/{sticker_id}",
             json=data,
         )
-        return type_validate_python(Sticker, await _request(self, bot, request))
+        return type_validate_python(Sticker, await _request(self, request))
 
     async def _api_delete_guild_sticker(
         self: AdapterProtocol,
@@ -4990,7 +4935,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"guilds/{guild_id}/stickers/{sticker_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     # Subscription
 
@@ -5029,9 +4974,7 @@ class HandleMixin:
             url=self.base_url / f"skus/{sku_id}/subscriptions",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(
-            list[Subscription], await _request(self, bot, request)
-        )
+        return type_validate_python(list[Subscription], await _request(self, request))
 
     async def _api_get_SKU_subscription(  # noqa: N802
         self: AdapterProtocol,
@@ -5047,7 +4990,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"skus/{sku_id}/subscriptions/{subscription_id}",
         )
-        return type_validate_python(Subscription, await _request(self, bot, request))
+        return type_validate_python(Subscription, await _request(self, request))
 
     # Users
 
@@ -5060,7 +5003,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / "users/@me",
         )
-        return type_validate_python(User, await _request(self, bot, request))
+        return type_validate_python(User, await _request(self, request))
 
     async def _api_get_user(
         self: AdapterProtocol, bot: "Bot", *, user_id: SnowflakeType
@@ -5072,7 +5015,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"users/{user_id}",
         )
-        return type_validate_python(User, await _request(self, bot, request))
+        return type_validate_python(User, await _request(self, request))
 
     async def _api_modify_current_user(
         self: AdapterProtocol,
@@ -5097,11 +5040,11 @@ class HandleMixin:
             url=self.base_url / "users/@me",
             json=data,
         )
-        return type_validate_python(User, await _request(self, bot, request))
+        return type_validate_python(User, await _request(self, request))
 
     async def _api_get_current_user_guilds(  # noqa: PLR0913
         self: AdapterProtocol,
-        bot: "Bot",
+        bot: "Bot",  # noqa: ARG002
         *,
         access_token: str,
         before: Optional[SnowflakeType] = None,
@@ -5124,12 +5067,12 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
         )
         return type_validate_python(
-            list[CurrentUserGuild], await _request(self, bot, request)
+            list[CurrentUserGuild], await _request(self, request)
         )
 
     async def _api_get_current_user_guild_member(
         self: AdapterProtocol,
-        bot: "Bot",
+        bot: "Bot",  # noqa: ARG002
         *,
         guild_id: SnowflakeType,
         access_token: str,
@@ -5141,7 +5084,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"users/@me/guilds/{guild_id}/member",
         )
-        return type_validate_python(GuildMember, await _request(self, bot, request))
+        return type_validate_python(GuildMember, await _request(self, request))
 
     async def _api_leave_guild(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -5153,7 +5096,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"users/@me/guilds/{guild_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_create_DM(  # noqa: N802
         self: AdapterProtocol,
@@ -5169,7 +5112,7 @@ class HandleMixin:
             url=self.base_url / "users/@me/channels",
             json={"recipient_id": recipient_id},
         )
-        return type_validate_python(Channel, await _request(self, bot, request))
+        return type_validate_python(Channel, await _request(self, request))
 
     async def _api_create_group_DM(  # noqa: N802
         self: AdapterProtocol,
@@ -5187,11 +5130,11 @@ class HandleMixin:
             url=self.base_url / "users/@me/channels",
             json=data,
         )
-        return type_validate_python(Channel, await _request(self, bot, request))
+        return type_validate_python(Channel, await _request(self, request))
 
     async def _api_get_user_connections(
         self: AdapterProtocol,
-        bot: "Bot",
+        bot: "Bot",  # noqa: ARG002
         *,
         access_token: str,
     ) -> list[Connection]:
@@ -5202,13 +5145,11 @@ class HandleMixin:
             method="GET",
             url=self.base_url / "users/@me/connections",
         )
-        return type_validate_python(
-            list[Connection], await _request(self, bot, request)
-        )
+        return type_validate_python(list[Connection], await _request(self, request))
 
     async def _api_get_user_application_role_connection(
         self: AdapterProtocol,
-        bot: "Bot",
+        bot: "Bot",  # noqa: ARG002
         *,
         application_id: SnowflakeType,
         access_token: str,
@@ -5222,12 +5163,12 @@ class HandleMixin:
             / f"users/@me/applications/{application_id}/role-connection",
         )
         return type_validate_python(
-            ApplicationRoleConnection, await _request(self, bot, request)
+            ApplicationRoleConnection, await _request(self, request)
         )
 
     async def _api_update_user_application_role_connection(  # noqa: PLR0913
         self: AdapterProtocol,
-        bot: "Bot",
+        bot: "Bot",  # noqa: ARG002
         *,
         application_id: SnowflakeType,
         access_token: str,
@@ -5250,7 +5191,7 @@ class HandleMixin:
             json={key: value for key, value in data.items() if value is not None},
         )
         return type_validate_python(
-            ApplicationRoleConnection, await _request(self, bot, request)
+            ApplicationRoleConnection, await _request(self, request)
         )
 
     # Webhook
@@ -5279,7 +5220,7 @@ class HandleMixin:
             url=self.base_url / f"channels/{channel_id}/webhooks",
             json=data,
         )
-        return type_validate_python(Webhook, await _request(self, bot, request))
+        return type_validate_python(Webhook, await _request(self, request))
 
     async def _api_get_channel_webhooks(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
@@ -5291,7 +5232,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"channels/{channel_id}/webhooks",
         )
-        return type_validate_python(list[Webhook], await _request(self, bot, request))
+        return type_validate_python(list[Webhook], await _request(self, request))
 
     async def _api_get_guild_webhooks(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
@@ -5303,7 +5244,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"guilds/{guild_id}/webhooks",
         )
-        return type_validate_python(list[Webhook], await _request(self, bot, request))
+        return type_validate_python(list[Webhook], await _request(self, request))
 
     async def _api_get_webhook(
         self: AdapterProtocol, bot: "Bot", *, webhook_id: SnowflakeType
@@ -5315,17 +5256,21 @@ class HandleMixin:
             method="GET",
             url=self.base_url / f"webhooks/{webhook_id}",
         )
-        return type_validate_python(Webhook, await _request(self, bot, request))
+        return type_validate_python(Webhook, await _request(self, request))
 
     async def _api_get_webhook_with_token(
-        self: AdapterProtocol, bot: "Bot", *, webhook_id: SnowflakeType, token: str
+        self: AdapterProtocol,
+        bot: "Bot",  # noqa: ARG002
+        *,
+        webhook_id: SnowflakeType,
+        token: str,
     ) -> Webhook:
         """https://discord.com/developers/docs/resources/webhook#get-webhook-with-token"""
         request = Request(
             method="GET",
             url=self.base_url / f"webhooks/{webhook_id}/{token}",
         )
-        return type_validate_python(Webhook, await _request(self, bot, request))
+        return type_validate_python(Webhook, await _request(self, request))
 
     async def _api_modify_webhook(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -5348,11 +5293,11 @@ class HandleMixin:
             url=self.base_url / f"webhooks/{webhook_id}",
             json=data,
         )
-        return type_validate_python(Webhook, await _request(self, bot, request))
+        return type_validate_python(Webhook, await _request(self, request))
 
     async def _api_modify_webhook_with_token(
         self: AdapterProtocol,
-        bot: "Bot",
+        bot: "Bot",  # noqa: ARG002
         *,
         webhook_id: SnowflakeType,
         token: str,
@@ -5366,7 +5311,7 @@ class HandleMixin:
             url=self.base_url / f"webhooks/{webhook_id}/{token}",
             json=data,
         )
-        return type_validate_python(Webhook, await _request(self, bot, request))
+        return type_validate_python(Webhook, await _request(self, request))
 
     async def _api_delete_webhook(
         self: AdapterProtocol,
@@ -5384,11 +5329,11 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"webhooks/{webhook_id}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_delete_webhook_with_token(
         self: AdapterProtocol,
-        bot: "Bot",
+        bot: "Bot",  # noqa: ARG002
         *,
         webhook_id: SnowflakeType,
         token: str,
@@ -5398,7 +5343,7 @@ class HandleMixin:
             method="DELETE",
             url=self.base_url / f"webhooks/{webhook_id}/{token}",
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     async def _api_execute_webhook(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -5471,7 +5416,7 @@ class HandleMixin:
             json=request_kwargs.get("json"),
             files=request_kwargs.get("files"),
         )
-        resp = await _request(self, bot, request)
+        resp = await _request(self, request)
         if resp is None:
             return None
         return type_validate_python(MessageGet, resp)
@@ -5496,7 +5441,7 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
             json=payload,
         )
-        resp = await _request(self, bot, request)
+        resp = await _request(self, request)
         if resp is None:
             return None
         return type_validate_python(MessageGet, resp)
@@ -5521,7 +5466,7 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
             json=payload,
         )
-        resp = await _request(self, bot, request)
+        resp = await _request(self, request)
         if resp is None:
             return None
         return type_validate_python(MessageGet, resp)
@@ -5544,7 +5489,7 @@ class HandleMixin:
             url=self.base_url / f"webhooks/{webhook_id}/{token}/messages/{message_id}",
             params={key: value for key, value in params.items() if value is not None},
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     async def _api_edit_webhook_message(  # noqa: PLR0913
         self: AdapterProtocol,
@@ -5592,7 +5537,7 @@ class HandleMixin:
             json=request_kwargs.get("json"),
             files=request_kwargs.get("files"),
         )
-        return type_validate_python(MessageGet, await _request(self, bot, request))
+        return type_validate_python(MessageGet, await _request(self, request))
 
     async def _api_delete_webhook_message(
         self: AdapterProtocol,
@@ -5612,18 +5557,21 @@ class HandleMixin:
             url=self.base_url / f"webhooks/{webhook_id}/{token}/messages/{message_id}",
             params={key: value for key, value in params.items() if value is not None},
         )
-        await _request(self, bot, request)
+        await _request(self, request)
 
     # Gateway
 
     # see https://discord.com/developers/docs/topics/gateway
-    async def _api_get_gateway(self: AdapterProtocol, bot: "Bot") -> Gateway:
+    async def _api_get_gateway(
+        self: AdapterProtocol,
+        bot: "Bot",  # noqa: ARG002
+    ) -> Gateway:
         """https://discord.com/developers/docs/topics/gateway#get-gateway"""
         request = Request(
             method="GET",
             url=self.base_url / "gateway",
         )
-        return type_validate_python(Gateway, await _request(self, bot, request))
+        return type_validate_python(Gateway, await _request(self, request))
 
     async def _api_get_gateway_bot(self: AdapterProtocol, bot: "Bot") -> GatewayBot:
         """https://discord.com/developers/docs/topics/gateway#get-gateway-bot"""
@@ -5633,7 +5581,7 @@ class HandleMixin:
             method="GET",
             url=self.base_url / "gateway/bot",
         )
-        return type_validate_python(GatewayBot, await _request(self, bot, request))
+        return type_validate_python(GatewayBot, await _request(self, request))
 
     # OAuth2
 
@@ -5648,11 +5596,11 @@ class HandleMixin:
             method="GET",
             url=self.base_url / "oauth2/applications/@me",
         )
-        return type_validate_python(Application, await _request(self, bot, request))
+        return type_validate_python(Application, await _request(self, request))
 
     async def _api_get_current_authorization_information(
         self: AdapterProtocol,
-        bot: "Bot",
+        bot: "Bot",  # noqa: ARG002
         *,
         access_token: str,
     ) -> AuthorizationResponse:
@@ -5664,7 +5612,7 @@ class HandleMixin:
             url=self.base_url / "oauth2/@me",
         )
         return type_validate_python(
-            AuthorizationResponse, await _request(self, bot, request)
+            AuthorizationResponse, await _request(self, request)
         )
 
 

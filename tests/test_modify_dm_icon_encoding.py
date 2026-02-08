@@ -42,12 +42,11 @@ async def test_modify_dm_icon_bytes_are_encoded_to_data_uri(
 
     async def fake_request(
         _adapter: object,
-        _bot: object,
         request_obj: Request,
         *,
         parse_json: bool = True,
     ) -> dict[str, object]:
-        del _adapter, _bot, parse_json
+        del _adapter, parse_json
         captured["json"] = request_obj.json
         return {}
 

@@ -31,7 +31,6 @@ def bot() -> SimpleNamespace:
 def patch_api_runtime(monkeypatch: pytest.MonkeyPatch) -> None:
     async def fake_request(
         _adapter: object,
-        _bot: object,
         _request_obj: object,
         *,
         parse_json: bool = True,
