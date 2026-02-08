@@ -6,6 +6,7 @@ from nonebot.adapters import Bot as BaseBot
 from nonebot.message import handle_event
 
 from .api import (
+    UNSET,
     AllowedMention,
     ApiClient,
     InteractionCallbackMessage,
@@ -28,11 +29,17 @@ if TYPE_CHECKING:
 
 
 async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
-    if not event.message_reference or not event.message_reference.message_id:
+    message_reference = event.message_reference
+    if message_reference is UNSET:
         return
+
+    message_id = message_reference.message_id
+    if message_id is UNSET:
+        return
+
     try:
         msg = await bot.get_channel_message(
-            channel_id=event.channel_id, message_id=event.message_reference.message_id
+            channel_id=event.channel_id, message_id=message_id
         )
         event.reply = msg
         if msg.author.id == bot.self_info.id:
