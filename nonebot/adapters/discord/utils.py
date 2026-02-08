@@ -10,15 +10,15 @@ from .api.types import UNSET
 log = logger_wrapper("Discord")
 
 
-def exclude_unset_data(data: Any) -> Any:  # noqa: ANN401
+def omit_unset(data: Any) -> Any:  # noqa: ANN401
+    """Recursively omit fields whose value is exactly ``UNSET``."""
+
     if isinstance(data, dict):
         return data.__class__(
-            (k, exclude_unset_data(v)) for k, v in data.items() if v is not UNSET
+            (k, omit_unset(v)) for k, v in data.items() if v is not UNSET
         )
-    if isinstance(data, list):
-        return data.__class__(exclude_unset_data(i) for i in data)
-    if data is UNSET:
-        return None
+    if isinstance(data, (list, tuple, set)):
+        return data.__class__(omit_unset(i) for i in data if i is not UNSET)
     return data
 
 
@@ -42,7 +42,7 @@ def model_dump(  # noqa: PLR0913
         exclude_none=exclude_none,
     )
     if exclude_none or exclude_unset:
-        return exclude_unset_data(data)
+        return omit_unset(data)
     return data
 
 
@@ -55,4 +55,9 @@ def unescape(s: str) -> str:
 
 
 def decompress_data(data: Union[str, bytes], *, compress: bool) -> Union[str, bytes]:
-    return zlib.decompress(data) if compress else data
+    if not compress:
+        return data
+    if isinstance(data, str):
+        msg = "compressed data must be bytes"
+        raise TypeError(msg)
+    return zlib.decompress(data)
