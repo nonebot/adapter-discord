@@ -1984,21 +1984,21 @@ class AttachmentSend(BaseModel):
 class MessageSend(BaseModel):
     """Message Send
 
-    see https://discord.com/developers/docs/resources/channel#create-message"""
+    see https://discord.com/developers/docs/resources/message#create-message"""
 
-    content: Optional[str] = None
-    nonce: Optional[Union[int, str]] = None
-    enforce_nonce: Optional[bool] = None
-    tts: Optional[bool] = None
-    embeds: Optional[list[Embed]] = None
-    allowed_mentions: Optional[AllowedMention] = None
-    message_reference: Optional[MessageReference] = None
-    components: Optional[list[DirectComponent]] = None
-    sticker_ids: Optional[list[Snowflake]] = None
-    files: Optional[list[File]] = None
-    attachments: Optional[list[AttachmentSend]] = None
-    flags: Optional[MessageFlag] = None
-    poll: Optional["PollRequest"] = None
+    content: Missing[str] = UNSET
+    nonce: Missing[Union[int, str]] = UNSET
+    enforce_nonce: Missing[bool] = UNSET
+    tts: Missing[bool] = UNSET
+    embeds: Missing[list[Embed]] = UNSET
+    allowed_mentions: Missing[AllowedMention] = UNSET
+    message_reference: Missing[MessageReference] = UNSET
+    components: Missing[list[DirectComponent]] = UNSET
+    sticker_ids: Missing[list[Snowflake]] = UNSET
+    files: Missing[list[File]] = UNSET
+    attachments: Missing[list[AttachmentSend]] = UNSET
+    flags: Missing[MessageFlag] = UNSET
+    poll: Missing["PollRequest"] = UNSET
 
 
 class MessageEditParams(BaseModel):
@@ -3205,19 +3205,19 @@ class ExecuteWebhookParams(BaseModel):
 
     see https://discord.com/developers/docs/resources/webhook#execute-webhook"""
 
-    content: Optional[str] = None
-    username: Optional[str] = None
-    avatar_url: Optional[str] = None
-    tts: Optional[bool] = None
-    embeds: Optional[list[Embed]] = None
-    allowed_mentions: Optional[AllowedMention] = None
-    components: Optional[list[DirectComponent]] = None
-    files: Optional[list[File]] = None
-    attachments: Optional[list[AttachmentSend]] = None
-    flags: Optional[MessageFlag] = None
-    thread_name: Optional[str] = None
-    applied_tags: Optional[list[Snowflake]] = None
-    poll: Optional["Poll"] = None
+    content: Missing[str] = UNSET
+    username: Missing[str] = UNSET
+    avatar_url: Missing[str] = UNSET
+    tts: Missing[bool] = UNSET
+    embeds: Missing[list[Embed]] = UNSET
+    allowed_mentions: Missing[AllowedMention] = UNSET
+    components: Missing[list[DirectComponent]] = UNSET
+    files: Missing[list[File]] = UNSET
+    attachments: Missing[list[AttachmentSend]] = UNSET
+    flags: Missing[MessageFlag] = UNSET
+    thread_name: Missing[str] = UNSET
+    applied_tags: Missing[list[Snowflake]] = UNSET
+    poll: Missing["Poll"] = UNSET
 
 
 # gateway
