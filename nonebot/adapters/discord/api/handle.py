@@ -709,7 +709,6 @@ class HandleMixin:
 
     async def _api_get_guild_application_command_permissions(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
@@ -735,7 +734,6 @@ class HandleMixin:
 
     async def _api_get_application_command_permissions(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
@@ -759,9 +757,8 @@ class HandleMixin:
             GuildApplicationCommandPermissions, await _request(self, request)
         )
 
-    async def _api_edit_application_command_permissions(  # noqa: PLR0913
+    async def _api_edit_application_command_permissions(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
@@ -5042,9 +5039,8 @@ class HandleMixin:
         )
         return type_validate_python(User, await _request(self, request))
 
-    async def _api_get_current_user_guilds(  # noqa: PLR0913
+    async def _api_get_current_user_guilds(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         access_token: str,
         before: Optional[SnowflakeType] = None,
@@ -5072,7 +5068,6 @@ class HandleMixin:
 
     async def _api_get_current_user_guild_member(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         guild_id: SnowflakeType,
         access_token: str,
@@ -5134,7 +5129,6 @@ class HandleMixin:
 
     async def _api_get_user_connections(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         access_token: str,
     ) -> list[Connection]:
@@ -5149,7 +5143,6 @@ class HandleMixin:
 
     async def _api_get_user_application_role_connection(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         application_id: SnowflakeType,
         access_token: str,
@@ -5166,9 +5159,8 @@ class HandleMixin:
             ApplicationRoleConnection, await _request(self, request)
         )
 
-    async def _api_update_user_application_role_connection(  # noqa: PLR0913
+    async def _api_update_user_application_role_connection(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         application_id: SnowflakeType,
         access_token: str,
@@ -5260,7 +5252,6 @@ class HandleMixin:
 
     async def _api_get_webhook_with_token(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         webhook_id: SnowflakeType,
         token: str,
@@ -5297,7 +5288,6 @@ class HandleMixin:
 
     async def _api_modify_webhook_with_token(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         webhook_id: SnowflakeType,
         token: str,
@@ -5333,7 +5323,6 @@ class HandleMixin:
 
     async def _api_delete_webhook_with_token(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         webhook_id: SnowflakeType,
         token: str,
@@ -5562,10 +5551,7 @@ class HandleMixin:
     # Gateway
 
     # see https://discord.com/developers/docs/topics/gateway
-    async def _api_get_gateway(
-        self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
-    ) -> Gateway:
+    async def _api_get_gateway(self: AdapterProtocol) -> Gateway:
         """https://discord.com/developers/docs/topics/gateway#get-gateway"""
         request = Request(
             method="GET",
@@ -5600,7 +5586,6 @@ class HandleMixin:
 
     async def _api_get_current_authorization_information(
         self: AdapterProtocol,
-        bot: "Bot",  # noqa: ARG002
         *,
         access_token: str,
     ) -> AuthorizationResponse:
