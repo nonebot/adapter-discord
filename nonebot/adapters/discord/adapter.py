@@ -463,8 +463,8 @@ class Adapter(BaseAdapter, HandleMixin):
         api_handler = getattr(self, f"_api_{api}", None)
         if api_handler is None:
             raise ApiNotAvailable
+        handler_params = inspect.signature(api_handler).parameters
         if data:
-            handler_params = inspect.signature(api_handler).parameters
 
             def can_flatten(legacy_key: str) -> bool:
                 param = handler_params.get(legacy_key)
@@ -482,4 +482,6 @@ class Adapter(BaseAdapter, HandleMixin):
                     for key, value in legacy_value.items():
                         data.setdefault(key, value)
                     data.pop(legacy_key, None)
-        return await api_handler(bot, **data)
+        if "bot" in handler_params:
+            return await api_handler(bot, **data)
+        return await api_handler(**data)
