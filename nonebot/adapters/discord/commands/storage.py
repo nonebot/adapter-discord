@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import TYPE_CHECKING, Literal
 
-from ..api import ApplicationCommandCreate, Snowflake
+from ..api import ApplicationCommandBulkOverwriteParams, Snowflake
 from ..bot import Bot
 from ..utils import model_dump
 
@@ -16,13 +16,20 @@ OPTION_KEY: Literal["_discord_application_command_options"] = (
 
 
 async def sync_application_command(bot: Bot) -> None:  # noqa: C901, PLR0912
-    commands_global: list[ApplicationCommandCreate] = []
-    commands_guild: dict[Snowflake, list[ApplicationCommandCreate]] = defaultdict(list)
+    commands_global: list[ApplicationCommandBulkOverwriteParams] = []
+    commands_guild: dict[Snowflake, list[ApplicationCommandBulkOverwriteParams]] = (
+        defaultdict(list)
+    )
     if "*" in bot.bot_info.application_commands:
         if "*" in bot.bot_info.application_commands["*"]:
             commands_global = [
-                ApplicationCommandCreate(
-                    **model_dump(a, exclude={"guild_ids"}, exclude_none=True)
+                ApplicationCommandBulkOverwriteParams(
+                    **model_dump(
+                        a,
+                        exclude={"guild_ids"},
+                        exclude_none=True,
+                        omit_unset_values=True,
+                    )
                 )
                 for a in _application_command_storage.values()
             ]
@@ -33,9 +40,12 @@ async def sync_application_command(bot: Bot) -> None:  # noqa: C901, PLR0912
                 ]
                 for guild in command.guild_ids:
                     commands_guild[guild].append(
-                        ApplicationCommandCreate(
+                        ApplicationCommandBulkOverwriteParams(
                             **model_dump(
-                                command, exclude={"guild_ids"}, exclude_none=True
+                                command,
+                                exclude={"guild_ids"},
+                                exclude_none=True,
+                                omit_unset_values=True,
                             )
                         )
                     )
@@ -45,9 +55,12 @@ async def sync_application_command(bot: Bot) -> None:  # noqa: C901, PLR0912
             if command:
                 if "*" in config:
                     commands_global.append(
-                        ApplicationCommandCreate(
+                        ApplicationCommandBulkOverwriteParams(
                             **model_dump(
-                                command, exclude={"guild_ids"}, exclude_none=True
+                                command,
+                                exclude={"guild_ids"},
+                                exclude_none=True,
+                                omit_unset_values=True,
                             )
                         )
                     )
@@ -55,9 +68,12 @@ async def sync_application_command(bot: Bot) -> None:  # noqa: C901, PLR0912
                     command.guild_ids = [g for g in config if g != "*"]
                     for guild in command.guild_ids:
                         commands_guild[guild].append(
-                            ApplicationCommandCreate(
+                            ApplicationCommandBulkOverwriteParams(
                                 **model_dump(
-                                    command, exclude={"guild_ids"}, exclude_none=True
+                                    command,
+                                    exclude={"guild_ids"},
+                                    exclude_none=True,
+                                    omit_unset_values=True,
                                 )
                             )
                         )
