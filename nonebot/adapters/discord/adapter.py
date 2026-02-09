@@ -333,7 +333,14 @@ class Adapter(BaseAdapter, HandleMixin):
 
         try:
             await ws.send(
-                json.dumps(model_dump(payload, by_alias=True, exclude_none=True))
+                json.dumps(
+                    model_dump(
+                        payload,
+                        by_alias=True,
+                        exclude_none=True,
+                        omit_unset_values=True,
+                    )
+                )
             )
         except Exception as e:
             log(

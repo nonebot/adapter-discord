@@ -164,7 +164,6 @@ from .types import (
     VideoQualityMode,
 )
 from .utils import (
-    omit_unset,
     parse_data,
     parse_forum_thread_message,
     parse_interaction_response,
@@ -184,7 +183,7 @@ from ..exception import (
     RateLimitException,
     UnauthorizedException,
 )
-from ..utils import decompress_data, log, model_dump
+from ..utils import decompress_data, log, model_dump, omit_unset
 
 if TYPE_CHECKING:
     from ..bot import Bot
@@ -290,7 +289,7 @@ def _build_command_payloads(
         )
         command_data = model_dump(
             command_model,
-            exclude_unset=True,
+            omit_unset_values=True,
             exclude_none=True,
         )
         command_data["description"] = description
@@ -381,7 +380,7 @@ class HandleMixin:
         data = {key: value for key, value in data.items() if value is not None}
         payload = model_dump(
             type_validate_python(ApplicationCommandCreate, data),
-            exclude_unset=True,
+            omit_unset_values=True,
             exclude_none=True,
         )
         request = Request(
@@ -452,7 +451,7 @@ class HandleMixin:
         }
         data = model_dump(
             type_validate_python(ApplicationCommandEditParams, data),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -577,7 +576,7 @@ class HandleMixin:
         data = {key: value for key, value in data.items() if value is not None}
         payload = model_dump(
             type_validate_python(ApplicationCommandCreate, data),
-            exclude_unset=True,
+            omit_unset_values=True,
             exclude_none=True,
         )
         request = Request(
@@ -648,7 +647,7 @@ class HandleMixin:
         }
         data = model_dump(
             type_validate_python(ApplicationCommandEditParams, data),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -783,7 +782,7 @@ class HandleMixin:
             / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",
             json={
                 "permissions": [
-                    model_dump(permission, exclude_unset=True)
+                    model_dump(permission, omit_unset_values=True)
                     for permission in permissions
                 ]
             },
@@ -1122,7 +1121,7 @@ class HandleMixin:
                     "event_webhooks_types": event_webhooks_types,
                 },
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -1194,7 +1193,7 @@ class HandleMixin:
         payload = [
             model_dump(
                 type_validate_python(ApplicationRoleConnectionMetadata, record),
-                exclude_unset=True,
+                omit_unset_values=True,
             )
             for record in records
         ]
@@ -1437,6 +1436,7 @@ class HandleMixin:
         data = model_dump(
             type_validate_python(CreateAndModifyAutoModerationRuleParams, data),
             exclude_none=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -1490,6 +1490,7 @@ class HandleMixin:
                 {key: value for key, value in data.items() if value is not None},
             ),
             exclude_none=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -1621,7 +1622,7 @@ class HandleMixin:
                 ModifyChannelParams,
                 data,
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -1664,7 +1665,7 @@ class HandleMixin:
                     "applied_tags": applied_tags,
                 },
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -2362,7 +2363,7 @@ class HandleMixin:
                     "rate_limit_per_user": rate_limit_per_user,
                 },
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -2406,7 +2407,7 @@ class HandleMixin:
                     "rate_limit_per_user": rate_limit_per_user,
                 },
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -2730,7 +2731,7 @@ class HandleMixin:
             type_validate_python(
                 ModifyGuildEmojiParams, {"name": name, "roles": roles}
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -2988,7 +2989,7 @@ class HandleMixin:
             "system_channel_flags": system_channel_flags,
         }
         data = model_dump(
-            type_validate_python(CreateGuildParams, data), exclude_unset=True
+            type_validate_python(CreateGuildParams, data), omit_unset_values=True
         )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
@@ -3086,7 +3087,7 @@ class HandleMixin:
                 ModifyGuildParams,
                 data,
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -3174,7 +3175,7 @@ class HandleMixin:
             "default_sort_order": default_sort_order,
         }
         data = model_dump(
-            type_validate_python(CreateGuildChannelParams, data), exclude_unset=True
+            type_validate_python(CreateGuildChannelParams, data), omit_unset_values=True
         )
         request = Request(
             headers=headers,
@@ -3214,7 +3215,7 @@ class HandleMixin:
         payload = [
             model_dump(
                 type_validate_python(ModifyGuildChannelPositionParams, channel),
-                exclude_unset=True,
+                omit_unset_values=True,
             )
             for channel in channels
         ]
@@ -3366,7 +3367,7 @@ class HandleMixin:
                     "flags": flags,
                 },
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -3401,7 +3402,7 @@ class HandleMixin:
                     "bio": bio,
                 },
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -3751,7 +3752,7 @@ class HandleMixin:
                     "mentionable": mentionable,
                 },
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -3786,7 +3787,7 @@ class HandleMixin:
         payload = [
             model_dump(
                 type_validate_python(ModifyGuildRolePositionParams, role),
-                exclude_unset=True,
+                omit_unset_values=True,
             )
             for role in roles
         ]
@@ -3832,7 +3833,7 @@ class HandleMixin:
                     "mentionable": mentionable,
                 },
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -4023,7 +4024,7 @@ class HandleMixin:
                 ModifyGuildWidgetParams,
                 {"enabled": enabled, "channel_id": channel_id},
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -4113,7 +4114,7 @@ class HandleMixin:
                 ModifyGuildWelcomeScreenParams,
                 data,
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -4157,7 +4158,8 @@ class HandleMixin:
             "mode": mode,
         }
         data = model_dump(
-            type_validate_python(ModifyGuildOnboardingParams, data), exclude_unset=True
+            type_validate_python(ModifyGuildOnboardingParams, data),
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -4230,7 +4232,7 @@ class HandleMixin:
                     "request_to_speak_timestamp": request_to_speak_timestamp,
                 },
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -4336,6 +4338,7 @@ class HandleMixin:
         data = model_dump(
             type_validate_python(CreateGuildScheduledEventParams, data),
             exclude_none=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -4405,7 +4408,7 @@ class HandleMixin:
                 ModifyGuildScheduledEventParams,
                 data,
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -4531,7 +4534,7 @@ class HandleMixin:
                 CreateGuildTemplateParams,
                 {"name": name, "description": description},
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -4573,7 +4576,7 @@ class HandleMixin:
                 ModifyGuildTemplateParams,
                 {"name": name, "description": description},
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -4905,7 +4908,7 @@ class HandleMixin:
                 ModifyGuildStickerParams,
                 {"name": name, "description": description, "tags": tags},
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -5029,7 +5032,7 @@ class HandleMixin:
                 ModifyCurrentUserParams,
                 {"username": username, "avatar": avatar, "banner": banner},
             ),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
@@ -5204,7 +5207,7 @@ class HandleMixin:
             headers["X-Audit-Log-Reason"] = reason
         data = model_dump(
             type_validate_python(CreateWebhookParams, {"name": name, "avatar": avatar}),
-            exclude_unset=True,
+            omit_unset_values=True,
         )
         request = Request(
             headers=headers,
