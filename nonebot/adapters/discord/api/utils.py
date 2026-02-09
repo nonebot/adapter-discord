@@ -12,26 +12,7 @@ from .model import (
     WebhookMessageEditParams,
 )
 from .types import UNSET
-from ..utils import model_dump, omit_unset
-
-
-def _serialize_model_payload(
-    model: Any,  # noqa: ANN401
-    *,
-    exclude: Optional[set[str]] = None,
-    exclude_none: bool = False,
-    exclude_unset: bool = False,
-    omit_unset_values: bool = False,
-) -> dict[str, Any]:
-    payload = model_dump(
-        model,
-        exclude=exclude,
-        exclude_none=exclude_none,
-        exclude_unset=exclude_unset,
-    )
-    if omit_unset_values:
-        return omit_unset(payload)
-    return payload
+from ..utils import model_dump
 
 
 def _build_multipart_payload(
@@ -73,7 +54,7 @@ def parse_data(
     ],
 ) -> dict[Literal["files", "json"], Any]:
     model = type_validate_python(model_class, data)
-    payload: dict[str, Any] = _serialize_model_payload(
+    payload: dict[str, Any] = model_dump(
         model,
         exclude={"files"},
         omit_unset_values=True,
@@ -96,7 +77,7 @@ def parse_forum_thread_message(
     }
     model = type_validate_python(MessageSend, message_data)
     payload: dict[str, Any] = {"name": data["name"]}
-    content: dict[str, Any] = _serialize_model_payload(
+    content: dict[str, Any] = model_dump(
         model,
         exclude={"files"},
         exclude_none=True,
@@ -124,13 +105,13 @@ def parse_forum_thread_message(
 def parse_interaction_response(
     response: InteractionResponse,
 ) -> dict[Literal["files", "json"], Any]:
-    payload: dict[str, Any] = _serialize_model_payload(
+    payload: dict[str, Any] = model_dump(
         response,
         exclude_none=True,
         omit_unset_values=True,
     )
     if response.data and isinstance(response.data, InteractionCallbackMessage):
-        payload["data"] = _serialize_model_payload(
+        payload["data"] = model_dump(
             response.data,
             exclude={"files"},
             exclude_none=True,

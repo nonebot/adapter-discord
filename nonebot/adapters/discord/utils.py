@@ -31,6 +31,7 @@ def model_dump(  # noqa: PLR0913
     exclude_unset: bool = False,
     exclude_defaults: bool = False,
     exclude_none: bool = False,
+    omit_unset_values: bool = False,
 ) -> dict[str, Any]:
     data = model_dump_(
         model,
@@ -41,7 +42,7 @@ def model_dump(  # noqa: PLR0913
         exclude_defaults=exclude_defaults,
         exclude_none=exclude_none,
     )
-    if exclude_none or exclude_unset:
+    if omit_unset_values:
         return omit_unset(data)
     return data
 
