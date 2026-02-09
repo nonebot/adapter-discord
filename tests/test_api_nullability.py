@@ -1,19 +1,20 @@
-from importlib import import_module
 import json
 
-api_model = import_module("nonebot.adapters.discord.api.model")
-api_types = import_module("nonebot.adapters.discord.api.types")
-api_utils = import_module("nonebot.adapters.discord.api.utils")
-discord_utils = import_module("nonebot.adapters.discord.utils")
-
-File = api_model.File
-ExecuteWebhookParams = api_model.ExecuteWebhookParams
-MessageSend = api_model.MessageSend
-MessageEditParams = api_model.MessageEditParams
-UNSET = api_types.UNSET
-parse_data = api_utils.parse_data
-parse_forum_thread_message = api_utils.parse_forum_thread_message
-omit_unset = discord_utils.omit_unset
+from nonebot.adapters.discord.api import (
+    ActionRow,
+    ComponentType,
+    SelectMenu,
+    SelectOption,
+)
+from nonebot.adapters.discord.api.model import (
+    ExecuteWebhookParams,
+    File,
+    MessageEditParams,
+    MessageSend,
+)
+from nonebot.adapters.discord.api.types import UNSET
+from nonebot.adapters.discord.api.utils import parse_data, parse_forum_thread_message
+from nonebot.adapters.discord.utils import omit_unset
 
 
 def test_parse_data_keeps_explicit_null() -> None:
@@ -70,21 +71,15 @@ def test_parse_data_multipart_maps_attachment_id() -> None:
 
 
 def test_parse_data_keeps_action_row_type_for_components() -> None:
-    api = import_module("nonebot.adapters.discord.api")
-    action_row = api.ActionRow
-    component_type = api.ComponentType
-    select_menu = api.SelectMenu
-    select_option = api.SelectOption
-
     payload = parse_data(
         {
             "components": [
-                action_row(
+                ActionRow(
                     components=[
-                        select_menu(
-                            type=component_type.StringSelect,
+                        SelectMenu(
+                            type=ComponentType.StringSelect,
                             custom_id="menu",
-                            options=[select_option(label="A", value="a")],
+                            options=[SelectOption(label="A", value="a")],
                         )
                     ]
                 )
@@ -93,7 +88,7 @@ def test_parse_data_keeps_action_row_type_for_components() -> None:
         MessageSend,
     )["json"]
     assert "content" not in payload
-    assert int(payload["components"][0]["type"]) == int(component_type.ActionRow)
+    assert int(payload["components"][0]["type"]) == int(ComponentType.ActionRow)
 
 
 def test_parse_forum_thread_message_keeps_name() -> None:

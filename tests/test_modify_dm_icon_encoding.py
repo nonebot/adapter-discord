@@ -1,15 +1,11 @@
 import base64
-import importlib
 from types import SimpleNamespace
-from typing import Any, cast
+
+import nonebot.adapters.discord.api.handle as handle_module
 
 from nonebot.drivers import Request
 import pytest
 from yarl import URL
-
-handle_module = cast(
-    "Any", importlib.import_module("nonebot.adapters.discord.api.handle")
-)
 
 
 class DummyAdapter(handle_module.HandleMixin):
