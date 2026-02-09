@@ -3217,7 +3217,7 @@ class ExecuteWebhookParams(BaseModel):
     flags: Missing[MessageFlag] = UNSET
     thread_name: Missing[str] = UNSET
     applied_tags: Missing[list[Snowflake]] = UNSET
-    poll: Missing["Poll"] = UNSET
+    poll: Missing["PollRequest"] = UNSET
 
 
 # gateway
