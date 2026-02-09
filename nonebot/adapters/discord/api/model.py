@@ -276,18 +276,18 @@ class ApplicationCommandCreate(BaseModel):
     see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
     """
 
-    type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
     name: str
-    name_localizations: Optional[dict[str, str]] = None
-    description: Optional[str] = None
-    description_localizations: Optional[dict[str, str]] = None
-    options: Optional[list["AnyCommandOption"]] = None
-    default_member_permissions: Optional[str] = None
-    dm_permission: Optional[bool] = None
-    default_permission: Optional[bool] = None
-    nsfw: Optional[bool] = None
+    name_localizations: MissingOrNullable[dict[str, str]] = UNSET
+    description: Missing[str] = UNSET
+    description_localizations: MissingOrNullable[dict[str, str]] = UNSET
+    options: Missing[list["AnyCommandOption"]] = UNSET
+    default_member_permissions: MissingOrNullable[str] = UNSET
+    dm_permission: MissingOrNullable[bool] = UNSET
+    default_permission: Missing[bool] = UNSET
     integration_types: Missing[list[ApplicationIntegrationType]] = UNSET
-    contexts: MissingOrNullable[list[InteractionContextType]] = UNSET
+    contexts: Missing[list[InteractionContextType]] = UNSET
+    type: Missing[ApplicationCommandType] = UNSET
+    nsfw: Missing[bool] = UNSET
 
 
 class ApplicationCommandBulkOverwriteParams(BaseModel):
@@ -323,11 +323,11 @@ class ApplicationCommandEditParams(BaseModel):
     description_localizations: MissingOrNullable[dict[str, str]] = UNSET
     options: Missing[list["AnyCommandOption"]] = UNSET
     default_member_permissions: MissingOrNullable[str] = UNSET
-    dm_permission: Missing[bool] = UNSET
-    default_permission: MissingOrNullable[bool] = UNSET
+    dm_permission: MissingOrNullable[bool] = UNSET
+    default_permission: Missing[bool] = UNSET
     nsfw: Missing[bool] = UNSET
     integration_types: Missing[list[ApplicationIntegrationType]] = UNSET
-    contexts: MissingOrNullable[list[InteractionContextType]] = UNSET
+    contexts: Missing[list[InteractionContextType]] = UNSET
 
 
 class CommandOptionBase(BaseModel):
