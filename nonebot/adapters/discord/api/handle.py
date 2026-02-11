@@ -1248,18 +1248,10 @@ class HandleMixin:
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> AuditLog:
-        """Returns an audit log object for the guild.
-        Requires the VIEW_AUDIT_LOG permission.
+        """Get guild audit log.
 
-        The returned list of audit log entries is ordered based on whether you use
-        before or after. When using before, the list is ordered by the audit log entry
-        ID descending (newer entries first). If after is used, the list is reversed and
-        appears in ascending order (older entries first). Omitting both before and after
-        defaults to before the current timestamp and will show the most recent entries
-        in descending order by ID, the opposite can be achieved using after=0 (showing
-        oldest entries).
-
-        see https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log"""
+        see https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {
             "user_id": user_id,
@@ -1282,7 +1274,7 @@ class HandleMixin:
     async def _api_list_auto_moderation_rules_for_guild(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> list[AutoModerationRule]:
-        """list auto moderation rules for guild
+        """List auto moderation rules for guild.
 
         see https://discord.com/developers/docs/resources/auto-moderation#list-auto-moderation-rules-for-guild
         """
@@ -1303,7 +1295,7 @@ class HandleMixin:
         guild_id: SnowflakeType,
         rule_id: SnowflakeType,
     ) -> AutoModerationRule:
-        """get auto moderation rule
+        """Get auto moderation rule.
 
         see https://discord.com/developers/docs/resources/auto-moderation#get-auto-moderation-rule
         """
@@ -1398,7 +1390,7 @@ class HandleMixin:
         ] = None,
         reason: Optional[str] = None,
     ) -> AutoModerationRule:
-        """create auto moderation rule
+        """Create auto moderation rule.
 
         see https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
         """
@@ -1450,7 +1442,7 @@ class HandleMixin:
         ] = None,
         reason: Optional[str] = None,
     ) -> AutoModerationRule:
-        """modify auto moderation rule
+        """Modify auto moderation rule.
 
         see https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
         """
@@ -1490,7 +1482,7 @@ class HandleMixin:
         rule_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """delete auto moderation rule
+        """Delete auto moderation rule.
 
         see https://discord.com/developers/docs/resources/auto-moderation#delete-auto-moderation-rule
         """
