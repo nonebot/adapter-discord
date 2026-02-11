@@ -2133,7 +2133,10 @@ class HandleMixin:
         type: OverwriteType,  # noqa: A002
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#edit-channel-permissions"""
+        """Edit channel permissions.
+
+        see https://discord.com/developers/docs/resources/channel#edit-channel-permissions
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2153,7 +2156,10 @@ class HandleMixin:
     async def _api_get_channel_invites(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
     ) -> list[Invite]:
-        """https://discord.com/developers/docs/resources/channel#get-channel-invites"""
+        """Get channel invites.
+
+        see https://discord.com/developers/docs/resources/channel#get-channel-invites
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2178,7 +2184,10 @@ class HandleMixin:
         role_ids: Optional[list[SnowflakeType]] = None,
         reason: Optional[str] = None,
     ) -> Invite:
-        """https://discord.com/developers/docs/resources/channel#create-channel-invite"""
+        """Create channel invite.
+
+        see https://discord.com/developers/docs/resources/channel#create-channel-invite
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2233,7 +2242,10 @@ class HandleMixin:
         overwrite_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#delete-channel-permission"""
+        """Delete channel permission.
+
+        see https://discord.com/developers/docs/resources/channel#delete-channel-permission
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2252,7 +2264,10 @@ class HandleMixin:
         webhook_channel_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> FollowedChannel:
-        """https://discord.com/developers/docs/resources/channel#follow-announcement-channel"""
+        """Follow announcement channel.
+
+        see https://discord.com/developers/docs/resources/channel#follow-announcement-channel
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2268,7 +2283,10 @@ class HandleMixin:
     async def _api_trigger_typing_indicator(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#trigger-typing-indicator"""
+        """Trigger typing indicator.
+
+        see https://discord.com/developers/docs/resources/channel#trigger-typing-indicator
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2280,7 +2298,10 @@ class HandleMixin:
     async def _api_get_pinned_messages(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
     ) -> list[MessageGet]:
-        """https://discord.com/developers/docs/resources/channel#get-pinned-messages"""
+        """Get pinned messages.
+
+        see https://discord.com/developers/docs/resources/channel#get-pinned-messages
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2297,7 +2318,10 @@ class HandleMixin:
         message_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#pin-message"""
+        """Pin message.
+
+        see https://discord.com/developers/docs/resources/channel#pin-message
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2316,7 +2340,10 @@ class HandleMixin:
         message_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#unpin-message"""
+        """Unpin message.
+
+        see https://discord.com/developers/docs/resources/channel#unpin-message
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2336,7 +2363,10 @@ class HandleMixin:
         access_token: str,
         nick: str,
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#group-dm-add-recipient"""
+        """Group DM add recipient.
+
+        see https://discord.com/developers/docs/resources/channel#group-dm-add-recipient
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {"access_token": access_token, "nick": nick}
         request = Request(
@@ -2354,7 +2384,10 @@ class HandleMixin:
         channel_id: SnowflakeType,
         user_id: SnowflakeType,
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#group-dm-remove-recipient"""
+        """Group DM remove recipient.
+
+        see https://discord.com/developers/docs/resources/channel#group-dm-remove-recipient
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2374,7 +2407,10 @@ class HandleMixin:
         rate_limit_per_user: MissingOrNullable[int] = UNSET,
         reason: Optional[str] = None,
     ) -> Channel:
-        """https://discord.com/developers/docs/resources/channel#start-thread-from-message"""
+        """Start thread from message.
+
+        see https://discord.com/developers/docs/resources/channel#start-thread-from-message
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2409,7 +2445,10 @@ class HandleMixin:
         rate_limit_per_user: MissingOrNullable[int] = UNSET,
         reason: Optional[str] = None,
     ) -> Channel:
-        """https://discord.com/developers/docs/resources/channel#start-thread-without-message"""
+        """Start thread without message.
+
+        see https://discord.com/developers/docs/resources/channel#start-thread-without-message
+        """
         if type is not UNSET and type not in (
             ChannelType.ANNOUNCEMENT_THREAD,
             ChannelType.PUBLIC_THREAD,
@@ -2460,7 +2499,10 @@ class HandleMixin:
         flags: Optional[MessageFlag] = None,
         reason: Optional[str] = None,
     ) -> Channel:
-        """https://discord.com/developers/docs/resources/channel#start-thread-in-forum-or-media-channel"""
+        """Start thread in forum or media channel.
+
+        see https://discord.com/developers/docs/resources/channel#start-thread-in-forum-or-media-channel
+        """
         data = {
             "name": name,
             "auto_archive_duration": auto_archive_duration,
@@ -2491,7 +2533,10 @@ class HandleMixin:
     async def _api_join_thread(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#join-thread"""
+        """Join thread.
+
+        see https://discord.com/developers/docs/resources/channel#join-thread
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2507,7 +2552,10 @@ class HandleMixin:
         channel_id: SnowflakeType,
         user_id: SnowflakeType,
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#add-thread-member"""
+        """Add thread member.
+
+        see https://discord.com/developers/docs/resources/channel#add-thread-member
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2519,7 +2567,10 @@ class HandleMixin:
     async def _api_leave_thread(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#leave-thread"""
+        """Leave thread.
+
+        see https://discord.com/developers/docs/resources/channel#leave-thread
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2535,7 +2586,10 @@ class HandleMixin:
         channel_id: SnowflakeType,
         user_id: SnowflakeType,
     ) -> None:
-        """https://discord.com/developers/docs/resources/channel#remove-thread-member"""
+        """Remove thread member.
+
+        see https://discord.com/developers/docs/resources/channel#remove-thread-member
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2552,7 +2606,10 @@ class HandleMixin:
         user_id: SnowflakeType,
         with_member: Optional[bool] = None,
     ) -> ThreadMember:
-        """https://discord.com/developers/docs/resources/channel#get-thread-member"""
+        """Get thread member.
+
+        see https://discord.com/developers/docs/resources/channel#get-thread-member
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"with_member": _bool_query(value=with_member)}
         request = Request(
@@ -2576,7 +2633,10 @@ class HandleMixin:
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> list[ThreadMember]:
-        """https://discord.com/developers/docs/resources/channel#list-thread-members"""
+        """List thread members.
+
+        see https://discord.com/developers/docs/resources/channel#list-thread-members
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "with_member": _bool_query(value=with_member),
@@ -2599,7 +2659,10 @@ class HandleMixin:
         before: Optional[datetime] = None,
         limit: Optional[int] = None,
     ) -> ArchivedThreadsResponse:
-        """https://discord.com/developers/docs/resources/channel#list-public-archived-threads"""
+        """List public archived threads.
+
+        see https://discord.com/developers/docs/resources/channel#list-public-archived-threads
+        """
         params = {"before": before, "limit": limit}
         if params["before"]:
             before_utc = params["before"]
@@ -2629,7 +2692,10 @@ class HandleMixin:
         before: Optional[datetime] = None,
         limit: Optional[int] = None,
     ) -> ArchivedThreadsResponse:
-        """https://discord.com/developers/docs/resources/channel#list-private-archived-threads"""
+        """List private archived threads.
+
+        see https://discord.com/developers/docs/resources/channel#list-private-archived-threads
+        """
         params = {"before": before, "limit": limit}
         if params["before"]:
             before_utc = params["before"]
@@ -2659,7 +2725,10 @@ class HandleMixin:
         before: Optional[SnowflakeType] = None,
         limit: Optional[int] = None,
     ) -> ArchivedThreadsResponse:
-        """https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads"""
+        """List joined private archived threads.
+
+        see https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads
+        """
         params = {"before": before, "limit": limit}
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
