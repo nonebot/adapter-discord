@@ -3596,7 +3596,8 @@ class HandleMixin:
     ) -> GuildMember:
         """Deprecated in favor of Modify Current Member.
 
-        https://discord.com/developers/docs/resources/guild#modify-current-user-nick"""
+        see https://discord.com/developers/docs/resources/guild#modify-current-user-nick
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
