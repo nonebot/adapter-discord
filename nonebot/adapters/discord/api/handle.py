@@ -771,7 +771,10 @@ class HandleMixin:
         response: InteractionResponse,
         with_response: Optional[bool] = None,
     ) -> Optional[InteractionResponse]:
-        """https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response"""
+        """Create an interaction response.
+
+        see https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response
+        """
         params = parse_interaction_response(response)
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         query = {"with_response": _bool_query(value=with_response)}
@@ -797,7 +800,10 @@ class HandleMixin:
         interaction_token: str,
         thread_id: Optional[SnowflakeType] = None,
     ) -> MessageGet:
-        """https://discord.com/developers/docs/interactions/receiving-and-responding#get-original-interaction-response"""
+        """Get the original interaction response.
+
+        see https://discord.com/developers/docs/interactions/receiving-and-responding#get-original-interaction-response
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"thread_id": thread_id}
         request = Request(
@@ -826,7 +832,10 @@ class HandleMixin:
         attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
         poll: MissingOrNullable[PollRequest] = UNSET,
     ) -> MessageGet:
-        """https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response"""
+        """Edit the original interaction response.
+
+        see https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response
+        """
         params: dict[str, Any] = {"thread_id": thread_id}
         if with_components is not None:
             params["with_components"] = str(with_components).lower()
@@ -864,7 +873,10 @@ class HandleMixin:
         interaction_token: str,
         thread_id: Optional[SnowflakeType] = None,
     ) -> None:
-        """https://discord.com/developers/docs/interactions/receiving-and-responding#delete-original-interaction-response"""
+        """Delete the original interaction response.
+
+        see https://discord.com/developers/docs/interactions/receiving-and-responding#delete-original-interaction-response
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"thread_id": thread_id}
         request = Request(
@@ -891,7 +903,10 @@ class HandleMixin:
         attachments: Optional[list[AttachmentSend]] = None,
         flags: Optional[int] = None,
     ) -> MessageGet:
-        """https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message"""
+        """Create a followup message.
+
+        see https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message
+        """
         has_payload = any(
             [
                 bool(content),
@@ -936,7 +951,7 @@ class HandleMixin:
         message_id: SnowflakeType,
         thread_id: Optional[SnowflakeType] = None,
     ) -> MessageGet:
-        """Returns a followup message for an Interaction. Functions the same as Get Webhook Message.
+        """Get a followup message.
 
         see https://discord.com/developers/docs/interactions/receiving-and-responding#get-followup-message
         """
@@ -969,7 +984,7 @@ class HandleMixin:
         attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
         poll: MissingOrNullable[PollRequest] = UNSET,
     ) -> MessageGet:
-        """Edits a followup message for an Interaction. Functions the same as Edit Webhook Message.
+        """Edit a followup message.
 
         see https://discord.com/developers/docs/interactions/receiving-and-responding#edit-followup-message
         """
@@ -1011,7 +1026,7 @@ class HandleMixin:
         message_id: SnowflakeType,
         thread_id: Optional[SnowflakeType] = None,
     ) -> None:
-        """Deletes a followup message for an Interaction.
+        """Delete a followup message.
 
         see https://discord.com/developers/docs/interactions/receiving-and-responding#delete-followup-message
         """
