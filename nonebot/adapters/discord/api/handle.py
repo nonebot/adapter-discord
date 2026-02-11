@@ -1666,7 +1666,7 @@ class HandleMixin:
     ) -> Channel:
         """Delete or close a channel.
 
-        see https://discord.com/developers/docs/resources/channel#deleteclose-channel
+        see https://discord.com/developers/docs/resources/channel#delete/close-channel
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
@@ -2300,7 +2300,7 @@ class HandleMixin:
     ) -> list[MessageGet]:
         """Get pinned messages.
 
-        see https://discord.com/developers/docs/resources/channel#get-pinned-messages
+        see https://discord.com/developers/docs/resources/message#get-channel-pins
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
@@ -2320,7 +2320,7 @@ class HandleMixin:
     ) -> None:
         """Pin message.
 
-        see https://discord.com/developers/docs/resources/channel#pin-message
+        see https://discord.com/developers/docs/resources/message#pin-message
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
@@ -2342,7 +2342,7 @@ class HandleMixin:
     ) -> None:
         """Unpin message.
 
-        see https://discord.com/developers/docs/resources/channel#unpin-message
+        see https://discord.com/developers/docs/resources/message#unpin-message
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
@@ -3105,7 +3105,7 @@ class HandleMixin:
         system_channel_id: Optional[Snowflake] = None,
         system_channel_flags: Optional[SystemChannelFlags] = None,
     ) -> Guild:
-        """https://discord.com/developers/docs/resources/guild#create-guild"""
+        """https://discord.com/developers/docs/resources/guild"""
         if not name:
             msg = "name is required"
             raise ValueError(msg)
@@ -3249,7 +3249,7 @@ class HandleMixin:
     async def _api_delete_guild(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#delete-guild"""
+        """https://discord.com/developers/docs/resources/guild"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4070,7 +4070,7 @@ class HandleMixin:
         level: int,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level"""
+        """https://discord.com/developers/docs/resources/guild"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4794,7 +4794,7 @@ class HandleMixin:
         name: str,
         icon: Optional[str] = None,
     ) -> Guild:
-        """https://discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template"""
+        """https://discord.com/developers/docs/resources/guild-template"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {"name": name, "icon": icon}
         request = Request(
@@ -5998,11 +5998,11 @@ class HandleMixin:
 
     # Gateway
 
-    # see https://discord.com/developers/docs/topics/gateway
+    # see https://discord.com/developers/docs/events/gateway
     async def _api_get_gateway(self: AdapterProtocol) -> Gateway:
         """Get gateway.
 
-        see https://discord.com/developers/docs/topics/gateway#get-gateway
+        see https://discord.com/developers/docs/events/gateway#get-gateway
         """
         request = Request(
             method="GET",
@@ -6013,7 +6013,7 @@ class HandleMixin:
     async def _api_get_gateway_bot(self: AdapterProtocol, bot: "Bot") -> GatewayBot:
         """Get gateway bot.
 
-        see https://discord.com/developers/docs/topics/gateway#get-gateway-bot
+        see https://discord.com/developers/docs/events/gateway#get-gateway-bot
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
