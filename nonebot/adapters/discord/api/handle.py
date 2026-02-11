@@ -4767,7 +4767,10 @@ class HandleMixin:
     async def _api_get_guild_template(
         self: AdapterProtocol, bot: "Bot", *, template_code: str
     ) -> GuildTemplate:
-        """https://discord.com/developers/docs/resources/guild-template#get-guild-template"""
+        """Get guild template.
+
+        see https://discord.com/developers/docs/resources/guild-template#get-guild-template
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4804,7 +4807,10 @@ class HandleMixin:
     async def _api_get_guild_templates(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> list[GuildTemplate]:
-        """https://discord.com/developers/docs/resources/guild-template#get-guild-templates"""
+        """Get guild templates.
+
+        see https://discord.com/developers/docs/resources/guild-template#get-guild-templates
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4821,7 +4827,10 @@ class HandleMixin:
         name: str,
         description: MissingOrNullable[str] = UNSET,
     ) -> GuildTemplate:
-        """https://discord.com/developers/docs/resources/guild-template#create-guild-template"""
+        """Create guild template.
+
+        see https://discord.com/developers/docs/resources/guild-template#create-guild-template
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = model_dump(
             type_validate_python(
@@ -4845,7 +4854,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         template_code: str,
     ) -> GuildTemplate:
-        """https://discord.com/developers/docs/resources/guild-template#sync-guild-template"""
+        """Sync guild template.
+
+        see https://discord.com/developers/docs/resources/guild-template#sync-guild-template
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4863,7 +4875,10 @@ class HandleMixin:
         name: Missing[str] = UNSET,
         description: MissingOrNullable[str] = UNSET,
     ) -> GuildTemplate:
-        """https://discord.com/developers/docs/resources/guild-template#modify-guild-template"""
+        """Modify guild template.
+
+        see https://discord.com/developers/docs/resources/guild-template#modify-guild-template
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = model_dump(
             type_validate_python(
@@ -4887,7 +4902,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         template_code: str,
     ) -> GuildTemplate:
-        """https://discord.com/developers/docs/resources/guild-template#delete-guild-template"""
+        """Delete guild template.
+
+        see https://discord.com/developers/docs/resources/guild-template#delete-guild-template
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
