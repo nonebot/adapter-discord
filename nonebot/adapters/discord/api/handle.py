@@ -1048,7 +1048,7 @@ class HandleMixin:
         self: AdapterProtocol,
         bot: "Bot",
     ) -> Application:
-        """Returns the application object associated with the requesting bot user.
+        """Get current application.
 
         see https://discord.com/developers/docs/resources/application#get-current-application
         """
@@ -1080,7 +1080,7 @@ class HandleMixin:
         event_webhooks_status: Missing[int] = UNSET,
         event_webhooks_types: Missing[list[str]] = UNSET,
     ) -> Application:
-        """Edit properties of the app associated with the requesting bot user.
+        """Edit current application.
 
         see https://discord.com/developers/docs/resources/application#edit-current-application
         """
@@ -1121,8 +1121,7 @@ class HandleMixin:
         application_id: SnowflakeType,
         instance_id: str,
     ) -> ActivityInstance:
-        """Returns a serialized activity instance, if it exists.
-        Useful for preventing unwanted activity sessions.
+        """Get application activity instance.
 
         see https://discord.com/developers/docs/resources/application#get-application-activity-instance
         """
@@ -1141,7 +1140,7 @@ class HandleMixin:
     async def _api_get_application_role_connection_metadata_records(
         self: AdapterProtocol, bot: "Bot", *, application_id: SnowflakeType
     ) -> list[ApplicationRoleConnectionMetadata]:
-        """get application role connection metadata records
+        """Get application role connection metadata records.
 
         see https://discord.com/developers/docs/resources/application-role-connection-metadata#get-application-role-connection-metadata-records
         """
@@ -1168,7 +1167,7 @@ class HandleMixin:
             Range(message="metadata records must be 0-5 items", max_length=5),
         ],
     ) -> list[ApplicationRoleConnectionMetadata]:
-        """update application role connection metadata records
+        """Update application role connection metadata records.
 
         see https://discord.com/developers/docs/resources/application-role-connection-metadata#update-application-role-connection-metadata-records
         """
