@@ -4194,7 +4194,10 @@ class HandleMixin:
     async def _api_get_guild_integrations(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> list[Integration]:
-        """https://discord.com/developers/docs/resources/guild#get-guild-integrations"""
+        """Get guild integrations.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-integrations
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4211,7 +4214,10 @@ class HandleMixin:
         integration_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#delete-guild-integration"""
+        """Delete guild integration.
+
+        see https://discord.com/developers/docs/resources/guild#delete-guild-integration
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4225,7 +4231,10 @@ class HandleMixin:
     async def _api_get_guild_widget_settings(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> GuildWidgetSettings:
-        """https://discord.com/developers/docs/resources/guild#get-guild-widget-settings"""
+        """Get guild widget settings.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-widget-settings
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4243,7 +4252,10 @@ class HandleMixin:
         channel_id: MissingOrNullable[SnowflakeType] = UNSET,
         reason: Optional[str] = None,
     ) -> GuildWidgetSettings:
-        """https://discord.com/developers/docs/resources/guild#modify-guild-widget"""
+        """Modify guild widget.
+
+        see https://discord.com/developers/docs/resources/guild#modify-guild-widget
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4265,7 +4277,10 @@ class HandleMixin:
     async def _api_get_guild_widget(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> GuildWidget:
-        """https://discord.com/developers/docs/resources/guild#get-guild-widget"""
+        """Get guild widget.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-widget
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4277,7 +4292,10 @@ class HandleMixin:
     async def _api_get_guild_vanity_url(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> GuildVanityURL:
-        """https://discord.com/developers/docs/resources/guild#get-guild-vanity-url"""
+        """Get guild vanity URL.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-vanity-url
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4295,7 +4313,10 @@ class HandleMixin:
             Literal["shield", "banner1", "banner2", "banner3", "banner4"]
         ] = None,
     ) -> bytes:
-        """https://discord.com/developers/docs/resources/guild#get-guild-widget-image"""
+        """Get guild widget image.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-widget-image
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"style": style}
         request = Request(
@@ -4309,7 +4330,10 @@ class HandleMixin:
     async def _api_get_guild_welcome_screen(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> WelcomeScreen:
-        """https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen"""
+        """Get guild welcome screen.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4328,7 +4352,10 @@ class HandleMixin:
         description: MissingOrNullable[str] = UNSET,
         reason: Optional[str] = None,
     ) -> WelcomeScreen:
-        """https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen"""
+        """Modify guild welcome screen.
+
+        see https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4355,7 +4382,10 @@ class HandleMixin:
     async def _api_get_guild_onboarding(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> GuildOnboarding:
-        """https://discord.com/developers/docs/resources/guild#get-guild-onboarding"""
+        """Get guild onboarding.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-onboarding
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4375,7 +4405,10 @@ class HandleMixin:
         mode: Missing[OnboardingMode] = UNSET,
         reason: Optional[str] = None,
     ) -> GuildOnboarding:
-        """https://discord.com/developers/docs/resources/guild#modify-guild-onboarding"""
+        """Modify guild onboarding.
+
+        see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
