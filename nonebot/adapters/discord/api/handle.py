@@ -4548,7 +4548,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         with_user_count: Optional[bool] = None,
     ) -> list[GuildScheduledEvent]:
-        """https://discord.com/developers/docs/resources/guild-scheduled-event#list-scheduled-events-for-guild"""
+        """List scheduled events for guild.
+
+        see https://discord.com/developers/docs/resources/guild-scheduled-event#list-scheduled-events-for-guild
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"with_user_count": _bool_query(value=with_user_count)}
         request = Request(
@@ -4578,7 +4581,10 @@ class HandleMixin:
         recurrence_rule: Optional[RecurrenceRule] = None,
         reason: Optional[str] = None,
     ) -> GuildScheduledEvent:
-        """https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event"""
+        """Create guild scheduled event.
+
+        see https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event
+        """
         if entity_type == GuildScheduledEventEntityType.EXTERNAL:
             if channel_id is not None:
                 msg = "channel_id must be None for EXTERNAL events"
@@ -4632,7 +4638,10 @@ class HandleMixin:
         event_id: SnowflakeType,
         with_user_count: Optional[bool] = None,
     ) -> GuildScheduledEvent:
-        """https://discord.com/developers/docs/resources/guild-scheduled-event#get-guild-scheduled-event"""
+        """Get guild scheduled event.
+
+        see https://discord.com/developers/docs/resources/guild-scheduled-event#get-guild-scheduled-event
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"with_user_count": _bool_query(value=with_user_count)}
         request = Request(
@@ -4662,7 +4671,10 @@ class HandleMixin:
         recurrence_rule: MissingOrNullable[RecurrenceRule] = UNSET,
         reason: Optional[str] = None,
     ) -> GuildScheduledEvent:
-        """https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event"""
+        """Modify guild scheduled event.
+
+        see https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4701,7 +4713,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         event_id: SnowflakeType,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild-scheduled-event#delete-guild-scheduled-event"""
+        """Delete guild scheduled event.
+
+        see https://discord.com/developers/docs/resources/guild-scheduled-event#delete-guild-scheduled-event
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4725,7 +4740,10 @@ class HandleMixin:
         before: Optional[SnowflakeType] = None,
         after: Optional[SnowflakeType] = None,
     ) -> list[GuildScheduledEventUser]:
-        """https://discord.com/developers/docs/resources/guild-scheduled-event#get-guild-scheduled-event-users"""
+        """Get guild scheduled event users.
+
+        see https://discord.com/developers/docs/resources/guild-scheduled-event#get-guild-scheduled-event-users
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "limit": limit,
