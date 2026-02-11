@@ -4926,7 +4926,10 @@ class HandleMixin:
         with_expiration: Optional[bool] = None,
         guild_scheduled_event_id: Optional[SnowflakeType] = None,
     ) -> Invite:
-        """https://discord.com/developers/docs/resources/invite#get-invite"""
+        """Get invite.
+
+        see https://discord.com/developers/docs/resources/invite#get-invite
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "with_counts": _bool_query(value=with_counts),
@@ -4948,7 +4951,10 @@ class HandleMixin:
         invite_code: str,
         reason: Optional[str] = None,
     ) -> Invite:
-        """https://discord.com/developers/docs/resources/invite#delete-invite"""
+        """Delete invite.
+
+        see https://discord.com/developers/docs/resources/invite#delete-invite
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4976,7 +4982,10 @@ class HandleMixin:
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> AnswerVoters:
-        """https://discord.com/developers/docs/resources/poll#get-answer-voters"""
+        """Get answer voters.
+
+        see https://discord.com/developers/docs/resources/poll#get-answer-voters
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"after": after, "limit": limit}
         request = Request(
@@ -4995,7 +5004,10 @@ class HandleMixin:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
     ) -> MessageGet:
-        """https://discord.com/developers/docs/resources/poll#end-poll"""
+        """End poll.
+
+        see https://discord.com/developers/docs/resources/poll#end-poll
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5010,7 +5022,10 @@ class HandleMixin:
     async def _api_list_SKUs(  # noqa: N802
         self: AdapterProtocol, bot: "Bot", *, application_id: SnowflakeType
     ) -> list[SKU]:
-        """https://discord.com/developers/docs/resources/sku#list-skus"""
+        """List SKUs.
+
+        see https://discord.com/developers/docs/resources/sku#list-skus
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
