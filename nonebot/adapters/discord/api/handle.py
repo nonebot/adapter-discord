@@ -2748,7 +2748,10 @@ class HandleMixin:
     async def _api_list_guild_emojis(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> list[Emoji]:
-        """https://discord.com/developers/docs/resources/emoji#list-guild-emojis"""
+        """List guild emojis.
+
+        see https://discord.com/developers/docs/resources/emoji#list-guild-emojis
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2764,7 +2767,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         emoji_id: SnowflakeType,
     ) -> Emoji:
-        """https://discord.com/developers/docs/resources/emoji#get-guild-emoji"""
+        """Get guild emoji.
+
+        see https://discord.com/developers/docs/resources/emoji#get-guild-emoji
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2783,7 +2789,10 @@ class HandleMixin:
         roles: Optional[list[SnowflakeType]] = None,
         reason: Optional[str] = None,
     ) -> Emoji:
-        """https://discord.com/developers/docs/resources/emoji#create-guild-emoji"""
+        """Create guild emoji.
+
+        see https://discord.com/developers/docs/resources/emoji#create-guild-emoji
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2816,7 +2825,10 @@ class HandleMixin:
         roles: MissingOrNullable[list[SnowflakeType]] = UNSET,
         reason: Optional[str] = None,
     ) -> Emoji:
-        """https://discord.com/developers/docs/resources/emoji#modify-guild-emoji"""
+        """Modify guild emoji.
+
+        see https://discord.com/developers/docs/resources/emoji#modify-guild-emoji
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2842,7 +2854,10 @@ class HandleMixin:
         emoji_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/emoji#delete-guild-emoji"""
+        """Delete guild emoji.
+
+        see https://discord.com/developers/docs/resources/emoji#delete-guild-emoji
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2856,7 +2871,10 @@ class HandleMixin:
     async def _api_list_application_emojis(
         self: AdapterProtocol, bot: "Bot", *, application_id: SnowflakeType
     ) -> ApplicationEmojis:
-        """https://discord.com/developers/docs/resources/emoji#list-application-emojis"""
+        """List application emojis.
+
+        see https://discord.com/developers/docs/resources/emoji#list-application-emojis
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2872,7 +2890,10 @@ class HandleMixin:
         application_id: SnowflakeType,
         emoji_id: SnowflakeType,
     ) -> Emoji:
-        """https://discord.com/developers/docs/resources/emoji#get-application-emoji"""
+        """Get application emoji.
+
+        see https://discord.com/developers/docs/resources/emoji#get-application-emoji
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2889,7 +2910,10 @@ class HandleMixin:
         name: str,
         image: str,
     ) -> Emoji:
-        """https://discord.com/developers/docs/resources/emoji#create-application-emoji"""
+        """Create application emoji.
+
+        see https://discord.com/developers/docs/resources/emoji#create-application-emoji
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if not name:
             msg = "name is required"
@@ -2914,7 +2938,10 @@ class HandleMixin:
         emoji_id: SnowflakeType,
         name: str,
     ) -> Emoji:
-        """https://discord.com/developers/docs/resources/emoji#modify-application-emoji"""
+        """Modify application emoji.
+
+        see https://discord.com/developers/docs/resources/emoji#modify-application-emoji
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -2931,7 +2958,10 @@ class HandleMixin:
         application_id: SnowflakeType,
         emoji_id: SnowflakeType,
     ) -> None:
-        """https://discord.com/developers/docs/resources/emoji#delete-application-emoji"""
+        """Delete application emoji.
+
+        see https://discord.com/developers/docs/resources/emoji#delete-application-emoji
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
