@@ -3139,7 +3139,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         with_counts: Optional[bool] = None,
     ) -> Guild:
-        """https://discord.com/developers/docs/resources/guild#get-guild"""
+        """Get guild.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"with_counts": _bool_query(value=with_counts)}
         request = Request(
@@ -3153,7 +3156,10 @@ class HandleMixin:
     async def _api_get_guild_preview(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> GuildPreview:
-        """https://discord.com/developers/docs/resources/guild#get-guild-preview"""
+        """Get guild preview.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-preview
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -3191,7 +3197,10 @@ class HandleMixin:
         safety_alerts_channel_id: MissingOrNullable[Snowflake] = UNSET,
         reason: Optional[str] = None,
     ) -> Guild:
-        """https://discord.com/developers/docs/resources/guild#modify-guild"""
+        """Modify guild.
+
+        see https://discord.com/developers/docs/resources/guild#modify-guild
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3252,7 +3261,10 @@ class HandleMixin:
     async def _api_get_guild_channels(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> list[Channel]:
-        """https://discord.com/developers/docs/resources/guild#get-guild-channels"""
+        """Get guild channels.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-channels
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -3284,7 +3296,10 @@ class HandleMixin:
         default_sort_order: Optional[SortOrderTypes] = None,
         reason: Optional[str] = None,
     ) -> Channel:
-        """https://discord.com/developers/docs/resources/guild#create-guild-channel"""
+        """Create guild channel.
+
+        see https://discord.com/developers/docs/resources/guild#create-guild-channel
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3331,7 +3346,10 @@ class HandleMixin:
         lock_permissions: MissingOrNullable[bool] = UNSET,
         parent_id: MissingOrNullable[SnowflakeType] = UNSET,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions"""
+        """Modify guild channel positions.
+
+        see https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if channels is None:
             if id is None:
@@ -3365,7 +3383,10 @@ class HandleMixin:
     async def _api_list_active_guild_threads(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> ListActiveGuildThreadsResponse:
-        """https://discord.com/developers/docs/resources/guild#list-active-guild-threads"""
+        """List active guild threads.
+
+        see https://discord.com/developers/docs/resources/guild#list-active-guild-threads
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
