@@ -5600,7 +5600,10 @@ class HandleMixin:
         avatar: MissingOrNullable[str] = UNSET,
         reason: Optional[str] = None,
     ) -> Webhook:
-        """https://discord.com/developers/docs/resources/webhook#create-webhook"""
+        """Create webhook.
+
+        see https://discord.com/developers/docs/resources/webhook#create-webhook
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -5619,7 +5622,10 @@ class HandleMixin:
     async def _api_get_channel_webhooks(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
     ) -> list[Webhook]:
-        """https://discord.com/developers/docs/resources/webhook#get-channel-webhooks"""
+        """Get channel webhooks.
+
+        see https://discord.com/developers/docs/resources/webhook#get-channel-webhooks
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5631,7 +5637,10 @@ class HandleMixin:
     async def _api_get_guild_webhooks(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> list[Webhook]:
-        """https://discord.com/developers/docs/resources/webhook#get-guild-webhooks"""
+        """Get guild webhooks.
+
+        see https://discord.com/developers/docs/resources/webhook#get-guild-webhooks
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5643,7 +5652,10 @@ class HandleMixin:
     async def _api_get_webhook(
         self: AdapterProtocol, bot: "Bot", *, webhook_id: SnowflakeType
     ) -> Webhook:
-        """https://discord.com/developers/docs/resources/webhook#get-webhook"""
+        """Get webhook.
+
+        see https://discord.com/developers/docs/resources/webhook#get-webhook
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5658,7 +5670,10 @@ class HandleMixin:
         webhook_id: SnowflakeType,
         token: str,
     ) -> Webhook:
-        """https://discord.com/developers/docs/resources/webhook#get-webhook-with-token"""
+        """Get webhook with token.
+
+        see https://discord.com/developers/docs/resources/webhook#get-webhook-with-token
+        """
         request = Request(
             method="GET",
             url=self.base_url / f"webhooks/{webhook_id}/{token}",
@@ -5675,7 +5690,10 @@ class HandleMixin:
         channel_id: Missing[SnowflakeType] = UNSET,
         reason: Optional[str] = None,
     ) -> Webhook:
-        """https://discord.com/developers/docs/resources/webhook#modify-webhook"""
+        """Modify webhook.
+
+        see https://discord.com/developers/docs/resources/webhook#modify-webhook
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -5696,7 +5714,10 @@ class HandleMixin:
         name: Missing[str] = UNSET,
         avatar: MissingOrNullable[str] = UNSET,
     ) -> Webhook:
-        """https://discord.com/developers/docs/resources/webhook#modify-webhook-with-token"""
+        """Modify webhook with token.
+
+        see https://discord.com/developers/docs/resources/webhook#modify-webhook-with-token
+        """
         data = omit_unset({"name": name, "avatar": avatar})
         request = Request(
             method="PATCH",
@@ -5712,7 +5733,10 @@ class HandleMixin:
         webhook_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/webhook#delete-webhook"""
+        """Delete webhook.
+
+        see https://discord.com/developers/docs/resources/webhook#delete-webhook
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -5729,7 +5753,10 @@ class HandleMixin:
         webhook_id: SnowflakeType,
         token: str,
     ) -> None:
-        """https://discord.com/developers/docs/resources/webhook#delete-webhook-with-token"""
+        """Delete webhook with token.
+
+        see https://discord.com/developers/docs/resources/webhook#delete-webhook-with-token
+        """
         request = Request(
             method="DELETE",
             url=self.base_url / f"webhooks/{webhook_id}/{token}",
@@ -5759,7 +5786,10 @@ class HandleMixin:
         applied_tags: Optional[list[SnowflakeType]] = None,
         poll: Optional[PollRequest] = None,
     ) -> Optional[MessageGet]:
-        """https://discord.com/developers/docs/resources/webhook#execute-webhook"""
+        """Execute webhook.
+
+        see https://discord.com/developers/docs/resources/webhook#execute-webhook
+        """
         has_payload = any(
             [
                 bool(content),
@@ -5822,7 +5852,10 @@ class HandleMixin:
         thread_id: Optional[SnowflakeType] = None,
         wait: Optional[bool] = None,
     ) -> Optional[MessageGet]:
-        """https://discord.com/developers/docs/resources/webhook#execute-slack-compatible-webhook"""
+        """Execute Slack-compatible webhook.
+
+        see https://discord.com/developers/docs/resources/webhook#execute-slack-compatible-webhook
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"thread_id": thread_id, "wait": _bool_query(value=wait)}
         request = Request(
@@ -5847,7 +5880,10 @@ class HandleMixin:
         thread_id: Optional[SnowflakeType] = None,
         wait: Optional[bool] = None,
     ) -> Optional[MessageGet]:
-        """https://discord.com/developers/docs/resources/webhook#execute-github-compatible-webhook"""
+        """Execute GitHub-compatible webhook.
+
+        see https://discord.com/developers/docs/resources/webhook#execute-github-compatible-webhook
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"thread_id": thread_id, "wait": _bool_query(value=wait)}
         request = Request(
@@ -5871,7 +5907,10 @@ class HandleMixin:
         message_id: SnowflakeType,
         thread_id: Optional[SnowflakeType] = None,
     ) -> MessageGet:
-        """https://discord.com/developers/docs/resources/webhook#get-webhook-message"""
+        """Get webhook message.
+
+        see https://discord.com/developers/docs/resources/webhook#get-webhook-message
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"thread_id": thread_id}
         request = Request(
@@ -5900,7 +5939,10 @@ class HandleMixin:
         attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
         poll: MissingOrNullable[PollRequest] = UNSET,
     ) -> MessageGet:
-        """https://discord.com/developers/docs/resources/webhook#edit-webhook-message"""
+        """Edit webhook message.
+
+        see https://discord.com/developers/docs/resources/webhook#edit-webhook-message
+        """
         params: dict[str, Any] = {"thread_id": thread_id}
         if with_components is not None:
             params["with_components"] = str(with_components).lower()
@@ -5939,7 +5981,10 @@ class HandleMixin:
         message_id: SnowflakeType,
         thread_id: Optional[SnowflakeType] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/webhook#delete-webhook-message"""
+        """Delete webhook message.
+
+        see https://discord.com/developers/docs/resources/webhook#delete-webhook-message
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"thread_id": thread_id}
         request = Request(
@@ -5954,7 +5999,10 @@ class HandleMixin:
 
     # see https://discord.com/developers/docs/topics/gateway
     async def _api_get_gateway(self: AdapterProtocol) -> Gateway:
-        """https://discord.com/developers/docs/topics/gateway#get-gateway"""
+        """Get gateway.
+
+        see https://discord.com/developers/docs/topics/gateway#get-gateway
+        """
         request = Request(
             method="GET",
             url=self.base_url / "gateway",
@@ -5962,7 +6010,10 @@ class HandleMixin:
         return type_validate_python(Gateway, await _request(self, request))
 
     async def _api_get_gateway_bot(self: AdapterProtocol, bot: "Bot") -> GatewayBot:
-        """https://discord.com/developers/docs/topics/gateway#get-gateway-bot"""
+        """Get gateway bot.
+
+        see https://discord.com/developers/docs/topics/gateway#get-gateway-bot
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5977,7 +6028,10 @@ class HandleMixin:
     async def _api_get_current_bot_application_information(
         self: AdapterProtocol, bot: "Bot"
     ) -> Application:
-        """https://discord.com/developers/docs/topics/oauth2#get-current-bot-application-information"""
+        """Get current bot application information.
+
+        see https://discord.com/developers/docs/topics/oauth2#get-current-bot-application-information
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5991,7 +6045,10 @@ class HandleMixin:
         *,
         access_token: str,
     ) -> AuthorizationResponse:
-        """https://discord.com/developers/docs/topics/oauth2#get-current-authorization-information"""
+        """Get current authorization information.
+
+        see https://discord.com/developers/docs/topics/oauth2#get-current-authorization-information
+        """
         headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
