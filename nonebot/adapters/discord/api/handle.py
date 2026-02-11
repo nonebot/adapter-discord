@@ -5048,7 +5048,10 @@ class HandleMixin:
         guild_scheduled_event_id: Optional[SnowflakeType] = None,
         reason: Optional[str] = None,
     ) -> StageInstance:
-        """https://discord.com/developers/docs/resources/stage-instance#create-stage-instance"""
+        """Create stage instance.
+
+        see https://discord.com/developers/docs/resources/stage-instance#create-stage-instance
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -5070,7 +5073,10 @@ class HandleMixin:
     async def _api_get_stage_instance(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
     ) -> StageInstance:
-        """https://discord.com/developers/docs/resources/stage-instance#get-stage-instance"""
+        """Get stage instance.
+
+        see https://discord.com/developers/docs/resources/stage-instance#get-stage-instance
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5088,7 +5094,10 @@ class HandleMixin:
         privacy_level: Optional[StagePrivacyLevel] = None,
         reason: Optional[str] = None,
     ) -> StageInstance:
-        """https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance"""
+        """Modify stage instance.
+
+        see https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -5108,7 +5117,10 @@ class HandleMixin:
         channel_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/stage-instance#delete-stage-instance"""
+        """Delete stage instance.
+
+        see https://discord.com/developers/docs/resources/stage-instance#delete-stage-instance
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -5125,7 +5137,10 @@ class HandleMixin:
     async def _api_get_sticker(
         self: AdapterProtocol, bot: "Bot", *, sticker_id: SnowflakeType
     ) -> Sticker:
-        """https://discord.com/developers/docs/resources/sticker#get-sticker"""
+        """Get sticker.
+
+        see https://discord.com/developers/docs/resources/sticker#get-sticker
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5137,7 +5152,10 @@ class HandleMixin:
     async def _api_list_nitro_sticker_packs(
         self: AdapterProtocol, bot: "Bot"
     ) -> StickerPacksResponse:
-        """https://discord.com/developers/docs/resources/sticker#list-sticker-packs"""
+        """List sticker packs.
+
+        see https://discord.com/developers/docs/resources/sticker#list-sticker-packs
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5149,7 +5167,10 @@ class HandleMixin:
     async def _api_get_sticker_packs(
         self: AdapterProtocol, bot: "Bot", *, pack_id: SnowflakeType
     ) -> StickerPack:
-        """https://discord.com/developers/docs/resources/sticker#get-sticker-pack"""
+        """Get sticker pack.
+
+        see https://discord.com/developers/docs/resources/sticker#get-sticker-pack
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5161,7 +5182,10 @@ class HandleMixin:
     async def _api_list_guild_stickers(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> list[Sticker]:
-        """https://discord.com/developers/docs/resources/sticker#list-guild-stickers"""
+        """List guild stickers.
+
+        see https://discord.com/developers/docs/resources/sticker#list-guild-stickers
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5177,7 +5201,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         sticker_id: SnowflakeType,
     ) -> Sticker:
-        """https://discord.com/developers/docs/resources/sticker#get-guild-sticker"""
+        """Get guild sticker.
+
+        see https://discord.com/developers/docs/resources/sticker#get-guild-sticker
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5197,7 +5224,10 @@ class HandleMixin:
         file: File,
         reason: Optional[str] = None,
     ) -> Sticker:
-        """https://discord.com/developers/docs/resources/sticker#create-guild-sticker"""
+        """Create guild sticker.
+
+        see https://discord.com/developers/docs/resources/sticker#create-guild-sticker
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         form = {
             "name": (None, name),
@@ -5226,7 +5256,10 @@ class HandleMixin:
         tags: Missing[str] = UNSET,
         reason: Optional[str] = None,
     ) -> Sticker:
-        """https://discord.com/developers/docs/resources/sticker#modify-guild-sticker"""
+        """Modify guild sticker.
+
+        see https://discord.com/developers/docs/resources/sticker#modify-guild-sticker
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -5253,7 +5286,10 @@ class HandleMixin:
         sticker_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/sticker#delete-guild-sticker"""
+        """Delete guild sticker.
+
+        see https://discord.com/developers/docs/resources/sticker#delete-guild-sticker
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
