@@ -316,8 +316,7 @@ class HandleMixin:
         application_id: SnowflakeType,
         with_localizations: Optional[bool] = None,
     ) -> list[ApplicationCommand]:
-        """Fetch global commands for your application.
-        Returns an array of application command objects.
+        """Get global application commands.
 
         see https://discord.com/developers/docs/interactions/application-commands#get-global-application-commands
         """
@@ -351,10 +350,7 @@ class HandleMixin:
         integration_types: Optional[list[ApplicationIntegrationType]] = None,
         contexts: Optional[list[InteractionContextType]] = None,
     ) -> ApplicationCommand:
-        """Create a new global command.
-        Returns 201 if a command with the same name does not already exist,
-        or a 200 if it does (in which case the previous command will be overwritten).
-        Both responses include an application command object.
+        """Create global application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
         """
@@ -398,8 +394,7 @@ class HandleMixin:
         application_id: SnowflakeType,
         command_id: SnowflakeType,
     ) -> ApplicationCommand:
-        """Fetch a global command for your application.
-        Returns an application command object.
+        """Get global application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#get-global-application-command
         """
@@ -429,9 +424,7 @@ class HandleMixin:
         integration_types: Missing[list[ApplicationIntegrationType]] = UNSET,
         contexts: MissingOrNullable[list[InteractionContextType]] = UNSET,
     ) -> ApplicationCommand:
-        """Edit a global command. Returns 200 and an application command object.
-        All fields are optional, but any fields provided will entirely overwrite
-        the existing values of those fields.
+        """Edit global application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#edit-global-application-command
         """
@@ -468,7 +461,7 @@ class HandleMixin:
         application_id: SnowflakeType,
         command_id: SnowflakeType,
     ) -> None:
-        """Deletes a global command. Returns 204 No Content on success.
+        """Delete global application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#delete-global-application-command
         """
@@ -487,11 +480,7 @@ class HandleMixin:
         application_id: SnowflakeType,
         commands: list[ApplicationCommandBulkOverwriteParams],
     ) -> list[ApplicationCommand]:
-        """Takes a list of application commands,
-        overwriting the existing global command list for this application.
-        Returns 200 and a list of application command objects.
-        Commands that do not already exist will count toward
-        daily application command create limits.
+        """Bulk overwrite global application commands.
 
         see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
         """
@@ -515,8 +504,7 @@ class HandleMixin:
         guild_id: SnowflakeType,
         with_localizations: Optional[bool] = None,
     ) -> list[ApplicationCommand]:
-        """Fetch all of the guild commands for your application for a specific guild.
-        Returns an array of application command objects.
+        """Get guild application commands.
 
         see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-commands
         """
@@ -549,11 +537,7 @@ class HandleMixin:
         type: Optional[ApplicationCommandType] = None,  # noqa: A002
         nsfw: Optional[bool] = None,
     ) -> ApplicationCommand:
-        """Create a new guild command.
-        New guild commands will be available in the guild immediately.
-        Returns 201 if a command with the same name does not already exist,
-        or a 200 if it does (in which case the previous command will be overwritten).
-        Both responses include an application command object.
+        """Create guild application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command
         """
@@ -596,8 +580,7 @@ class HandleMixin:
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
     ) -> ApplicationCommand:
-        """Fetch a guild command for your application.
-        Returns an application command object.
+        """Get guild application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command
         """
@@ -626,11 +609,7 @@ class HandleMixin:
         default_permission: MissingOrNullable[bool] = UNSET,
         nsfw: Missing[bool] = UNSET,
     ) -> ApplicationCommand:
-        """Edit a guild command.
-        Updates for guild commands will be available immediately.
-        Returns 200 and an application command object.
-        All fields are optional,
-        but any fields provided will entirely overwrite the existing values of those fields.
+        """Edit guild application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#edit-guild-application-command
         """
@@ -666,7 +645,7 @@ class HandleMixin:
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
     ) -> None:
-        """Delete a guild command. Returns 204 No Content on success.
+        """Delete guild application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#delete-guild-application-command
         """
@@ -687,9 +666,7 @@ class HandleMixin:
         guild_id: SnowflakeType,
         commands: list[ApplicationCommandBulkOverwriteParams],
     ) -> list[ApplicationCommand]:
-        """Takes a list of application commands,
-        overwriting the existing command list for this application for the targeted guild.
-        Returns 200 and a list of application command objects.
+        """Bulk overwrite guild application commands.
 
         see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-guild-application-commands
         """
@@ -713,9 +690,7 @@ class HandleMixin:
         guild_id: SnowflakeType,
         access_token: str,
     ) -> list[GuildApplicationCommandPermissions]:
-        """
-        Fetches permissions for all commands for your application in a guild.
-        Returns an array of guild application command permissions objects.
+        """Get guild application command permissions.
 
         see https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command-permissions
         """
@@ -739,9 +714,7 @@ class HandleMixin:
         command_id: SnowflakeType,
         access_token: str,
     ) -> GuildApplicationCommandPermissions:
-        """
-        Fetches permissions for a specific command for your application in a guild.
-        Returns a guild application command permissions object.
+        """Get application command permissions.
 
         see https://discord.com/developers/docs/interactions/application-commands#get-application-command-permissions
         """
@@ -765,12 +738,7 @@ class HandleMixin:
         access_token: str,
         permissions: list[ApplicationCommandPermissions],
     ) -> GuildApplicationCommandPermissions:
-        """
-        Edits command permissions for a specific command for your application in a guild
-        and returns a guild application command permissions object.
-        Fires an Application Command Permissions Update Gateway event.
-
-        You can add up to 100 permission overwrites for a command.
+        """Edit application command permissions.
 
         see https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions
         """
