@@ -1502,9 +1502,10 @@ class HandleMixin:
     async def _api_get_channel(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
     ) -> Channel:
-        """get channel
+        """Get a channel by ID.
 
-        see https://discord.com/developers/docs/resources/channel#get-channel"""
+        see https://discord.com/developers/docs/resources/channel#get-channel
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -1522,9 +1523,10 @@ class HandleMixin:
         icon: Optional[bytes] = None,
         reason: Optional[str] = None,
     ) -> Channel:
-        """modify channel
+        """Update a Group DM channel's settings.
 
-        see https://discord.com/developers/docs/resources/channel#modify-channel"""
+        see https://discord.com/developers/docs/resources/channel#modify-channel
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -1566,7 +1568,10 @@ class HandleMixin:
         default_forum_layout: Missing[ForumLayoutTypes] = UNSET,
         reason: Optional[str] = None,
     ) -> Channel:
-        """https://discord.com/developers/docs/resources/channel#modify-channel"""
+        """Update a channel's settings.
+
+        see https://discord.com/developers/docs/resources/channel#modify-channel
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -1621,7 +1626,10 @@ class HandleMixin:
         applied_tags: Missing[list[SnowflakeType]] = UNSET,
         reason: Optional[str] = None,
     ) -> Channel:
-        """https://discord.com/developers/docs/resources/channel#modify-channel"""
+        """Update a thread's settings.
+
+        see https://discord.com/developers/docs/resources/channel#modify-channel
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -1656,7 +1664,10 @@ class HandleMixin:
         channel_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> Channel:
-        """https://discord.com/developers/docs/resources/channel#deleteclose-channel"""
+        """Delete or close a channel.
+
+        see https://discord.com/developers/docs/resources/channel#deleteclose-channel
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
