@@ -3725,7 +3725,10 @@ class HandleMixin:
         before: Optional[SnowflakeType] = None,
         after: Optional[SnowflakeType] = None,
     ) -> list[Ban]:
-        """https://discord.com/developers/docs/resources/guild#get-guild-bans"""
+        """Get guild bans.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-bans
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"limit": limit, "before": before, "after": after}
         request = Request(
@@ -3743,7 +3746,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
     ) -> Ban:
-        """https://discord.com/developers/docs/resources/guild#get-guild-ban"""
+        """Get guild ban.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-ban
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -3814,7 +3820,10 @@ class HandleMixin:
         ] = None,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#create-guild-ban"""
+        """Create guild ban.
+
+        see https://discord.com/developers/docs/resources/guild#create-guild-ban
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3838,7 +3847,10 @@ class HandleMixin:
         user_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#remove-guild-ban"""
+        """Remove guild ban.
+
+        see https://discord.com/developers/docs/resources/guild#remove-guild-ban
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3858,7 +3870,10 @@ class HandleMixin:
         delete_message_seconds: Optional[int] = None,
         reason: Optional[str] = None,
     ) -> BulkBan:
-        """https://discord.com/developers/docs/resources/guild#bulk-guild-ban"""
+        """Bulk guild ban.
+
+        see https://discord.com/developers/docs/resources/guild#bulk-guild-ban
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3877,7 +3892,10 @@ class HandleMixin:
     async def _api_get_guild_roles(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> list[Role]:
-        """https://discord.com/developers/docs/resources/guild#get-guild-roles"""
+        """Get guild roles.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-roles
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -3893,7 +3911,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         role_id: SnowflakeType,
     ) -> Role:
-        """https://discord.com/developers/docs/resources/guild#get-guild-role"""
+        """Get guild role.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-role
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -3917,7 +3938,10 @@ class HandleMixin:
         mentionable: Missing[bool] = UNSET,
         reason: Optional[str] = None,
     ) -> Role:
-        """https://discord.com/developers/docs/resources/guild#create-guild-role"""
+        """Create guild role.
+
+        see https://discord.com/developers/docs/resources/guild#create-guild-role
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3955,7 +3979,10 @@ class HandleMixin:
         position: MissingOrNullable[int] = UNSET,
         reason: Optional[str] = None,
     ) -> list[Role]:
-        """https://discord.com/developers/docs/resources/guild#modify-guild-role-positions"""
+        """Modify guild role positions.
+
+        see https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3998,7 +4025,10 @@ class HandleMixin:
         mentionable: MissingOrNullable[bool] = UNSET,
         reason: Optional[str] = None,
     ) -> Role:
-        """https://discord.com/developers/docs/resources/guild#modify-guild-role"""
+        """Modify guild role.
+
+        see https://discord.com/developers/docs/resources/guild#modify-guild-role
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4060,7 +4090,10 @@ class HandleMixin:
         role_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#delete-guild-role"""
+        """Delete guild role.
+
+        see https://discord.com/developers/docs/resources/guild#delete-guild-role
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4079,7 +4112,10 @@ class HandleMixin:
         days: Optional[int] = None,
         include_roles: Optional[list[SnowflakeType]] = None,
     ) -> dict[Literal["pruned"], int]:
-        """https://discord.com/developers/docs/resources/guild#get-guild-prune-count"""
+        """Get guild prune count.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-prune-count
+        """
         data = {
             "days": days,
             "include_roles": ",".join(str(role) for role in include_roles)
@@ -4105,7 +4141,10 @@ class HandleMixin:
         include_roles: Optional[list[SnowflakeType]] = None,
         reason: Optional[str] = None,
     ) -> dict[Literal["pruned"], int]:
-        """https://discord.com/developers/docs/resources/guild#begin-guild-prune"""
+        """Begin guild prune.
+
+        see https://discord.com/developers/docs/resources/guild#begin-guild-prune
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -4125,7 +4164,10 @@ class HandleMixin:
     async def _api_get_guild_voice_regions(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> list[VoiceRegion]:
-        """https://discord.com/developers/docs/resources/guild#get-guild-voice-regions"""
+        """Get guild voice regions.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-voice-regions
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4137,7 +4179,10 @@ class HandleMixin:
     async def _api_get_guild_invites(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> list[Invite]:
-        """https://discord.com/developers/docs/resources/guild#get-guild-invites"""
+        """Get guild invites.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-invites
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
