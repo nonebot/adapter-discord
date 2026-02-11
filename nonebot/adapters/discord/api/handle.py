@@ -4436,7 +4436,10 @@ class HandleMixin:
     async def _api_list_voice_regions(
         self: AdapterProtocol, bot: "Bot"
     ) -> list[VoiceRegion]:
-        """https://discord.com/developers/docs/resources/voice#list-voice-regions"""
+        """List voice regions.
+
+        see https://discord.com/developers/docs/resources/voice#list-voice-regions
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4448,7 +4451,10 @@ class HandleMixin:
     async def _api_get_current_user_voice_state(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> VoiceState:
-        """https://discord.com/developers/docs/resources/voice#get-current-user-voice-state"""
+        """Get current user voice state.
+
+        see https://discord.com/developers/docs/resources/voice#get-current-user-voice-state
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4464,7 +4470,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
     ) -> VoiceState:
-        """https://discord.com/developers/docs/resources/voice#get-user-voice-state"""
+        """Get user voice state.
+
+        see https://discord.com/developers/docs/resources/voice#get-user-voice-state
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -4482,7 +4491,10 @@ class HandleMixin:
         suppress: Missing[bool] = UNSET,
         request_to_speak_timestamp: MissingOrNullable[datetime] = UNSET,
     ) -> None:
-        """https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state"""
+        """Modify current user voice state.
+
+        see https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = model_dump(
             type_validate_python(
@@ -4512,7 +4524,10 @@ class HandleMixin:
         channel_id: Optional[SnowflakeType] = None,
         suppress: Optional[bool] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/voice#modify-user-voice-state"""
+        """Modify user voice state.
+
+        see https://discord.com/developers/docs/resources/voice#modify-user-voice-state
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {"channel_id": channel_id, "suppress": suppress}
         request = Request(
