@@ -1498,7 +1498,7 @@ class HandleMixin:
 
     # Channels
 
-    # https://discord.com/developers/docs/resources/channel
+    # see https://discord.com/developers/docs/resources/channel
     async def _api_get_channel(
         self: AdapterProtocol, bot: "Bot", *, channel_id: SnowflakeType
     ) -> Channel:
@@ -4432,7 +4432,7 @@ class HandleMixin:
 
     # Voice
 
-    # https://discord.com/developers/docs/resources/voice
+    # see https://discord.com/developers/docs/resources/voice
     async def _api_list_voice_regions(
         self: AdapterProtocol, bot: "Bot"
     ) -> list[VoiceRegion]:
