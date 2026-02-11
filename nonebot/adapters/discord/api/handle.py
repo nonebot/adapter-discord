@@ -2987,7 +2987,10 @@ class HandleMixin:
         exclude_ended: Optional[bool] = None,
         exclude_deleted: Optional[bool] = None,
     ) -> list[Entitlement]:
-        """https://discord.com/developers/docs/resources/entitlement#list-entitlements"""
+        """List entitlements.
+
+        see https://discord.com/developers/docs/resources/entitlement#list-entitlements
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "user_id": user_id,
@@ -3014,7 +3017,10 @@ class HandleMixin:
         application_id: SnowflakeType,
         entitlement_id: SnowflakeType,
     ) -> None:
-        """https://discord.com/developers/docs/resources/entitlement#consume-an-entitlement"""
+        """Consume an entitlement.
+
+        see https://discord.com/developers/docs/resources/entitlement#consume-an-entitlement
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -3033,7 +3039,10 @@ class HandleMixin:
         owner_id: str,
         owner_type: Literal[1, 2],
     ) -> Entitlement:
-        """https://discord.com/developers/docs/resources/entitlement#create-test-entitlement"""
+        """Create test entitlement.
+
+        see https://discord.com/developers/docs/resources/entitlement#create-test-entitlement
+        """
         if owner_type not in (1, 2):
             msg = "owner_type must be 1 or 2"
             raise ValueError(msg)
@@ -3058,7 +3067,10 @@ class HandleMixin:
         application_id: SnowflakeType,
         entitlement_id: SnowflakeType,
     ) -> None:
-        """https://discord.com/developers/docs/resources/entitlement#delete-test-entitlement"""
+        """Delete test entitlement.
+
+        see https://discord.com/developers/docs/resources/entitlement#delete-test-entitlement
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
