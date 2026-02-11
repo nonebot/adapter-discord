@@ -3404,7 +3404,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
     ) -> GuildMember:
-        """https://discord.com/developers/docs/resources/guild#get-guild-member"""
+        """Get guild member.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-member
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -3425,7 +3428,10 @@ class HandleMixin:
         ] = None,
         after: Optional[SnowflakeType] = None,
     ) -> list[GuildMember]:
-        """https://discord.com/developers/docs/resources/guild#list-guild-members"""
+        """List guild members.
+
+        see https://discord.com/developers/docs/resources/guild#list-guild-members
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"limit": limit, "after": after}
         request = Request(
@@ -3448,7 +3454,10 @@ class HandleMixin:
             Range(message="limit must be between 1 and 1000", ge=1, le=1000),
         ] = None,
     ) -> list[GuildMember]:
-        """https://discord.com/developers/docs/resources/guild#search-guild-members"""
+        """Search guild members.
+
+        see https://discord.com/developers/docs/resources/guild#search-guild-members
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {"query": query, "limit": limit}
         request = Request(
@@ -3471,7 +3480,10 @@ class HandleMixin:
         mute: Optional[bool] = None,
         deaf: Optional[bool] = None,
     ) -> Optional[GuildMember]:
-        """https://discord.com/developers/docs/resources/guild#add-guild-member"""
+        """Add guild member.
+
+        see https://discord.com/developers/docs/resources/guild#add-guild-member
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {
             "access_token": access_token,
@@ -3506,7 +3518,10 @@ class HandleMixin:
         flags: MissingOrNullable[GuildMemberFlags] = UNSET,
         reason: Optional[str] = None,
     ) -> GuildMember:
-        """https://discord.com/developers/docs/resources/guild#modify-guild-member"""
+        """Modify guild member.
+
+        see https://discord.com/developers/docs/resources/guild#modify-guild-member
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3544,7 +3559,10 @@ class HandleMixin:
         bio: MissingOrNullable[str] = UNSET,
         reason: Optional[str] = None,
     ) -> GuildMember:
-        """https://discord.com/developers/docs/resources/guild#modify-current-member"""
+        """Modify current member.
+
+        see https://discord.com/developers/docs/resources/guild#modify-current-member
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3600,7 +3618,10 @@ class HandleMixin:
         role_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#add-guild-member-role"""
+        """Add guild member role.
+
+        see https://discord.com/developers/docs/resources/guild#add-guild-member-role
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3620,7 +3641,10 @@ class HandleMixin:
         role_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#remove-guild-member-role"""
+        """Remove guild member role.
+
+        see https://discord.com/developers/docs/resources/guild#remove-guild-member-role
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -3639,7 +3663,10 @@ class HandleMixin:
         user_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/guild#remove-guild-member"""
+        """Remove guild member.
+
+        see https://discord.com/developers/docs/resources/guild#remove-guild-member
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
