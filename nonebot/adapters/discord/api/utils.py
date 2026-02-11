@@ -23,6 +23,7 @@ def _build_multipart_payload(
 ) -> dict[Literal["files", "json"], Any]:
     multipart: dict[str, Any] = {}
     container = payload if attachment_owner is None else attachment_owner
+    has_attachments = "attachments" in container
     attachments = container.get("attachments", [])
     if isinstance(attachments, list):
         attachments = container.pop("attachments", [])
@@ -35,7 +36,7 @@ def _build_multipart_payload(
                     break
         multipart[f"files[{index}]"] = (file.filename, file.content)
 
-    if isinstance(attachments, list) and attachments:
+    if isinstance(attachments, list) and has_attachments:
         container["attachments"] = attachments
     multipart["payload_json"] = (None, json.dumps(payload), "application/json")
     result: dict[Literal["files", "json"], Any] = {"files": multipart}
