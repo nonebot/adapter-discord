@@ -5317,9 +5317,9 @@ class HandleMixin:
         ] = None,
         user_id: Optional[SnowflakeType] = None,
     ) -> list[Subscription]:
-        """https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions
+        """List SKU subscriptions.
 
-        Note: user_id is required except for OAuth queries.
+        see https://discord.com/developers/docs/resources/subscription#list-sku-subscriptions
         """
         if user_id is None:
             msg = "user_id is required for bot token queries"
@@ -5346,7 +5346,10 @@ class HandleMixin:
         sku_id: SnowflakeType,
         subscription_id: SnowflakeType,
     ) -> Subscription:
-        """https://discord.com/developers/docs/resources/subscription#get-sku-subscription"""
+        """Get SKU subscription.
+
+        see https://discord.com/developers/docs/resources/subscription#get-sku-subscription
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5359,7 +5362,10 @@ class HandleMixin:
 
     # see https://discord.com/developers/docs/resources/user
     async def _api_get_current_user(self: AdapterProtocol, bot: "Bot") -> User:
-        """https://discord.com/developers/docs/resources/user#get-current-user"""
+        """Get current user.
+
+        see https://discord.com/developers/docs/resources/user#get-current-user
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5371,7 +5377,10 @@ class HandleMixin:
     async def _api_get_user(
         self: AdapterProtocol, bot: "Bot", *, user_id: SnowflakeType
     ) -> User:
-        """https://discord.com/developers/docs/resources/user#get-user"""
+        """Get user.
+
+        see https://discord.com/developers/docs/resources/user#get-user
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5388,7 +5397,10 @@ class HandleMixin:
         avatar: MissingOrNullable[str] = UNSET,
         banner: MissingOrNullable[str] = UNSET,
     ) -> User:
-        """https://discord.com/developers/docs/resources/user#modify-current-user"""
+        """Modify current user.
+
+        see https://discord.com/developers/docs/resources/user#modify-current-user
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = model_dump(
             type_validate_python(
@@ -5414,7 +5426,10 @@ class HandleMixin:
         limit: Optional[int] = None,
         with_counts: Optional[bool] = None,
     ) -> list[CurrentUserGuild]:
-        """https://discord.com/developers/docs/resources/user#get-current-user-guilds"""
+        """Get current user guilds.
+
+        see https://discord.com/developers/docs/resources/user#get-current-user-guilds
+        """
         headers = {"Authorization": f"Bearer {access_token}"}
         params = {
             "before": before,
@@ -5438,7 +5453,10 @@ class HandleMixin:
         guild_id: SnowflakeType,
         access_token: str,
     ) -> GuildMember:
-        """https://discord.com/developers/docs/resources/user#get-current-user-guild-member"""
+        """Get current user guild member.
+
+        see https://discord.com/developers/docs/resources/user#get-current-user-guild-member
+        """
         headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
@@ -5450,7 +5468,10 @@ class HandleMixin:
     async def _api_leave_guild(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> None:
-        """https://discord.com/developers/docs/resources/user#leave-guild"""
+        """Leave guild.
+
+        see https://discord.com/developers/docs/resources/user#leave-guild
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5465,7 +5486,10 @@ class HandleMixin:
         *,
         recipient_id: SnowflakeType,
     ) -> Channel:
-        """https://discord.com/developers/docs/resources/user#create-dm"""
+        """Create DM.
+
+        see https://discord.com/developers/docs/resources/user#create-dm
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -5482,7 +5506,10 @@ class HandleMixin:
         access_tokens: list[str],
         nicks: dict[SnowflakeType, str],
     ) -> Channel:
-        """https://discord.com/developers/docs/resources/user#create-group-dm"""
+        """Create group DM.
+
+        see https://discord.com/developers/docs/resources/user#create-group-dm
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         data = {"access_tokens": access_tokens, "nicks": nicks}
         request = Request(
@@ -5498,7 +5525,10 @@ class HandleMixin:
         *,
         access_token: str,
     ) -> list[Connection]:
-        """https://discord.com/developers/docs/resources/user#get-current-user-connections"""
+        """Get current user connections.
+
+        see https://discord.com/developers/docs/resources/user#get-current-user-connections
+        """
         headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
@@ -5513,7 +5543,10 @@ class HandleMixin:
         application_id: SnowflakeType,
         access_token: str,
     ) -> ApplicationRoleConnection:
-        """https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection"""
+        """Get current user application role connection.
+
+        see https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection
+        """
         headers = {"Authorization": f"Bearer {access_token}"}
         request = Request(
             headers=headers,
@@ -5534,7 +5567,10 @@ class HandleMixin:
         platform_username: Optional[str] = None,
         metadata: Optional[dict[str, str]] = None,
     ) -> ApplicationRoleConnection:
-        """https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection"""
+        """Update current user application role connection.
+
+        see https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection
+        """
         data = {
             "platform_name": platform_name,
             "platform_username": platform_username,
