@@ -1747,7 +1747,10 @@ class HandleMixin:
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> list[MessageGet]:
-        """https://discord.com/developers/docs/resources/message#get-channel-messages"""
+        """Get channel messages.
+
+        see https://discord.com/developers/docs/resources/message#get-channel-messages
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "around": around,
@@ -1770,7 +1773,10 @@ class HandleMixin:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
     ) -> MessageGet:
-        """https://discord.com/developers/docs/resources/message#get-channel-message"""
+        """Get a channel message.
+
+        see https://discord.com/developers/docs/resources/message#get-channel-message
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -1798,7 +1804,10 @@ class HandleMixin:
         flags: Optional[MessageFlag] = None,
         poll: Optional[PollRequest] = None,
     ) -> MessageGet:
-        """https://discord.com/developers/docs/resources/message#create-message"""
+        """Create a message.
+
+        see https://discord.com/developers/docs/resources/message#create-message
+        """
         has_payload = any(
             [
                 bool(content),
@@ -1851,7 +1860,10 @@ class HandleMixin:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
     ) -> MessageGet:
-        """https://discord.com/developers/docs/resources/message#crosspost-message"""
+        """Crosspost a message.
+
+        see https://discord.com/developers/docs/resources/message#crosspost-message
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -1870,7 +1882,10 @@ class HandleMixin:
         emoji: str,
         emoji_id: Optional[SnowflakeType] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/message#create-reaction"""
+        """Create a reaction.
+
+        see https://discord.com/developers/docs/resources/message#create-reaction
+        """
         if emoji_id is not None:
             emoji = f"{emoji}:{emoji_id}"
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
@@ -1891,7 +1906,10 @@ class HandleMixin:
         emoji: str,
         emoji_id: Optional[SnowflakeType] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/message#delete-own-reaction"""
+        """Delete own reaction.
+
+        see https://discord.com/developers/docs/resources/message#delete-own-reaction
+        """
         if emoji_id is not None:
             emoji = f"{emoji}:{emoji_id}"
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
@@ -1913,7 +1931,10 @@ class HandleMixin:
         emoji: str,
         emoji_id: Optional[SnowflakeType] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/message#delete-user-reaction"""
+        """Delete a user reaction.
+
+        see https://discord.com/developers/docs/resources/message#delete-user-reaction
+        """
         if emoji_id is not None:
             emoji = f"{emoji}:{emoji_id}"
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
@@ -1941,7 +1962,10 @@ class HandleMixin:
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> list[User]:
-        """https://discord.com/developers/docs/resources/message#get-reactions"""
+        """Get reactions.
+
+        see https://discord.com/developers/docs/resources/message#get-reactions
+        """
         if emoji_id is not None:
             emoji = f"{emoji}:{emoji_id}"
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
@@ -1962,7 +1986,10 @@ class HandleMixin:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
     ) -> None:
-        """https://discord.com/developers/docs/resources/message#delete-all-reactions"""
+        """Delete all reactions.
+
+        see https://discord.com/developers/docs/resources/message#delete-all-reactions
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
@@ -1981,7 +2008,10 @@ class HandleMixin:
         emoji: str,
         emoji_id: Optional[SnowflakeType] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/message#delete-all-reactions-for-emoji"""
+        """Delete all reactions for emoji.
+
+        see https://discord.com/developers/docs/resources/message#delete-all-reactions-for-emoji
+        """
         if emoji_id is not None:
             emoji = f"{emoji}:{emoji_id}"
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
@@ -2009,7 +2039,10 @@ class HandleMixin:
         sticker_ids: Missing[list[SnowflakeType]] = UNSET,
         poll: MissingOrNullable[PollRequest] = UNSET,
     ) -> MessageGet:
-        """https://discord.com/developers/docs/resources/message#edit-message"""
+        """Edit a message.
+
+        see https://discord.com/developers/docs/resources/message#edit-message
+        """
         data = {
             "content": content,
             "embeds": embeds,
@@ -2043,7 +2076,10 @@ class HandleMixin:
         message_id: SnowflakeType,
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/message#delete-message"""
+        """Delete a message.
+
+        see https://discord.com/developers/docs/resources/message#delete-message
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2070,7 +2106,10 @@ class HandleMixin:
         ],
         reason: Optional[str] = None,
     ) -> None:
-        """https://discord.com/developers/docs/resources/message#bulk-delete-messages"""
+        """Bulk delete messages.
+
+        see https://discord.com/developers/docs/resources/message#bulk-delete-messages
+        """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
