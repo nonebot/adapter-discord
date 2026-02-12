@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum, IntFlag
-from typing import Literal, TypeVar, Union
-from typing_extensions import TypeAlias, override
+from typing import Literal, TypeVar, Union, final
+from typing_extensions import TypeAlias, TypeGuard, override
 
 T = TypeVar("T")
 
@@ -18,30 +18,42 @@ class _UNSET(type):
         return False
 
 
-class UNSET(metaclass=_UNSET): ...
+@final
+class UNSET(metaclass=_UNSET):
+    """UNSET means that the field maybe not given in the data.
+
+    see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
 
 
-"""UNSET means that the field maybe not given in the data.
+UnsetType: TypeAlias = type[UNSET]
 
-see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
-
-Missing: TypeAlias = Union[Literal[UNSET], T]
+Missing: TypeAlias = Union[UnsetType, T]
 """Missing means that the field maybe not given in the data.
 
-Missing[T] equal to Union[UNSET, T].
+Missing[T] equal to Union[UnsetType, T].
 
-example: Missing[int] == Union[UNSET, int]
+example: Missing[int] == Union[UnsetType, int]
 
 see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
 
-MissingOrNullable: TypeAlias = Union[Literal[UNSET], T, None]
+MissingOrNullable: TypeAlias = Union[UnsetType, T, None]
 """MissingOrNullable means that the field maybe not given in the data or value is None.
 
-MissingOrNullable[T] equal to Union[UNSET, T, None].
+MissingOrNullable[T] equal to Union[UnsetType, T, None].
 
-example: MissingOrNullable[int] == Union[UNSET, int, None]
+example: MissingOrNullable[int] == Union[UnsetType, int, None]
 
 see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
+
+
+def is_unset(value: Union[T, UnsetType]) -> TypeGuard[UnsetType]:
+    """Check if the value is UNSET."""
+    return value is UNSET
+
+
+def is_not_unset(value: Union[T, UnsetType]) -> TypeGuard[T]:
+    """Check if the value is not UNSET."""
+    return value is not UNSET
 
 
 class StrEnum(str, Enum):
