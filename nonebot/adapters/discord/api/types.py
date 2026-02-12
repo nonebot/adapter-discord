@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum, IntFlag
 from typing import Literal, TypeVar, Union, final
-from typing_extensions import TypeAlias, TypeGuard, override
+from typing_extensions import TypeAlias, TypeIs, override
 
 T = TypeVar("T")
 
@@ -46,12 +46,12 @@ example: MissingOrNullable[int] == Union[UnsetType, int, None]
 see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
 
 
-def is_unset(value: Union[T, UnsetType]) -> TypeGuard[UnsetType]:
+def is_unset(value: object) -> TypeIs[UnsetType]:
     """Check if the value is UNSET."""
     return value is UNSET
 
 
-def is_not_unset(value: Union[T, UnsetType]) -> TypeGuard[T]:
+def is_not_unset(value: Union[T, UnsetType]) -> TypeIs[T]:
     """Check if the value is not UNSET."""
     return value is not UNSET
 
