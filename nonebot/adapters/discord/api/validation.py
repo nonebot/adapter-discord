@@ -109,7 +109,6 @@ def _validate_annotated_argument(
     base_type: Any,  # noqa: ANN401
     ranges: list[Range],
 ) -> None:
-    converted = value
     try:
         converted = type_validate_python(base_type, value)
     except ValidationError as exception:
