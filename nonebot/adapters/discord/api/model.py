@@ -343,10 +343,10 @@ class CommandOptionBase(BaseModel):
     description_localizations: Optional[dict[str, str]] = None
 
 
-class ApplicationCommandOption(CommandOptionBase):
+class ApplicationCommandOption(BaseModel):
     """Application Command Option
 
-    Required options must be listed before optional options
+    Required options must be listed before optional options.
 
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
@@ -3802,26 +3802,26 @@ class MessageCreate(MessageGet):
     mentions: list[User]
 
 
-class MessageUpdate(MessageGet):
+class MessageUpdate(BaseModel):
     """Message Update Event Fields
 
     Unlike creates, message updates may contain only a subset of the full
-    message object payload(but will always contain an ID and channel_id).
+    message object payload (but will always contain an ID and channel_id).
 
     see https://discord.com/developers/docs/topics/gateway-events#message-update
     """
 
-    guild_id: Missing[str] = UNSET
-    member: Missing[GuildMember] = UNSET
-    mentions: Missing[list[User]] = UNSET
     id: Snowflake
     channel_id: Snowflake
+    guild_id: Missing[Snowflake] = UNSET
+    member: Missing[GuildMember] = UNSET
     author: Missing["User"] = UNSET
     content: Missing[str] = UNSET
     timestamp: Missing[datetime.datetime] = UNSET
     edited_timestamp: MissingOrNullable[datetime.datetime] = UNSET
     tts: Missing[bool] = UNSET
     mention_everyone: Missing[bool] = UNSET
+    mentions: Missing[list[User]] = UNSET
     mention_roles: Missing[list[Snowflake]] = UNSET
     mention_channels: Missing[list["ChannelMention"]] = UNSET
     attachments: Missing[list["Attachment"]] = UNSET
@@ -3836,7 +3836,9 @@ class MessageUpdate(MessageGet):
     application_id: Missing[Snowflake] = UNSET
     message_reference: Missing["MessageReference"] = UNSET
     flags: Missing[MessageFlag] = UNSET
+    message_snapshots: Missing[list["MessageSnapshot"]] = UNSET
     referenced_message: MissingOrNullable["MessageGet"] = UNSET
+    interaction_metadata: Missing[MessageInteractionMetadata] = UNSET
     interaction: Missing[MessageInteraction] = UNSET
     thread: Missing[Channel] = UNSET
     components: Missing[list[DirectComponent]] = UNSET
@@ -3844,6 +3846,9 @@ class MessageUpdate(MessageGet):
     stickers: Missing[list["Sticker"]] = UNSET
     position: Missing[int] = UNSET
     role_subscription_data: Missing["RoleSubscriptionData"] = UNSET
+    resolved: Missing[ResolvedData] = UNSET
+    poll: Missing["Poll"] = UNSET
+    call: Missing["MessageCall"] = UNSET
 
 
 class MessageDelete(BaseModel):
@@ -3924,7 +3929,7 @@ class MessageReactionRemoveEmoji(BaseModel):
     emoji: Emoji  # partial emoji object
 
 
-class PresenceUpdateUser(User):
+class PresenceUpdateUser(BaseModel):
     """Presence Update User Fields
 
     see https://discord.com/developers/docs/topics/gateway-events#presence-update"""
@@ -3932,6 +3937,7 @@ class PresenceUpdateUser(User):
     id: Snowflake
     username: Missing[str] = UNSET
     discriminator: Missing[str] = UNSET
+    global_name: MissingOrNullable[str] = UNSET
     avatar: MissingOrNullable[str] = UNSET
     bot: Missing[bool] = UNSET
     system: Missing[bool] = UNSET
@@ -3944,6 +3950,7 @@ class PresenceUpdateUser(User):
     flags: Missing[int] = UNSET
     premium_type: Missing[PremiumType] = UNSET
     public_flags: Missing[UserFlags] = UNSET
+    avatar_decoration_data: MissingOrNullable["AvatarDecorationData"] = UNSET
 
 
 class PresenceUpdate(BaseModel):
