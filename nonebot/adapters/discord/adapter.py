@@ -3,7 +3,8 @@ import contextlib
 import inspect
 import json
 import sys
-from typing import Any, Optional
+from functools import lru_cache
+from typing import Any, Callable, Mapping, Optional
 from typing_extensions import override
 
 from nonebot.adapters import Adapter as BaseAdapter
@@ -36,6 +37,12 @@ from .payload import (
 from .utils import decompress_data, log, model_dump
 
 RECONNECT_INTERVAL = 3.0
+
+
+@lru_cache(maxsize=256)
+def _get_handler_params(handler: Callable[..., Any]) -> Mapping[str, inspect.Parameter]:
+    """Cache handler signature parameters to avoid repeated introspection."""
+    return inspect.signature(handler).parameters
 
 
 class Adapter(BaseAdapter, HandleMixin):
@@ -470,7 +477,7 @@ class Adapter(BaseAdapter, HandleMixin):
         api_handler = getattr(self, f"_api_{api}", None)
         if api_handler is None:
             raise ApiNotAvailable
-        handler_params = inspect.signature(api_handler).parameters
+        handler_params = _get_handler_params(api_handler)
         if data:
 
             def can_flatten(legacy_key: str) -> bool:
