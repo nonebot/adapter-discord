@@ -31,6 +31,7 @@ from .storage import (
     _application_command_storage,
 )
 from ..api import (
+    UNSET,
     AnyCommandOption,
     ApplicationCommandCreate,
     ApplicationCommandOptionType,
@@ -42,6 +43,7 @@ from ..api import (
     Snowflake,
     SnowflakeType,
 )
+from ..api.types import is_unset
 from ..bot import Bot
 from ..event import ApplicationCommandInteractionEvent
 from ..message import Message, MessageSegment, parse_message
@@ -241,19 +243,19 @@ class SlashCommandMatcher(ApplicationCommandMatcher):
             matcher: Matcher,
             state: T_State,  # noqa: ARG001 # TODO)): 验证state作用
         ) -> None:
-            if commands and not event.data.options:
-                matcher.skip()
             options = event.data.options
+            if commands and is_unset(options):
+                matcher.skip()
             for command in commands:
-                if not options:
+                if is_unset(options):
                     matcher.skip()
                 option = options[0]
-                if option.name != command or options[0].type not in (
+                if option.name != command or option.type not in (
                     ApplicationCommandOptionType.SUB_COMMAND_GROUP,
                     ApplicationCommandOptionType.SUB_COMMAND,
                 ):
                     matcher.skip()
-                options = options[0].options if options[0].options else None
+                options = option.options
 
         parameterless = [Depends(_sub_command_rule), *(parameterless or [])]
 
