@@ -11,6 +11,7 @@ from nonebot.compat import PYDANTIC_V2, model_dump
 from nonebot.utils import escape_tag
 from pydantic import BaseModel, Field
 
+from .api import model as _model_module
 from .api.model import (
     ApplicationCommandData,
     ApplicationCommandPermissions,
@@ -1229,15 +1230,23 @@ event_classes: dict[str, type[Event]] = {
     ],
 }
 
+_model_types_namespace = vars(_model_module)
+
 for _, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass):
     if (
         issubclass(obj, BaseModel)
         and obj.__module__ == __name__
     ):
         if PYDANTIC_V2:
-            obj.model_rebuild()
+            obj.model_rebuild(_types_namespace=_model_types_namespace)
         else:
-            obj.update_forward_refs()
+            obj.update_forward_refs(
+                **{
+                    k: v
+                    for k, v in _model_types_namespace.items()
+                    if isinstance(v, type)
+                }
+            )
 
 __all__ = [
     "ApplicationCommandAutoCompleteInteractionEvent",
