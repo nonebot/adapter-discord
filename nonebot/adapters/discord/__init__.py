@@ -1,4 +1,5 @@
 from .adapter import Adapter
+from .api.types import UNSET
 from .bot import Bot
 from .commands import (
     ApplicationCommandMatcher,
@@ -132,6 +133,7 @@ from .message import (
 from .utils import log as log
 
 __all__ = [
+    "UNSET",
     "Adapter",
     "ApplicationCommandAutoCompleteInteractionEvent",
     "ApplicationCommandInteractionEvent",
