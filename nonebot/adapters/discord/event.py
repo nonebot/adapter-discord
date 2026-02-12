@@ -1229,8 +1229,11 @@ event_classes: dict[str, type[Event]] = {
     ],
 }
 
-for _, obj in inspect.getmembers(sys.modules[__name__]):
-    if inspect.isclass(obj) and issubclass(obj, BaseModel) and obj is not BaseModel:
+for _, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass):
+    if (
+        issubclass(obj, BaseModel)
+        and obj.__module__ == __name__
+    ):
         if PYDANTIC_V2:
             obj.model_rebuild()
         else:
