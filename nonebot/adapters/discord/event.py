@@ -1,3 +1,5 @@
+import inspect
+import sys
 from datetime import datetime
 from enum import Enum
 from typing import Literal, Optional, Union
@@ -5,9 +7,9 @@ from typing_extensions import override
 
 from nonebot.adapters import Event as BaseEvent
 
-from nonebot.compat import model_dump
+from nonebot.compat import PYDANTIC_V2, model_dump
 from nonebot.utils import escape_tag
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from .api.model import (
     ApplicationCommandData,
@@ -1226,6 +1228,13 @@ event_classes: dict[str, type[Event]] = {
         MessagePollVoteRemoveEvent,
     ],
 }
+
+for _, obj in inspect.getmembers(sys.modules[__name__]):
+    if inspect.isclass(obj) and issubclass(obj, BaseModel) and obj is not BaseModel:
+        if PYDANTIC_V2:
+            obj.model_rebuild()
+        else:
+            obj.update_forward_refs()
 
 __all__ = [
     "ApplicationCommandAutoCompleteInteractionEvent",
