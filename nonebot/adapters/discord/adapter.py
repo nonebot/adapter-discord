@@ -479,24 +479,6 @@ class Adapter(BaseAdapter, HandleMixin):
         if api_handler is None:
             raise ApiNotAvailable
         handler_params = _get_handler_params(api_handler)
-        if data:
-
-            def can_flatten(legacy_key: str) -> bool:
-                param = handler_params.get(legacy_key)
-                if param is None:
-                    return True
-                return param.kind is inspect.Parameter.VAR_KEYWORD
-
-            for legacy_key in ("params", "data"):
-                legacy_value = data.get(legacy_key)
-                if (
-                    isinstance(legacy_value, dict)
-                    and legacy_value
-                    and can_flatten(legacy_key)
-                ):
-                    for key, value in legacy_value.items():
-                        data.setdefault(key, value)
-                    data.pop(legacy_key, None)
         if "bot" in handler_params:
             return await api_handler(bot, **data)
         return await api_handler(**data)
