@@ -41,6 +41,7 @@ from .api import (
     TextInput,
     TimeStampStyle,
 )
+from .api.types import is_not_unset
 from .utils import unescape
 
 
@@ -92,7 +93,11 @@ class MessageSegment(BaseMessageSegment["Message"]):
                 "attachment": AttachmentSend(
                     filename=_filename, description=_description
                 ),
-                "file": File(filename=_filename, content=_content),
+                "file": (
+                    File(filename=_filename, content=_content)
+                    if isinstance(_filename, str)
+                    else None
+                ),
             },
         )
 
@@ -677,11 +682,11 @@ class Message(BaseMessage[MessageSegment]):
             )
         if message.embeds:
             msg.extend(MessageSegment.embed(embed) for embed in message.embeds)
-        if message.components:
+        if is_not_unset(message.components):
             msg.extend(
                 MessageSegment.component(component) for component in message.components
             )
-        if message.poll:
+        if is_not_unset(message.poll):
             msg.append(MessageSegment.poll(message.poll))
         return msg
 
