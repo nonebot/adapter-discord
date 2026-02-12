@@ -1,10 +1,11 @@
 import asyncio
+from collections.abc import Mapping
 import contextlib
+from functools import lru_cache
 import inspect
 import json
 import sys
-from functools import lru_cache
-from typing import Any, Callable, Mapping, Optional
+from typing import Any, Callable, Optional
 from typing_extensions import override
 
 from nonebot.adapters import Adapter as BaseAdapter
