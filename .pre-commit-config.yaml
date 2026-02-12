@@ -10,7 +10,7 @@ repos:
     hooks:
       - id: generate-client-pyi
         name: generate client.pyi
-        entry: python scripts/generate_client_pyi.py
+        entry: python3 scripts/generate_client_pyi.py
         language: system
         pass_filenames: false
         files: ^(nonebot/adapters/discord/api/handle\.py|scripts/generate_client_pyi\.py)$
