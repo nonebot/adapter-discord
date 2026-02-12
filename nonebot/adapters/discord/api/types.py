@@ -14,6 +14,9 @@ class _UNSET(type):
     def __repr__(cls) -> Literal["<UNSET>"]:
         return "<UNSET>"
 
+    def __bool__(cls) -> Literal[False]:
+        return False
+
 
 class UNSET(metaclass=_UNSET): ...
 
