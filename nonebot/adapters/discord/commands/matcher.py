@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from datetime import datetime, timedelta
 from typing import Any, Callable, Optional, Union
 
@@ -274,7 +274,7 @@ class UserMessageCommandMatcher(ApplicationCommandMatcher):
 def on_slash_command(  # noqa: PLR0913
     name: str,
     description: str,
-    options: Missing[list[AnyCommandOption]] = UNSET,
+    options: Missing[Sequence[AnyCommandOption]] = UNSET,
     internal_id: Optional[str] = None,
     rule: Union[Rule, T_RuleChecker, None] = None,
     permission: Union[Permission, T_PermissionChecker, None] = None,
@@ -299,7 +299,7 @@ def on_slash_command(  # noqa: PLR0913
         name_localizations=name_localizations,
         description=description,
         description_localizations=description_localizations,
-        options=options,
+        options=UNSET if is_unset(options) else list(options),
         default_member_permissions=default_member_permissions,
         dm_permission=dm_permission,
         default_permission=default_permission,
