@@ -7,7 +7,7 @@ from typing_extensions import override
 
 from nonebot.adapters import Event as BaseEvent
 
-from nonebot.compat import PYDANTIC_V2, model_dump
+from nonebot.compat import PYDANTIC_V2
 from nonebot.utils import escape_tag
 from pydantic import BaseModel, Field
 
@@ -93,7 +93,7 @@ from .api.model import (
 )
 from .api.types import UNSET, InteractionType, Missing, is_unset
 from .message import Message
-from .utils import log
+from .utils import log, model_dump
 
 
 class EventType(str, Enum):
@@ -238,7 +238,7 @@ class Event(BaseEvent):
 
     @override
     def get_event_description(self) -> str:
-        return escape_tag(str(model_dump(self)))
+        return escape_tag(str(model_dump(self, omit_unset_values=True)))
 
     @override
     def get_message(self) -> Message:
@@ -302,6 +302,32 @@ class MessageEvent(Event, MessageGet):
     @override
     def get_type(self) -> str:
         return "message"
+
+    @staticmethod
+    def _format_preview(content: str, max_length: int = 120) -> str:
+        normalized = content.replace("\r\n", "\n").replace("\r", "\n")
+        normalized = normalized.replace("\n", "\\n").strip()
+        if not normalized:
+            return "<empty>"
+        if len(normalized) > max_length:
+            return normalized[: max_length - 3] + "..."
+        return normalized
+
+    @override
+    def get_event_description(self) -> str:
+        guild_id = getattr(self, "guild_id", UNSET)
+        location = (
+            f"Guild {guild_id}, Channel {self.channel_id}"
+            if not is_unset(guild_id)
+            else f"Channel {self.channel_id}"
+        )
+        preview = self._format_preview(
+            self.get_message().extract_content() or self.content
+        )
+        return escape_tag(
+            f"Message {self.id} from {self.author.id}({self.author.username})"
+            f"@[{location}] {preview}"
+        )
 
     @override
     def get_user_id(self) -> str:
