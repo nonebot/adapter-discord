@@ -258,6 +258,25 @@ def _encode_image_data_uri(*, image: bytes) -> str:
     return f"data:{mime_type};base64,{encoded}"
 
 
+def _build_reaction_url(
+    *,
+    base_url: URL,
+    channel_id: SnowflakeType,
+    message_id: SnowflakeType,
+    emoji: str,
+    suffix: str = "",
+) -> URL:
+    encoded_emoji = quote(emoji, safe="")
+    suffix_path = f"/{suffix}" if suffix else ""
+    return URL(
+        (
+            f"{base_url}/channels/{channel_id}/messages/"
+            f"{message_id}/reactions/{encoded_emoji}{suffix_path}"
+        ),
+        encoded=True,
+    )
+
+
 def _normalize_command_description(
     *,
     command_type: Optional[ApplicationCommandType],
@@ -1892,8 +1911,13 @@ class HandleMixin:
         request = Request(
             headers=headers,
             method="PUT",
-            url=self.base_url
-            / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/@me",
+            url=_build_reaction_url(
+                base_url=self.base_url,
+                channel_id=channel_id,
+                message_id=message_id,
+                emoji=emoji,
+                suffix="@me",
+            ),
         )
         await _request(self, request)
 
@@ -1916,8 +1940,13 @@ class HandleMixin:
         request = Request(
             headers=headers,
             method="DELETE",
-            url=self.base_url
-            / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/@me",
+            url=_build_reaction_url(
+                base_url=self.base_url,
+                channel_id=channel_id,
+                message_id=message_id,
+                emoji=emoji,
+                suffix="@me",
+            ),
         )
         await _request(self, request)
 
@@ -1941,8 +1970,13 @@ class HandleMixin:
         request = Request(
             headers=headers,
             method="DELETE",
-            url=self.base_url
-            / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}/{user_id}",
+            url=_build_reaction_url(
+                base_url=self.base_url,
+                channel_id=channel_id,
+                message_id=message_id,
+                emoji=emoji,
+                suffix=str(user_id),
+            ),
         )
         await _request(self, request)
 
@@ -1973,8 +2007,12 @@ class HandleMixin:
         request = Request(
             headers=headers,
             method="GET",
-            url=self.base_url
-            / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}",
+            url=_build_reaction_url(
+                base_url=self.base_url,
+                channel_id=channel_id,
+                message_id=message_id,
+                emoji=emoji,
+            ),
             params={key: value for key, value in params.items() if value is not None},
         )
         return type_validate_python(list[User], await _request(self, request))
@@ -2018,8 +2056,12 @@ class HandleMixin:
         request = Request(
             headers=headers,
             method="DELETE",
-            url=self.base_url
-            / f"channels/{channel_id}/messages/{message_id}/reactions/{quote(emoji)}",
+            url=_build_reaction_url(
+                base_url=self.base_url,
+                channel_id=channel_id,
+                message_id=message_id,
+                emoji=emoji,
+            ),
         )
         await _request(self, request)
 
