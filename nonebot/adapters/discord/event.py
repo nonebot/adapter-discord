@@ -752,10 +752,12 @@ class InteractionCreateEvent(NoticeEvent, InteractionCreate):
 
     @override
     def get_user_id(self) -> str:
-        if is_unset(self.user):
-            msg = "Event has no context!"
-            raise ValueError(msg)
-        return str(self.user.id)
+        if not is_unset(self.user):
+            return str(self.user.id)
+        if not is_unset(self.member) and not is_unset(self.member.user):
+            return str(self.member.user.id)
+        msg = "Event has no context!"
+        raise ValueError(msg)
 
 
 class PingInteractionEvent(InteractionCreateEvent):
