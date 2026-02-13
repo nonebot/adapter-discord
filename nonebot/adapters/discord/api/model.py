@@ -3548,6 +3548,29 @@ class GuildCreate(BaseModel):
     guild_scheduled_events: Missing[list["GuildScheduledEvent"]] = UNSET
 
 
+class GuildCreateCompatRole(BaseModel):
+    id: Snowflake
+    permissions: Union[str, int]
+
+
+class GuildCreateCompatOverwrite(BaseModel):
+    id: Snowflake
+    type: Union[OverwriteType, Literal["role", "member"]]
+    allow: Union[str, int]
+    deny: Union[str, int]
+
+
+class GuildCreateCompatChannel(BaseModel):
+    id: Snowflake
+    permission_overwrites: Missing[list[GuildCreateCompatOverwrite]] = UNSET
+
+
+class GuildCreateCompat(BaseModel):
+    id: Snowflake
+    roles: list[GuildCreateCompatRole]
+    channels: list[GuildCreateCompatChannel]
+
+
 class GuildUpdate(Guild):
     """Guild Update Event Fields
 
@@ -4746,6 +4769,10 @@ __all__ = [
     "GuildBanAdd",
     "GuildBanRemove",
     "GuildCreate",
+    "GuildCreateCompat",
+    "GuildCreateCompatChannel",
+    "GuildCreateCompatOverwrite",
+    "GuildCreateCompatRole",
     "GuildDelete",
     "GuildEmojisUpdate",
     "GuildIntegrationsUpdate",

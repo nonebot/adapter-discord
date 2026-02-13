@@ -30,6 +30,7 @@ from .api.model import (
     GuildBanAdd,
     GuildBanRemove,
     GuildCreate,
+    GuildCreateCompat,
     GuildDelete,
     GuildEmojisUpdate,
     GuildIntegrationsUpdate,
@@ -92,6 +93,7 @@ from .api.model import (
 )
 from .api.types import UNSET, InteractionType, Missing, is_unset
 from .message import Message
+from .utils import log
 
 
 class EventType(str, Enum):
@@ -136,6 +138,7 @@ class EventType(str, Enum):
 
     # GUILDS
     GUILD_CREATE = "GUILD_CREATE"
+    GUILD_CREATE_COMPAT = "GUILD_CREATE_COMPAT"
     GUILD_UPDATE = "GUILD_UPDATE"
     GUILD_DELETE = "GUILD_DELETE"
     GUILD_AUDIT_LOG_ENTRY_CREATE = "GUILD_AUDIT_LOG_ENTRY_CREATE"
@@ -549,6 +552,18 @@ class GuildCreateEvent(GuildEvent, GuildCreate):
     see https://discord.com/developers/docs/topics/gateway-events#guild-create"""
 
     __type__ = EventType.GUILD_CREATE
+
+
+class GuildCreateCompatEvent(GuildEvent, GuildCreateCompat):
+    __type__ = EventType.GUILD_CREATE_COMPAT
+
+    def __init__(self, **data) -> None:  # noqa: ANN003
+        super().__init__(**data)
+        log(
+            "WARNING",
+            "Detected mixed-format GUILD_CREATE payload; "
+            "parsing as GuildCreateCompatEvent",
+        )
 
 
 class GuildUpdateEvent(GuildEvent, GuildUpdate):
@@ -1159,7 +1174,7 @@ event_classes: dict[str, type[Event]] = {
     EventType.ENTITLEMENT_CREATE.value: EntitlementCreateEvent,
     EventType.ENTITLEMENT_UPDATE.value: EntitlementUpdateEvent,
     EventType.ENTITLEMENT_DELETE.value: EntitlementDeleteEvent,
-    EventType.GUILD_CREATE.value: GuildCreateEvent,
+    EventType.GUILD_CREATE.value: Union[GuildCreateEvent, GuildCreateCompatEvent],
     EventType.GUILD_UPDATE.value: GuildUpdateEvent,
     EventType.GUILD_DELETE.value: GuildDeleteEvent,
     EventType.GUILD_AUDIT_LOG_ENTRY_CREATE.value: GuildAuditLogEntryCreateEvent,
@@ -1306,6 +1321,7 @@ __all__ = [
     "GuildAuditLogEntryCreateEvent",
     "GuildBanAddEvent",
     "GuildBanRemoveEvent",
+    "GuildCreateCompatEvent",
     "GuildCreateEvent",
     "GuildDeleteEvent",
     "GuildEmojisUpdateEvent",
