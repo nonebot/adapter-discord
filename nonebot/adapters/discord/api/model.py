@@ -3548,6 +3548,43 @@ class GuildCreate(BaseModel):
     guild_scheduled_events: Missing[list["GuildScheduledEvent"]] = UNSET
 
 
+class GuildCreateCompatRole(BaseModel):
+    id: Snowflake
+    permissions: Union[str, int]
+
+
+class GuildCreateCompatOverwrite(BaseModel):
+    id: Snowflake
+    type: Union[OverwriteType, Literal["role", "member"]]
+    allow: Union[str, int]
+    deny: Union[str, int]
+
+
+class GuildCreateCompatChannel(BaseModel):
+    id: Snowflake
+    permission_overwrites: Missing[list[GuildCreateCompatOverwrite]] = UNSET
+
+
+class GuildCreateCompat(BaseModel):
+    """Compatibility shape for mixed-format ``GUILD_CREATE`` payload.
+
+    Official Discord docs define these fields as serialized strings / enum:
+    - role ``permissions``: string
+    - overwrite ``type``: numeric enum
+    - overwrite ``allow``/``deny``: string
+
+    In production, gateway payloads can still contain numeric permissions and
+    overwrite types as ``"role"``/``"member"`` strings. This model keeps
+    parser compatibility for observed real-world payloads.
+
+    Related issue: https://github.com/nonebot/adapter-discord/issues/48
+    """
+
+    id: Snowflake
+    roles: list[GuildCreateCompatRole]
+    channels: list[GuildCreateCompatChannel]
+
+
 class GuildUpdate(Guild):
     """Guild Update Event Fields
 
@@ -4746,6 +4783,10 @@ __all__ = [
     "GuildBanAdd",
     "GuildBanRemove",
     "GuildCreate",
+    "GuildCreateCompat",
+    "GuildCreateCompatChannel",
+    "GuildCreateCompatOverwrite",
+    "GuildCreateCompatRole",
     "GuildDelete",
     "GuildEmojisUpdate",
     "GuildIntegrationsUpdate",
