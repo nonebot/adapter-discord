@@ -276,6 +276,27 @@ class ApplicationCommandCreate(BaseModel):
     see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
     """
 
+    name: str
+    name_localizations: MissingOrNullable[dict[str, str]] = UNSET
+    description: Missing[str] = UNSET
+    description_localizations: MissingOrNullable[dict[str, str]] = UNSET
+    options: Missing[list["AnyCommandOption"]] = UNSET
+    default_member_permissions: MissingOrNullable[str] = UNSET
+    dm_permission: MissingOrNullable[bool] = UNSET
+    default_permission: Missing[bool] = UNSET
+    integration_types: Missing[list[ApplicationIntegrationType]] = UNSET
+    contexts: Missing[list[InteractionContextType]] = UNSET
+    type: Missing[ApplicationCommandType] = UNSET
+    nsfw: Missing[bool] = UNSET
+
+
+class ApplicationCommandBulkOverwriteParams(BaseModel):
+    """Application Command Bulk Overwrite Params.
+
+    see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
+    """
+
+    id: Missing[Snowflake] = UNSET
     type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
     name: str
     name_localizations: Optional[dict[str, str]] = None
@@ -286,6 +307,27 @@ class ApplicationCommandCreate(BaseModel):
     dm_permission: Optional[bool] = None
     default_permission: Optional[bool] = None
     nsfw: Optional[bool] = None
+    integration_types: Missing[list[ApplicationIntegrationType]] = UNSET
+    contexts: MissingOrNullable[list[InteractionContextType]] = UNSET
+
+
+class ApplicationCommandEditParams(BaseModel):
+    """Application Command Edit Params.
+
+    see https://discord.com/developers/docs/interactions/application-commands#edit-global-application-command
+    """
+
+    name: Missing[str] = UNSET
+    name_localizations: MissingOrNullable[dict[str, str]] = UNSET
+    description: Missing[str] = UNSET
+    description_localizations: MissingOrNullable[dict[str, str]] = UNSET
+    options: Missing[list["AnyCommandOption"]] = UNSET
+    default_member_permissions: MissingOrNullable[str] = UNSET
+    dm_permission: MissingOrNullable[bool] = UNSET
+    default_permission: Missing[bool] = UNSET
+    nsfw: Missing[bool] = UNSET
+    integration_types: Missing[list[ApplicationIntegrationType]] = UNSET
+    contexts: Missing[list[InteractionContextType]] = UNSET
 
 
 class CommandOptionBase(BaseModel):
@@ -301,10 +343,10 @@ class CommandOptionBase(BaseModel):
     description_localizations: Optional[dict[str, str]] = None
 
 
-class ApplicationCommandOption(CommandOptionBase):
+class ApplicationCommandOption(BaseModel):
     """Application Command Option
 
-    Required options must be listed before optional options
+    Required options must be listed before optional options.
 
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
@@ -364,7 +406,7 @@ class SubCommandOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.SUB_COMMAND] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.SUB_COMMAND, init=False
     )
     options: Optional[
@@ -390,7 +432,7 @@ class SubCommandGroupOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.SUB_COMMAND_GROUP] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.SUB_COMMAND_GROUP, init=False
     )
     options: Optional[list[SubCommandOption]] = None
@@ -402,7 +444,7 @@ class IntegerOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.INTEGER] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.INTEGER, init=False
     )
     choices: Optional[list[OptionChoice[int]]] = None
@@ -418,7 +460,7 @@ class StringOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.STRING] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.STRING, init=False
     )
     choices: Optional[list[OptionChoice[str]]] = None
@@ -434,7 +476,7 @@ class BooleanOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.BOOLEAN] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.BOOLEAN, init=False
     )
     required: bool = False
@@ -446,7 +488,7 @@ class UserOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.USER] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.USER, init=False
     )
     required: bool = False
@@ -458,7 +500,7 @@ class ChannelOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.CHANNEL] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.CHANNEL, init=False
     )
     channel_types: Optional[list[ChannelType]] = None
@@ -471,7 +513,7 @@ class RoleOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.ROLE] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.ROLE, init=False
     )
     required: bool = False
@@ -483,7 +525,7 @@ class MentionableOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.MENTIONABLE] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.MENTIONABLE, init=False
     )
     required: bool = False
@@ -495,7 +537,7 @@ class NumberOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.NUMBER] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.NUMBER, init=False
     )
     choices: Optional[list[OptionChoice[float]]] = None
@@ -509,7 +551,7 @@ class AttachmentOption(CommandOptionBase):
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[ApplicationCommandOptionType.ATTACHMENT] = Field(
+    type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.ATTACHMENT, init=False
     )
     required: bool = False
@@ -1137,6 +1179,12 @@ class Application(BaseModel):
         UNSET  # return type not match the docs
     )
     """Role connection verification URL for the app"""
+    event_webhooks_url: MissingOrNullable[str] = UNSET
+    """Event webhooks URL for the app to receive webhook events"""
+    event_webhooks_status: Missing[int] = UNSET
+    """Status indicating whether event webhooks are enabled"""
+    event_webhooks_types: Missing[list[str]] = UNSET
+    """List of webhook event types the app subscribes to"""
     tags: Missing[list[str]] = UNSET
     """up to 5 tags describing the content and functionality of the application"""
     install_params: Missing["InstallParams"] = UNSET
@@ -1664,6 +1712,20 @@ class Overwrite(BaseModel):
     deny: str
 
 
+class PartialOverwrite(BaseModel):
+    """Partial overwrite.
+
+    Used in request payloads where `allow`/`deny` can be omitted or null.
+
+    see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
+    """
+
+    id: Snowflake
+    type: OverwriteType
+    allow: MissingOrNullable[str] = UNSET
+    deny: MissingOrNullable[str] = UNSET
+
+
 class ThreadMetadata(BaseModel):
     """Thread metadata.
 
@@ -1709,6 +1771,18 @@ class ForumTag(BaseModel):
     moderated: bool
     emoji_id: Optional[Snowflake] = None
     emoji_name: Optional[str] = None
+
+
+class ForumTagRequest(BaseModel):
+    """Forum tag request.
+
+    see https://discord.com/developers/docs/resources/channel#forum-tag-object"""
+
+    id: Missing[Snowflake] = UNSET
+    name: str
+    moderated: Missing[bool] = UNSET
+    emoji_id: MissingOrNullable[Snowflake] = UNSET
+    emoji_name: MissingOrNullable[str] = UNSET
 
 
 class Embed(BaseModel):
@@ -1902,27 +1976,66 @@ class AttachmentSend(BaseModel):
 
     see https://discord.com/developers/docs/resources/channel#attachment-object"""
 
-    filename: str
-    description: Optional[str] = None
+    id: Missing[int] = UNSET
+    filename: Missing[str] = UNSET
+    description: MissingOrNullable[str] = UNSET
 
 
 class MessageSend(BaseModel):
     """Message Send
 
-    see https://discord.com/developers/docs/resources/channel#create-message"""
+    see https://discord.com/developers/docs/resources/message#create-message"""
 
-    content: Optional[str] = None
-    nonce: Optional[Union[int, str]] = None
-    tts: Optional[bool] = None
-    embeds: Optional[list[Embed]] = None
-    allowed_mentions: Optional[AllowedMention] = None
-    message_reference: Optional[MessageReference] = None
-    components: Optional[list[DirectComponent]] = None
-    sticker_ids: Optional[list[Snowflake]] = None
-    files: Optional[list[File]] = None
-    attachments: Optional[list[AttachmentSend]] = None
-    flags: Optional[MessageFlag] = None
-    poll: Optional["PollRequest"] = None
+    content: Missing[str] = UNSET
+    nonce: Missing[Union[int, str]] = UNSET
+    enforce_nonce: Missing[bool] = UNSET
+    tts: Missing[bool] = UNSET
+    embeds: Missing[list[Embed]] = UNSET
+    allowed_mentions: Missing[AllowedMention] = UNSET
+    message_reference: Missing[MessageReference] = UNSET
+    components: Missing[list[DirectComponent]] = UNSET
+    sticker_ids: Missing[list[Snowflake]] = UNSET
+    files: Missing[list[File]] = UNSET
+    attachments: Missing[list[AttachmentSend]] = UNSET
+    flags: Missing[MessageFlag] = UNSET
+    poll: Missing["PollRequest"] = UNSET
+
+
+class MessageEditParams(BaseModel):
+    """Edit Message Parameters.
+
+    All parameters are optional and nullable.
+
+    see https://discord.com/developers/docs/resources/message#edit-message
+    """
+
+    content: MissingOrNullable[str] = UNSET
+    embeds: MissingOrNullable[list[Embed]] = UNSET
+    flags: MissingOrNullable[MessageFlag] = UNSET
+    allowed_mentions: MissingOrNullable[AllowedMention] = UNSET
+    components: MissingOrNullable[list[Component]] = UNSET
+    files: Missing[list[File]] = UNSET
+    attachments: MissingOrNullable[list[AttachmentSend]] = UNSET
+    sticker_ids: Missing[list[Snowflake]] = UNSET
+    poll: MissingOrNullable["PollRequest"] = UNSET
+
+
+class WebhookMessageEditParams(BaseModel):
+    """Edit Webhook Message Parameters.
+
+    All parameters are optional and nullable.
+
+    see https://discord.com/developers/docs/resources/webhook#edit-webhook-message
+    """
+
+    content: MissingOrNullable[str] = UNSET
+    embeds: MissingOrNullable[list[Embed]] = UNSET
+    flags: MissingOrNullable[MessageFlag] = UNSET
+    allowed_mentions: MissingOrNullable[AllowedMention] = UNSET
+    components: MissingOrNullable[list[Component]] = UNSET
+    files: Missing[list[File]] = UNSET
+    attachments: MissingOrNullable[list[AttachmentSend]] = UNSET
+    poll: MissingOrNullable["PollRequest"] = UNSET
 
 
 class ModifyChannelParams(BaseModel):
@@ -1931,25 +2044,142 @@ class ModifyChannelParams(BaseModel):
     see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
     """
 
-    name: Optional[str] = None
-    type: Optional[ChannelType] = None
-    position: Optional[int] = None
-    topic: Optional[str] = None
-    nsfw: Optional[bool] = None
-    rate_limit_per_user: Optional[int] = None
-    bitrate: Optional[int] = None
-    user_limit: Optional[int] = None
-    permission_overwrites: Optional[list[Overwrite]] = None
-    parent_id: Optional[Snowflake] = None
-    rtc_region: Optional[str] = None
-    video_quality_mode: Optional[VideoQualityMode] = None
-    default_auto_archive_duration: Optional[int] = None
-    flags: Optional[ChannelFlags] = None
-    available_tags: Optional[list[ForumTag]] = None
-    default_reaction_emoji: Optional[DefaultReaction] = None
-    default_thread_rate_limit_per_user: Optional[int] = None
-    default_sort_order: Optional[SortOrderTypes] = None
-    default_forum_layout: Optional[ForumLayoutTypes] = None
+    # JSON Params (Guild channel)
+    # see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
+    name: Missing[str] = UNSET
+    type: Missing[ChannelType] = UNSET
+    position: MissingOrNullable[int] = UNSET
+    topic: MissingOrNullable[str] = UNSET
+    nsfw: MissingOrNullable[bool] = UNSET
+    rate_limit_per_user: MissingOrNullable[int] = UNSET
+    bitrate: MissingOrNullable[int] = UNSET
+    user_limit: MissingOrNullable[int] = UNSET
+    permission_overwrites: MissingOrNullable[list[PartialOverwrite]] = UNSET
+    parent_id: MissingOrNullable[Snowflake] = UNSET
+    rtc_region: MissingOrNullable[str] = UNSET
+    video_quality_mode: MissingOrNullable[VideoQualityMode] = UNSET
+    default_auto_archive_duration: MissingOrNullable[int] = UNSET
+    flags: Missing[ChannelFlags] = UNSET
+    available_tags: Missing[list[ForumTagRequest]] = UNSET
+    default_reaction_emoji: MissingOrNullable[DefaultReaction] = UNSET
+    default_thread_rate_limit_per_user: Missing[int] = UNSET
+    default_sort_order: MissingOrNullable[SortOrderTypes] = UNSET
+    default_forum_layout: Missing[ForumLayoutTypes] = UNSET
+
+
+class ModifyThreadParams(BaseModel):
+    """Modify Thread Params.
+
+    see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-thread
+    """
+
+    name: Missing[str] = UNSET
+    archived: Missing[bool] = UNSET
+    auto_archive_duration: Missing[int] = UNSET
+    locked: Missing[bool] = UNSET
+    invitable: Missing[bool] = UNSET
+    rate_limit_per_user: MissingOrNullable[int] = UNSET
+    flags: Missing[ChannelFlags] = UNSET
+    applied_tags: Missing[list[Snowflake]] = UNSET
+
+
+class StartThreadFromMessageParams(BaseModel):
+    """Start Thread From Message Params.
+
+    see https://discord.com/developers/docs/resources/channel#start-thread-from-message
+    """
+
+    name: str
+    auto_archive_duration: Missing[int] = UNSET
+    rate_limit_per_user: MissingOrNullable[int] = UNSET
+
+
+class StartThreadWithoutMessageParams(BaseModel):
+    """Start Thread Without Message Params.
+
+    see https://discord.com/developers/docs/resources/channel#start-thread-without-message
+    """
+
+    name: str
+    auto_archive_duration: Missing[int] = UNSET
+    type: Missing[ChannelType] = UNSET
+    invitable: Missing[bool] = UNSET
+    rate_limit_per_user: MissingOrNullable[int] = UNSET
+
+
+class ModifyGuildChannelPositionParams(BaseModel):
+    """Modify Guild Channel Position Params.
+
+    see https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions
+    """
+
+    id: Snowflake
+    position: MissingOrNullable[int] = UNSET
+    lock_permissions: MissingOrNullable[bool] = UNSET
+    parent_id: MissingOrNullable[Snowflake] = UNSET
+
+
+class EditCurrentApplicationParams(BaseModel):
+    """Edit Current Application Params.
+
+    see https://discord.com/developers/docs/resources/application#edit-current-application
+    """
+
+    custom_install_url: Missing[str] = UNSET
+    description: Missing[str] = UNSET
+    role_connections_verification_url: Missing[str] = UNSET
+    install_params: Missing[InstallParams] = UNSET
+    integration_types_config: Missing[
+        dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfiguration]
+    ] = UNSET
+    flags: Missing[ApplicationFlag] = UNSET
+    icon: MissingOrNullable[str] = UNSET
+    cover_image: MissingOrNullable[str] = UNSET
+    interactions_endpoint_url: Missing[str] = UNSET
+    tags: Missing[list[str]] = UNSET
+    event_webhooks_url: Missing[str] = UNSET
+    event_webhooks_status: Missing[int] = UNSET
+    event_webhooks_types: Missing[list[str]] = UNSET
+
+
+class ModifyCurrentUserParams(BaseModel):
+    """Modify Current User Params.
+
+    see https://discord.com/developers/docs/resources/user#modify-current-user
+    """
+
+    username: Missing[str] = UNSET
+    avatar: MissingOrNullable[str] = UNSET
+    banner: MissingOrNullable[str] = UNSET
+
+
+class ModifyGuildMemberParams(BaseModel):
+    """Modify Guild Member Params.
+
+    All parameters are optional and nullable.
+
+    see https://discord.com/developers/docs/resources/guild#modify-guild-member
+    """
+
+    nick: MissingOrNullable[str] = UNSET
+    roles: MissingOrNullable[list[Snowflake]] = UNSET
+    mute: MissingOrNullable[bool] = UNSET
+    deaf: MissingOrNullable[bool] = UNSET
+    channel_id: MissingOrNullable[Snowflake] = UNSET
+    communication_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
+    flags: MissingOrNullable[GuildMemberFlags] = UNSET
+
+
+class ModifyCurrentMemberParams(BaseModel):
+    """Modify Current Member Params.
+
+    see https://discord.com/developers/docs/resources/guild#modify-current-member
+    """
+
+    nick: MissingOrNullable[str] = UNSET
+    banner: MissingOrNullable[str] = UNSET
+    avatar: MissingOrNullable[str] = UNSET
+    bio: MissingOrNullable[str] = UNSET
 
 
 # Emoji
@@ -2094,6 +2324,16 @@ class GuildWidget(BaseModel):
     channels: list["GuildWidgetChannel"]
     members: list["GuildWidgetUser"]
     presence_count: int
+
+
+class GuildVanityURL(BaseModel):
+    """Guild Vanity URL.
+
+    see https://discord.com/developers/docs/resources/guild#get-guild-vanity-url
+    """
+
+    code: Optional[str] = None
+    uses: int
 
 
 class GuildWidgetChannel(BaseModel):
@@ -2297,27 +2537,28 @@ class ModifyGuildParams(BaseModel):
 
     see https://discord.com/developers/docs/resources/guild#modify-guild"""
 
-    name: Optional[str] = None
-    region: Optional[str] = None
-    verification_level: Optional[VerificationLevel] = None
-    default_message_notifications: Optional[DefaultMessageNotificationLevel] = None
-    explicit_content_filter: Optional[ExplicitContentFilterLevel] = None
-    afk_channel_id: Optional[Snowflake] = None
-    afk_timeout: Optional[int] = None
-    icon: Optional[str] = None
-    owner_id: Optional[Snowflake] = None
-    splash: Optional[str] = None
-    discovery_splash: Optional[str] = None
-    banner: Optional[str] = None
-    system_channel_id: Optional[Snowflake] = None
-    system_channel_flags: Optional[SystemChannelFlags] = None
-    rules_channel_id: Optional[Snowflake] = None
-    public_updates_channel_id: Optional[Snowflake] = None
-    preferred_locale: Optional[str] = None
-    features: Optional[list[GuildFeature]] = None
-    description: Optional[str] = None
-    premium_progress_bar_enabled: Optional[bool] = None
-    safety_alerts_channel_id: Optional[Snowflake] = None
+    name: Missing[str] = UNSET
+    region: MissingOrNullable[str] = UNSET
+    verification_level: MissingOrNullable[VerificationLevel] = UNSET
+    default_message_notifications: MissingOrNullable[
+        DefaultMessageNotificationLevel
+    ] = UNSET
+    explicit_content_filter: MissingOrNullable[ExplicitContentFilterLevel] = UNSET
+    afk_channel_id: MissingOrNullable[Snowflake] = UNSET
+    afk_timeout: Missing[int] = UNSET
+    icon: MissingOrNullable[str] = UNSET
+    splash: MissingOrNullable[str] = UNSET
+    discovery_splash: MissingOrNullable[str] = UNSET
+    banner: MissingOrNullable[str] = UNSET
+    system_channel_id: MissingOrNullable[Snowflake] = UNSET
+    system_channel_flags: Missing[SystemChannelFlags] = UNSET
+    rules_channel_id: MissingOrNullable[Snowflake] = UNSET
+    public_updates_channel_id: MissingOrNullable[Snowflake] = UNSET
+    preferred_locale: MissingOrNullable[str] = UNSET
+    features: Missing[list[GuildFeature]] = UNSET
+    description: MissingOrNullable[str] = UNSET
+    premium_progress_bar_enabled: Missing[bool] = UNSET
+    safety_alerts_channel_id: MissingOrNullable[Snowflake] = UNSET
 
 
 class CreateGuildChannelParams(BaseModel):
@@ -2339,7 +2580,7 @@ class CreateGuildChannelParams(BaseModel):
     video_quality_mode: Optional[VideoQualityMode] = None
     default_auto_archive_duration: Optional[int] = None
     default_reaction_emoji: Optional[DefaultReaction] = None
-    available_tags: Optional[list[ForumTag]] = None
+    available_tags: Optional[list[ForumTagRequest]] = None
     default_sort_order: Optional[SortOrderTypes] = None
     default_forum_layout: Optional[ForumLayoutTypes] = None
     default_thread_rate_limit_per_user: Optional[int] = None
@@ -2360,9 +2601,19 @@ class ModifyGuildWelcomeScreenParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
     """
 
-    enabled: Optional[bool] = None
-    welcome_channels: Optional[list[WelcomeScreenChannel]] = None
-    description: Optional[str] = None
+    enabled: MissingOrNullable[bool] = UNSET
+    welcome_channels: MissingOrNullable[list[WelcomeScreenChannel]] = UNSET
+    description: MissingOrNullable[str] = UNSET
+
+
+class ModifyGuildWidgetParams(BaseModel):
+    """Modify Guild Widget Params.
+
+    see https://discord.com/developers/docs/resources/guild#modify-guild-widget
+    """
+
+    enabled: Missing[bool] = UNSET
+    channel_id: MissingOrNullable[Snowflake] = UNSET
 
 
 # Guild Scheduled Event
@@ -2438,17 +2689,123 @@ class ModifyGuildScheduledEventParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event-json-params
     """
 
-    channel_id: Optional[Snowflake] = None
-    entity_metadata: Optional[GuildScheduledEventEntityMetadata] = None
-    name: Optional[str] = None
-    privacy_level: Optional[GuildScheduledEventPrivacyLevel] = None
-    scheduled_start_time: Optional[datetime.datetime] = None  # ISO8601 timestamp
-    scheduled_end_time: Optional[datetime.datetime] = None  # ISO8601 timestamp
-    description: Optional[str] = None
-    entity_type: Optional[GuildScheduledEventEntityType] = None
-    status: Optional[GuildScheduledEventStatus] = None
-    image: Optional[str] = None
-    recurrence_rule: Optional["RecurrenceRule"] = None
+    channel_id: MissingOrNullable[Snowflake] = UNSET
+    entity_metadata: MissingOrNullable[GuildScheduledEventEntityMetadata] = UNSET
+    name: Missing[str] = UNSET
+    privacy_level: Missing[GuildScheduledEventPrivacyLevel] = UNSET
+    scheduled_start_time: Missing[datetime.datetime] = UNSET  # ISO8601 timestamp
+    scheduled_end_time: Missing[datetime.datetime] = UNSET  # ISO8601 timestamp
+    description: MissingOrNullable[str] = UNSET
+    entity_type: Missing[GuildScheduledEventEntityType] = UNSET
+    status: Missing[GuildScheduledEventStatus] = UNSET
+    image: Missing[str] = UNSET
+    recurrence_rule: MissingOrNullable["RecurrenceRule"] = UNSET
+
+
+class ModifyGuildEmojiParams(BaseModel):
+    """Modify Guild Emoji Params.
+
+    see https://discord.com/developers/docs/resources/emoji#modify-guild-emoji
+    """
+
+    name: Missing[str] = UNSET
+    roles: MissingOrNullable[list[Snowflake]] = UNSET
+
+
+class ModifyGuildStickerParams(BaseModel):
+    """Modify Guild Sticker Params.
+
+    see https://discord.com/developers/docs/resources/sticker#modify-guild-sticker
+    """
+
+    name: Missing[str] = UNSET
+    description: MissingOrNullable[str] = UNSET
+    tags: Missing[str] = UNSET
+
+
+class ModifyGuildRoleParams(BaseModel):
+    """Modify Guild Role Params.
+
+    All parameters are optional and nullable.
+
+    see https://discord.com/developers/docs/resources/guild#modify-guild-role
+    """
+
+    name: MissingOrNullable[str] = UNSET
+    permissions: MissingOrNullable[str] = UNSET
+    color: MissingOrNullable[int] = UNSET
+    colors: Missing["RoleColors"] = UNSET
+    hoist: MissingOrNullable[bool] = UNSET
+    icon: MissingOrNullable[str] = UNSET
+    unicode_emoji: MissingOrNullable[str] = UNSET
+    mentionable: MissingOrNullable[bool] = UNSET
+
+
+class CreateGuildRoleParams(BaseModel):
+    """Create Guild Role Params.
+
+    see https://discord.com/developers/docs/resources/guild#create-guild-role
+    """
+
+    name: Missing[str] = UNSET
+    permissions: Missing[str] = UNSET
+    color: Missing[int] = UNSET
+    colors: Missing["RoleColors"] = UNSET
+    hoist: Missing[bool] = UNSET
+    icon: MissingOrNullable[str] = UNSET
+    unicode_emoji: MissingOrNullable[str] = UNSET
+    mentionable: Missing[bool] = UNSET
+
+
+class ModifyGuildRolePositionParams(BaseModel):
+    """Modify Guild Role Position Params.
+
+    see https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
+    """
+
+    id: Snowflake
+    position: MissingOrNullable[int] = UNSET
+
+
+class CreateWebhookParams(BaseModel):
+    """Create Webhook Params.
+
+    see https://discord.com/developers/docs/resources/webhook#create-webhook
+    """
+
+    name: str
+    avatar: MissingOrNullable[str] = UNSET
+
+
+class ModifyCurrentUserVoiceStateParams(BaseModel):
+    """Modify Current User Voice State Params.
+
+    see https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state
+    """
+
+    channel_id: Missing[Snowflake] = UNSET
+    suppress: Missing[bool] = UNSET
+    request_to_speak_timestamp: MissingOrNullable[datetime.datetime] = UNSET
+
+
+class CreateGuildTemplateParams(BaseModel):
+    """Create Guild Template Params.
+
+    see https://discord.com/developers/docs/resources/guild-template#create-guild-template
+    """
+
+    name: str
+    description: MissingOrNullable[str] = UNSET
+
+
+class ModifyGuildTemplateParams(BaseModel):
+    """Modify Guild Template Params.
+
+    see https://discord.com/developers/docs/resources/guild-template#modify-guild-template
+    """
+
+    name: Missing[str] = UNSET
+    description: MissingOrNullable[str] = UNSET
 
 
 # Guild Template
@@ -2463,7 +2820,7 @@ class GuildTemplate(BaseModel):
     name: str
     description: Optional[str] = None
     usage_count: int
-    creator_id: str
+    creator_id: Snowflake
     creator: "User"
     created_at: datetime.datetime
     updated_at: datetime.datetime
@@ -2561,6 +2918,11 @@ class Invite(BaseModel):
     expires_at: MissingOrNullable[datetime.datetime] = UNSET
     stage_instance: Missing["InviteStageInstance"] = UNSET
     guild_scheduled_event: Missing["GuildScheduledEvent"] = UNSET
+    uses: Missing[int] = UNSET
+    max_uses: Missing[int] = UNSET
+    max_age: Missing[int] = UNSET
+    temporary: Missing[bool] = UNSET
+    created_at: Missing[datetime.datetime] = UNSET
 
     def __init__(self, **data) -> None:  # noqa: ANN003
         super().__init__(**data)
@@ -2688,6 +3050,15 @@ class StickerPack(BaseModel):
     cover_sticker_id: Missing[Snowflake] = UNSET
     description: str
     banner_asset_id: Missing[Snowflake] = UNSET
+
+
+class StickerPacksResponse(BaseModel):
+    """List Nitro Sticker Packs Response.
+
+    see https://discord.com/developers/docs/resources/sticker#list-sticker-packs
+    """
+
+    sticker_packs: list[StickerPack]
 
 
 # User
@@ -2834,19 +3205,19 @@ class ExecuteWebhookParams(BaseModel):
 
     see https://discord.com/developers/docs/resources/webhook#execute-webhook"""
 
-    content: Optional[str] = None
-    username: Optional[str] = None
-    avatar_url: Optional[str] = None
-    tts: Optional[bool] = None
-    embeds: Optional[list[Embed]] = None
-    allowed_mentions: Optional[AllowedMention] = None
-    components: Optional[list[DirectComponent]] = None
-    files: Optional[list[File]] = None
-    attachments: Optional[list[AttachmentSend]] = None
-    flags: Optional[MessageFlag] = None
-    thread_name: Optional[str] = None
-    applied_tags: Optional[list[Snowflake]] = None
-    poll: Optional["Poll"] = None
+    content: Missing[str] = UNSET
+    username: Missing[str] = UNSET
+    avatar_url: Missing[str] = UNSET
+    tts: Missing[bool] = UNSET
+    embeds: Missing[list[Embed]] = UNSET
+    allowed_mentions: Missing[AllowedMention] = UNSET
+    components: Missing[list[DirectComponent]] = UNSET
+    files: Missing[list[File]] = UNSET
+    attachments: Missing[list[AttachmentSend]] = UNSET
+    flags: Missing[MessageFlag] = UNSET
+    thread_name: Missing[str] = UNSET
+    applied_tags: Missing[list[Snowflake]] = UNSET
+    poll: Missing["PollRequest"] = UNSET
 
 
 # gateway
@@ -3431,27 +3802,27 @@ class MessageCreate(MessageGet):
     mentions: list[User]
 
 
-class MessageUpdate(MessageGet):
+class MessageUpdate(BaseModel):
     """Message Update Event Fields
 
     Unlike creates, message updates may contain only a subset of the full
-    message object payload(but will always contain an ID and channel_id).
+    message object payload (but will always contain an ID and channel_id).
 
     see https://discord.com/developers/docs/topics/gateway-events#message-update
     """
 
-    guild_id: Missing[str] = UNSET
-    member: Missing[GuildMember] = UNSET
-    mentions: Missing[list[User]] = UNSET
     id: Snowflake
     channel_id: Snowflake
+    guild_id: Missing[Snowflake] = UNSET
+    member: Missing[GuildMember] = UNSET
     author: Missing["User"] = UNSET
     content: Missing[str] = UNSET
     timestamp: Missing[datetime.datetime] = UNSET
     edited_timestamp: MissingOrNullable[datetime.datetime] = UNSET
     tts: Missing[bool] = UNSET
     mention_everyone: Missing[bool] = UNSET
-    mention_roles: Missing[list[str]] = UNSET
+    mentions: Missing[list[User]] = UNSET
+    mention_roles: Missing[list[Snowflake]] = UNSET
     mention_channels: Missing[list["ChannelMention"]] = UNSET
     attachments: Missing[list["Attachment"]] = UNSET
     embeds: Missing[list["Embed"]] = UNSET
@@ -3465,7 +3836,9 @@ class MessageUpdate(MessageGet):
     application_id: Missing[Snowflake] = UNSET
     message_reference: Missing["MessageReference"] = UNSET
     flags: Missing[MessageFlag] = UNSET
+    message_snapshots: Missing[list["MessageSnapshot"]] = UNSET
     referenced_message: MissingOrNullable["MessageGet"] = UNSET
+    interaction_metadata: Missing[MessageInteractionMetadata] = UNSET
     interaction: Missing[MessageInteraction] = UNSET
     thread: Missing[Channel] = UNSET
     components: Missing[list[DirectComponent]] = UNSET
@@ -3473,6 +3846,9 @@ class MessageUpdate(MessageGet):
     stickers: Missing[list["Sticker"]] = UNSET
     position: Missing[int] = UNSET
     role_subscription_data: Missing["RoleSubscriptionData"] = UNSET
+    resolved: Missing[ResolvedData] = UNSET
+    poll: Missing["Poll"] = UNSET
+    call: Missing["MessageCall"] = UNSET
 
 
 class MessageDelete(BaseModel):
@@ -3553,7 +3929,7 @@ class MessageReactionRemoveEmoji(BaseModel):
     emoji: Emoji  # partial emoji object
 
 
-class PresenceUpdateUser(User):
+class PresenceUpdateUser(BaseModel):
     """Presence Update User Fields
 
     see https://discord.com/developers/docs/topics/gateway-events#presence-update"""
@@ -3561,6 +3937,7 @@ class PresenceUpdateUser(User):
     id: Snowflake
     username: Missing[str] = UNSET
     discriminator: Missing[str] = UNSET
+    global_name: MissingOrNullable[str] = UNSET
     avatar: MissingOrNullable[str] = UNSET
     bot: Missing[bool] = UNSET
     system: Missing[bool] = UNSET
@@ -3573,6 +3950,7 @@ class PresenceUpdateUser(User):
     flags: Missing[int] = UNSET
     premium_type: Missing[PremiumType] = UNSET
     public_flags: Missing[UserFlags] = UNSET
+    avatar_decoration_data: MissingOrNullable["AvatarDecorationData"] = UNSET
 
 
 class PresenceUpdate(BaseModel):
@@ -3775,6 +4153,19 @@ class StageInstanceDelete(StageInstance):
 
 # Permissions
 # see https://discord.com/developers/docs/topics/permissions
+
+
+class RoleColors(BaseModel):
+    """Role colors.
+
+    see https://discord.com/developers/docs/topics/permissions#role-object-role-colors-object
+    """
+
+    primary_color: int
+    secondary_color: Optional[int] = None
+    tertiary_color: Optional[int] = None
+
+
 class Role(BaseModel):
     """Role
 
@@ -3783,6 +4174,7 @@ class Role(BaseModel):
     id: Snowflake
     name: str
     color: int
+    colors: Missing[RoleColors] = UNSET
     hoist: bool
     icon: MissingOrNullable[str] = UNSET
     unicode_emoji: MissingOrNullable[str] = UNSET
@@ -4031,13 +4423,13 @@ class ModifyGuildOnboardingParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
     """
 
-    prompts: list[OnboardingPrompt]
+    prompts: Missing[list[OnboardingPrompt]] = UNSET
     """Prompts shown during onboarding and in customize community"""
-    default_channel_ids: list[Snowflake]
+    default_channel_ids: Missing[list[Snowflake]] = UNSET
     """Channel IDs that members get opted into automatically"""
-    enabled: bool
+    enabled: Missing[bool] = UNSET
     """Whether onboarding is enabled in the guild"""
-    mode: OnboardingMode
+    mode: Missing[OnboardingMode] = UNSET
     """Current mode of onboarding"""
 
 
@@ -4118,6 +4510,13 @@ class SKU(BaseModel):
     name: str
     slug: str
     flags: SKUFlag
+    dependent_sku_id: MissingOrNullable[Snowflake] = UNSET
+    manifest_labels: MissingOrNullable[list[str]] = UNSET
+    access_type: Missing[int] = UNSET
+    features: Missing[list[str]] = UNSET
+    release_date: MissingOrNullable[datetime.datetime] = UNSET
+    premium: Missing[bool] = UNSET
+    show_age_gate: Missing[bool] = UNSET
 
 
 class Subscription(BaseModel):
@@ -4237,6 +4636,7 @@ __all__ = [
     "AnyCommandOption",
     "Application",
     "ApplicationCommand",
+    "ApplicationCommandBulkOverwriteParams",
     "ApplicationCommandCreate",
     "ApplicationCommandData",
     "ApplicationCommandInteractionDataOption",
@@ -4307,6 +4707,7 @@ __all__ = [
     "File",
     "FollowedChannel",
     "ForumTag",
+    "ForumTagRequest",
     "Gateway",
     "GatewayBot",
     "Guild",
@@ -4423,6 +4824,7 @@ __all__ = [
     "ResolvedData",
     "Resume",
     "Role",
+    "RoleColors",
     "RoleOption",
     "RoleSubscriptionData",
     "RoleTags",
@@ -4440,6 +4842,7 @@ __all__ = [
     "Sticker",
     "StickerItem",
     "StickerPack",
+    "StickerPacksResponse",
     "StringOption",
     "SubCommandGroupOption",
     "SubCommandOption",

@@ -1,8 +1,11 @@
 import asyncio
+from collections.abc import Mapping
 import contextlib
+from functools import lru_cache
+import inspect
 import json
 import sys
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 from typing_extensions import override
 
 from nonebot.adapters import Adapter as BaseAdapter
@@ -13,7 +16,7 @@ from nonebot.exception import WebSocketClosed
 from nonebot.plugin import get_plugin_config
 from nonebot.utils import escape_tag
 
-from .api.handle import API_HANDLERS
+from .api.handle import HandleMixin
 from .api.model import GatewayBot, User
 from .bot import Bot
 from .commands import sync_application_command
@@ -37,7 +40,13 @@ from .utils import decompress_data, log, model_dump
 RECONNECT_INTERVAL = 3.0
 
 
-class Adapter(BaseAdapter):
+@lru_cache(maxsize=256)
+def _get_handler_params(handler: Callable[..., Any]) -> Mapping[str, inspect.Parameter]:
+    """Cache handler signature parameters to avoid repeated introspection."""
+    return inspect.signature(handler).parameters
+
+
+class Adapter(BaseAdapter, HandleMixin):
     @override
     def __init__(self, driver: Driver, **kwargs: Any) -> None:
         super().__init__(driver, **kwargs)
@@ -332,7 +341,14 @@ class Adapter(BaseAdapter):
 
         try:
             await ws.send(
-                json.dumps(model_dump(payload, by_alias=True, exclude_none=True))
+                json.dumps(
+                    model_dump(
+                        payload,
+                        by_alias=True,
+                        exclude_none=True,
+                        omit_unset_values=True,
+                    )
+                )
             )
         except Exception as e:
             log(
@@ -459,6 +475,10 @@ class Adapter(BaseAdapter):
     @override
     async def _call_api(self, bot: Bot, api: str, **data: Any) -> Any:
         log("DEBUG", f"Calling API <y>{api}</y>")
-        if (api_handler := API_HANDLERS.get(api)) is None:
+        api_handler = getattr(self, f"_api_{api}", None)
+        if api_handler is None:
             raise ApiNotAvailable
-        return await api_handler(self, bot, **data)
+        handler_params = _get_handler_params(api_handler)
+        if "bot" in handler_params:
+            return await api_handler(bot, **data)
+        return await api_handler(**data)

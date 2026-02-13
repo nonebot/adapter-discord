@@ -88,7 +88,7 @@ from .api.model import (
     VoiceStateUpdate,
     WebhooksUpdate,
 )
-from .api.types import UNSET, InteractionType, Missing
+from .api.types import UNSET, InteractionType, Missing, is_unset
 from .message import Message
 
 
@@ -752,7 +752,7 @@ class InteractionCreateEvent(NoticeEvent, InteractionCreate):
 
     @override
     def get_user_id(self) -> str:
-        if not self.user:
+        if is_unset(self.user):
             msg = "Event has no context!"
             raise ValueError(msg)
         return str(self.user.id)

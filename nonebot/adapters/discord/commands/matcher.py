@@ -31,6 +31,7 @@ from .storage import (
     _application_command_storage,
 )
 from ..api import (
+    UNSET,
     AnyCommandOption,
     ApplicationCommandCreate,
     ApplicationCommandOptionType,
@@ -39,9 +40,11 @@ from ..api import (
     InteractionResponse,
     MessageFlag,
     MessageGet,
+    Missing,
     Snowflake,
     SnowflakeType,
 )
+from ..api.types import is_unset
 from ..bot import Bot
 from ..event import ApplicationCommandInteractionEvent
 from ..message import Message, MessageSegment, parse_message
@@ -241,19 +244,19 @@ class SlashCommandMatcher(ApplicationCommandMatcher):
             matcher: Matcher,
             state: T_State,  # noqa: ARG001 # TODO)): 验证state作用
         ) -> None:
-            if commands and not event.data.options:
-                matcher.skip()
             options = event.data.options
+            if commands and is_unset(options):
+                matcher.skip()
             for command in commands:
-                if not options:
+                if is_unset(options):
                     matcher.skip()
                 option = options[0]
-                if option.name != command or options[0].type not in (
+                if option.name != command or option.type not in (
                     ApplicationCommandOptionType.SUB_COMMAND_GROUP,
                     ApplicationCommandOptionType.SUB_COMMAND,
                 ):
                     matcher.skip()
-                options = options[0].options if options[0].options else None
+                options = option.options
 
         parameterless = [Depends(_sub_command_rule), *(parameterless or [])]
 
@@ -271,7 +274,7 @@ class UserMessageCommandMatcher(ApplicationCommandMatcher):
 def on_slash_command(  # noqa: PLR0913
     name: str,
     description: str,
-    options: Optional[list[AnyCommandOption]] = None,
+    options: Missing[list[AnyCommandOption]] = UNSET,
     internal_id: Optional[str] = None,
     rule: Union[Rule, T_RuleChecker, None] = None,
     permission: Union[Permission, T_PermissionChecker, None] = None,
@@ -280,8 +283,8 @@ def on_slash_command(  # noqa: PLR0913
     description_localizations: Optional[dict[str, str]] = None,
     default_member_permissions: Optional[str] = None,
     dm_permission: Optional[bool] = None,
-    default_permission: Optional[bool] = None,
-    nsfw: Optional[bool] = None,
+    default_permission: Missing[bool] = UNSET,
+    nsfw: Missing[bool] = UNSET,
     handlers: Optional[list[Union[T_Handler, Dependent]]] = None,
     temp: bool = False,
     expire_time: Union[datetime, timedelta, None] = None,
@@ -344,8 +347,8 @@ def on_user_command(  # noqa: PLR0913
     name_localizations: Optional[dict[str, str]] = None,
     default_member_permissions: Optional[str] = None,
     dm_permission: Optional[bool] = None,
-    default_permission: Optional[bool] = None,
-    nsfw: Optional[bool] = None,
+    default_permission: Missing[bool] = UNSET,
+    nsfw: Missing[bool] = UNSET,
     handlers: Optional[list[Union[T_Handler, Dependent]]] = None,
     temp: bool = False,
     expire_time: Union[datetime, timedelta, None] = None,
@@ -405,8 +408,8 @@ def on_message_command(  # noqa: PLR0913
     name_localizations: Optional[dict[str, str]] = None,
     default_member_permissions: Optional[str] = None,
     dm_permission: Optional[bool] = None,
-    default_permission: Optional[bool] = None,
-    nsfw: Optional[bool] = None,
+    default_permission: Missing[bool] = UNSET,
+    nsfw: Missing[bool] = UNSET,
     handlers: Optional[list[Union[T_Handler, Dependent]]] = None,
     temp: bool = False,
     expire_time: Union[datetime, timedelta, None] = None,

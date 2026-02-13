@@ -1,86 +1,59 @@
 from enum import Enum, IntEnum, IntFlag
-from typing import Any, Literal, TypeVar, Union, final
-from typing_extensions import TypeAlias
-
-from nonebot.compat import PYDANTIC_V2
-
-if PYDANTIC_V2:
-    from pydantic_core import core_schema
+from typing import Literal, TypeVar, Union, final
+from typing_extensions import TypeAlias, TypeIs, override
 
 T = TypeVar("T")
 
 
-@final
-class Unset(Enum):
-    """Unset marker for optional fields.
-
-    see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields
-    """
-
-    _UNSET = "<UNSET>"
-
-    def __repr__(self) -> str:
+class _UNSET(type):
+    @override
+    def __str__(cls) -> Literal["<UNSET>"]:
         return "<UNSET>"
 
-    def __str__(self) -> str:
-        return self.__repr__()
+    @override
+    def __repr__(cls) -> Literal["<UNSET>"]:
+        return "<UNSET>"
 
-    def __bool__(self) -> Literal[False]:
+    def __bool__(cls) -> Literal[False]:
         return False
 
-    def __copy__(self):  # noqa: ANN204
-        return self._UNSET
 
-    def __deepcopy__(self, memo: dict[int, Any]):  # noqa: ANN204
-        return self._UNSET
+@final
+class UNSET(metaclass=_UNSET):
+    """UNSET means that the field maybe not given in the data.
 
-    if PYDANTIC_V2:
-
-        @classmethod
-        def __get_pydantic_core_schema__(
-            cls,
-            source_type: Any,  # noqa: ANN401
-            handler: Any,  # noqa: ANN401
-        ) -> core_schema.CoreSchema:
-            return core_schema.with_info_plain_validator_function(
-                lambda value, _: cls._validate(value)
-            )
-    else:
-
-        @classmethod
-        def __get_validators__(cls):  # noqa: ANN206
-            yield cls._validate
-
-    @classmethod
-    def _validate(cls, value: Any):  # noqa: ANN206, ANN401
-        if value is not cls._UNSET:
-            msg = f"{value!r} is not UNSET"
-            raise ValueError(msg)
-        return value
+    see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
 
 
-UNSET = Unset._UNSET  # noqa: SLF001
-"""UNSET means that the field maybe not given in the data.
+UnsetType: TypeAlias = type[UNSET]
 
-see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
-
-Missing: TypeAlias = Union[Literal[UNSET], T]
+Missing: TypeAlias = Union[UnsetType, T]
 """Missing means that the field maybe not given in the data.
 
-Missing[T] equal to Union[UNSET, T].
+Missing[T] equal to Union[UnsetType, T].
 
-example: Missing[int] == Union[UNSET, int]
+example: Missing[int] == Union[UnsetType, int]
 
 see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
 
-MissingOrNullable: TypeAlias = Union[Literal[UNSET], T, None]
+MissingOrNullable: TypeAlias = Union[UnsetType, T, None]
 """MissingOrNullable means that the field maybe not given in the data or value is None.
 
-MissingOrNullable[T] equal to Union[UNSET, T, None].
+MissingOrNullable[T] equal to Union[UnsetType, T, None].
 
-example: MissingOrNullable[int] == Union[UNSET, int, None]
+example: MissingOrNullable[int] == Union[UnsetType, int, None]
 
 see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
+
+
+def is_unset(value: object) -> TypeIs[UnsetType]:
+    """Check if the value is UNSET."""
+    return value is UNSET
+
+
+def is_not_unset(value: Union[T, UnsetType]) -> TypeIs[T]:
+    """Check if the value is not UNSET."""
+    return value is not UNSET
 
 
 class StrEnum(str, Enum):
