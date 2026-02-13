@@ -4089,6 +4089,22 @@ class VoiceStateUpdate(VoiceState):
     """
 
 
+class VoiceChannelStatusUpdate(BaseModel):
+    """Voice Channel Status Update Event Fields
+
+    This gateway dispatch is observed in production but is not yet fully
+    documented on Discord's public Gateway Events page.
+
+    Field shape is based on:
+    - https://github.com/discord/discord-api-docs/pull/6398
+    - https://github.com/discord/discord-api-docs/pull/6400
+    """
+
+    id: Snowflake
+    guild_id: Snowflake
+    status: Optional[str] = None
+
+
 class VoiceServerUpdate(BaseModel):
     """Voice Server Update Event Fields
 
