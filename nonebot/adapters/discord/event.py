@@ -84,6 +84,7 @@ from .api.model import (
     TypingStart,
     UserUpdate,
     VoiceChannelEffectSend,
+    VoiceChannelStartTimeUpdate,
     VoiceChannelStatusUpdate,
     VoiceServerUpdate,
     VoiceStateUpdate,
@@ -205,6 +206,7 @@ class EventType(str, Enum):
 
     # VOICE
     VOICE_CHANNEL_STATUS_UPDATE = "VOICE_CHANNEL_STATUS_UPDATE"
+    VOICE_CHANNEL_START_TIME_UPDATE = "VOICE_CHANNEL_START_TIME_UPDATE"
     VOICE_CHANNEL_EFFECT_SEND = "VOICE_CHANNEL_EFFECT_SEND"
     VOICE_STATE_UPDATE = "VOICE_STATE_UPDATE"
     VOICE_SERVER_UPDATE = "VOICE_SERVER_UPDATE"
@@ -1058,6 +1060,16 @@ class VoiceChannelStatusUpdateEvent(NoticeEvent, VoiceChannelStatusUpdate):
     __type__ = EventType.VOICE_CHANNEL_STATUS_UPDATE
 
 
+class VoiceChannelStartTimeUpdateEvent(NoticeEvent, VoiceChannelStartTimeUpdate):
+    """Voice Channel Start Time Update Event
+
+    This dispatch exists in practice but is not fully documented in the
+    official Discord Gateway Events page yet.
+    """
+
+    __type__ = EventType.VOICE_CHANNEL_START_TIME_UPDATE
+
+
 class VoiceStateUpdateEvent(NoticeEvent, VoiceStateUpdate):
     """Voice State Update Event
 
@@ -1229,6 +1241,7 @@ event_classes: dict[str, type[Event]] = {
     ],
     EventType.USER_UPDATE.value: UserUpdateEvent,
     EventType.VOICE_CHANNEL_STATUS_UPDATE.value: VoiceChannelStatusUpdateEvent,
+    EventType.VOICE_CHANNEL_START_TIME_UPDATE.value: VoiceChannelStartTimeUpdateEvent,
     EventType.VOICE_CHANNEL_EFFECT_SEND.value: VoiceChannelEffectSendEvent,
     EventType.VOICE_STATE_UPDATE.value: VoiceStateUpdateEvent,
     EventType.VOICE_SERVER_UPDATE.value: VoiceServerUpdateEvent,
@@ -1369,6 +1382,7 @@ __all__ = [
     "TypingStartEvent",
     "UserUpdateEvent",
     "VoiceChannelEffectSendEvent",
+    "VoiceChannelStartTimeUpdateEvent",
     "VoiceChannelStatusUpdateEvent",
     "VoiceServerUpdateEvent",
     "VoiceStateUpdateEvent",
