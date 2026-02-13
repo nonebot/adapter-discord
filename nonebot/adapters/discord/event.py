@@ -1,7 +1,7 @@
-import inspect
-import sys
 from datetime import datetime
 from enum import Enum
+import inspect
+import sys
 from typing import Literal, Optional, Union
 from typing_extensions import override
 
@@ -1233,10 +1233,7 @@ event_classes: dict[str, type[Event]] = {
 _model_types_namespace = vars(_model_module)
 
 for _, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass):
-    if (
-        issubclass(obj, BaseModel)
-        and obj.__module__ == __name__
-    ):
+    if issubclass(obj, BaseModel) and obj.__module__ == __name__:
         if PYDANTIC_V2:
             obj.model_rebuild(_types_namespace=_model_types_namespace)
         else:
