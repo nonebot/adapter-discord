@@ -1,14 +1,18 @@
-from typing import TYPE_CHECKING, Any, Optional, Union
+from http import HTTPStatus
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 from typing_extensions import override
+from urllib.parse import urlparse
 
 from nonebot.adapters import Bot as BaseBot
 
+from nonebot.drivers import Request
 from nonebot.message import handle_event
 
 from .api import (
     UNSET,
     AllowedMention,
     ApiClient,
+    File,
     InteractionCallbackMessage,
     InteractionCallbackType,
     InteractionResponse,
@@ -26,6 +30,10 @@ from .utils import log
 
 if TYPE_CHECKING:
     from .adapter import Adapter
+
+
+DISCORD_ATTACHMENT_HOSTS = {"cdn.discordapp.com", "media.discordapp.net"}
+AttachmentFetchOnError = Literal["raise", "skip"]
 
 
 async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
@@ -175,6 +183,136 @@ class Bot(BaseBot, ApiClient):
             _check_at_me(self, event)
         await handle_event(self, event)
 
+    async def fetch_attachments(  # noqa: PLR0913
+        self,
+        message: Union[str, Message, MessageSegment],
+        *,
+        allowed_hosts: Optional[set[str]] = None,
+        require_https: bool = True,
+        timeout: Optional[float] = None,
+        max_bytes: Optional[int] = None,
+        prefer_proxy_url: bool = True,
+        on_error: AttachmentFetchOnError = "raise",
+    ) -> Message:
+        message = MessageSegment.text(message) if isinstance(message, str) else message
+        message = message if isinstance(message, Message) else Message(message)
+        new = message.clone()
+
+        if allowed_hosts is None:
+            allowed_hosts = DISCORD_ATTACHMENT_HOSTS
+
+        attachment_segments = new["attachment"] or []
+        for index, attachment in enumerate(attachment_segments):
+            if attachment.data["file"] is not None:
+                continue
+
+            url = self._pick_attachment_url(
+                attachment,
+                allowed_hosts=allowed_hosts,
+                require_https=require_https,
+                prefer_proxy_url=prefer_proxy_url,
+            )
+            if url is None:
+                if on_error == "raise":
+                    msg = (
+                        f"Attachment segment at index {index} has no fetchable "
+                        "url/proxy_url"
+                    )
+                    raise ValueError(msg)
+                continue
+
+            content = await self._fetch_attachment_content(
+                url,
+                timeout=timeout,
+                max_bytes=max_bytes,
+            )
+            if content is None:
+                if on_error == "raise":
+                    msg = (
+                        f"Failed to fetch attachment content for segment "
+                        f"at index {index} from URL {url}"
+                    )
+                    raise ValueError(msg)
+                continue
+
+            attachment.data["file"] = File(
+                filename=attachment.data["attachment"].filename,
+                content=content,
+            )
+
+        return new
+
+    @staticmethod
+    def _pick_attachment_url(
+        attachment: MessageSegment,
+        *,
+        allowed_hosts: set[str],
+        require_https: bool,
+        prefer_proxy_url: bool,
+    ) -> Optional[str]:
+        urls = []
+        if prefer_proxy_url:
+            urls.extend(
+                [
+                    attachment.data.get("proxy_url"),
+                    attachment.data.get("url"),
+                ]
+            )
+        else:
+            urls.extend(
+                [
+                    attachment.data.get("url"),
+                    attachment.data.get("proxy_url"),
+                ]
+            )
+
+        for candidate in urls:
+            if isinstance(candidate, str) and Bot._is_supported_attachment_url(
+                candidate,
+                allowed_hosts=allowed_hosts,
+                require_https=require_https,
+            ):
+                return candidate
+
+        return None
+
+    @staticmethod
+    def _is_supported_attachment_url(
+        url: str, *, allowed_hosts: set[str], require_https: bool
+    ) -> bool:
+        parsed = urlparse(url)
+        scheme_ok = parsed.scheme == "https" if require_https else bool(parsed.scheme)
+        return scheme_ok and parsed.netloc in allowed_hosts
+
+    async def _fetch_attachment_content(
+        self,
+        url: str,
+        *,
+        timeout: Optional[float],
+        max_bytes: Optional[int],
+    ) -> Optional[bytes]:
+        try:
+            request = Request(
+                method="GET",
+                url=url,
+                timeout=timeout or self.adapter.discord_config.discord_api_timeout,
+                proxy=self.adapter.discord_config.discord_proxy,
+            )
+            response = await self.adapter.request(request)
+            if response.status_code != HTTPStatus.OK or not response.content:
+                return None
+            content = (
+                response.content.encode()
+                if isinstance(response.content, str)
+                else response.content
+            )
+            if max_bytes is not None and len(content) > max_bytes:
+                return None
+            return content  # noqa: TRY300
+        except Exception as e:
+            log("DEBUG", f"Failed to fetch attachment content from URL {url}: {e!r}", e)
+            return None
+
     async def send_to(
         self,
         channel_id: SnowflakeType,
@@ -183,6 +321,9 @@ class Bot(BaseBot, ApiClient):
         nonce: Union[int, str, None] = None,
         allowed_mentions: Optional[AllowedMention] = None,
     ) -> MessageGet:
+        message = MessageSegment.text(message) if isinstance(message, str) else message
+        message = message if isinstance(message, Message) else Message(message)
+        message = message.sendable()
         message_data = parse_message(message)
 
         return await self.create_message(
@@ -222,6 +363,8 @@ class Bot(BaseBot, ApiClient):
             message model
         """
         message = MessageSegment.text(message) if isinstance(message, str) else message
+        message = message if isinstance(message, Message) else Message(message)
+        message = message.sendable()
         if isinstance(event, InteractionCreateEvent):
             message_data = parse_message(message)
             response = InteractionResponse(
@@ -250,7 +393,6 @@ class Bot(BaseBot, ApiClient):
         if not isinstance(event, MessageEvent) or not event.channel_id or not event.id:
             msg = "Event cannot be replied to!"
             raise RuntimeError(msg)
-        message = message if isinstance(message, Message) else Message(message)
         if mention_sender or at_sender:
             message.insert(0, MessageSegment.mention_user(event.user_id))
         if reply_message:

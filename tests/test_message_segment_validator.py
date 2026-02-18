@@ -132,7 +132,7 @@ def test_parse_message_integration() -> None:
             )
         )
     )
-    msg.append(MessageSegment.attachment("a.txt"))
+    msg.append(MessageSegment.attachment("a.txt", content=b"x"))
 
     poll = Poll(
         question=PollMedia(text="Q"),
@@ -149,4 +149,5 @@ def test_parse_message_integration() -> None:
     assert int(payload["message_reference"].message_id) == 123
     assert int(payload["components"][0].type) == int(ComponentType.ActionRow)
     assert payload["attachments"][0].filename == "a.txt"
+    assert payload["files"][0].content == b"x"
     assert isinstance(payload["poll"], PollRequest)
