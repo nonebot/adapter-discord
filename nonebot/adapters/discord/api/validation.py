@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import wraps
 import inspect
-from typing import Annotated, Any, Callable, Optional, Union, get_args, get_origin
+from typing import Annotated, Any, get_args, get_origin
 
 from nonebot.compat import type_validate_python
 from pydantic import ValidationError
@@ -12,10 +13,10 @@ class Range:
         self,
         *,
         message: str,
-        ge: Optional[int] = None,
-        le: Optional[int] = None,
-        min_length: Optional[int] = None,
-        max_length: Optional[int] = None,
+        ge: int | None = None,
+        le: int | None = None,
+        min_length: int | None = None,
+        max_length: int | None = None,
     ) -> None:
         self.message = message
         self.ge = ge
@@ -54,7 +55,7 @@ class RequireIfNotEquals:
     message: str
 
 
-CrossRule = Union[AtMostOne, ForbidIfEquals, RequireIfEquals, RequireIfNotEquals]
+CrossRule = AtMostOne | ForbidIfEquals | RequireIfEquals | RequireIfNotEquals
 
 
 def _is_annotated_constraint(annotation: object) -> bool:
@@ -168,7 +169,7 @@ def _validate_cross_rules(
 
 
 def validate(
-    func: Optional[Callable[..., Any]] = None,
+    func: Callable[..., Any] | None = None,
     *,
     cross_rules: tuple[CrossRule, ...] = (),
 ) -> Callable[..., Any]:

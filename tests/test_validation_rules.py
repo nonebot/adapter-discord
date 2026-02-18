@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from nonebot.adapters.discord.api.types import TriggerType
 from nonebot.adapters.discord.api.validation import (
@@ -16,10 +16,10 @@ def test_range_numeric_validation() -> None:
     @validate
     def func(
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
-    ) -> Optional[int]:
+    ) -> int | None:
         return limit
 
     assert func(limit=1) == 1
@@ -52,7 +52,7 @@ def test_cross_rule_at_most_one() -> None:
             ),
         )
     )
-    def func(before: Optional[int] = None, after: Optional[int] = None) -> str:
+    def func(before: int | None = None, after: int | None = None) -> str:
         if before is None and after is None:
             return "ok"
         return "ok"
@@ -82,7 +82,7 @@ def test_cross_rules_forbid_and_require() -> None:
     )
     def func(
         trigger_type: TriggerType,
-        trigger_metadata: Optional[str] = None,
+        trigger_metadata: str | None = None,
     ) -> str:
         if trigger_type == TriggerType.SPAM and trigger_metadata is None:
             return "ok"
@@ -111,9 +111,9 @@ async def test_async_wrapper_cross_rules() -> None:
         )
     )
     async def func(
-        around: Optional[int] = None,
-        before: Optional[int] = None,
-        after: Optional[int] = None,
+        around: int | None = None,
+        before: int | None = None,
+        after: int | None = None,
     ) -> str:
         del around, before, after
         return "ok"

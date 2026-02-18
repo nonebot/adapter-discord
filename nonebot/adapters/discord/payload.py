@@ -1,6 +1,5 @@
 from enum import IntEnum
-from typing import Annotated, Optional, Union
-from typing_extensions import Literal
+from typing import Annotated, Literal
 
 from nonebot.compat import PYDANTIC_V2, ConfigDict
 from pydantic import BaseModel, Field
@@ -43,7 +42,7 @@ class Dispatch(Payload):
 
 class Heartbeat(Payload):
     opcode: Literal[Opcode.HEARTBEAT] = Field(Opcode.HEARTBEAT, alias="op")
-    data: Optional[int] = Field(None, alias="d")
+    data: int | None = Field(None, alias="d")
 
 
 class Identify(Payload):
@@ -73,10 +72,10 @@ class HeartbeatAck(Payload):
     opcode: Literal[Opcode.HEARTBEAT_ACK] = Field(Opcode.HEARTBEAT_ACK, alias="op")
 
 
-PayloadType = Union[
+PayloadType = (
     Annotated[
-        Union[Dispatch, Reconnect, InvalidSession, Hello, HeartbeatAck],
+        Dispatch | Reconnect | InvalidSession | Hello | HeartbeatAck,
         Field(discriminator="opcode"),
-    ],
-    Payload,
-]
+    ]
+    | Payload
+)

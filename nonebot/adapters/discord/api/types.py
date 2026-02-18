@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum, IntFlag
-from typing import Literal, TypeVar, Union, final
-from typing_extensions import TypeAlias, TypeIs, override
+from typing import Literal, TypeAlias, TypeVar, final
+from typing_extensions import TypeIs, override
 
 T = TypeVar("T")
 
@@ -27,21 +27,21 @@ class UNSET(metaclass=_UNSET):
 
 UnsetType: TypeAlias = type[UNSET]
 
-Missing: TypeAlias = Union[UnsetType, T]
+Missing: TypeAlias = UnsetType | T
 """Missing means that the field maybe not given in the data.
 
-Missing[T] equal to Union[UnsetType, T].
+Missing[T] equal to UnsetType | T.
 
-example: Missing[int] == Union[UnsetType, int]
+example: Missing[int] == UnsetType | int
 
 see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
 
-MissingOrNullable: TypeAlias = Union[UnsetType, T, None]
+MissingOrNullable: TypeAlias = UnsetType | T | None
 """MissingOrNullable means that the field maybe not given in the data or value is None.
 
-MissingOrNullable[T] equal to Union[UnsetType, T, None].
+MissingOrNullable[T] equal to UnsetType | T | None.
 
-example: MissingOrNullable[int] == Union[UnsetType, int, None]
+example: MissingOrNullable[int] == UnsetType | int | None
 
 see https://discord.com/developers/docs/reference#nullable-and-optional-resource-fields"""
 
@@ -51,7 +51,7 @@ def is_unset(value: object) -> TypeIs[UnsetType]:
     return value is UNSET
 
 
-def is_not_unset(value: Union[T, UnsetType]) -> TypeIs[T]:
+def is_not_unset(value: T | UnsetType) -> TypeIs[T]:
     """Check if the value is not UNSET."""
     return value is not UNSET
 

@@ -1,5 +1,5 @@
 import json
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal
 
 from nonebot.compat import type_validate_python
 
@@ -19,7 +19,7 @@ def _build_multipart_payload(
     payload: dict[str, Any],
     files: list[Any],
     *,
-    attachment_owner: Optional[dict[str, Any]] = None,
+    attachment_owner: dict[str, Any] | None = None,
 ) -> dict[Literal["files", "json"], Any]:
     multipart: dict[str, Any] = {}
     container = payload if attachment_owner is None else attachment_owner
@@ -46,12 +46,10 @@ def _build_multipart_payload(
 def parse_data(
     data: dict[str, Any],
     model_class: type[
-        Union[
-            ExecuteWebhookParams,
-            MessageEditParams,
-            MessageSend,
-            WebhookMessageEditParams,
-        ]
+        ExecuteWebhookParams
+        | MessageEditParams
+        | MessageSend
+        | WebhookMessageEditParams
     ],
 ) -> dict[Literal["files", "json"], Any]:
     model = type_validate_python(model_class, data)

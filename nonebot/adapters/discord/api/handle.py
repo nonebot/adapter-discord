@@ -7,8 +7,6 @@ from typing import (
     Annotated,
     Any,
     Literal,
-    Optional,
-    Union,
     overload,
 )
 from typing_extensions import Protocol, deprecated
@@ -235,7 +233,7 @@ async def _request(
         raise NetworkError(msg) from e
 
 
-def _bool_query(*, value: Optional[bool]) -> Optional[str]:
+def _bool_query(*, value: bool | None) -> str | None:
     if value is None:
         return None
     return "true" if value else "false"
@@ -279,8 +277,8 @@ def _build_reaction_url(
 
 def _normalize_command_description(
     *,
-    command_type: Optional[ApplicationCommandType],
-    description: Optional[str],
+    command_type: ApplicationCommandType | None,
+    description: str | None,
 ) -> str:
     resolved_type = command_type or ApplicationCommandType.CHAT_INPUT
     if resolved_type in (ApplicationCommandType.USER, ApplicationCommandType.MESSAGE):
@@ -333,7 +331,7 @@ class HandleMixin:
         bot: "Bot",
         *,
         application_id: SnowflakeType,
-        with_localizations: Optional[bool] = None,
+        with_localizations: bool | None = None,
     ) -> list[ApplicationCommand]:
         """Get global application commands.
 
@@ -357,17 +355,17 @@ class HandleMixin:
         *,
         application_id: SnowflakeType,
         name: str,
-        name_localizations: Optional[dict[str, str]] = None,
-        description: Optional[str] = None,
-        description_localizations: Optional[dict[str, str]] = None,
-        options: Optional[list[ApplicationCommandOption]] = None,
-        default_member_permissions: Optional[str] = None,
-        dm_permission: Optional[bool] = None,
-        default_permission: Optional[bool] = None,
-        type: Optional[ApplicationCommandType] = None,  # noqa: A002
-        nsfw: Optional[bool] = None,
-        integration_types: Optional[list[ApplicationIntegrationType]] = None,
-        contexts: Optional[list[InteractionContextType]] = None,
+        name_localizations: dict[str, str] | None = None,
+        description: str | None = None,
+        description_localizations: dict[str, str] | None = None,
+        options: list[ApplicationCommandOption] | None = None,
+        default_member_permissions: str | None = None,
+        dm_permission: bool | None = None,
+        default_permission: bool | None = None,
+        type: ApplicationCommandType | None = None,  # noqa: A002
+        nsfw: bool | None = None,
+        integration_types: list[ApplicationIntegrationType] | None = None,
+        contexts: list[InteractionContextType] | None = None,
     ) -> ApplicationCommand:
         """Create global application command.
 
@@ -521,7 +519,7 @@ class HandleMixin:
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
-        with_localizations: Optional[bool] = None,
+        with_localizations: bool | None = None,
     ) -> list[ApplicationCommand]:
         """Get guild application commands.
 
@@ -547,14 +545,14 @@ class HandleMixin:
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         name: str,
-        name_localizations: Optional[dict[str, str]] = None,
-        description: Optional[str] = None,
-        description_localizations: Optional[dict[str, str]] = None,
-        options: Optional[list[ApplicationCommandOption]] = None,
-        default_member_permissions: Optional[str] = None,
-        default_permission: Optional[bool] = None,
-        type: Optional[ApplicationCommandType] = None,  # noqa: A002
-        nsfw: Optional[bool] = None,
+        name_localizations: dict[str, str] | None = None,
+        description: str | None = None,
+        description_localizations: dict[str, str] | None = None,
+        options: list[ApplicationCommandOption] | None = None,
+        default_member_permissions: str | None = None,
+        default_permission: bool | None = None,
+        type: ApplicationCommandType | None = None,  # noqa: A002
+        nsfw: bool | None = None,
     ) -> ApplicationCommand:
         """Create guild application command.
 
@@ -788,8 +786,8 @@ class HandleMixin:
         interaction_id: SnowflakeType,
         interaction_token: str,
         response: InteractionResponse,
-        with_response: Optional[bool] = None,
-    ) -> Optional[InteractionResponse]:
+        with_response: bool | None = None,
+    ) -> InteractionResponse | None:
         """Create an interaction response.
 
         see https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response
@@ -817,7 +815,7 @@ class HandleMixin:
         *,
         application_id: SnowflakeType,
         interaction_token: str,
-        thread_id: Optional[SnowflakeType] = None,
+        thread_id: SnowflakeType | None = None,
     ) -> MessageGet:
         """Get the original interaction response.
 
@@ -840,8 +838,8 @@ class HandleMixin:
         *,
         application_id: SnowflakeType,
         interaction_token: str,
-        thread_id: Optional[SnowflakeType] = None,
-        with_components: Optional[bool] = None,
+        thread_id: SnowflakeType | None = None,
+        with_components: bool | None = None,
         content: MissingOrNullable[str] = UNSET,
         embeds: MissingOrNullable[list[Embed]] = UNSET,
         flags: MissingOrNullable[MessageFlag] = UNSET,
@@ -890,7 +888,7 @@ class HandleMixin:
         *,
         application_id: SnowflakeType,
         interaction_token: str,
-        thread_id: Optional[SnowflakeType] = None,
+        thread_id: SnowflakeType | None = None,
     ) -> None:
         """Delete the original interaction response.
 
@@ -913,14 +911,14 @@ class HandleMixin:
         *,
         application_id: SnowflakeType,
         interaction_token: str,
-        content: Optional[str] = None,
-        tts: Optional[bool] = None,
-        embeds: Optional[list[Embed]] = None,
-        allowed_mentions: Optional[AllowedMention] = None,
-        components: Optional[list[Component]] = None,
-        files: Optional[list[File]] = None,
-        attachments: Optional[list[AttachmentSend]] = None,
-        flags: Optional[int] = None,
+        content: str | None = None,
+        tts: bool | None = None,
+        embeds: list[Embed] | None = None,
+        allowed_mentions: AllowedMention | None = None,
+        components: list[Component] | None = None,
+        files: list[File] | None = None,
+        attachments: list[AttachmentSend] | None = None,
+        flags: int | None = None,
     ) -> MessageGet:
         """Create a followup message.
 
@@ -968,7 +966,7 @@ class HandleMixin:
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
-        thread_id: Optional[SnowflakeType] = None,
+        thread_id: SnowflakeType | None = None,
     ) -> MessageGet:
         """Get a followup message.
 
@@ -992,8 +990,8 @@ class HandleMixin:
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
-        thread_id: Optional[SnowflakeType] = None,
-        with_components: Optional[bool] = None,
+        thread_id: SnowflakeType | None = None,
+        with_components: bool | None = None,
         content: MissingOrNullable[str] = UNSET,
         embeds: MissingOrNullable[list[Embed]] = UNSET,
         flags: MissingOrNullable[MessageFlag] = UNSET,
@@ -1043,7 +1041,7 @@ class HandleMixin:
         application_id: SnowflakeType,
         interaction_token: str,
         message_id: SnowflakeType,
-        thread_id: Optional[SnowflakeType] = None,
+        thread_id: SnowflakeType | None = None,
     ) -> None:
         """Delete a followup message.
 
@@ -1219,12 +1217,12 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        user_id: Optional[SnowflakeType] = None,
-        action_type: Optional[AuditLogEventType] = None,
-        before: Optional[SnowflakeType] = None,
+        user_id: SnowflakeType | None = None,
+        action_type: AuditLogEventType | None = None,
+        before: SnowflakeType | None = None,
         after: None = None,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> AuditLog: ...
@@ -1235,12 +1233,12 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        user_id: Optional[SnowflakeType] = None,
-        action_type: Optional[AuditLogEventType] = None,
+        user_id: SnowflakeType | None = None,
+        action_type: AuditLogEventType | None = None,
         before: None = None,
-        after: Optional[SnowflakeType] = None,
+        after: SnowflakeType | None = None,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> AuditLog: ...
@@ -1258,12 +1256,12 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        user_id: Optional[SnowflakeType] = None,
-        action_type: Optional[AuditLogEventType] = None,
-        before: Optional[SnowflakeType] = None,
-        after: Optional[SnowflakeType] = None,
+        user_id: SnowflakeType | None = None,
+        action_type: AuditLogEventType | None = None,
+        before: SnowflakeType | None = None,
+        after: SnowflakeType | None = None,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> AuditLog:
@@ -1337,16 +1335,16 @@ class HandleMixin:
         trigger_type: Literal[TriggerType.SPAM],
         actions: list[AutoModerationAction],
         trigger_metadata: None = None,
-        enabled: Optional[bool] = None,
+        enabled: bool | None = None,
         exempt_roles: Annotated[
-            Optional[list[SnowflakeType]],
+            list[SnowflakeType] | None,
             Range(message="exempt_roles must be 20 items or fewer", max_length=20),
         ] = None,
         exempt_channels: Annotated[
-            Optional[list[SnowflakeType]],
+            list[SnowflakeType] | None,
             Range(message="exempt_channels must be 50 items or fewer", max_length=50),
         ] = None,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> AutoModerationRule: ...
 
     @overload
@@ -1360,16 +1358,16 @@ class HandleMixin:
         trigger_type: NonSpamTriggerType,
         actions: list[AutoModerationAction],
         trigger_metadata: TriggerMetadata,
-        enabled: Optional[bool] = None,
+        enabled: bool | None = None,
         exempt_roles: Annotated[
-            Optional[list[SnowflakeType]],
+            list[SnowflakeType] | None,
             Range(message="exempt_roles must be 20 items or fewer", max_length=20),
         ] = None,
         exempt_channels: Annotated[
-            Optional[list[SnowflakeType]],
+            list[SnowflakeType] | None,
             Range(message="exempt_channels must be 50 items or fewer", max_length=50),
         ] = None,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> AutoModerationRule: ...
 
     @validate(
@@ -1397,17 +1395,17 @@ class HandleMixin:
         event_type: AutoModerationRuleEventType,
         trigger_type: TriggerType,
         actions: list[AutoModerationAction],
-        trigger_metadata: Optional[TriggerMetadata] = None,
-        enabled: Optional[bool] = None,
+        trigger_metadata: TriggerMetadata | None = None,
+        enabled: bool | None = None,
         exempt_roles: Annotated[
-            Optional[list[SnowflakeType]],
+            list[SnowflakeType] | None,
             Range(message="exempt_roles must be 20 items or fewer", max_length=20),
         ] = None,
         exempt_channels: Annotated[
-            Optional[list[SnowflakeType]],
+            list[SnowflakeType] | None,
             Range(message="exempt_channels must be 50 items or fewer", max_length=50),
         ] = None,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> AutoModerationRule:
         """Create auto moderation rule.
 
@@ -1446,20 +1444,20 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         rule_id: SnowflakeType,
-        name: Optional[str] = None,
-        event_type: Optional[AutoModerationRuleEventType] = None,
-        trigger_metadata: Optional[TriggerMetadata] = None,
-        actions: Optional[list[AutoModerationAction]] = None,
-        enabled: Optional[bool] = None,
+        name: str | None = None,
+        event_type: AutoModerationRuleEventType | None = None,
+        trigger_metadata: TriggerMetadata | None = None,
+        actions: list[AutoModerationAction] | None = None,
+        enabled: bool | None = None,
         exempt_roles: Annotated[
-            Optional[list[SnowflakeType]],
+            list[SnowflakeType] | None,
             Range(message="exempt_roles must be 20 items or fewer", max_length=20),
         ] = None,
         exempt_channels: Annotated[
-            Optional[list[SnowflakeType]],
+            list[SnowflakeType] | None,
             Range(message="exempt_channels must be 50 items or fewer", max_length=50),
         ] = None,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> AutoModerationRule:
         """Modify auto moderation rule.
 
@@ -1499,7 +1497,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         rule_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Delete auto moderation rule.
 
@@ -1538,9 +1536,9 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        name: Optional[str] = None,
-        icon: Optional[bytes] = None,
-        reason: Optional[str] = None,
+        name: str | None = None,
+        icon: bytes | None = None,
+        reason: str | None = None,
     ) -> Channel:
         """Update a Group DM channel's settings.
 
@@ -1585,7 +1583,7 @@ class HandleMixin:
         default_thread_rate_limit_per_user: Missing[int] = UNSET,
         default_sort_order: MissingOrNullable[SortOrderTypes] = UNSET,
         default_forum_layout: Missing[ForumLayoutTypes] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Channel:
         """Update a channel's settings.
 
@@ -1643,7 +1641,7 @@ class HandleMixin:
         rate_limit_per_user: MissingOrNullable[int] = UNSET,
         flags: Missing[ChannelFlags] = UNSET,
         applied_tags: Missing[list[SnowflakeType]] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Channel:
         """Update a thread's settings.
 
@@ -1681,7 +1679,7 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Channel:
         """Delete or close a channel.
 
@@ -1706,11 +1704,11 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        around: Optional[SnowflakeType] = None,
+        around: SnowflakeType | None = None,
         before: None = None,
         after: None = None,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> list[MessageGet]: ...
@@ -1722,10 +1720,10 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         around: None = None,
-        before: Optional[SnowflakeType] = None,
+        before: SnowflakeType | None = None,
         after: None = None,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> list[MessageGet]: ...
@@ -1738,9 +1736,9 @@ class HandleMixin:
         channel_id: SnowflakeType,
         around: None = None,
         before: None = None,
-        after: Optional[SnowflakeType] = None,
+        after: SnowflakeType | None = None,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> list[MessageGet]: ...
@@ -1758,11 +1756,11 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        around: Optional[SnowflakeType] = None,
-        before: Optional[SnowflakeType] = None,
-        after: Optional[SnowflakeType] = None,
+        around: SnowflakeType | None = None,
+        before: SnowflakeType | None = None,
+        after: SnowflakeType | None = None,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> list[MessageGet]:
@@ -1809,19 +1807,19 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        content: Optional[str] = None,
-        nonce: Optional[Union[int, str]] = None,
-        enforce_nonce: Optional[bool] = None,
-        tts: Optional[bool] = None,
-        embeds: Optional[list[Embed]] = None,
-        allowed_mentions: Optional[AllowedMention] = None,
-        message_reference: Optional[MessageReference] = None,
-        components: Optional[list[DirectComponent]] = None,
-        sticker_ids: Optional[list[SnowflakeType]] = None,
-        files: Optional[list[File]] = None,
-        attachments: Optional[list[AttachmentSend]] = None,
-        flags: Optional[MessageFlag] = None,
-        poll: Optional[PollRequest] = None,
+        content: str | None = None,
+        nonce: int | str | None = None,
+        enforce_nonce: bool | None = None,
+        tts: bool | None = None,
+        embeds: list[Embed] | None = None,
+        allowed_mentions: AllowedMention | None = None,
+        message_reference: MessageReference | None = None,
+        components: list[DirectComponent] | None = None,
+        sticker_ids: list[SnowflakeType] | None = None,
+        files: list[File] | None = None,
+        attachments: list[AttachmentSend] | None = None,
+        flags: MessageFlag | None = None,
+        poll: PollRequest | None = None,
     ) -> MessageGet:
         """Create a message.
 
@@ -1899,7 +1897,7 @@ class HandleMixin:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
         emoji: str,
-        emoji_id: Optional[SnowflakeType] = None,
+        emoji_id: SnowflakeType | None = None,
     ) -> None:
         """Create a reaction.
 
@@ -1928,7 +1926,7 @@ class HandleMixin:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
         emoji: str,
-        emoji_id: Optional[SnowflakeType] = None,
+        emoji_id: SnowflakeType | None = None,
     ) -> None:
         """Delete own reaction.
 
@@ -1958,7 +1956,7 @@ class HandleMixin:
         message_id: SnowflakeType,
         user_id: SnowflakeType,
         emoji: str,
-        emoji_id: Optional[SnowflakeType] = None,
+        emoji_id: SnowflakeType | None = None,
     ) -> None:
         """Delete a user reaction.
 
@@ -1988,11 +1986,11 @@ class HandleMixin:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
         emoji: str,
-        emoji_id: Optional[SnowflakeType] = None,
-        type: Optional[ReactionType] = None,  # noqa: A002
-        after: Optional[SnowflakeType] = None,
+        emoji_id: SnowflakeType | None = None,
+        type: ReactionType | None = None,  # noqa: A002
+        after: SnowflakeType | None = None,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> list[User]:
@@ -2044,7 +2042,7 @@ class HandleMixin:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
         emoji: str,
-        emoji_id: Optional[SnowflakeType] = None,
+        emoji_id: SnowflakeType | None = None,
     ) -> None:
         """Delete all reactions for emoji.
 
@@ -2116,7 +2114,7 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Delete a message.
 
@@ -2146,7 +2144,7 @@ class HandleMixin:
                 max_length=100,
             ),
         ],
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Bulk delete messages.
 
@@ -2170,10 +2168,10 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         overwrite_id: SnowflakeType,
-        allow: Optional[str] = None,
-        deny: Optional[str] = None,
+        allow: str | None = None,
+        deny: str | None = None,
         type: OverwriteType,  # noqa: A002
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Edit channel permissions.
 
@@ -2215,16 +2213,16 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        max_age: Optional[int] = None,
-        max_uses: Optional[int] = None,
-        temporary: Optional[bool] = None,
-        unique: Optional[bool] = None,
-        target_type: Optional[InviteTargetType] = None,
-        target_user_id: Optional[SnowflakeType] = None,
-        target_application_id: Optional[SnowflakeType] = None,
-        target_users_file: Optional[File] = None,
-        role_ids: Optional[list[SnowflakeType]] = None,
-        reason: Optional[str] = None,
+        max_age: int | None = None,
+        max_uses: int | None = None,
+        temporary: bool | None = None,
+        unique: bool | None = None,
+        target_type: InviteTargetType | None = None,
+        target_user_id: SnowflakeType | None = None,
+        target_application_id: SnowflakeType | None = None,
+        target_users_file: File | None = None,
+        role_ids: list[SnowflakeType] | None = None,
+        reason: str | None = None,
     ) -> Invite:
         """Create channel invite.
 
@@ -2282,7 +2280,7 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         overwrite_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Delete channel permission.
 
@@ -2304,7 +2302,7 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         webhook_channel_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> FollowedChannel:
         """Follow announcement channel.
 
@@ -2358,7 +2356,7 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Pin message.
 
@@ -2380,7 +2378,7 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Unpin message.
 
@@ -2447,7 +2445,7 @@ class HandleMixin:
         name: str,
         auto_archive_duration: Missing[int] = UNSET,
         rate_limit_per_user: MissingOrNullable[int] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Channel:
         """Start thread from message.
 
@@ -2485,7 +2483,7 @@ class HandleMixin:
         type: Missing[ChannelType] = UNSET,  # noqa: A002
         invitable: Missing[bool] = UNSET,
         rate_limit_per_user: MissingOrNullable[int] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Channel:
         """Start thread without message.
 
@@ -2531,15 +2529,15 @@ class HandleMixin:
         auto_archive_duration: Missing[int] = UNSET,
         rate_limit_per_user: MissingOrNullable[int] = UNSET,
         applied_tags: Missing[list[SnowflakeType]] = UNSET,
-        content: Optional[str] = None,
-        embeds: Optional[list[Embed]] = None,
-        allowed_mentions: Optional[AllowedMention] = None,
-        components: Optional[list[DirectComponent]] = None,
-        sticker_ids: Optional[list[SnowflakeType]] = None,
-        files: Optional[list[File]] = None,
-        attachments: Optional[list[AttachmentSend]] = None,
-        flags: Optional[MessageFlag] = None,
-        reason: Optional[str] = None,
+        content: str | None = None,
+        embeds: list[Embed] | None = None,
+        allowed_mentions: AllowedMention | None = None,
+        components: list[DirectComponent] | None = None,
+        sticker_ids: list[SnowflakeType] | None = None,
+        files: list[File] | None = None,
+        attachments: list[AttachmentSend] | None = None,
+        flags: MessageFlag | None = None,
+        reason: str | None = None,
     ) -> Channel:
         """Start thread in forum or media channel.
 
@@ -2646,7 +2644,7 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         user_id: SnowflakeType,
-        with_member: Optional[bool] = None,
+        with_member: bool | None = None,
     ) -> ThreadMember:
         """Get thread member.
 
@@ -2668,10 +2666,10 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        with_member: Optional[bool] = None,
-        after: Optional[SnowflakeType] = None,
+        with_member: bool | None = None,
+        after: SnowflakeType | None = None,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> list[ThreadMember]:
@@ -2698,8 +2696,8 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        before: Optional[datetime] = None,
-        limit: Optional[int] = None,
+        before: datetime | None = None,
+        limit: int | None = None,
     ) -> ArchivedThreadsResponse:
         """List public archived threads.
 
@@ -2731,8 +2729,8 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        before: Optional[datetime] = None,
-        limit: Optional[int] = None,
+        before: datetime | None = None,
+        limit: int | None = None,
     ) -> ArchivedThreadsResponse:
         """List private archived threads.
 
@@ -2764,8 +2762,8 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        before: Optional[SnowflakeType] = None,
-        limit: Optional[int] = None,
+        before: SnowflakeType | None = None,
+        limit: int | None = None,
     ) -> ArchivedThreadsResponse:
         """List joined private archived threads.
 
@@ -2828,8 +2826,8 @@ class HandleMixin:
         guild_id: SnowflakeType,
         name: str,
         image: str,
-        roles: Optional[list[SnowflakeType]] = None,
-        reason: Optional[str] = None,
+        roles: list[SnowflakeType] | None = None,
+        reason: str | None = None,
     ) -> Emoji:
         """Create guild emoji.
 
@@ -2865,7 +2863,7 @@ class HandleMixin:
         emoji_id: SnowflakeType,
         name: Missing[str] = UNSET,
         roles: MissingOrNullable[list[SnowflakeType]] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Emoji:
         """Modify guild emoji.
 
@@ -2894,7 +2892,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         emoji_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Delete guild emoji.
 
@@ -3020,14 +3018,14 @@ class HandleMixin:
         bot: "Bot",
         *,
         application_id: SnowflakeType,
-        user_id: Optional[SnowflakeType] = None,
-        sku_ids: Optional[tuple[SnowflakeType]] = None,
-        before: Optional[SnowflakeType] = None,
-        after: Optional[SnowflakeType] = None,
-        limit: Optional[int] = None,
-        guild_id: Optional[SnowflakeType] = None,
-        exclude_ended: Optional[bool] = None,
-        exclude_deleted: Optional[bool] = None,
+        user_id: SnowflakeType | None = None,
+        sku_ids: tuple[SnowflakeType] | None = None,
+        before: SnowflakeType | None = None,
+        after: SnowflakeType | None = None,
+        limit: int | None = None,
+        guild_id: SnowflakeType | None = None,
+        exclude_ended: bool | None = None,
+        exclude_deleted: bool | None = None,
     ) -> list[Entitlement]:
         """List entitlements.
 
@@ -3135,17 +3133,17 @@ class HandleMixin:
         bot: "Bot",
         *,
         name: str,
-        region: Optional[str] = None,
-        icon: Optional[str] = None,
-        verification_level: Optional[VerificationLevel] = None,
-        default_message_notifications: Optional[DefaultMessageNotificationLevel] = None,
-        explicit_content_filter: Optional[ExplicitContentFilterLevel] = None,
-        roles: Optional[list[Role]] = None,
-        channels: Optional[list[Channel]] = None,
-        afk_channel_id: Optional[Snowflake] = None,
-        afk_timeout: Optional[int] = None,
-        system_channel_id: Optional[Snowflake] = None,
-        system_channel_flags: Optional[SystemChannelFlags] = None,
+        region: str | None = None,
+        icon: str | None = None,
+        verification_level: VerificationLevel | None = None,
+        default_message_notifications: DefaultMessageNotificationLevel | None = None,
+        explicit_content_filter: ExplicitContentFilterLevel | None = None,
+        roles: list[Role] | None = None,
+        channels: list[Channel] | None = None,
+        afk_channel_id: Snowflake | None = None,
+        afk_timeout: int | None = None,
+        system_channel_id: Snowflake | None = None,
+        system_channel_flags: SystemChannelFlags | None = None,
     ) -> Guild:
         """https://discord.com/developers/docs/resources/guild"""
         if not name:
@@ -3179,7 +3177,7 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        with_counts: Optional[bool] = None,
+        with_counts: bool | None = None,
     ) -> Guild:
         """Get guild.
 
@@ -3237,7 +3235,7 @@ class HandleMixin:
         description: MissingOrNullable[str] = UNSET,
         premium_progress_bar_enabled: Missing[bool] = UNSET,
         safety_alerts_channel_id: MissingOrNullable[Snowflake] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Guild:
         """Modify guild.
 
@@ -3321,22 +3319,22 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         name: str,
-        type: Optional[ChannelType] = None,  # noqa: A002
-        topic: Optional[str] = None,
-        bitrate: Optional[int] = None,
-        user_limit: Optional[int] = None,
-        rate_limit_per_user: Optional[int] = None,
-        position: Optional[int] = None,
-        permission_overwrites: Optional[list[Overwrite]] = None,
-        parent_id: Optional[Snowflake] = None,
-        nsfw: Optional[bool] = None,
-        rtc_region: Optional[str] = None,
-        video_quality_mode: Optional[VideoQualityMode] = None,
-        default_auto_archive_duration: Optional[int] = None,
-        default_reaction_emoji: Optional[DefaultReaction] = None,
-        available_tags: Optional[list[ForumTagRequest]] = None,
-        default_sort_order: Optional[SortOrderTypes] = None,
-        reason: Optional[str] = None,
+        type: ChannelType | None = None,  # noqa: A002
+        topic: str | None = None,
+        bitrate: int | None = None,
+        user_limit: int | None = None,
+        rate_limit_per_user: int | None = None,
+        position: int | None = None,
+        permission_overwrites: list[Overwrite] | None = None,
+        parent_id: Snowflake | None = None,
+        nsfw: bool | None = None,
+        rtc_region: str | None = None,
+        video_quality_mode: VideoQualityMode | None = None,
+        default_auto_archive_duration: int | None = None,
+        default_reaction_emoji: DefaultReaction | None = None,
+        available_tags: list[ForumTagRequest] | None = None,
+        default_sort_order: SortOrderTypes | None = None,
+        reason: str | None = None,
     ) -> Channel:
         """Create guild channel.
 
@@ -3382,8 +3380,8 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        channels: Optional[list[ModifyGuildChannelPositionParams]] = None,
-        id: Optional[SnowflakeType] = None,  # noqa: A002
+        channels: list[ModifyGuildChannelPositionParams] | None = None,
+        id: SnowflakeType | None = None,  # noqa: A002
         position: MissingOrNullable[int] = UNSET,
         lock_permissions: MissingOrNullable[bool] = UNSET,
         parent_id: MissingOrNullable[SnowflakeType] = UNSET,
@@ -3465,10 +3463,10 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 1000", ge=1, le=1000),
         ] = None,
-        after: Optional[SnowflakeType] = None,
+        after: SnowflakeType | None = None,
     ) -> list[GuildMember]:
         """List guild members.
 
@@ -3492,7 +3490,7 @@ class HandleMixin:
         guild_id: SnowflakeType,
         query: Annotated[str, Range(message="query is required", min_length=1)],
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 1000", ge=1, le=1000),
         ] = None,
     ) -> list[GuildMember]:
@@ -3517,11 +3515,11 @@ class HandleMixin:
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
         access_token: str,
-        nick: Optional[str] = None,
-        roles: Optional[list[SnowflakeType]] = None,
-        mute: Optional[bool] = None,
-        deaf: Optional[bool] = None,
-    ) -> Optional[GuildMember]:
+        nick: str | None = None,
+        roles: list[SnowflakeType] | None = None,
+        mute: bool | None = None,
+        deaf: bool | None = None,
+    ) -> GuildMember | None:
         """Add guild member.
 
         see https://discord.com/developers/docs/resources/guild#add-guild-member
@@ -3558,7 +3556,7 @@ class HandleMixin:
         channel_id: MissingOrNullable[SnowflakeType] = UNSET,
         communication_disabled_until: MissingOrNullable[datetime] = UNSET,
         flags: MissingOrNullable[GuildMemberFlags] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> GuildMember:
         """Modify guild member.
 
@@ -3599,7 +3597,7 @@ class HandleMixin:
         banner: MissingOrNullable[str] = UNSET,
         avatar: MissingOrNullable[str] = UNSET,
         bio: MissingOrNullable[str] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> GuildMember:
         """Modify current member.
 
@@ -3634,7 +3632,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         nick: MissingOrNullable[str] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> GuildMember:
         """Deprecated in favor of Modify Current Member.
 
@@ -3659,7 +3657,7 @@ class HandleMixin:
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
         role_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Add guild member role.
 
@@ -3682,7 +3680,7 @@ class HandleMixin:
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
         role_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Remove guild member role.
 
@@ -3704,7 +3702,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Remove guild member.
 
@@ -3727,10 +3725,10 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 1000", ge=1, le=1000),
         ] = None,
-        before: Optional[SnowflakeType] = None,
+        before: SnowflakeType | None = None,
         after: None = None,
     ) -> list[Ban]: ...
 
@@ -3741,11 +3739,11 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 1000", ge=1, le=1000),
         ] = None,
         before: None = None,
-        after: Optional[SnowflakeType] = None,
+        after: SnowflakeType | None = None,
     ) -> list[Ban]: ...
 
     @validate(
@@ -3762,11 +3760,11 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 1000", ge=1, le=1000),
         ] = None,
-        before: Optional[SnowflakeType] = None,
-        after: Optional[SnowflakeType] = None,
+        before: SnowflakeType | None = None,
+        after: SnowflakeType | None = None,
     ) -> list[Ban]:
         """Get guild bans.
 
@@ -3809,11 +3807,11 @@ class HandleMixin:
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
         delete_message_days: Annotated[
-            Optional[int],
+            int | None,
             Range(message="delete_message_days must be between 0 and 7", ge=0, le=7),
         ] = None,
         delete_message_seconds: None = None,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None: ...
 
     @overload
@@ -3825,14 +3823,14 @@ class HandleMixin:
         user_id: SnowflakeType,
         delete_message_days: None = None,
         delete_message_seconds: Annotated[
-            Optional[int],
+            int | None,
             Range(
                 message="delete_message_seconds must be between 0 and 604800",
                 ge=0,
                 le=604800,
             ),
         ] = None,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None: ...
 
     @validate(
@@ -3850,18 +3848,18 @@ class HandleMixin:
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
         delete_message_days: Annotated[
-            Optional[int],
+            int | None,
             Range(message="delete_message_days must be between 0 and 7", ge=0, le=7),
         ] = None,
         delete_message_seconds: Annotated[
-            Optional[int],
+            int | None,
             Range(
                 message="delete_message_seconds must be between 0 and 604800",
                 ge=0,
                 le=604800,
             ),
         ] = None,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Create guild ban.
 
@@ -3888,7 +3886,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Remove guild ban.
 
@@ -3910,8 +3908,8 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         user_ids: list[SnowflakeType],
-        delete_message_seconds: Optional[int] = None,
-        reason: Optional[str] = None,
+        delete_message_seconds: int | None = None,
+        reason: str | None = None,
     ) -> BulkBan:
         """Bulk guild ban.
 
@@ -3979,7 +3977,7 @@ class HandleMixin:
         icon: MissingOrNullable[str] = UNSET,
         unicode_emoji: MissingOrNullable[str] = UNSET,
         mentionable: Missing[bool] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Role:
         """Create guild role.
 
@@ -4017,10 +4015,10 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        roles: Optional[list[ModifyGuildRolePositionParams]] = None,
-        id: Optional[SnowflakeType] = None,  # noqa: A002
+        roles: list[ModifyGuildRolePositionParams] | None = None,
+        id: SnowflakeType | None = None,  # noqa: A002
         position: MissingOrNullable[int] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> list[Role]:
         """Modify guild role positions.
 
@@ -4066,7 +4064,7 @@ class HandleMixin:
         icon: MissingOrNullable[str] = UNSET,
         unicode_emoji: MissingOrNullable[str] = UNSET,
         mentionable: MissingOrNullable[bool] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Role:
         """Modify guild role.
 
@@ -4110,7 +4108,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         level: int,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """https://discord.com/developers/docs/resources/guild"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
@@ -4131,7 +4129,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         role_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Delete guild role.
 
@@ -4152,8 +4150,8 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        days: Optional[int] = None,
-        include_roles: Optional[list[SnowflakeType]] = None,
+        days: int | None = None,
+        include_roles: list[SnowflakeType] | None = None,
     ) -> dict[Literal["pruned"], int]:
         """Get guild prune count.
 
@@ -4179,10 +4177,10 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        days: Optional[int] = None,
-        compute_prune_count: Optional[bool] = None,
-        include_roles: Optional[list[SnowflakeType]] = None,
-        reason: Optional[str] = None,
+        days: int | None = None,
+        compute_prune_count: bool | None = None,
+        include_roles: list[SnowflakeType] | None = None,
+        reason: str | None = None,
     ) -> dict[Literal["pruned"], int]:
         """Begin guild prune.
 
@@ -4255,7 +4253,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         integration_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Delete guild integration.
 
@@ -4293,7 +4291,7 @@ class HandleMixin:
         guild_id: SnowflakeType,
         enabled: Missing[bool] = UNSET,
         channel_id: MissingOrNullable[SnowflakeType] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> GuildWidgetSettings:
         """Modify guild widget.
 
@@ -4352,9 +4350,8 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        style: Optional[
-            Literal["shield", "banner1", "banner2", "banner3", "banner4"]
-        ] = None,
+        style: Literal["shield", "banner1", "banner2", "banner3", "banner4"]
+        | None = None,
     ) -> bytes:
         """Get guild widget image.
 
@@ -4393,7 +4390,7 @@ class HandleMixin:
         enabled: MissingOrNullable[bool] = UNSET,
         welcome_channels: MissingOrNullable[list[WelcomeScreenChannel]] = UNSET,
         description: MissingOrNullable[str] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> WelcomeScreen:
         """Modify guild welcome screen.
 
@@ -4446,7 +4443,7 @@ class HandleMixin:
         default_channel_ids: Missing[list[Snowflake]] = UNSET,
         enabled: Missing[bool] = UNSET,
         mode: Missing[OnboardingMode] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> GuildOnboarding:
         """Modify guild onboarding.
 
@@ -4564,8 +4561,8 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        channel_id: Optional[SnowflakeType] = None,
-        suppress: Optional[bool] = None,
+        channel_id: SnowflakeType | None = None,
+        suppress: bool | None = None,
     ) -> None:
         """Modify user voice state.
 
@@ -4589,7 +4586,7 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        with_user_count: Optional[bool] = None,
+        with_user_count: bool | None = None,
     ) -> list[GuildScheduledEvent]:
         """List scheduled events for guild.
 
@@ -4612,17 +4609,17 @@ class HandleMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        channel_id: Optional[Snowflake] = None,
-        entity_metadata: Optional[GuildScheduledEventEntityMetadata] = None,
+        channel_id: Snowflake | None = None,
+        entity_metadata: GuildScheduledEventEntityMetadata | None = None,
         name: str,
         privacy_level: GuildScheduledEventPrivacyLevel,
         scheduled_start_time: datetime,
-        scheduled_end_time: Optional[datetime] = None,
-        description: Optional[str] = None,
+        scheduled_end_time: datetime | None = None,
+        description: str | None = None,
         entity_type: GuildScheduledEventEntityType,
-        image: Optional[str] = None,
-        recurrence_rule: Optional[RecurrenceRule] = None,
-        reason: Optional[str] = None,
+        image: str | None = None,
+        recurrence_rule: RecurrenceRule | None = None,
+        reason: str | None = None,
     ) -> GuildScheduledEvent:
         """Create guild scheduled event.
 
@@ -4679,7 +4676,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         event_id: SnowflakeType,
-        with_user_count: Optional[bool] = None,
+        with_user_count: bool | None = None,
     ) -> GuildScheduledEvent:
         """Get guild scheduled event.
 
@@ -4712,7 +4709,7 @@ class HandleMixin:
         status: Missing[GuildScheduledEventStatus] = UNSET,
         image: Missing[str] = UNSET,
         recurrence_rule: MissingOrNullable[RecurrenceRule] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> GuildScheduledEvent:
         """Modify guild scheduled event.
 
@@ -4776,12 +4773,12 @@ class HandleMixin:
         guild_id: SnowflakeType,
         event_id: SnowflakeType,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
-        with_member: Optional[bool] = None,
-        before: Optional[SnowflakeType] = None,
-        after: Optional[SnowflakeType] = None,
+        with_member: bool | None = None,
+        before: SnowflakeType | None = None,
+        after: SnowflakeType | None = None,
     ) -> list[GuildScheduledEventUser]:
         """Get guild scheduled event users.
 
@@ -4834,7 +4831,7 @@ class HandleMixin:
         *,
         template_code: str,
         name: str,
-        icon: Optional[str] = None,
+        icon: str | None = None,
     ) -> Guild:
         """https://discord.com/developers/docs/resources/guild-template"""
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
@@ -4965,9 +4962,9 @@ class HandleMixin:
         bot: "Bot",
         *,
         invite_code: str,
-        with_counts: Optional[bool] = None,
-        with_expiration: Optional[bool] = None,
-        guild_scheduled_event_id: Optional[SnowflakeType] = None,
+        with_counts: bool | None = None,
+        with_expiration: bool | None = None,
+        guild_scheduled_event_id: SnowflakeType | None = None,
     ) -> Invite:
         """Get invite.
 
@@ -4992,7 +4989,7 @@ class HandleMixin:
         bot: "Bot",
         *,
         invite_code: str,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Invite:
         """Delete invite.
 
@@ -5019,9 +5016,9 @@ class HandleMixin:
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
         answer_id: int,
-        after: Optional[SnowflakeType] = None,
+        after: SnowflakeType | None = None,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
     ) -> AnswerVoters:
@@ -5086,10 +5083,10 @@ class HandleMixin:
         *,
         channel_id: SnowflakeType,
         topic: str,
-        privacy_level: Optional[StagePrivacyLevel] = None,
-        send_start_notification: Optional[bool] = None,
-        guild_scheduled_event_id: Optional[SnowflakeType] = None,
-        reason: Optional[str] = None,
+        privacy_level: StagePrivacyLevel | None = None,
+        send_start_notification: bool | None = None,
+        guild_scheduled_event_id: SnowflakeType | None = None,
+        reason: str | None = None,
     ) -> StageInstance:
         """Create stage instance.
 
@@ -5133,9 +5130,9 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        topic: Optional[str] = None,
-        privacy_level: Optional[StagePrivacyLevel] = None,
-        reason: Optional[str] = None,
+        topic: str | None = None,
+        privacy_level: StagePrivacyLevel | None = None,
+        reason: str | None = None,
     ) -> StageInstance:
         """Modify stage instance.
 
@@ -5158,7 +5155,7 @@ class HandleMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Delete stage instance.
 
@@ -5265,7 +5262,7 @@ class HandleMixin:
         description: str,
         tags: str,
         file: File,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Sticker:
         """Create guild sticker.
 
@@ -5297,7 +5294,7 @@ class HandleMixin:
         name: Missing[str] = UNSET,
         description: MissingOrNullable[str] = UNSET,
         tags: Missing[str] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Sticker:
         """Modify guild sticker.
 
@@ -5327,7 +5324,7 @@ class HandleMixin:
         *,
         guild_id: SnowflakeType,
         sticker_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Delete guild sticker.
 
@@ -5352,13 +5349,13 @@ class HandleMixin:
         bot: "Bot",
         *,
         sku_id: SnowflakeType,
-        before: Optional[SnowflakeType] = None,
-        after: Optional[SnowflakeType] = None,
+        before: SnowflakeType | None = None,
+        after: SnowflakeType | None = None,
         limit: Annotated[
-            Optional[int],
+            int | None,
             Range(message="limit must be between 1 and 100", ge=1, le=100),
         ] = None,
-        user_id: Optional[SnowflakeType] = None,
+        user_id: SnowflakeType | None = None,
     ) -> list[Subscription]:
         """List SKU subscriptions.
 
@@ -5464,10 +5461,10 @@ class HandleMixin:
         self: AdapterProtocol,
         *,
         access_token: str,
-        before: Optional[SnowflakeType] = None,
-        after: Optional[SnowflakeType] = None,
-        limit: Optional[int] = None,
-        with_counts: Optional[bool] = None,
+        before: SnowflakeType | None = None,
+        after: SnowflakeType | None = None,
+        limit: int | None = None,
+        with_counts: bool | None = None,
     ) -> list[CurrentUserGuild]:
         """Get current user guilds.
 
@@ -5606,9 +5603,9 @@ class HandleMixin:
         *,
         application_id: SnowflakeType,
         access_token: str,
-        platform_name: Optional[str] = None,
-        platform_username: Optional[str] = None,
-        metadata: Optional[dict[str, str]] = None,
+        platform_name: str | None = None,
+        platform_username: str | None = None,
+        metadata: dict[str, str] | None = None,
     ) -> ApplicationRoleConnection:
         """Update current user application role connection.
 
@@ -5641,7 +5638,7 @@ class HandleMixin:
         channel_id: SnowflakeType,
         name: str,
         avatar: MissingOrNullable[str] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Webhook:
         """Create webhook.
 
@@ -5731,7 +5728,7 @@ class HandleMixin:
         name: Missing[str] = UNSET,
         avatar: MissingOrNullable[str] = UNSET,
         channel_id: Missing[SnowflakeType] = UNSET,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> Webhook:
         """Modify webhook.
 
@@ -5774,7 +5771,7 @@ class HandleMixin:
         bot: "Bot",
         *,
         webhook_id: SnowflakeType,
-        reason: Optional[str] = None,
+        reason: str | None = None,
     ) -> None:
         """Delete webhook.
 
@@ -5812,23 +5809,23 @@ class HandleMixin:
         *,
         webhook_id: SnowflakeType,
         token: str,
-        wait: Optional[bool] = None,
-        thread_id: Optional[SnowflakeType] = None,
-        with_components: Optional[bool] = None,
-        content: Optional[str] = None,
-        username: Optional[str] = None,
-        avatar_url: Optional[str] = None,
-        tts: Optional[bool] = None,
-        embeds: Optional[list[Embed]] = None,
-        allowed_mentions: Optional[AllowedMention] = None,
-        components: Optional[list[Component]] = None,
-        files: Optional[list[File]] = None,
-        attachments: Optional[list[AttachmentSend]] = None,
-        flags: Optional[int] = None,
-        thread_name: Optional[str] = None,
-        applied_tags: Optional[list[SnowflakeType]] = None,
-        poll: Optional[PollRequest] = None,
-    ) -> Optional[MessageGet]:
+        wait: bool | None = None,
+        thread_id: SnowflakeType | None = None,
+        with_components: bool | None = None,
+        content: str | None = None,
+        username: str | None = None,
+        avatar_url: str | None = None,
+        tts: bool | None = None,
+        embeds: list[Embed] | None = None,
+        allowed_mentions: AllowedMention | None = None,
+        components: list[Component] | None = None,
+        files: list[File] | None = None,
+        attachments: list[AttachmentSend] | None = None,
+        flags: int | None = None,
+        thread_name: str | None = None,
+        applied_tags: list[SnowflakeType] | None = None,
+        poll: PollRequest | None = None,
+    ) -> MessageGet | None:
         """Execute webhook.
 
         see https://discord.com/developers/docs/resources/webhook#execute-webhook
@@ -5892,9 +5889,9 @@ class HandleMixin:
         webhook_id: SnowflakeType,
         token: str,
         payload: dict[str, Any],
-        thread_id: Optional[SnowflakeType] = None,
-        wait: Optional[bool] = None,
-    ) -> Optional[MessageGet]:
+        thread_id: SnowflakeType | None = None,
+        wait: bool | None = None,
+    ) -> MessageGet | None:
         """Execute Slack-compatible webhook.
 
         see https://discord.com/developers/docs/resources/webhook#execute-slack-compatible-webhook
@@ -5920,9 +5917,9 @@ class HandleMixin:
         webhook_id: SnowflakeType,
         token: str,
         payload: dict[str, Any],
-        thread_id: Optional[SnowflakeType] = None,
-        wait: Optional[bool] = None,
-    ) -> Optional[MessageGet]:
+        thread_id: SnowflakeType | None = None,
+        wait: bool | None = None,
+    ) -> MessageGet | None:
         """Execute GitHub-compatible webhook.
 
         see https://discord.com/developers/docs/resources/webhook#execute-github-compatible-webhook
@@ -5948,7 +5945,7 @@ class HandleMixin:
         webhook_id: SnowflakeType,
         token: str,
         message_id: SnowflakeType,
-        thread_id: Optional[SnowflakeType] = None,
+        thread_id: SnowflakeType | None = None,
     ) -> MessageGet:
         """Get webhook message.
 
@@ -5971,8 +5968,8 @@ class HandleMixin:
         webhook_id: SnowflakeType,
         webhook_token: str,
         message_id: SnowflakeType,
-        thread_id: Optional[SnowflakeType] = None,
-        with_components: Optional[bool] = None,
+        thread_id: SnowflakeType | None = None,
+        with_components: bool | None = None,
         content: MissingOrNullable[str] = UNSET,
         embeds: MissingOrNullable[list[Embed]] = UNSET,
         flags: MissingOrNullable[MessageFlag] = UNSET,
@@ -6022,7 +6019,7 @@ class HandleMixin:
         webhook_id: SnowflakeType,
         token: str,
         message_id: SnowflakeType,
-        thread_id: Optional[SnowflakeType] = None,
+        thread_id: SnowflakeType | None = None,
     ) -> None:
         """Delete webhook message.
 

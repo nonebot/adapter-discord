@@ -1,11 +1,11 @@
 import asyncio
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 import contextlib
 from functools import lru_cache
 import inspect
 import json
 import sys
-from typing import Any, Callable, Optional
+from typing import Any
 from typing_extensions import override
 
 from nonebot.adapters import Adapter as BaseAdapter
@@ -186,8 +186,8 @@ class Adapter(BaseAdapter, HandleMixin):
             timeout=self.discord_config.discord_api_timeout,
             proxy=self.discord_config.discord_proxy,
         )
-        heartbeat_task: Optional[asyncio.Task] = None
-        bot: Optional[Bot] = None
+        heartbeat_task: asyncio.Task | None = None
+        bot: Bot | None = None
         while True:
             try:
                 if bot is None:
@@ -259,7 +259,7 @@ class Adapter(BaseAdapter, HandleMixin):
                 )
                 await asyncio.sleep(RECONNECT_INTERVAL)
 
-    async def _hello(self, ws: WebSocket) -> Optional[int]:
+    async def _hello(self, ws: WebSocket) -> int | None:
         """接收并处理服务器的 Hello 事件
 
         见 https://discord.com/developers/docs/topics/gateway#hello-event
@@ -308,7 +308,7 @@ class Adapter(BaseAdapter, HandleMixin):
 
     async def _authenticate(
         self, bot: Bot, ws: WebSocket, shard: tuple[int, int]
-    ) -> Optional[bool]:
+    ) -> bool | None:
         """鉴权连接"""
         if not bot.ready:
             payload = type_validate_python(
@@ -461,7 +461,7 @@ class Adapter(BaseAdapter, HandleMixin):
 
     @classmethod
     def payload_to_event(cls, payload: Dispatch) -> Event:
-        EventClass: Optional[type[Event]] = event_classes.get(payload.type, None)  # noqa: N806
+        EventClass: type[Event] | None = event_classes.get(payload.type, None)  # noqa: N806
         if not EventClass:
             log(
                 "WARNING",
