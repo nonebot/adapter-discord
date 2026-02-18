@@ -1,12 +1,12 @@
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 from typing_extensions import override
-from urllib.parse import urlparse
 
 from nonebot.adapters import Bot as BaseBot
 
 from nonebot.drivers import Request
 from nonebot.message import handle_event
+from yarl import URL
 
 from .api import (
     UNSET,
@@ -280,9 +280,11 @@ class Bot(BaseBot, ApiClient):
     def _is_supported_attachment_url(
         url: str, *, allowed_hosts: set[str], require_https: bool
     ) -> bool:
-        parsed = urlparse(url)
+        parsed = URL(url)
         scheme_ok = parsed.scheme == "https" if require_https else bool(parsed.scheme)
-        return scheme_ok and parsed.netloc in allowed_hosts
+        return (
+            scheme_ok and isinstance(parsed.host, str) and parsed.host in allowed_hosts
+        )
 
     async def _fetch_attachment_content(
         self,
