@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from copy import deepcopy
 from dataclasses import dataclass
 import datetime
 import re
@@ -61,6 +62,9 @@ class MessageSegment(BaseMessageSegment["Message"]):
         file: Union[str, File, AttachmentSend],
         description: Optional[str] = None,
         content: Optional[bytes] = None,
+        *,
+        url: Optional[str] = None,
+        proxy_url: Optional[str] = None,
     ) -> "AttachmentSegment":
         if isinstance(file, str):
             _filename = file
@@ -85,6 +89,8 @@ class MessageSegment(BaseMessageSegment["Message"]):
                         filename=_filename, description=_description
                     ),
                     "file": None,
+                    "url": url,
+                    "proxy_url": proxy_url,
                 },
             )
         return AttachmentSegment(
@@ -98,6 +104,8 @@ class MessageSegment(BaseMessageSegment["Message"]):
                     if isinstance(_filename, str)
                     else None
                 ),
+                "url": url,
+                "proxy_url": proxy_url,
             },
         )
 
@@ -475,6 +483,8 @@ class EmbedSegment(MessageSegment):
 class AttachmentData(TypedDict):
     attachment: AttachmentSend
     file: Optional[File]
+    url: Optional[str]
+    proxy_url: Optional[str]
 
 
 @dataclass
@@ -507,6 +517,17 @@ class AttachmentSegment(MessageSegment):
             file, File
         ):
             instance.data["file"] = type_validate_python(File, file)
+        url = instance.data.get("url")
+        if url is not None and not isinstance(url, str):
+            msg = f"Expected str for AttachmentSegment.data['url'], got {type(url)}"
+            raise TypeError(msg)
+        proxy_url = instance.data.get("proxy_url")
+        if proxy_url is not None and not isinstance(proxy_url, str):
+            msg = (
+                "Expected str for AttachmentSegment.data['proxy_url'], "
+                f"got {type(proxy_url)}"
+            )
+            raise TypeError(msg)
         return instance
 
 
@@ -676,7 +697,9 @@ class Message(BaseMessage[MessageSegment]):
                             if isinstance(attachment.description, str)
                             else None
                         ),
-                    )
+                    ),
+                    url=attachment.url,
+                    proxy_url=attachment.proxy_url,
                 )
                 for attachment in message.attachments
             )
@@ -706,6 +729,29 @@ class Message(BaseMessage[MessageSegment]):
             )
         )
 
+    def clone(self) -> "Message":
+        new = self.__class__()
+        for segment in self:
+            new.append(
+                type_validate_python(
+                    MessageSegment,
+                    {
+                        "type": segment.type,
+                        "data": deepcopy(segment.data),
+                    },
+                )
+            )
+        return new
+
+    def sendable(self) -> "Message":
+        new = self.clone()
+        attachments_segment = new["attachment"] or None
+        if attachments_segment is not None:
+            for index, attachment in enumerate(attachments_segment):
+                if attachment.data["file"] is None:
+                    raise ValueError(_get_unsendable_attachment_msg(index, attachment))
+        return new
+
 
 def parse_message(message: Union[Message, MessageSegment, str]) -> dict[str, Any]:
     message = MessageSegment.text(message) if isinstance(message, str) else message
@@ -733,17 +779,8 @@ def parse_message(message: Union[Message, MessageSegment, str]) -> dict[str, Any
                 layout_type=poll.layout_type,
             )
 
-    attachments = None
-    files = None
-    if attachments_segment := (message["attachment"] or None):
-        attachments = [
-            attachment.data["attachment"] for attachment in attachments_segment
-        ]
-        files = [
-            attachment.data["file"]
-            for attachment in attachments_segment
-            if attachment.data["file"] is not None
-        ]
+    attachments, files = extract_attachments(message)
+
     return {
         k: v
         for k, v in {
@@ -758,3 +795,38 @@ def parse_message(message: Union[Message, MessageSegment, str]) -> dict[str, Any
         }.items()
         if v is not None
     }
+
+
+def extract_attachments(
+    message: Message,
+) -> tuple[Optional[list[AttachmentSend]], Optional[list[File]]]:
+    attachments_segment = message["attachment"] or None
+    if not attachments_segment:
+        return None, None
+
+    attachments_list: list[AttachmentSend] = []
+    files_list: list[File] = []
+    for index, attachment in enumerate(attachments_segment):
+        file = attachment.data["file"]
+        if file is None:
+            raise ValueError(_get_unsendable_attachment_msg(index, attachment))
+        attachments_list.append(attachment.data["attachment"])
+        files_list.append(file)
+
+    attachments = attachments_list or None
+    files = files_list or None
+    return attachments, files
+
+
+def _get_unsendable_attachment_msg(index: int, attachment: MessageSegment) -> str:
+    if attachment.data.get("url") or attachment.data.get("proxy_url"):
+        return (
+            f"Attachment segment at index {index} is not sendable because file "
+            "content is missing; call "
+            "`await bot.fetch_attachments(message)` first"
+        )
+    return (
+        f"Attachment segment at index {index} is not sendable because file "
+        "content is missing; provide `content=` in "
+        "MessageSegment.attachment(...)"
+    )
