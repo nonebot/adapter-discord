@@ -2,7 +2,8 @@ from datetime import datetime
 from enum import Enum
 import inspect
 import sys
-from typing import Literal, Optional, Union
+from types import UnionType
+from typing import Literal
 from typing_extensions import override
 
 from nonebot.adapters import Event as BaseEvent
@@ -289,7 +290,7 @@ class MessageEvent(Event, MessageGet):
 
     to_me: bool = False
 
-    reply: Optional[MessageGet] = None
+    reply: MessageGet | None = None
 
     @property
     def message(self) -> Message:
@@ -1172,7 +1173,7 @@ class DirectMessagePollVoteRemoveEvent(MessagePollVoteRemoveEvent):
     guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
 
 
-event_classes: dict[str, type[Event]] = {
+event_classes: dict[str, type[Event] | UnionType] = {
     EventType.HELLO.value: HelloEvent,
     EventType.READY.value: ReadyEvent,
     EventType.RESUMED.value: ResumedEvent,
@@ -1200,7 +1201,7 @@ event_classes: dict[str, type[Event]] = {
     EventType.ENTITLEMENT_CREATE.value: EntitlementCreateEvent,
     EventType.ENTITLEMENT_UPDATE.value: EntitlementUpdateEvent,
     EventType.ENTITLEMENT_DELETE.value: EntitlementDeleteEvent,
-    EventType.GUILD_CREATE.value: Union[GuildCreateEvent, GuildCreateCompatEvent],
+    EventType.GUILD_CREATE.value: GuildCreateEvent | GuildCreateCompatEvent,
     EventType.GUILD_UPDATE.value: GuildUpdateEvent,
     EventType.GUILD_DELETE.value: GuildDeleteEvent,
     EventType.GUILD_AUDIT_LOG_ENTRY_CREATE.value: GuildAuditLogEntryCreateEvent,
@@ -1226,50 +1227,50 @@ event_classes: dict[str, type[Event]] = {
     EventType.INTEGRATION_CREATE.value: IntegrationCreateEvent,
     EventType.INTEGRATION_UPDATE.value: IntegrationUpdateEvent,
     EventType.INTEGRATION_DELETE.value: IntegrationDeleteEvent,
-    EventType.INTERACTION_CREATE.value: Union[
-        PingInteractionEvent,
-        ApplicationCommandInteractionEvent,
-        ApplicationCommandAutoCompleteInteractionEvent,
-        MessageComponentInteractionEvent,
-        ModalSubmitInteractionEvent,
-        InteractionCreateEvent,
-    ],
+    EventType.INTERACTION_CREATE.value: (
+        PingInteractionEvent
+        | ApplicationCommandInteractionEvent
+        | ApplicationCommandAutoCompleteInteractionEvent
+        | MessageComponentInteractionEvent
+        | ModalSubmitInteractionEvent
+        | InteractionCreateEvent
+    ),
     EventType.INVITE_CREATE.value: InviteCreateEvent,
     EventType.INVITE_DELETE.value: InviteDeleteEvent,
-    EventType.MESSAGE_CREATE.value: Union[
-        GuildMessageCreateEvent, DirectMessageCreateEvent, MessageCreateEvent
-    ],
-    EventType.MESSAGE_UPDATE.value: Union[
-        GuildMessageUpdateEvent, DirectMessageUpdateEvent, MessageUpdateEvent
-    ],
-    EventType.MESSAGE_DELETE.value: Union[
-        GuildMessageDeleteEvent, DirectMessageDeleteEvent, MessageDeleteEvent
-    ],
-    EventType.MESSAGE_DELETE_BULK.value: Union[
-        GuildMessageDeleteBulkEvent,
-        DirectMessageDeleteBulkEvent,
-        MessageDeleteBulkEvent,
-    ],
-    EventType.MESSAGE_REACTION_ADD.value: Union[
-        GuildMessageReactionAddEvent,
-        DirectMessageReactionAddEvent,
-        MessageReactionAddEvent,
-    ],
-    EventType.MESSAGE_REACTION_REMOVE.value: Union[
-        GuildMessageReactionRemoveEvent,
-        DirectMessageReactionRemoveEvent,
-        MessageReactionRemoveEvent,
-    ],
-    EventType.MESSAGE_REACTION_REMOVE_ALL.value: Union[
-        GuildMessageReactionRemoveAllEvent,
-        DirectMessageReactionRemoveAllEvent,
-        MessageReactionRemoveAllEvent,
-    ],
-    EventType.MESSAGE_REACTION_REMOVE_EMOJI.value: Union[
-        GuildMessageReactionRemoveEmojiEvent,
-        DirectMessageReactionRemoveEmojiEvent,
-        MessageReactionRemoveEmojiEvent,
-    ],
+    EventType.MESSAGE_CREATE.value: (
+        GuildMessageCreateEvent | DirectMessageCreateEvent | MessageCreateEvent
+    ),
+    EventType.MESSAGE_UPDATE.value: (
+        GuildMessageUpdateEvent | DirectMessageUpdateEvent | MessageUpdateEvent
+    ),
+    EventType.MESSAGE_DELETE.value: (
+        GuildMessageDeleteEvent | DirectMessageDeleteEvent | MessageDeleteEvent
+    ),
+    EventType.MESSAGE_DELETE_BULK.value: (
+        GuildMessageDeleteBulkEvent
+        | DirectMessageDeleteBulkEvent
+        | MessageDeleteBulkEvent
+    ),
+    EventType.MESSAGE_REACTION_ADD.value: (
+        GuildMessageReactionAddEvent
+        | DirectMessageReactionAddEvent
+        | MessageReactionAddEvent
+    ),
+    EventType.MESSAGE_REACTION_REMOVE.value: (
+        GuildMessageReactionRemoveEvent
+        | DirectMessageReactionRemoveEvent
+        | MessageReactionRemoveEvent
+    ),
+    EventType.MESSAGE_REACTION_REMOVE_ALL.value: (
+        GuildMessageReactionRemoveAllEvent
+        | DirectMessageReactionRemoveAllEvent
+        | MessageReactionRemoveAllEvent
+    ),
+    EventType.MESSAGE_REACTION_REMOVE_EMOJI.value: (
+        GuildMessageReactionRemoveEmojiEvent
+        | DirectMessageReactionRemoveEmojiEvent
+        | MessageReactionRemoveEmojiEvent
+    ),
     EventType.PRESENCE_UPDATE.value: PresenceUpdateEvent,
     EventType.STAGE_INSTANCE_CREATE.value: StageInstanceCreateEvent,
     EventType.STAGE_INSTANCE_UPDATE.value: StageInstanceUpdateEvent,
@@ -1277,9 +1278,9 @@ event_classes: dict[str, type[Event]] = {
     EventType.SUBSCRIPTION_CREATE.value: SubscriptionCreateEvent,
     EventType.SUBSCRIPTION_UPDATE.value: SubscriptionUpdateEvent,
     EventType.SUBSCRIPTION_DELETE.value: SubscriptionDeleteEvent,
-    EventType.TYPING_START.value: Union[
-        GuildTypingStartEvent, DirectTypingStartEvent, TypingStartEvent
-    ],
+    EventType.TYPING_START.value: (
+        GuildTypingStartEvent | DirectTypingStartEvent | TypingStartEvent
+    ),
     EventType.USER_UPDATE.value: UserUpdateEvent,
     EventType.VOICE_CHANNEL_STATUS_UPDATE.value: VoiceChannelStatusUpdateEvent,
     EventType.VOICE_CHANNEL_START_TIME_UPDATE.value: VoiceChannelStartTimeUpdateEvent,
@@ -1287,16 +1288,16 @@ event_classes: dict[str, type[Event]] = {
     EventType.VOICE_STATE_UPDATE.value: VoiceStateUpdateEvent,
     EventType.VOICE_SERVER_UPDATE.value: VoiceServerUpdateEvent,
     EventType.WEBHOOKS_UPDATE.value: WebhooksUpdateEvent,
-    EventType.MESSAGE_POLL_VOTE_ADD.value: Union[
-        GuildMessagePollVoteAddEvent,
-        DirectMessagePollVoteAddEvent,
-        MessagePollVoteAddEvent,
-    ],
-    EventType.MESSAGE_POLL_VOTE_REMOVE.value: Union[
-        GuildMessagePollVoteRemoveEvent,
-        DirectMessagePollVoteRemoveEvent,
-        MessagePollVoteRemoveEvent,
-    ],
+    EventType.MESSAGE_POLL_VOTE_ADD.value: (
+        GuildMessagePollVoteAddEvent
+        | DirectMessagePollVoteAddEvent
+        | MessagePollVoteAddEvent
+    ),
+    EventType.MESSAGE_POLL_VOTE_REMOVE.value: (
+        GuildMessagePollVoteRemoveEvent
+        | DirectMessagePollVoteRemoveEvent
+        | MessagePollVoteRemoveEvent
+    ),
 }
 
 _model_types_namespace = vars(_model_module)

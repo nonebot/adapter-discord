@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal
 from typing_extensions import override
 
 from nonebot.adapters import Bot as BaseBot
@@ -116,9 +116,9 @@ class Bot(BaseBot, ApiClient):
         self.adapter = adapter
         self._bot_info: BotInfo = bot_info
         self._application_id: Snowflake = Snowflake(self_id)
-        self._session_id: Optional[str] = None
-        self._self_info: Optional[User] = None
-        self._sequence: Optional[int] = None
+        self._session_id: str | None = None
+        self._self_info: User | None = None
+        self._sequence: int | None = None
 
     @override
     def __repr__(self) -> str:
@@ -185,12 +185,12 @@ class Bot(BaseBot, ApiClient):
 
     async def fetch_attachments(  # noqa: PLR0913
         self,
-        message: Union[str, Message, MessageSegment],
+        message: str | Message | MessageSegment,
         *,
-        allowed_hosts: Optional[set[str]] = None,
+        allowed_hosts: set[str] | None = None,
         require_https: bool = True,
-        timeout: Optional[float] = None,
-        max_bytes: Optional[int] = None,
+        timeout: float | None = None,
+        max_bytes: int | None = None,
         prefer_proxy_url: bool = True,
         on_error: AttachmentFetchOnError = "raise",
     ) -> Message:
@@ -249,7 +249,7 @@ class Bot(BaseBot, ApiClient):
         allowed_hosts: set[str],
         require_https: bool,
         prefer_proxy_url: bool,
-    ) -> Optional[str]:
+    ) -> str | None:
         urls = []
         if prefer_proxy_url:
             urls.extend(
@@ -290,9 +290,9 @@ class Bot(BaseBot, ApiClient):
         self,
         url: str,
         *,
-        timeout: Optional[float],
-        max_bytes: Optional[int],
-    ) -> Optional[bytes]:
+        timeout: float | None,
+        max_bytes: int | None,
+    ) -> bytes | None:
         try:
             request = Request(
                 method="GET",
@@ -318,10 +318,10 @@ class Bot(BaseBot, ApiClient):
     async def send_to(
         self,
         channel_id: SnowflakeType,
-        message: Union[str, Message, MessageSegment],
+        message: str | Message | MessageSegment,
         tts: bool = False,  # noqa: FBT001, FBT002
-        nonce: Union[int, str, None] = None,
-        allowed_mentions: Optional[AllowedMention] = None,
+        nonce: int | str | None = None,
+        allowed_mentions: AllowedMention | None = None,
     ) -> MessageGet:
         message = MessageSegment.text(message) if isinstance(message, str) else message
         message = message if isinstance(message, Message) else Message(message)
@@ -340,12 +340,12 @@ class Bot(BaseBot, ApiClient):
     async def send(
         self,
         event: Event,
-        message: Union[str, Message, MessageSegment],
+        message: str | Message | MessageSegment,
         tts: bool = False,
-        nonce: Union[int, str, None] = None,
-        allowed_mentions: Optional[AllowedMention] = None,
-        mention_sender: Optional[bool] = None,
-        at_sender: Optional[bool] = None,
+        nonce: int | str | None = None,
+        allowed_mentions: AllowedMention | None = None,
+        mention_sender: bool | None = None,
+        at_sender: bool | None = None,
         reply_message: bool = False,
         **params: Any,
     ) -> MessageGet:

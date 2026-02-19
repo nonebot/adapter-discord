@@ -1,6 +1,6 @@
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from datetime import datetime, timedelta
-from typing import Any, Callable, Optional, Union
+from typing import Any
 
 from nonebot.adapters import MessageTemplate
 
@@ -58,7 +58,7 @@ type_str_mapping = {
 
 
 class ApplicationCommandConfig(ApplicationCommandCreate):
-    guild_ids: Optional[list[Snowflake]] = None
+    guild_ids: list[Snowflake] | None = None
 
 
 class ApplicationCommandMatcher(Matcher):
@@ -83,7 +83,7 @@ class ApplicationCommandMatcher(Matcher):
 
     @classmethod
     async def send_response(
-        cls, message: Union[str, Message, MessageSegment, MessageTemplate]
+        cls, message: str | Message | MessageSegment | MessageTemplate
     ) -> None:
         return await cls.send(message)
 
@@ -104,7 +104,7 @@ class ApplicationCommandMatcher(Matcher):
     @classmethod
     async def edit_response(
         cls,
-        message: Union[str, Message, MessageSegment, MessageTemplate],
+        message: str | Message | MessageSegment | MessageTemplate,
     ) -> None:
         event = current_event.get()
         bot = current_bot.get()
@@ -142,8 +142,8 @@ class ApplicationCommandMatcher(Matcher):
     @classmethod
     async def send_followup_msg(
         cls,
-        message: Union[str, Message, MessageSegment, MessageTemplate],
-        flags: Optional[MessageFlag] = None,
+        message: str | Message | MessageSegment | MessageTemplate,
+        flags: MessageFlag | None = None,
     ) -> MessageGet:
         event = current_event.get()
         bot = current_bot.get()
@@ -185,7 +185,7 @@ class ApplicationCommandMatcher(Matcher):
     async def edit_followup_msg(
         cls,
         message_id: SnowflakeType,
-        message: Union[str, Message, MessageSegment, MessageTemplate],
+        message: str | Message | MessageSegment | MessageTemplate,
     ) -> MessageGet:
         event = current_event.get()
         bot = current_bot.get()
@@ -237,7 +237,7 @@ class SlashCommandMatcher(ApplicationCommandMatcher):
 
     @classmethod
     def handle_sub_command(
-        cls, *commands: str, parameterless: Optional[Iterable[Any]] = None
+        cls, *commands: str, parameterless: Iterable[Any] | None = None
     ) -> Callable[..., T_Handler]:
         def _sub_command_rule(
             event: ApplicationCommandInteractionEvent,
@@ -275,22 +275,22 @@ def on_slash_command(  # noqa: PLR0913
     name: str,
     description: str,
     options: Missing[Sequence[AnyCommandOption]] = UNSET,
-    internal_id: Optional[str] = None,
-    rule: Union[Rule, T_RuleChecker, None] = None,
-    permission: Union[Permission, T_PermissionChecker, None] = None,
+    internal_id: str | None = None,
+    rule: Rule | T_RuleChecker | None = None,
+    permission: Permission | T_PermissionChecker | None = None,
     *,
-    name_localizations: Optional[dict[str, str]] = None,
-    description_localizations: Optional[dict[str, str]] = None,
-    default_member_permissions: Optional[str] = None,
-    dm_permission: Optional[bool] = None,
+    name_localizations: dict[str, str] | None = None,
+    description_localizations: dict[str, str] | None = None,
+    default_member_permissions: str | None = None,
+    dm_permission: bool | None = None,
     default_permission: Missing[bool] = UNSET,
     nsfw: Missing[bool] = UNSET,
-    handlers: Optional[list[Union[T_Handler, Dependent]]] = None,
+    handlers: list[T_Handler | Dependent] | None = None,
     temp: bool = False,
-    expire_time: Union[datetime, timedelta, None] = None,
+    expire_time: datetime | timedelta | None = None,
     priority: int = 1,
     block: bool = True,
-    state: Optional[T_State] = None,
+    state: T_State | None = None,
     _depth: int = 0,
 ) -> type[SlashCommandMatcher]:
     config = ApplicationCommandConfig(
@@ -340,21 +340,21 @@ def on_slash_command(  # noqa: PLR0913
 
 def on_user_command(  # noqa: PLR0913
     name: str,
-    internal_id: Optional[str] = None,
-    rule: Union[Rule, T_RuleChecker, None] = None,
-    permission: Union[Permission, T_PermissionChecker, None] = None,
+    internal_id: str | None = None,
+    rule: Rule | T_RuleChecker | None = None,
+    permission: Permission | T_PermissionChecker | None = None,
     *,
-    name_localizations: Optional[dict[str, str]] = None,
-    default_member_permissions: Optional[str] = None,
-    dm_permission: Optional[bool] = None,
+    name_localizations: dict[str, str] | None = None,
+    default_member_permissions: str | None = None,
+    dm_permission: bool | None = None,
     default_permission: Missing[bool] = UNSET,
     nsfw: Missing[bool] = UNSET,
-    handlers: Optional[list[Union[T_Handler, Dependent]]] = None,
+    handlers: list[T_Handler | Dependent] | None = None,
     temp: bool = False,
-    expire_time: Union[datetime, timedelta, None] = None,
+    expire_time: datetime | timedelta | None = None,
     priority: int = 1,
     block: bool = True,
-    state: Optional[T_State] = None,
+    state: T_State | None = None,
     _depth: int = 0,
 ) -> type[UserMessageCommandMatcher]:
     config = ApplicationCommandConfig(
@@ -401,21 +401,21 @@ def on_user_command(  # noqa: PLR0913
 
 def on_message_command(  # noqa: PLR0913
     name: str,
-    internal_id: Optional[str] = None,
-    rule: Union[Rule, T_RuleChecker, None] = None,
-    permission: Union[Permission, T_PermissionChecker, None] = None,
+    internal_id: str | None = None,
+    rule: Rule | T_RuleChecker | None = None,
+    permission: Permission | T_PermissionChecker | None = None,
     *,
-    name_localizations: Optional[dict[str, str]] = None,
-    default_member_permissions: Optional[str] = None,
-    dm_permission: Optional[bool] = None,
+    name_localizations: dict[str, str] | None = None,
+    default_member_permissions: str | None = None,
+    dm_permission: bool | None = None,
     default_permission: Missing[bool] = UNSET,
     nsfw: Missing[bool] = UNSET,
-    handlers: Optional[list[Union[T_Handler, Dependent]]] = None,
+    handlers: list[T_Handler | Dependent] | None = None,
     temp: bool = False,
-    expire_time: Union[datetime, timedelta, None] = None,
+    expire_time: datetime | timedelta | None = None,
     priority: int = 1,
     block: bool = True,
-    state: Optional[T_State] = None,
+    state: T_State | None = None,
     _depth: int = 0,
 ) -> type[UserMessageCommandMatcher]:
     config = ApplicationCommandConfig(

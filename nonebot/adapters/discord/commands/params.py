@@ -1,6 +1,6 @@
 import inspect
-from typing import Annotated, Any, Optional, TypeVar, Union
-from typing_extensions import get_args, get_origin, override
+from typing import Annotated, Any, TypeVar, get_args, get_origin
+from typing_extensions import override
 
 from nonebot.dependencies import Param
 from nonebot.params import Depends
@@ -27,7 +27,7 @@ type_str_mapping = {
 
 
 class CommandOptionType:
-    def __init__(self, key: Optional[str] = None) -> None:
+    def __init__(self, key: str | None = None) -> None:
         self.key = key
 
     def __repr__(self) -> str:
@@ -46,7 +46,7 @@ class OptionParam(Param):
     @override
     def _check_param(
         cls, param: inspect.Parameter, allow_types: tuple[type[Param], ...]
-    ) -> Optional["OptionParam"]:
+    ) -> "OptionParam | None":
         if isinstance(param.default, CommandOptionType):
             return cls(key=param.default.key or param.name, validate=True)
         if get_origin(param.annotation) is Annotated:
@@ -58,7 +58,7 @@ class OptionParam(Param):
     @staticmethod
     def _get_options(
         options: Missing[list[ApplicationCommandInteractionDataOption]],
-    ) -> Optional[list[ApplicationCommandInteractionDataOption]]:
+    ) -> list[ApplicationCommandInteractionDataOption] | None:
         if is_unset(options):
             return None
         if (
@@ -123,7 +123,7 @@ class OptionParam(Param):
 
 def get_command_message(
     event: ApplicationCommandInteractionEvent,
-) -> Union[MessageGet, None]:
+) -> MessageGet | None:
     if event.data.type != ApplicationCommandType.MESSAGE:
         return None
 
@@ -137,7 +137,7 @@ def get_command_message(
     return event.data.resolved.messages.get(event.data.target_id)
 
 
-def get_command_user(event: ApplicationCommandInteractionEvent) -> Union[User, None]:
+def get_command_user(event: ApplicationCommandInteractionEvent) -> User | None:
     if event.data.type != ApplicationCommandType.USER:
         return None
 
