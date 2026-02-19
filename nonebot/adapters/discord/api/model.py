@@ -409,9 +409,7 @@ class SubCommandOption(CommandOptionBase):
     )
     options: (
         list[
-            "IntegerOption | StringOption | BooleanOption | UserOption"
-            " | ChannelOption | RoleOption | MentionableOption"
-            " | NumberOption | AttachmentOption"
+            "IntegerOption | StringOption | BooleanOption | UserOption| ChannelOption | RoleOption | MentionableOption | NumberOption | AttachmentOption"
         ]
         | None
     ) = None
