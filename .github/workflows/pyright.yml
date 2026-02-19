@@ -28,6 +28,7 @@ jobs:
 
       - run: |
           echo "$(dirname $(uv python find))" >> $GITHUB_PATH
+          uv pip install .
         shell: bash
 
       - name: Run Pyright
