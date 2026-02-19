@@ -1,5 +1,5 @@
 import inspect
-from typing import Annotated, Any, Optional, TypeVar, get_args, get_origin
+from typing import Annotated, Any, TypeVar, get_args, get_origin
 from typing_extensions import override
 
 from nonebot.dependencies import Param
@@ -46,7 +46,7 @@ class OptionParam(Param):
     @override
     def _check_param(
         cls, param: inspect.Parameter, allow_types: tuple[type[Param], ...]
-    ) -> Optional["OptionParam"]:
+    ) -> "OptionParam | None":
         if isinstance(param.default, CommandOptionType):
             return cls(key=param.default.key or param.name, validate=True)
         if get_origin(param.annotation) is Annotated:

@@ -6,9 +6,7 @@ from typing import (
     Any,
     Generic,
     Literal,
-    Optional,
     TypeVar,
-    Union,
     final,
 )
 from typing_extensions import Self
@@ -411,17 +409,9 @@ class SubCommandOption(CommandOptionBase):
     )
     options: (
         list[
-            Union[
-                "IntegerOption",
-                "StringOption",
-                "BooleanOption",
-                "UserOption",
-                "ChannelOption",
-                "RoleOption",
-                "MentionableOption",
-                "NumberOption",
-                "AttachmentOption",
-            ]
+            "IntegerOption | StringOption | BooleanOption | UserOption"
+            " | ChannelOption | RoleOption | MentionableOption"
+            " | NumberOption | AttachmentOption"
         ]
         | None
     ) = None
@@ -644,7 +634,7 @@ class ActionRow(BaseModel):
     """
 
     type: ComponentType = Field(default=ComponentType.ActionRow)
-    components: list[Union["Button", "SelectMenu", "TextInput"]]
+    components: list["Button | SelectMenu | TextInput"]
 
 
 class ComponentEmoji(BaseModel):
@@ -1063,7 +1053,7 @@ class InteractionCallbackMessage(BaseModel):
     """message content"""
     embeds: list["Embed"] | None = None
     """supports up to 10 embeds"""
-    allowed_mentions: Optional["AllowedMention"] = None
+    allowed_mentions: "AllowedMention | None" = None
     """allowed mentions object"""
     flags: MessageFlag | None = None
     """message flags combined as a bitfield
@@ -1073,7 +1063,7 @@ class InteractionCallbackMessage(BaseModel):
     attachments: list["AttachmentSend"] | None = None
     """attachment objects with filename and description.
     See Uploading Files for details."""
-    poll: Optional["PollRequest"] = None
+    poll: "PollRequest | None" = None
     """Details about the poll"""
 
     files: list["File"] | None = None
@@ -1148,7 +1138,7 @@ class Application(BaseModel):
     verify_key: str
     """the hex encoded key for verification in
     interactions and the GameSDK's GetTicket"""
-    team: Optional["Team"] = None
+    team: "Team | None" = None
     """if the application belongs to a team, this will
     be a list of the members of that team"""
     guild_id: Missing[Snowflake] = UNSET
@@ -2639,11 +2629,11 @@ class GuildScheduledEvent(BaseModel):
     status: GuildScheduledEventStatus
     entity_type: GuildScheduledEventEntityType
     entity_id: Snowflake | None = None
-    entity_metadata: Optional["GuildScheduledEventEntityMetadata"] = None
+    entity_metadata: "GuildScheduledEventEntityMetadata | None" = None
     creator: Missing["User"] = UNSET
     user_count: Missing[int] = UNSET
     image: MissingOrNullable[str] = UNSET
-    recurrence_rule: Optional["RecurrenceRule"] = None
+    recurrence_rule: "RecurrenceRule | None" = None
 
 
 class GuildScheduledEventEntityMetadata(BaseModel):
@@ -2681,7 +2671,7 @@ class CreateGuildScheduledEventParams(BaseModel):
     description: str | None = None
     entity_type: GuildScheduledEventEntityType
     image: str | None = None
-    recurrence_rule: Optional["RecurrenceRule"] = None
+    recurrence_rule: "RecurrenceRule | None" = None
 
 
 class ModifyGuildScheduledEventParams(BaseModel):
