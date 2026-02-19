@@ -1,0 +1,32 @@
+name: Pyright Lint
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  pyright:
+    name: Pyright Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v7
+        name: Setup UV
+        with:
+          enable-cache: true
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: ".python-version"
+
+      - run: uv sync
+        shell: bash
+
+      - name: Run Pyright
+        uses: jakebailey/pyright-action@v3
+        with:
+          pylance-version: latest-release
