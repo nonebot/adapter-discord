@@ -26,6 +26,10 @@ jobs:
       - run: uv sync
         shell: bash
 
+      - run: |
+          echo "$(dirname $(uv python find))" >> $GITHUB_PATH
+        shell: bash
+
       - name: Run Pyright
         uses: jakebailey/pyright-action@v3
         with:
