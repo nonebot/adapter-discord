@@ -1,6 +1,6 @@
 from collections.abc import Awaitable, Callable
 from types import SimpleNamespace
-from typing import Any, Optional
+from typing import Any
 
 import nonebot.adapters.discord.api.handle as handle_module
 
@@ -30,7 +30,7 @@ def bot() -> SimpleNamespace:
 
 
 MethodCaller = Callable[
-    [DummyAdapter, SimpleNamespace, str, Optional[int]], Awaitable[None]
+    [DummyAdapter, SimpleNamespace, str, int | None], Awaitable[None]
 ]
 
 
@@ -38,7 +38,7 @@ async def _call_create_reaction(
     adapter: DummyAdapter,
     bot: SimpleNamespace,
     emoji: str,
-    emoji_id: Optional[int],
+    emoji_id: int | None,
 ) -> None:
     await adapter._api_create_reaction(  # noqa: SLF001
         bot=bot,
@@ -53,7 +53,7 @@ async def _call_delete_own_reaction(
     adapter: DummyAdapter,
     bot: SimpleNamespace,
     emoji: str,
-    emoji_id: Optional[int],
+    emoji_id: int | None,
 ) -> None:
     await adapter._api_delete_own_reaction(  # noqa: SLF001
         bot=bot,
@@ -68,7 +68,7 @@ async def _call_delete_user_reaction(
     adapter: DummyAdapter,
     bot: SimpleNamespace,
     emoji: str,
-    emoji_id: Optional[int],
+    emoji_id: int | None,
 ) -> None:
     await adapter._api_delete_user_reaction(  # noqa: SLF001
         bot=bot,
@@ -84,7 +84,7 @@ async def _call_get_reactions(
     adapter: DummyAdapter,
     bot: SimpleNamespace,
     emoji: str,
-    emoji_id: Optional[int],
+    emoji_id: int | None,
 ) -> None:
     await adapter._api_get_reactions(  # noqa: SLF001
         bot=bot,
@@ -99,7 +99,7 @@ async def _call_delete_all_reactions_for_emoji(
     adapter: DummyAdapter,
     bot: SimpleNamespace,
     emoji: str,
-    emoji_id: Optional[int],
+    emoji_id: int | None,
 ) -> None:
     await adapter._api_delete_all_reactions_for_emoji(  # noqa: SLF001
         bot=bot,
@@ -130,7 +130,7 @@ async def test_reaction_endpoints_encode_emoji_once(
     adapter: DummyAdapter,
     bot: SimpleNamespace,
     monkeypatch: pytest.MonkeyPatch,
-    case: tuple[MethodCaller, str, str, Optional[int], str],
+    case: tuple[MethodCaller, str, str, int | None, str],
 ) -> None:
     caller, suffix, emoji, emoji_id, encoded_emoji = case
     captured: list[str] = []

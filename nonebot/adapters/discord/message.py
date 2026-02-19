@@ -7,9 +7,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Literal,
-    Optional,
     TypedDict,
-    Union,
     overload,
 )
 from typing_extensions import Self, override
@@ -59,12 +57,12 @@ class MessageSegment(BaseMessageSegment["Message"]):
 
     @staticmethod
     def attachment(
-        file: Union[str, File, AttachmentSend],
-        description: Optional[str] = None,
-        content: Optional[bytes] = None,
+        file: str | File | AttachmentSend,
+        description: str | None = None,
+        content: bytes | None = None,
         *,
-        url: Optional[str] = None,
-        proxy_url: Optional[str] = None,
+        url: str | None = None,
+        proxy_url: str | None = None,
     ) -> "AttachmentSegment":
         if isinstance(file, str):
             _filename = file
@@ -129,7 +127,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
     def custom_emoji(
         name: str,
         emoji_id: str,
-        animated: Optional[bool] = None,  # noqa: FBT001
+        animated: bool | None = None,  # noqa: FBT001
     ) -> "CustomEmojiSegment":
         return CustomEmojiSegment(
             "custom_emoji", {"name": name, "id": emoji_id, "animated": animated}
@@ -159,7 +157,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
 
     @staticmethod
     def timestamp(
-        timestamp: Union[int, datetime.datetime], style: Optional[TimeStampStyle] = None
+        timestamp: int | datetime.datetime, style: TimeStampStyle | None = None
     ) -> "TimestampSegment":
         if isinstance(timestamp, datetime.datetime):
             timestamp = int(timestamp.timestamp())
@@ -173,17 +171,17 @@ class MessageSegment(BaseMessageSegment["Message"]):
     @overload
     def reference(
         reference: SnowflakeType,
-        channel_id: Optional[SnowflakeType] = None,
-        guild_id: Optional[SnowflakeType] = None,
-        fail_if_not_exists: Optional[bool] = None,  # noqa: FBT001
+        channel_id: SnowflakeType | None = None,
+        guild_id: SnowflakeType | None = None,
+        fail_if_not_exists: bool | None = None,  # noqa: FBT001
     ) -> "ReferenceSegment": ...
 
     @staticmethod
     def reference(
-        reference: Union[SnowflakeType, MessageReference],
-        channel_id: Optional[SnowflakeType] = None,
-        guild_id: Optional[SnowflakeType] = None,
-        fail_if_not_exists: Optional[bool] = None,  # noqa: FBT001
+        reference: SnowflakeType | MessageReference,
+        channel_id: SnowflakeType | None = None,
+        guild_id: SnowflakeType | None = None,
+        fail_if_not_exists: bool | None = None,  # noqa: FBT001
     ):
         if isinstance(reference, MessageReference):
             _reference = reference
@@ -198,7 +196,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
         return ReferenceSegment("reference", {"reference": _reference})
 
     @staticmethod
-    def poll(poll: Union[Poll, PollRequest]) -> "PollSegment":
+    def poll(poll: Poll | PollRequest) -> "PollSegment":
         return PollSegment("poll", {"poll": poll})
 
     @override
@@ -303,7 +301,7 @@ class ComponentSegment(MessageSegment):
 class CustomEmojiData(TypedDict):
     name: str
     id: str
-    animated: Optional[bool]
+    animated: bool | None
 
 
 @dataclass
@@ -401,7 +399,7 @@ class MentionEveryoneSegment(MessageSegment):
 
 class TimestampData(TypedDict):
     timestamp: int
-    style: Optional[TimeStampStyle]
+    style: TimeStampStyle | None
 
 
 @dataclass
@@ -482,9 +480,9 @@ class EmbedSegment(MessageSegment):
 
 class AttachmentData(TypedDict):
     attachment: AttachmentSend
-    file: Optional[File]
-    url: Optional[str]
-    proxy_url: Optional[str]
+    file: File | None
+    url: str | None
+    proxy_url: str | None
 
 
 @dataclass
@@ -565,7 +563,7 @@ class ReferenceSegment(MessageSegment):
 
 
 class PollData(TypedDict):
-    poll: Union[Poll, PollRequest]
+    poll: Poll | PollRequest
 
 
 @dataclass
@@ -630,7 +628,7 @@ class Message(BaseMessage[MessageSegment]):
 
     @override
     def __add__(
-        self, other: Union[str, MessageSegment, Iterable[MessageSegment]]
+        self, other: str | MessageSegment | Iterable[MessageSegment]
     ) -> "Message":
         return super().__add__(
             MessageSegment.text(other) if isinstance(other, str) else other
@@ -638,7 +636,7 @@ class Message(BaseMessage[MessageSegment]):
 
     @override
     def __radd__(
-        self, other: Union[str, MessageSegment, Iterable[MessageSegment]]
+        self, other: str | MessageSegment | Iterable[MessageSegment]
     ) -> "Message":
         return super().__radd__(
             MessageSegment.text(other) if isinstance(other, str) else other
@@ -753,7 +751,7 @@ class Message(BaseMessage[MessageSegment]):
         return new
 
 
-def parse_message(message: Union[Message, MessageSegment, str]) -> dict[str, Any]:
+def parse_message(message: Message | MessageSegment | str) -> dict[str, Any]:
     message = MessageSegment.text(message) if isinstance(message, str) else message
     message = message if isinstance(message, Message) else Message(message)
 
@@ -799,7 +797,7 @@ def parse_message(message: Union[Message, MessageSegment, str]) -> dict[str, Any
 
 def extract_attachments(
     message: Message,
-) -> tuple[Optional[list[AttachmentSend]], Optional[list[File]]]:
+) -> tuple[list[AttachmentSend] | None, list[File] | None]:
     attachments_segment = message["attachment"] or None
     if not attachments_segment:
         return None, None

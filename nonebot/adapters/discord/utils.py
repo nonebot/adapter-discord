@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any
 import zlib
 
 from nonebot.compat import model_dump as model_dump_
@@ -24,8 +24,8 @@ def omit_unset(data: Any) -> Any:  # noqa: ANN401
 
 def model_dump(  # noqa: PLR0913
     model: BaseModel,
-    include: Optional[set[str]] = None,
-    exclude: Optional[set[str]] = None,
+    include: set[str] | None = None,
+    exclude: set[str] | None = None,
     *,
     by_alias: bool = False,
     exclude_unset: bool = False,
@@ -55,7 +55,7 @@ def unescape(s: str) -> str:
     return s.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
 
 
-def decompress_data(data: Union[str, bytes], *, compress: bool) -> Union[str, bytes]:
+def decompress_data(data: str | bytes, *, compress: bool) -> str | bytes:
     if not compress:
         return data
     if isinstance(data, str):

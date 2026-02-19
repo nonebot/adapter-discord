@@ -1,5 +1,3 @@
-from typing import Union
-
 from nonebot.adapters.discord.event import (
     DirectMessageCreateEvent,
     GuildCreateEvent,
@@ -20,10 +18,6 @@ def test_guild_create_event_forward_refs_are_resolved() -> None:
 def test_message_create_union_forward_refs_are_resolved() -> None:
     with pytest.raises(ValidationError):
         type_validate_python(
-            Union[
-                GuildMessageCreateEvent,
-                DirectMessageCreateEvent,
-                MessageCreateEvent,
-            ],
+            GuildMessageCreateEvent | DirectMessageCreateEvent | MessageCreateEvent,
             {},
         )

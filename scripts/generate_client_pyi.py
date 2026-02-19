@@ -143,7 +143,7 @@ def _extract_method_signature(
         has_default = idx >= default_start
         params.append(_format_param(arg.arg, ann, has_default=has_default))
 
-    for arg, default in zip(args.kwonlyargs, args.kw_defaults):
+    for arg, default in zip(args.kwonlyargs, args.kw_defaults, strict=False):
         ann = _get_source_segment(source, arg.annotation)
         has_default = default is not None
         params.append(_format_param(arg.arg, ann, has_default=has_default))

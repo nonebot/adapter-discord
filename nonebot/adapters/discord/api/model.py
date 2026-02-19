@@ -206,7 +206,7 @@ class Snowflake(int):
         return cls.from_data(int(dt.timestamp() * 1000), 0, 0, 0)
 
 
-SnowflakeType = Union[Snowflake, int]
+SnowflakeType = Snowflake | int
 """Snowflake or int"""
 
 
@@ -247,7 +247,7 @@ class ApplicationCommand(BaseModel):
     Values follow the same restrictions as description"""
     options: MissingOrNullable[list["ApplicationCommandOption"]] = UNSET
     """Parameters for the command, max of 25"""
-    default_member_permissions: Optional[str] = Field(...)
+    default_member_permissions: str | None = Field(...)
     """Set of permissions represented as a bit set"""
     dm_permission: Missing[bool] = UNSET
     """Indicates whether the command is available in DMs with the app,
@@ -299,14 +299,14 @@ class ApplicationCommandBulkOverwriteParams(BaseModel):
     id: Missing[Snowflake] = UNSET
     type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
     name: str
-    name_localizations: Optional[dict[str, str]] = None
-    description: Optional[str] = None
-    description_localizations: Optional[dict[str, str]] = None
-    options: Optional[list["AnyCommandOption"]] = None
-    default_member_permissions: Optional[str] = None
-    dm_permission: Optional[bool] = None
-    default_permission: Optional[bool] = None
-    nsfw: Optional[bool] = None
+    name_localizations: dict[str, str] | None = None
+    description: str | None = None
+    description_localizations: dict[str, str] | None = None
+    options: list["AnyCommandOption"] | None = None
+    default_member_permissions: str | None = None
+    dm_permission: bool | None = None
+    default_permission: bool | None = None
+    nsfw: bool | None = None
     integration_types: Missing[list[ApplicationIntegrationType]] = UNSET
     contexts: MissingOrNullable[list[InteractionContextType]] = UNSET
 
@@ -338,9 +338,9 @@ class CommandOptionBase(BaseModel):
 
     type: ApplicationCommandOptionType
     name: str
-    name_localizations: Optional[dict[str, str]] = None
+    name_localizations: dict[str, str] | None = None
     description: str
-    description_localizations: Optional[dict[str, str]] = None
+    description_localizations: dict[str, str] | None = None
 
 
 class ApplicationCommandOption(BaseModel):
@@ -374,9 +374,9 @@ class ApplicationCommandOption(BaseModel):
     channel_types: Missing[list[ChannelType]] = UNSET
     """	If the option is a channel type,
     the channels shown will be restricted to these types"""
-    min_value: Missing[Union[int, float]] = UNSET
+    min_value: Missing[int | float] = UNSET
     """If the option is an INTEGER or NUMBER type, the minimum value permitted"""
-    max_value: Missing[Union[int, float]] = UNSET
+    max_value: Missing[int | float] = UNSET
     """If the option is an INTEGER or NUMBER type, the maximum value permitted"""
     min_length: Missing[int] = UNSET
     """For option type STRING,
@@ -396,7 +396,7 @@ class OptionChoice(GenericModel, Generic[T]):
     """
 
     name: str
-    name_localizations: Optional[dict[str, str]] = None
+    name_localizations: dict[str, str] | None = None
     value: T
 
 
@@ -409,7 +409,7 @@ class SubCommandOption(CommandOptionBase):
     type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.SUB_COMMAND, init=False
     )
-    options: Optional[
+    options: (
         list[
             Union[
                 "IntegerOption",
@@ -423,7 +423,8 @@ class SubCommandOption(CommandOptionBase):
                 "AttachmentOption",
             ]
         ]
-    ] = None
+        | None
+    ) = None
 
 
 class SubCommandGroupOption(CommandOptionBase):
@@ -435,7 +436,7 @@ class SubCommandGroupOption(CommandOptionBase):
     type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.SUB_COMMAND_GROUP, init=False
     )
-    options: Optional[list[SubCommandOption]] = None
+    options: list[SubCommandOption] | None = None
 
 
 class IntegerOption(CommandOptionBase):
@@ -447,10 +448,10 @@ class IntegerOption(CommandOptionBase):
     type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.INTEGER, init=False
     )
-    choices: Optional[list[OptionChoice[int]]] = None
-    min_value: Optional[int] = None
-    max_value: Optional[int] = None
-    autocomplete: Optional[bool] = None
+    choices: list[OptionChoice[int]] | None = None
+    min_value: int | None = None
+    max_value: int | None = None
+    autocomplete: bool | None = None
     required: bool = False
 
 
@@ -463,10 +464,10 @@ class StringOption(CommandOptionBase):
     type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.STRING, init=False
     )
-    choices: Optional[list[OptionChoice[str]]] = None
-    min_length: Optional[int] = None
-    max_length: Optional[int] = None
-    autocomplete: Optional[bool] = None
+    choices: list[OptionChoice[str]] | None = None
+    min_length: int | None = None
+    max_length: int | None = None
+    autocomplete: bool | None = None
     required: bool = False
 
 
@@ -503,7 +504,7 @@ class ChannelOption(CommandOptionBase):
     type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.CHANNEL, init=False
     )
-    channel_types: Optional[list[ChannelType]] = None
+    channel_types: list[ChannelType] | None = None
     required: bool = False
 
 
@@ -540,8 +541,8 @@ class NumberOption(CommandOptionBase):
     type: ApplicationCommandOptionType = Field(
         ApplicationCommandOptionType.NUMBER, init=False
     )
-    choices: Optional[list[OptionChoice[float]]] = None
-    min_value: Optional[float] = None
+    choices: list[OptionChoice[float]] | None = None
+    min_value: float | None = None
     required: bool = False
 
 
@@ -557,19 +558,19 @@ class AttachmentOption(CommandOptionBase):
     required: bool = False
 
 
-AnyCommandOption = Union[
-    SubCommandGroupOption,
-    SubCommandOption,
-    IntegerOption,
-    StringOption,
-    UserOption,
-    ChannelOption,
-    RoleOption,
-    MentionableOption,
-    NumberOption,
-    BooleanOption,
-    AttachmentOption,
-]
+AnyCommandOption = (
+    SubCommandGroupOption
+    | SubCommandOption
+    | IntegerOption
+    | StringOption
+    | UserOption
+    | ChannelOption
+    | RoleOption
+    | MentionableOption
+    | NumberOption
+    | BooleanOption
+    | AttachmentOption
+)
 
 
 class ApplicationCommandOptionChoice(BaseModel):
@@ -586,7 +587,7 @@ class ApplicationCommandOptionChoice(BaseModel):
     name_localizations: MissingOrNullable[dict[str, str]] = UNSET
     """Localization dictionary for the name field.
     Values follow the same restrictions as name"""
-    value: Union[str, int, float]
+    value: str | int | float
     """Value for the choice, up to 100 characters if string.
     Type of value depends on the option type that the choice belongs to."""
 
@@ -652,9 +653,9 @@ class ComponentEmoji(BaseModel):
     see https://discord.com/developers/docs/interactions/message-components#button-object
     """
 
-    id: Optional[str] = Field(...)
+    id: str | None = Field(...)
     """emoji id"""
-    name: Optional[str] = Field(...)
+    name: str | None = Field(...)
     """emoji name"""
     animated: Missing[bool] = UNSET
     """whether this emoji is animated"""
@@ -807,8 +808,8 @@ class TextInput(BaseModel):
     """Custom placeholder text if the input is empty; max 100 characters"""
 
 
-Component = Union[ActionRow, Button, SelectMenu, TextInput]
-DirectComponent = Union[ActionRow, TextInput]
+Component = ActionRow | Button | SelectMenu | TextInput
+DirectComponent = ActionRow | TextInput
 
 
 # Receiving and Responding
@@ -862,7 +863,7 @@ class Interaction(BaseModel):
     """For monetized apps, any entitlements for the
     invoking user, representing access to premium SKUs"""
     authorizing_integration_owners: dict[
-        ApplicationIntegrationType, Union[Snowflake, Literal["0"]]
+        ApplicationIntegrationType, Snowflake | Literal["0"]
     ]
     """Mapping of installation contexts that the interaction
     was authorized for to related user or guild IDs.
@@ -936,7 +937,7 @@ class ModalSubmitData(BaseModel):
     """the values submitted by the user"""
 
 
-InteractionData = Union[ApplicationCommandData, MessageComponentData, ModalSubmitData]
+InteractionData = ApplicationCommandData | MessageComponentData | ModalSubmitData
 """While the data field is guaranteed to be present for all interaction
 types besides PING, its structure will vary.
 The following tables detail the inner data payload for each interaction type.
@@ -981,7 +982,7 @@ class ApplicationCommandInteractionDataOption(BaseModel):
     """Name of the parameter"""
     type: ApplicationCommandOptionType
     """Value of application command option type"""
-    value: Missing[Union[str, int, float, bool]] = UNSET
+    value: Missing[str | int | float | bool] = UNSET
     """Value of the option resulting from user input"""
     options: Missing[list["ApplicationCommandInteractionDataOption"]] = UNSET
     """Present if this option is a group or subcommand"""
@@ -1022,7 +1023,7 @@ class MessageInteractionMetadata(BaseModel):
     user: "User"
     """User who triggered the interaction"""
     authorizing_integration_owners: dict[
-        ApplicationIntegrationType, Union[Snowflake, Literal["0"]]
+        ApplicationIntegrationType, Snowflake | Literal["0"]
     ]
     """IDs for installation context(s) related to an interaction.
     Details in Authorizing Integration Owners Object"""
@@ -1056,26 +1057,26 @@ class InteractionCallbackMessage(BaseModel):
     see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages
     """
 
-    tts: Optional[bool] = None
+    tts: bool | None = None
     """is the response TTS"""
-    content: Optional[str] = None
+    content: str | None = None
     """message content"""
-    embeds: Optional[list["Embed"]] = None
+    embeds: list["Embed"] | None = None
     """supports up to 10 embeds"""
     allowed_mentions: Optional["AllowedMention"] = None
     """allowed mentions object"""
-    flags: Optional[MessageFlag] = None
+    flags: MessageFlag | None = None
     """message flags combined as a bitfield
     (only SUPPRESS_EMBEDS and EPHEMERAL can be set)"""
-    components: Optional[list[Component]] = None
+    components: list[Component] | None = None
     """message components"""
-    attachments: Optional[list["AttachmentSend"]] = None
+    attachments: list["AttachmentSend"] | None = None
     """attachment objects with filename and description.
     See Uploading Files for details."""
     poll: Optional["PollRequest"] = None
     """Details about the poll"""
 
-    files: Optional[list["File"]] = None
+    files: list["File"] | None = None
 
 
 class InteractionCallbackAutocomplete(BaseModel):
@@ -1104,11 +1105,11 @@ class InteractionCallbackModal(BaseModel):
     """between 1 and 5 (inclusive) components that make up the modal"""
 
 
-InteractionCallbackData = Union[
-    InteractionCallbackMessage,
-    InteractionCallbackAutocomplete,
-    InteractionCallbackModal,
-]
+InteractionCallbackData = (
+    InteractionCallbackMessage
+    | InteractionCallbackAutocomplete
+    | InteractionCallbackModal
+)
 """see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure"""
 
 
@@ -1125,7 +1126,7 @@ class Application(BaseModel):
     """the id of the app"""
     name: str
     """the name of the app"""
-    icon: Optional[str] = None
+    icon: str | None = None
     """the icon hash of the app"""
     description: str
     """the description of the app"""
@@ -1281,11 +1282,11 @@ class AuditLogEntry(BaseModel):
     see https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object
     """
 
-    target_id: Optional[str] = None
+    target_id: str | None = None
     """ID of the affected entity (webhook, user, role, etc.)"""
     changes: Missing[list["AuditLogChange"]] = UNSET
     """Changes made to the target_id"""
-    user_id: Optional[Snowflake] = None
+    user_id: Snowflake | None = None
     """User or app that made the changes"""
     id: Snowflake
     """ID of the entry"""
@@ -1443,14 +1444,14 @@ class CreateAndModifyAutoModerationRuleParams(BaseModel):
     see https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
     """
 
-    name: Optional[str] = None
-    event_type: Optional[AutoModerationRuleEventType] = None
-    trigger_type: Optional[TriggerType] = None
-    trigger_metadata: Optional[TriggerMetadata] = None
-    actions: Optional[list[AutoModerationAction]] = None
-    enabled: Optional[bool] = None
-    exempt_roles: Optional[list[Snowflake]] = None
-    exempt_channels: Optional[list[Snowflake]] = None
+    name: str | None = None
+    event_type: AutoModerationRuleEventType | None = None
+    trigger_type: TriggerType | None = None
+    trigger_metadata: TriggerMetadata | None = None
+    actions: list[AutoModerationAction] | None = None
+    enabled: bool | None = None
+    exempt_roles: list[Snowflake] | None = None
+    exempt_channels: list[Snowflake] | None = None
 
 
 # Channel
@@ -1567,7 +1568,7 @@ class MessageGet(BaseModel):
     author: "User"
     content: str
     timestamp: datetime.datetime
-    edited_timestamp: Optional[datetime.datetime] = Field(...)
+    edited_timestamp: datetime.datetime | None = Field(...)
     tts: bool
     mention_everyone: bool
     mentions: list["User"]
@@ -1576,7 +1577,7 @@ class MessageGet(BaseModel):
     attachments: list["Attachment"]
     embeds: list["Embed"]
     reactions: Missing[list["Reaction"]] = UNSET
-    nonce: Missing[Union[int, str]] = UNSET
+    nonce: Missing[int | str] = UNSET
     pinned: bool
     webhook_id: Missing[Snowflake] = UNSET
     type: MessageType
@@ -1663,7 +1664,7 @@ class MessageSnapshotMessage(BaseModel):
     embeds: list["Embed"]
     attachments: list["Attachment"]
     timestamp: datetime.datetime
-    edited_timestamp: Optional[datetime.datetime] = Field(...)
+    edited_timestamp: datetime.datetime | None = Field(...)
     flags: Missing[MessageFlag] = UNSET
     mentions: list["User"]
     mention_roles: list[Snowflake]
@@ -1756,8 +1757,8 @@ class DefaultReaction(BaseModel):
 
     see https://discord.com/developers/docs/resources/channel#default-reaction-object"""
 
-    emoji_id: Optional[str] = None
-    emoji_name: Optional[str] = None
+    emoji_id: str | None = None
+    emoji_name: str | None = None
 
 
 class ForumTag(BaseModel):
@@ -1769,8 +1770,8 @@ class ForumTag(BaseModel):
     id: Snowflake
     name: str
     moderated: bool
-    emoji_id: Optional[Snowflake] = None
-    emoji_name: Optional[str] = None
+    emoji_id: Snowflake | None = None
+    emoji_name: str | None = None
 
 
 class ForumTagRequest(BaseModel):
@@ -1987,7 +1988,7 @@ class MessageSend(BaseModel):
     see https://discord.com/developers/docs/resources/message#create-message"""
 
     content: Missing[str] = UNSET
-    nonce: Missing[Union[int, str]] = UNSET
+    nonce: Missing[int | str] = UNSET
     enforce_nonce: Missing[bool] = UNSET
     tts: Missing[bool] = UNSET
     embeds: Missing[list[Embed]] = UNSET
@@ -2191,9 +2192,9 @@ class Emoji(BaseModel):
 
     see https://discord.com/developers/docs/resources/emoji#emoji-object"""
 
-    id: Optional[Snowflake] = None
+    id: Snowflake | None = None
     """emoji id"""
-    name: Optional[str] = None
+    name: str | None = None
     """emoji name(can be null only in reaction emoji objects)"""
     roles: Missing[list[Snowflake]] = UNSET
     """roles allowed to use this emoji"""
@@ -2218,15 +2219,15 @@ class Guild(BaseModel):
 
     id: Snowflake
     name: str
-    icon: Optional[str] = Field(...)
+    icon: str | None = Field(...)
     icon_hash: MissingOrNullable[str] = UNSET
-    splash: Optional[str] = Field(...)
-    discovery_splash: Optional[str] = None
+    splash: str | None = Field(...)
+    discovery_splash: str | None = None
     owner: Missing[bool] = UNSET
     owner_id: Snowflake
     permissions: Missing[str] = UNSET
     region: MissingOrNullable[str] = UNSET
-    afk_channel_id: Optional[Snowflake] = Field(...)
+    afk_channel_id: Snowflake | None = Field(...)
     afk_timeout: int
     widget_enabled: Missing[bool] = UNSET
     widget_channel_id: MissingOrNullable[Snowflake] = UNSET
@@ -2237,19 +2238,19 @@ class Guild(BaseModel):
     emojis: list[Emoji]
     features: list[GuildFeature]
     mfa_level: MFALevel
-    application_id: Optional[Snowflake] = Field(...)
-    system_channel_id: Optional[Snowflake] = Field(...)
+    application_id: Snowflake | None = Field(...)
+    system_channel_id: Snowflake | None = Field(...)
     system_channel_flags: SystemChannelFlags
-    rules_channel_id: Optional[Snowflake] = Field(...)
-    max_presences: Optional[int] = Field(...)
-    max_members: Optional[int] = Field(...)
-    vanity_url_code: Optional[str] = Field(...)
-    description: Optional[str] = Field(...)
-    banner: Optional[str] = Field(...)
+    rules_channel_id: Snowflake | None = Field(...)
+    max_presences: int | None = Field(...)
+    max_members: int | None = Field(...)
+    vanity_url_code: str | None = Field(...)
+    description: str | None = Field(...)
+    banner: str | None = Field(...)
     premium_tier: PremiumTier
-    premium_subscription_count: Optional[int] = Field(...)
+    premium_subscription_count: int | None = Field(...)
     preferred_locale: str
-    public_updates_channel_id: Optional[Snowflake] = Field(...)
+    public_updates_channel_id: Snowflake | None = Field(...)
     max_video_channel_users: Missing[int] = UNSET
     max_stage_video_channel_users: Missing[int] = UNSET
     approximate_member_count: Missing[int] = UNSET
@@ -2268,7 +2269,7 @@ class CurrentUserGuild(BaseModel):
 
     id: Snowflake
     name: str
-    icon: Optional[str] = Field(...)
+    icon: str | None = Field(...)
     owner: Missing[bool] = UNSET
     permissions: Missing[str] = UNSET
     features: list[GuildFeature]
@@ -2292,14 +2293,14 @@ class GuildPreview(BaseModel):
 
     id: Snowflake
     name: str
-    icon: Optional[str] = None
-    splash: Optional[str] = None
-    discovery_splash: Optional[str] = None
+    icon: str | None = None
+    splash: str | None = None
+    discovery_splash: str | None = None
     emojis: list[Emoji]
     features: list[GuildFeature]
     approximate_member_count: int
     approximate_presence_count: int
-    description: Optional[str] = None
+    description: str | None = None
     stickers: list["Sticker"]
 
 
@@ -2310,7 +2311,7 @@ class GuildWidgetSettings(BaseModel):
     """
 
     enabled: bool
-    channel_id: Optional[Snowflake] = None
+    channel_id: Snowflake | None = None
 
 
 class GuildWidget(BaseModel):
@@ -2320,7 +2321,7 @@ class GuildWidget(BaseModel):
 
     id: Snowflake
     name: str
-    instant_invite: Optional[str] = None
+    instant_invite: str | None = None
     channels: list["GuildWidgetChannel"]
     members: list["GuildWidgetUser"]
     presence_count: int
@@ -2332,7 +2333,7 @@ class GuildVanityURL(BaseModel):
     see https://discord.com/developers/docs/resources/guild#get-guild-vanity-url
     """
 
-    code: Optional[str] = None
+    code: str | None = None
     uses: int
 
 
@@ -2358,7 +2359,7 @@ class GuildWidgetUser(BaseModel):
     id: str
     username: str
     discriminator: str
-    avatar: Optional[str] = None
+    avatar: str | None = None
     status: str
     avatar_url: str
 
@@ -2424,7 +2425,7 @@ class IntegrationApplication(BaseModel):
 
     id: Snowflake
     name: str
-    icon: Optional[str] = None
+    icon: str | None = None
     description: str
     bot: Missing["User"] = UNSET
 
@@ -2434,7 +2435,7 @@ class Ban(BaseModel):
 
     see https://discord.com/developers/docs/resources/guild#ban-object"""
 
-    reason: Optional[str] = None
+    reason: str | None = None
     user: "User"
 
 
@@ -2443,7 +2444,7 @@ class WelcomeScreen(BaseModel):
 
     see https://discord.com/developers/docs/resources/guild#welcome-screen-object"""
 
-    description: Optional[str] = None
+    description: str | None = None
     welcome_channels: list["WelcomeScreenChannel"]
 
 
@@ -2455,8 +2456,8 @@ class WelcomeScreenChannel(BaseModel):
 
     channel_id: Snowflake
     description: str
-    emoji_id: Optional[Snowflake] = None
-    emoji_name: Optional[str] = None
+    emoji_id: Snowflake | None = None
+    emoji_name: str | None = None
 
 
 class GuildOnboarding(BaseModel):
@@ -2503,7 +2504,7 @@ class OnboardingPromptOption(BaseModel):
     emoji_name: Missing[str] = UNSET
     emoji_animated: Missing[bool] = UNSET
     title: str
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class MembershipScreening(BaseModel):
@@ -2519,17 +2520,17 @@ class CreateGuildParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#create-guild"""
 
     name: str
-    region: Optional[str] = None
-    icon: Optional[str] = None
-    verification_level: Optional[VerificationLevel] = None
-    default_message_notifications: Optional[DefaultMessageNotificationLevel] = None
-    explicit_content_filter: Optional[ExplicitContentFilterLevel] = None
-    roles: Optional[list["Role"]] = None
-    channels: Optional[list[Channel]] = None
-    afk_channel_id: Optional[Snowflake] = None
-    afk_timeout: Optional[int] = None
-    system_channel_id: Optional[Snowflake] = None
-    system_channel_flags: Optional[SystemChannelFlags] = None
+    region: str | None = None
+    icon: str | None = None
+    verification_level: VerificationLevel | None = None
+    default_message_notifications: DefaultMessageNotificationLevel | None = None
+    explicit_content_filter: ExplicitContentFilterLevel | None = None
+    roles: list["Role"] | None = None
+    channels: list[Channel] | None = None
+    afk_channel_id: Snowflake | None = None
+    afk_timeout: int | None = None
+    system_channel_id: Snowflake | None = None
+    system_channel_flags: SystemChannelFlags | None = None
 
 
 class ModifyGuildParams(BaseModel):
@@ -2567,23 +2568,23 @@ class CreateGuildChannelParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#create-guild-channel"""
 
     name: str
-    type: Optional[ChannelType] = None
-    topic: Optional[str] = None
-    bitrate: Optional[int] = None
-    user_limit: Optional[int] = None
-    rate_limit_per_user: Optional[int] = None
-    position: Optional[int] = None
-    permission_overwrites: Optional[list["Overwrite"]] = None
-    parent_id: Optional[Snowflake] = None
-    nsfw: Optional[bool] = None
-    rtc_region: Optional[str] = None
-    video_quality_mode: Optional[VideoQualityMode] = None
-    default_auto_archive_duration: Optional[int] = None
-    default_reaction_emoji: Optional[DefaultReaction] = None
-    available_tags: Optional[list[ForumTagRequest]] = None
-    default_sort_order: Optional[SortOrderTypes] = None
-    default_forum_layout: Optional[ForumLayoutTypes] = None
-    default_thread_rate_limit_per_user: Optional[int] = None
+    type: ChannelType | None = None
+    topic: str | None = None
+    bitrate: int | None = None
+    user_limit: int | None = None
+    rate_limit_per_user: int | None = None
+    position: int | None = None
+    permission_overwrites: list["Overwrite"] | None = None
+    parent_id: Snowflake | None = None
+    nsfw: bool | None = None
+    rtc_region: str | None = None
+    video_quality_mode: VideoQualityMode | None = None
+    default_auto_archive_duration: int | None = None
+    default_reaction_emoji: DefaultReaction | None = None
+    available_tags: list[ForumTagRequest] | None = None
+    default_sort_order: SortOrderTypes | None = None
+    default_forum_layout: ForumLayoutTypes | None = None
+    default_thread_rate_limit_per_user: int | None = None
 
 
 class ListActiveGuildThreadsResponse(BaseModel):
@@ -2628,16 +2629,16 @@ class GuildScheduledEvent(BaseModel):
 
     id: Snowflake
     guild_id: Snowflake
-    channel_id: Optional[Snowflake] = None
+    channel_id: Snowflake | None = None
     creator_id: MissingOrNullable[Snowflake] = UNSET
     name: str
     description: MissingOrNullable[str] = UNSET
     scheduled_start_time: datetime.datetime
-    scheduled_end_time: Optional[datetime.datetime] = None
+    scheduled_end_time: datetime.datetime | None = None
     privacy_level: GuildScheduledEventPrivacyLevel
     status: GuildScheduledEventStatus
     entity_type: GuildScheduledEventEntityType
-    entity_id: Optional[Snowflake] = None
+    entity_id: Snowflake | None = None
     entity_metadata: Optional["GuildScheduledEventEntityMetadata"] = None
     creator: Missing["User"] = UNSET
     user_count: Missing[int] = UNSET
@@ -2671,15 +2672,15 @@ class CreateGuildScheduledEventParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event-json-params
     """
 
-    channel_id: Optional[Snowflake] = None
-    entity_metadata: Optional[GuildScheduledEventEntityMetadata] = None
+    channel_id: Snowflake | None = None
+    entity_metadata: GuildScheduledEventEntityMetadata | None = None
     name: str
     privacy_level: GuildScheduledEventPrivacyLevel
     scheduled_start_time: datetime.datetime  # ISO8601 timestamp
-    scheduled_end_time: Optional[datetime.datetime] = None  # ISO8601 timestamp
-    description: Optional[str] = None
+    scheduled_end_time: datetime.datetime | None = None  # ISO8601 timestamp
+    description: str | None = None
     entity_type: GuildScheduledEventEntityType
-    image: Optional[str] = None
+    image: str | None = None
     recurrence_rule: Optional["RecurrenceRule"] = None
 
 
@@ -2818,7 +2819,7 @@ class GuildTemplate(BaseModel):
 
     code: str
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     usage_count: int
     creator_id: Snowflake
     creator: "User"
@@ -2826,7 +2827,7 @@ class GuildTemplate(BaseModel):
     updated_at: datetime.datetime
     source_guild_id: Snowflake
     serialized_source_guild: "GuildTemplateGuild"
-    is_dirty: Optional[bool] = None
+    is_dirty: bool | None = None
 
 
 class GuildTemplateGuild(BaseModel):
@@ -2836,15 +2837,15 @@ class GuildTemplateGuild(BaseModel):
     """
 
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     region: MissingOrNullable[str] = UNSET
     verification_level: VerificationLevel
     default_message_notifications: DefaultMessageNotificationLevel
     explicit_content_filter: ExplicitContentFilterLevel
     preferred_locale: str
-    afk_channel_id: Optional[Snowflake] = None
+    afk_channel_id: Snowflake | None = None
     afk_timeout: int
-    system_channel_id: Optional[Snowflake] = None
+    system_channel_id: Snowflake | None = None
     system_channel_flags: SystemChannelFlags
     icon_hash: MissingOrNullable[str] = UNSET
     roles: list["GuildTemplateGuildRole"]
@@ -2908,7 +2909,7 @@ class Invite(BaseModel):
     type: InviteType
     code: str
     guild: Missing["InviteGuild"] = UNSET
-    channel: Optional[Channel] = Field(...)  # partial channel object
+    channel: Channel | None = Field(...)  # partial channel object
     inviter: Missing["User"] = UNSET
     target_type: Missing["InviteTargetType"] = UNSET
     target_user: Missing["User"] = UNSET
@@ -2942,15 +2943,15 @@ class InviteGuild(BaseModel):
 
     id: Snowflake
     name: str
-    splash: Optional[str] = None
-    banner: Optional[str] = None
-    description: Optional[str] = None
-    icon: Optional[str] = None
+    splash: str | None = None
+    banner: str | None = None
+    description: str | None = None
+    icon: str | None = None
     features: list[GuildFeature]
     verification_level: VerificationLevel
-    vanity_url_code: Optional[str] = None
+    vanity_url_code: str | None = None
     nsfw_level: GuildNSFWLevel
-    premium_subscription_count: Optional[int] = None
+    premium_subscription_count: int | None = None
 
 
 class InviteMetadata(BaseModel):
@@ -3003,7 +3004,7 @@ class StageInstance(BaseModel):
     topic: str
     privacy_level: StagePrivacyLevel
     discoverable_disabled: bool
-    guild_scheduled_event_id: Optional[Snowflake] = None
+    guild_scheduled_event_id: Snowflake | None = None
 
 
 # Sticker
@@ -3016,7 +3017,7 @@ class Sticker(BaseModel):
     id: Snowflake
     pack_id: Missing[Snowflake] = UNSET
     name: str
-    description: Optional[str] = Field(...)
+    description: str | None = Field(...)
     tags: str
     asset: Missing[str] = UNSET
     """Deprecated. previously the sticker asset hash, now an empty string"""
@@ -3071,8 +3072,8 @@ class User(BaseModel):
     id: Snowflake
     username: str
     discriminator: str
-    global_name: Optional[str] = None
-    avatar: Optional[str] = Field(...)
+    global_name: str | None = None
+    avatar: str | None = Field(...)
     bot: Missing[bool] = UNSET
     system: Missing[bool] = UNSET
     mfa_enabled: Missing[bool] = UNSET
@@ -3120,8 +3121,8 @@ class ApplicationRoleConnection(BaseModel):
     see https://discord.com/developers/docs/resources/user#application-role-connection-object
     """
 
-    platform_name: Optional[str] = Field(...)
-    platform_username: Optional[str] = Field(...)
+    platform_name: str | None = Field(...)
+    platform_username: str | None = Field(...)
     metadata: dict  # object
 
 
@@ -3133,7 +3134,7 @@ class VoiceState(BaseModel):
     see https://discord.com/developers/docs/resources/voice#voice-state-object"""
 
     guild_id: Missing[Snowflake] = UNSET
-    channel_id: Optional[Snowflake] = Field(...)
+    channel_id: Snowflake | None = Field(...)
     user_id: Snowflake
     member: Missing[GuildMember] = UNSET
     session_id: str
@@ -3144,7 +3145,7 @@ class VoiceState(BaseModel):
     self_stream: Missing[bool] = UNSET
     self_video: bool
     suppress: bool
-    request_to_speak_timestamp: Optional[datetime.datetime] = Field(...)
+    request_to_speak_timestamp: datetime.datetime | None = Field(...)
 
 
 class VoiceRegion(BaseModel):
@@ -3169,7 +3170,7 @@ class SourceGuild(BaseModel):
 
     id: Snowflake
     name: str
-    icon: Optional[str] = None
+    icon: str | None = None
 
 
 class SourceChannel(BaseModel):
@@ -3189,12 +3190,12 @@ class Webhook(BaseModel):
     id: Snowflake
     type: WebhookType
     guild_id: MissingOrNullable[Snowflake] = UNSET
-    channel_id: Optional[Snowflake] = Field(...)
+    channel_id: Snowflake | None = Field(...)
     user: Missing[User] = UNSET
-    name: Optional[str] = Field(...)
-    avatar: Optional[str] = Field(...)
+    name: str | None = Field(...)
+    avatar: str | None = Field(...)
     token: Missing[str] = UNSET
-    application_id: Optional[Snowflake] = Field(...)
+    application_id: Snowflake | None = Field(...)
     source_guild: Missing[SourceGuild] = UNSET
     source_channel: Missing[SourceChannel] = UNSET
     url: Missing[str] = UNSET
@@ -3300,7 +3301,7 @@ class RequestGuildMembers(BaseModel):
     query: Missing[str] = UNSET
     limit: int
     presences: Missing[bool] = UNSET
-    user_ids: Missing[Union[Snowflake, list[Snowflake]]] = UNSET
+    user_ids: Missing[Snowflake | list[Snowflake]] = UNSET
     nonce: Missing[str] = UNSET
 
 
@@ -3310,7 +3311,7 @@ class UpdateVoiceState(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#update-voice-state"""
 
     guild_id: Snowflake
-    channel_id: Optional[Snowflake] = Field(...)
+    channel_id: Snowflake | None = Field(...)
     self_mute: bool
     self_deaf: bool
 
@@ -3320,7 +3321,7 @@ class UpdatePresence(BaseModel):
 
     see https://discord.com/developers/docs/topics/gateway-events#update-presence"""
 
-    since: Optional[int] = Field(...)
+    since: int | None = Field(...)
     activities: list["Activity"]
     status: UpdatePresenceStatusType
     afk: bool
@@ -3394,8 +3395,8 @@ class AutoModerationActionExecution(BaseModel):
     message_id: Missing[Snowflake] = UNSET
     alert_system_message_id: Missing[Snowflake] = UNSET
     content: str
-    matched_keyword: Optional[str] = Field(...)
-    matched_content: Optional[str] = Field(...)
+    matched_keyword: str | None = Field(...)
+    matched_content: str | None = Field(...)
 
 
 class ChannelCreate(Channel):
@@ -3483,7 +3484,7 @@ class ChannelPinsUpdate(BaseModel):
 
     guild_id: Missing[Snowflake] = UNSET
     channel_id: Snowflake
-    last_pin_timestamp: Missing[Optional[datetime.datetime]] = UNSET
+    last_pin_timestamp: Missing[datetime.datetime | None] = UNSET
 
 
 class GuildCreate(BaseModel):
@@ -3550,14 +3551,14 @@ class GuildCreate(BaseModel):
 
 class GuildCreateCompatRole(BaseModel):
     id: Snowflake
-    permissions: Union[str, int]
+    permissions: str | int
 
 
 class GuildCreateCompatOverwrite(BaseModel):
     id: Snowflake
-    type: Union[OverwriteType, Literal["role", "member"]]
-    allow: Union[str, int]
-    deny: Union[str, int]
+    type: OverwriteType | Literal["role", "member"]
+    allow: str | int
+    deny: str | int
 
 
 class GuildCreateCompatChannel(BaseModel):
@@ -3676,8 +3677,8 @@ class GuildMemberUpdate(BaseModel):
     roles: list[Snowflake]
     user: User
     nick: MissingOrNullable[str] = UNSET
-    avatar: Optional[str] = Field(...)
-    joined_at: Optional[datetime.datetime] = Field(...)
+    avatar: str | None = Field(...)
+    joined_at: datetime.datetime | None = Field(...)
     premium_since: MissingOrNullable[datetime.datetime] = UNSET
     deaf: Missing[bool] = UNSET
     mute: Missing[bool] = UNSET
@@ -3864,7 +3865,7 @@ class MessageUpdate(BaseModel):
     attachments: Missing[list["Attachment"]] = UNSET
     embeds: Missing[list["Embed"]] = UNSET
     reactions: Missing[list["Reaction"]] = UNSET
-    nonce: Missing[Union[int, str]] = UNSET
+    nonce: Missing[int | str] = UNSET
     pinned: Missing[bool] = UNSET
     webhook_id: Missing[Snowflake] = UNSET
     type: Missing[MessageType] = UNSET
@@ -4139,7 +4140,7 @@ class VoiceChannelStatusUpdate(BaseModel):
 
     id: Snowflake
     guild_id: Snowflake
-    status: Optional[str] = None
+    status: str | None = None
 
 
 class VoiceChannelStartTimeUpdate(BaseModel):
@@ -4153,7 +4154,7 @@ class VoiceChannelStartTimeUpdate(BaseModel):
 
     id: Snowflake
     guild_id: Snowflake
-    voice_start_time: Optional[datetime.datetime] = None
+    voice_start_time: datetime.datetime | None = None
 
 
 class VoiceServerUpdate(BaseModel):
@@ -4164,7 +4165,7 @@ class VoiceServerUpdate(BaseModel):
 
     token: str
     guild_id: Snowflake
-    endpoint: Optional[str] = Field(...)
+    endpoint: str | None = Field(...)
 
 
 class WebhooksUpdate(BaseModel):
@@ -4229,8 +4230,8 @@ class RoleColors(BaseModel):
     """
 
     primary_color: int
-    secondary_color: Optional[int] = None
-    tertiary_color: Optional[int] = None
+    secondary_color: int | None = None
+    tertiary_color: int | None = None
 
 
 class Role(BaseModel):
@@ -4274,7 +4275,7 @@ class Team(BaseModel):
 
     see https://discord.com/developers/docs/topics/teams#data-models-team-object"""
 
-    icon: Optional[str] = Field(...)
+    icon: str | None = Field(...)
     id: str
     members: list["TeamMember"]
     name: str
@@ -4299,7 +4300,7 @@ class TeamMemberUser(BaseModel):
     see https://discord.com/developers/docs/topics/teams#data-models-team-member-object
     """
 
-    avatar: Optional[str] = None
+    avatar: str | None = None
     discriminator: str
     id: Snowflake
     username: str
@@ -4329,7 +4330,7 @@ class Poll(BaseModel):
     """The question of the poll. Only `text` is supported."""
     answers: list["PollAnswer"]
     """Each of the answers available in the poll."""
-    expiry: Optional[datetime.datetime] = None
+    expiry: datetime.datetime | None = None
     """The time when the poll ends."""
     allow_multiselect: bool
     """Whether a user can select multiple answers"""
@@ -4449,26 +4450,26 @@ class RecurrenceRule(BaseModel):
 
     start: datetime.datetime
     """Starting time of the recurrence interval"""
-    end: Optional[datetime.datetime] = None
+    end: datetime.datetime | None = None
     """Ending time of the recurrence interval"""
     frequency: GuildScheduledEventRecurrenceRuleFrequency
     """How often the event occurs"""
     interval: int
     """The spacing between the events, defined by frequency. For example,
     frecency of WEEKLY and an interval of 2 would be "every-other week"""
-    by_weekday: Optional[list[GuildScheduledEventRecurrenceRuleWeekday]] = None
+    by_weekday: list[GuildScheduledEventRecurrenceRuleWeekday] | None = None
     """Set of specific days within a week for the event to recur on"""
-    by_n_weekday: Optional[
-        list["GuildScheduledEventRecurrenceRuleN_WeekdayStructure"]
-    ] = None
+    by_n_weekday: list["GuildScheduledEventRecurrenceRuleN_WeekdayStructure"] | None = (
+        None
+    )
     """List of specific days within a specific week (1-5) to recur on"""
-    by_month: Optional[list[GuildScheduledEventRecurrenceRuleMonth]] = None
+    by_month: list[GuildScheduledEventRecurrenceRuleMonth] | None = None
     """Set of specific months to recur on"""
-    by_month_day: Optional[int] = None
+    by_month_day: int | None = None
     """Set of specific dates within a month to recur on"""
-    by_year_day: Optional[int] = None
+    by_year_day: int | None = None
     """Set of days within a year to recur on (1-364)"""
-    count: Optional[int] = None
+    count: int | None = None
     """The total amount of times that the event is allowed to recur before stopping"""
 
 
@@ -4597,7 +4598,7 @@ class Subscription(BaseModel):
     current_period_start: datetime.datetime
     current_period_end: datetime.datetime
     status: SubscriptionStatus
-    canceled_at: Optional[datetime.datetime] = None
+    canceled_at: datetime.datetime | None = None
     country: Missing[str] = UNSET
 
 
@@ -4649,7 +4650,7 @@ class VoiceChannelEffectSend(BaseModel):
     emoji: MissingOrNullable[Emoji] = UNSET
     animation_type: MissingOrNullable[AnimationType] = UNSET
     animation_id: Missing[int] = UNSET
-    sound_id: Missing[Union[Snowflake, int]] = UNSET
+    sound_id: Missing[Snowflake | int] = UNSET
     sound_volume: Missing[float] = UNSET
 
 

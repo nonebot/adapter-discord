@@ -1,5 +1,4 @@
 import json
-from typing import Optional
 
 from nonebot.drivers import Response
 from nonebot.exception import (
@@ -23,10 +22,10 @@ class NoLogException(BaseNoLogException, DiscordAdapterException):
 class ActionFailed(BaseActionFailed, DiscordAdapterException):
     def __init__(self, response: Response) -> None:
         self.status_code: int = response.status_code
-        self.code: Optional[int] = None
-        self.message: Optional[str] = None
-        self.errors: Optional[dict] = None
-        self.data: Optional[dict] = None
+        self.code: int | None = None
+        self.message: str | None = None
+        self.errors: dict | None = None
+        self.data: dict | None = None
         if response.content:
             body = json.loads(response.content)
             self._prepare_body(body)
@@ -56,9 +55,9 @@ class RateLimitException(ActionFailed):
 
 
 class NetworkError(BaseNetworkError, DiscordAdapterException):
-    def __init__(self, msg: Optional[str] = None) -> None:
+    def __init__(self, msg: str | None = None) -> None:
         super().__init__()
-        self.msg: Optional[str] = msg
+        self.msg: str | None = msg
         """错误原因"""
 
     def __repr__(self) -> str:
