@@ -163,6 +163,7 @@ from .types import (
     GuildScheduledEventStatus,
     InteractionContextType,
     InviteTargetType,
+    LobbyMemberFlags,
     MessageFlag,
     MessageReferenceType,
     Missing,
@@ -3340,7 +3341,7 @@ class HandleMixin:
         lobby_id: SnowflakeType,
         user_id: SnowflakeType,
         metadata: Missing[dict[str, str]] = UNSET,
-        flags: Missing[int] = UNSET,
+        flags: Missing[LobbyMemberFlags] = UNSET,
     ) -> LobbyMember:
         """Add lobby member.
 

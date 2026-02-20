@@ -1559,7 +1559,7 @@ class LobbyMemberFlags(IntFlag):
     see https://discord.com/developers/docs/resources/lobby#lobby-member-object-lobby-member-flags
     """
 
-    CanLinkLobby = 1 << 0
+    CAN_LINK_LOBBY = 1 << 0
 
 
 class WebhookType(IntEnum):
