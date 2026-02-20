@@ -4719,22 +4719,22 @@ class ModifyGuildSoundboardSoundParams(BaseModel):
     emoji_name: MissingOrNullable[str] = UNSET
 
 
-class ListGuildSoundboardSoundsResponse(BaseModel):
+class _SoundboardSoundsListResponse(BaseModel):
+    items: list[SoundboardSound]
+
+
+class ListGuildSoundboardSoundsResponse(_SoundboardSoundsListResponse):
     """List Guild Soundboard Sounds Response.
 
     see https://discord.com/developers/docs/resources/soundboard#list-guild-soundboard-sounds
     """
 
-    items: list[SoundboardSound]
 
-
-class ListDefaultSoundboardSoundsResponse(BaseModel):
+class ListDefaultSoundboardSoundsResponse(_SoundboardSoundsListResponse):
     """List Default Soundboard Sounds Response.
 
     see https://discord.com/developers/docs/resources/soundboard#list-default-soundboard-sounds
     """
-
-    items: list[SoundboardSound]
 
 
 # Lobby
@@ -4765,15 +4765,18 @@ class Lobby(BaseModel):
     linked_channel: Missing["Channel"] = UNSET
 
 
-class CreateLobbyMemberParams(BaseModel):
+class _LobbyMemberWriteParamsBase(BaseModel):
+    metadata: Missing[dict[str, str]] = UNSET
+    flags: Missing[int] = UNSET
+
+
+class CreateLobbyMemberParams(_LobbyMemberWriteParamsBase):
     """Create Lobby Member Params.
 
     see https://discord.com/developers/docs/resources/lobby#create-lobby
     """
 
     id: Snowflake
-    metadata: Missing[dict[str, str]] = UNSET
-    flags: Missing[int] = UNSET
 
 
 class CreateLobbyParams(BaseModel):
@@ -4797,14 +4800,11 @@ class ModifyLobbyParams(BaseModel):
     idle_timeout_seconds: Missing[int] = UNSET
 
 
-class AddLobbyMemberParams(BaseModel):
+class AddLobbyMemberParams(_LobbyMemberWriteParamsBase):
     """Add Lobby Member Params.
 
     see https://discord.com/developers/docs/resources/lobby#add-lobby-member
     """
-
-    metadata: Missing[dict[str, str]] = UNSET
-    flags: Missing[int] = UNSET
 
 
 class LinkChannelToLobbyParams(BaseModel):
