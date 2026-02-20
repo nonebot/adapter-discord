@@ -89,6 +89,7 @@ from .model import (
     ListDefaultSoundboardSoundsResponse,
     ListGuildSoundboardSoundsResponse,
     Lobby,
+    LobbyMember,
     MessageEditParams,
     MessageGet,
     MessageReference,
@@ -3312,7 +3313,7 @@ class HandleMixin:
         user_id: SnowflakeType,
         metadata: Missing[dict[str, str]] = UNSET,
         flags: Missing[int] = UNSET,
-    ) -> Lobby:
+    ) -> LobbyMember:
         """Add lobby member.
 
         see https://discord.com/developers/docs/resources/lobby#add-lobby-member
@@ -3334,7 +3335,7 @@ class HandleMixin:
             url=self.base_url / f"lobbies/{lobby_id}/members/{user_id}",
             json=data,
         )
-        return type_validate_python(Lobby, await _request(self, request))
+        return type_validate_python(LobbyMember, await _request(self, request))
 
     async def _api_remove_lobby_member(
         self: AdapterProtocol,
