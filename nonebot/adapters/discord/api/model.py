@@ -4668,6 +4668,154 @@ class MessagePollVoteRemove(BaseModel):
     answer_id: int
 
 
+class SoundboardSound(BaseModel):
+    """Soundboard Sound Object
+
+    see https://discord.com/developers/docs/resources/soundboard#soundboard-sound-object
+    """
+
+    name: str
+    sound_id: Snowflake
+    volume: float
+    emoji_id: Snowflake | None
+    emoji_name: str | None
+    guild_id: Missing[Snowflake] = UNSET
+    available: bool
+    user: Missing["User"] = UNSET
+
+
+class SendSoundboardSoundParams(BaseModel):
+    """Send Soundboard Sound Params.
+
+    see https://discord.com/developers/docs/resources/soundboard#send-soundboard-sound
+    """
+
+    sound_id: Snowflake
+    source_guild_id: Missing[Snowflake] = UNSET
+
+
+class CreateGuildSoundboardSoundParams(BaseModel):
+    """Create Guild Soundboard Sound Params.
+
+    see https://discord.com/developers/docs/resources/soundboard#create-guild-soundboard-sound
+    """
+
+    name: str
+    sound: str
+    volume: Missing[float] = UNSET
+    emoji_id: Missing[Snowflake] = UNSET
+    emoji_name: Missing[str] = UNSET
+
+
+class ModifyGuildSoundboardSoundParams(BaseModel):
+    """Modify Guild Soundboard Sound Params.
+
+    see https://discord.com/developers/docs/resources/soundboard#modify-guild-soundboard-sound
+    """
+
+    name: Missing[str] = UNSET
+    volume: Missing[float] = UNSET
+    emoji_id: MissingOrNullable[Snowflake] = UNSET
+    emoji_name: MissingOrNullable[str] = UNSET
+
+
+class ListGuildSoundboardSoundsResponse(BaseModel):
+    """List Guild Soundboard Sounds Response.
+
+    see https://discord.com/developers/docs/resources/soundboard#list-guild-soundboard-sounds
+    """
+
+    items: list[SoundboardSound]
+
+
+class ListDefaultSoundboardSoundsResponse(BaseModel):
+    """List Default Soundboard Sounds Response.
+
+    see https://discord.com/developers/docs/resources/soundboard#list-default-soundboard-sounds
+    """
+
+    items: list[SoundboardSound]
+
+
+# Lobby
+# see https://discord.com/developers/docs/resources/lobby
+
+
+class LobbyMember(BaseModel):
+    """Lobby Member Object.
+
+    see https://discord.com/developers/docs/resources/lobby#lobby-member-object
+    """
+
+    id: Snowflake
+    metadata: dict[str, str] | None
+    flags: Missing[int] = UNSET
+
+
+class Lobby(BaseModel):
+    """Lobby Object.
+
+    see https://discord.com/developers/docs/resources/lobby#lobby-object
+    """
+
+    id: Snowflake
+    application_id: Snowflake
+    metadata: dict[str, str] | None
+    members: list[LobbyMember]
+    linked_channel: Missing["Channel"] = UNSET
+
+
+class CreateLobbyMemberParams(BaseModel):
+    """Create Lobby Member Params.
+
+    see https://discord.com/developers/docs/resources/lobby#create-lobby
+    """
+
+    id: Snowflake
+    metadata: Missing[dict[str, str]] = UNSET
+    flags: Missing[int] = UNSET
+
+
+class CreateLobbyParams(BaseModel):
+    """Create Lobby Params.
+
+    see https://discord.com/developers/docs/resources/lobby#create-lobby
+    """
+
+    metadata: Missing[dict[str, str]] = UNSET
+    members: Missing[list[CreateLobbyMemberParams]] = UNSET
+    idle_timeout_seconds: Missing[int] = UNSET
+
+
+class ModifyLobbyParams(BaseModel):
+    """Modify Lobby Params.
+
+    see https://discord.com/developers/docs/resources/lobby#modify-lobby
+    """
+
+    metadata: MissingOrNullable[dict[str, str]] = UNSET
+    idle_timeout_seconds: Missing[int] = UNSET
+
+
+class AddLobbyMemberParams(BaseModel):
+    """Add Lobby Member Params.
+
+    see https://discord.com/developers/docs/resources/lobby#add-lobby-member
+    """
+
+    metadata: Missing[dict[str, str]] = UNSET
+    flags: Missing[int] = UNSET
+
+
+class LinkChannelToLobbyParams(BaseModel):
+    """Link Channel to Lobby Params.
+
+    see https://discord.com/developers/docs/resources/lobby#link-channel-to-lobby
+    """
+
+    channel_id: MissingOrNullable[Snowflake] = UNSET
+
+
 for _, obj in inspect.getmembers(sys.modules[__name__]):
     if inspect.isclass(obj) and issubclass(obj, BaseModel) and obj is not BaseModel:
         if PYDANTIC_V2:
@@ -4687,6 +4835,7 @@ __all__ = [
     "ActivityParty",
     "ActivitySecrets",
     "ActivityTimestamps",
+    "AddLobbyMemberParams",
     "AllowedMention",
     "AnswerVoters",
     "AnyCommandOption",
@@ -4743,6 +4892,9 @@ __all__ = [
     "CreateGuildChannelParams",
     "CreateGuildParams",
     "CreateGuildScheduledEventParams",
+    "CreateGuildSoundboardSoundParams",
+    "CreateLobbyMemberParams",
+    "CreateLobbyParams",
     "CurrentUserGuild",
     "DefaultReaction",
     "DirectComponent",
@@ -4833,7 +4985,13 @@ __all__ = [
     "InviteGuild",
     "InviteMetadata",
     "InviteStageInstance",
+    "LinkChannelToLobbyParams",
     "ListActiveGuildThreadsResponse",
+    "ListActiveGuildThreadsResponse",
+    "ListDefaultSoundboardSoundsResponse",
+    "ListGuildSoundboardSoundsResponse",
+    "Lobby",
+    "LobbyMember",
     "MembershipScreening",
     "MentionableOption",
     "MessageActivity",
@@ -4861,7 +5019,9 @@ __all__ = [
     "ModifyGuildOnboardingParams",
     "ModifyGuildParams",
     "ModifyGuildScheduledEventParams",
+    "ModifyGuildSoundboardSoundParams",
     "ModifyGuildWelcomeScreenParams",
+    "ModifyLobbyParams",
     "NumberOption",
     "OnboardingPrompt",
     "OnboardingPromptOption",
@@ -4892,9 +5052,11 @@ __all__ = [
     "SelectMenu",
     "SelectMenuResolved",
     "SelectOption",
+    "SendSoundboardSoundParams",
     "SessionStartLimit",
     "Snowflake",
     "SnowflakeType",
+    "SoundboardSound",
     "StageInstance",
     "StageInstanceCreate",
     "StageInstanceDelete",

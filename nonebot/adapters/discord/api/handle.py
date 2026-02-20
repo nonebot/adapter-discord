@@ -20,6 +20,7 @@ from yarl import URL
 from .model import (
     SKU,
     ActivityInstance,
+    AddLobbyMemberParams,
     AllowedMention,
     AnswerVoters,
     Application,
@@ -49,7 +50,10 @@ from .model import (
     CreateGuildParams,
     CreateGuildRoleParams,
     CreateGuildScheduledEventParams,
+    CreateGuildSoundboardSoundParams,
     CreateGuildTemplateParams,
+    CreateLobbyMemberParams,
+    CreateLobbyParams,
     CreateWebhookParams,
     CurrentUserGuild,
     DefaultReaction,
@@ -80,7 +84,11 @@ from .model import (
     Integration,
     InteractionResponse,
     Invite,
+    LinkChannelToLobbyParams,
     ListActiveGuildThreadsResponse,
+    ListDefaultSoundboardSoundsResponse,
+    ListGuildSoundboardSoundsResponse,
+    Lobby,
     MessageEditParams,
     MessageGet,
     MessageReference,
@@ -97,10 +105,12 @@ from .model import (
     ModifyGuildRoleParams,
     ModifyGuildRolePositionParams,
     ModifyGuildScheduledEventParams,
+    ModifyGuildSoundboardSoundParams,
     ModifyGuildStickerParams,
     ModifyGuildTemplateParams,
     ModifyGuildWelcomeScreenParams,
     ModifyGuildWidgetParams,
+    ModifyLobbyParams,
     ModifyThreadParams,
     OnboardingPrompt,
     Overwrite,
@@ -109,8 +119,10 @@ from .model import (
     RecurrenceRule,
     Role,
     RoleColors,
+    SendSoundboardSoundParams,
     Snowflake,
     SnowflakeType,
+    SoundboardSound,
     StageInstance,
     StartThreadFromMessageParams,
     StartThreadWithoutMessageParams,
@@ -3010,6 +3022,386 @@ class HandleMixin:
         )
         await _request(self, request)
 
+    # Soundboard
+    # see https://discord.com/developers/docs/resources/soundboard
+    async def _api_send_soundboard_sound(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        channel_id: SnowflakeType,
+        sound_id: SnowflakeType,
+        source_guild_id: Missing[SnowflakeType] = UNSET,
+    ) -> None:
+        """Send soundboard sound.
+
+        see https://discord.com/developers/docs/resources/soundboard#send-soundboard-sound
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        data = model_dump(
+            type_validate_python(
+                SendSoundboardSoundParams,
+                {
+                    "sound_id": sound_id,
+                    "source_guild_id": source_guild_id,
+                },
+            ),
+            omit_unset_values=True,
+        )
+        request = Request(
+            headers=headers,
+            method="POST",
+            url=self.base_url / f"channels/{channel_id}/send-soundboard-sound",
+            json=data,
+        )
+        await _request(self, request)
+
+    async def _api_list_default_soundboard_sounds(
+        self: AdapterProtocol, bot: "Bot"
+    ) -> ListDefaultSoundboardSoundsResponse:
+        """List default soundboard sounds.
+
+        see https://discord.com/developers/docs/resources/soundboard#list-default-soundboard-sounds
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="GET",
+            url=self.base_url / "soundboard-default-sounds",
+        )
+        return type_validate_python(
+            ListDefaultSoundboardSoundsResponse, await _request(self, request)
+        )
+
+    async def _api_list_guild_soundboard_sounds(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+    ) -> ListGuildSoundboardSoundsResponse:
+        """List guild soundboard sounds.
+
+        see https://discord.com/developers/docs/resources/soundboard#list-guild-soundboard-sounds
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="GET",
+            url=self.base_url / f"guilds/{guild_id}/soundboard-sounds",
+        )
+        return type_validate_python(
+            ListGuildSoundboardSoundsResponse, await _request(self, request)
+        )
+
+    async def _api_get_guild_soundboard_sound(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        sound_id: SnowflakeType,
+    ) -> SoundboardSound:
+        """Get guild soundboard sound.
+
+        see https://discord.com/developers/docs/resources/soundboard#get-guild-soundboard-sound
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="GET",
+            url=self.base_url / f"guilds/{guild_id}/soundboard-sounds/{sound_id}",
+        )
+        return type_validate_python(SoundboardSound, await _request(self, request))
+
+    async def _api_create_guild_soundboard_sound(  # noqa: PLR0913
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        name: str,
+        sound: str,
+        volume: Missing[float] = UNSET,
+        emoji_id: Missing[SnowflakeType] = UNSET,
+        emoji_name: Missing[str] = UNSET,
+    ) -> SoundboardSound:
+        """Create guild soundboard sound.
+
+        see https://discord.com/developers/docs/resources/soundboard#create-guild-soundboard-sound
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        data = model_dump(
+            type_validate_python(
+                CreateGuildSoundboardSoundParams,
+                {
+                    "name": name,
+                    "sound": sound,
+                    "volume": volume,
+                    "emoji_id": emoji_id,
+                    "emoji_name": emoji_name,
+                },
+            ),
+            omit_unset_values=True,
+        )
+        request = Request(
+            headers=headers,
+            method="POST",
+            url=self.base_url / f"guilds/{guild_id}/soundboard-sounds",
+            json=data,
+        )
+        return type_validate_python(SoundboardSound, await _request(self, request))
+
+    async def _api_modify_guild_soundboard_sound(  # noqa: PLR0913
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        sound_id: SnowflakeType,
+        name: Missing[str] = UNSET,
+        volume: Missing[float] = UNSET,
+        emoji_id: MissingOrNullable[SnowflakeType] = UNSET,
+        emoji_name: MissingOrNullable[str] = UNSET,
+    ) -> SoundboardSound:
+        """Modify guild soundboard sound.
+
+        see https://discord.com/developers/docs/resources/soundboard#modify-guild-soundboard-sound
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        data = model_dump(
+            type_validate_python(
+                ModifyGuildSoundboardSoundParams,
+                {
+                    "name": name,
+                    "volume": volume,
+                    "emoji_id": emoji_id,
+                    "emoji_name": emoji_name,
+                },
+            ),
+            omit_unset_values=True,
+        )
+        request = Request(
+            headers=headers,
+            method="PATCH",
+            url=self.base_url / f"guilds/{guild_id}/soundboard-sounds/{sound_id}",
+            json=data,
+        )
+        return type_validate_python(SoundboardSound, await _request(self, request))
+
+    async def _api_delete_guild_soundboard_sound(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        sound_id: SnowflakeType,
+    ) -> None:
+        """Delete guild soundboard sound.
+
+        see https://discord.com/developers/docs/resources/soundboard#delete-guild-soundboard-sound
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="DELETE",
+            url=self.base_url / f"guilds/{guild_id}/soundboard-sounds/{sound_id}",
+        )
+        await _request(self, request)
+
+    # Lobby
+    # see https://discord.com/developers/docs/resources/lobby
+    async def _api_create_lobby(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        metadata: Missing[dict[str, str]] = UNSET,
+        members: Missing[list[CreateLobbyMemberParams]] = UNSET,
+        idle_timeout_seconds: Missing[int] = UNSET,
+    ) -> Lobby:
+        """Create lobby.
+
+        see https://discord.com/developers/docs/resources/lobby#create-lobby
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        data = model_dump(
+            type_validate_python(
+                CreateLobbyParams,
+                {
+                    "metadata": metadata,
+                    "members": members,
+                    "idle_timeout_seconds": idle_timeout_seconds,
+                },
+            ),
+            omit_unset_values=True,
+        )
+        request = Request(
+            headers=headers,
+            method="POST",
+            url=self.base_url / "lobbies",
+            json=data,
+        )
+        return type_validate_python(Lobby, await _request(self, request))
+
+    async def _api_get_lobby(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        lobby_id: SnowflakeType,
+    ) -> Lobby:
+        """Get lobby.
+
+        see https://discord.com/developers/docs/resources/lobby#get-lobby
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="GET",
+            url=self.base_url / f"lobbies/{lobby_id}",
+        )
+        return type_validate_python(Lobby, await _request(self, request))
+
+    async def _api_modify_lobby(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        lobby_id: SnowflakeType,
+        metadata: MissingOrNullable[dict[str, str]] = UNSET,
+        idle_timeout_seconds: Missing[int] = UNSET,
+    ) -> Lobby:
+        """Modify lobby.
+
+        see https://discord.com/developers/docs/resources/lobby#modify-lobby
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        data = model_dump(
+            type_validate_python(
+                ModifyLobbyParams,
+                {
+                    "metadata": metadata,
+                    "idle_timeout_seconds": idle_timeout_seconds,
+                },
+            ),
+            omit_unset_values=True,
+        )
+        request = Request(
+            headers=headers,
+            method="PATCH",
+            url=self.base_url / f"lobbies/{lobby_id}",
+            json=data,
+        )
+        return type_validate_python(Lobby, await _request(self, request))
+
+    async def _api_delete_lobby(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        lobby_id: SnowflakeType,
+    ) -> None:
+        """Delete lobby.
+
+        see https://discord.com/developers/docs/resources/lobby#delete-lobby
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="DELETE",
+            url=self.base_url / f"lobbies/{lobby_id}",
+        )
+        await _request(self, request)
+
+    async def _api_add_lobby_member(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        lobby_id: SnowflakeType,
+        user_id: SnowflakeType,
+        metadata: Missing[dict[str, str]] = UNSET,
+        flags: Missing[int] = UNSET,
+    ) -> Lobby:
+        """Add lobby member.
+
+        see https://discord.com/developers/docs/resources/lobby#add-lobby-member
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        data = model_dump(
+            type_validate_python(
+                AddLobbyMemberParams,
+                {
+                    "metadata": metadata,
+                    "flags": flags,
+                },
+            ),
+            omit_unset_values=True,
+        )
+        request = Request(
+            headers=headers,
+            method="PUT",
+            url=self.base_url / f"lobbies/{lobby_id}/members/{user_id}",
+            json=data,
+        )
+        return type_validate_python(Lobby, await _request(self, request))
+
+    async def _api_remove_lobby_member(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        lobby_id: SnowflakeType,
+        user_id: SnowflakeType,
+    ) -> None:
+        """Remove lobby member.
+
+        see https://discord.com/developers/docs/resources/lobby#remove-lobby-member
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="DELETE",
+            url=self.base_url / f"lobbies/{lobby_id}/members/{user_id}",
+        )
+        await _request(self, request)
+
+    async def _api_leave_lobby(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        lobby_id: SnowflakeType,
+    ) -> None:
+        """Leave lobby.
+
+        see https://discord.com/developers/docs/resources/lobby#leave-lobby
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="DELETE",
+            url=self.base_url / f"lobbies/{lobby_id}/members/@me",
+        )
+        await _request(self, request)
+
+    async def _api_link_channel_to_lobby(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        lobby_id: SnowflakeType,
+        channel_id: MissingOrNullable[SnowflakeType] = UNSET,
+    ) -> Lobby:
+        """Link channel to lobby.
+
+        see https://discord.com/developers/docs/resources/lobby#link-channel-to-lobby
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        data = model_dump(
+            type_validate_python(
+                LinkChannelToLobbyParams,
+                {
+                    "channel_id": channel_id,
+                },
+            ),
+            omit_unset_values=True,
+        )
+        request = Request(
+            headers=headers,
+            method="PATCH",
+            url=self.base_url / f"lobbies/{lobby_id}/channel-linking",
+            json=data,
+        )
+        return type_validate_python(Lobby, await _request(self, request))
+
     # Entitlements
 
     # see https://discord.com/developers/docs/resources/entitlement
@@ -3049,6 +3441,26 @@ class HandleMixin:
             params={key: value for key, value in params.items() if value is not None},
         )
         return type_validate_python(list[Entitlement], await _request(self, request))
+
+    async def _api_get_entitlement(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        application_id: SnowflakeType,
+        entitlement_id: SnowflakeType,
+    ) -> Entitlement:
+        """Get entitlement.
+
+        see https://discord.com/developers/docs/resources/entitlement#get-entitlement
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="GET",
+            url=self.base_url
+            / f"applications/{application_id}/entitlements/{entitlement_id}",
+        )
+        return type_validate_python(Entitlement, await _request(self, request))
 
     async def _api_consume_an_entitlement(
         self: AdapterProtocol,
