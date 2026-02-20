@@ -2248,6 +2248,19 @@ class Guild(BaseModel):
     stickers: Missing[list["Sticker"]] = UNSET
     premium_progress_bar_enabled: bool
     safety_alerts_channel_id: MissingOrNullable[Snowflake] = UNSET
+    incidents_data: MissingOrNullable["GuildIncidentsData"] = UNSET
+
+
+class GuildIncidentsData(BaseModel):
+    """Incidents Data.
+
+    see https://discord.com/developers/docs/resources/guild#incidents-data-object
+    """
+
+    invites_disabled_until: datetime.datetime | None = Field(...)
+    dms_disabled_until: datetime.datetime | None = Field(...)
+    dm_spam_detected_at: MissingOrNullable[datetime.datetime] = UNSET
+    raid_detected_at: MissingOrNullable[datetime.datetime] = UNSET
 
 
 class CurrentUserGuild(BaseModel):
@@ -2548,6 +2561,16 @@ class ModifyGuildParams(BaseModel):
     description: MissingOrNullable[str] = UNSET
     premium_progress_bar_enabled: Missing[bool] = UNSET
     safety_alerts_channel_id: MissingOrNullable[Snowflake] = UNSET
+
+
+class ModifyGuildIncidentActionsParams(BaseModel):
+    """Modify Guild Incident Actions Params.
+
+    see https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
+    """
+
+    invites_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
+    dms_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
 
 
 class CreateGuildChannelParams(BaseModel):
@@ -2952,6 +2975,20 @@ class InviteMetadata(BaseModel):
     max_age: int
     temporary: bool
     created_at: datetime.datetime
+
+
+class InviteTargetUsersJobStatus(BaseModel):
+    """Invite target users job status.
+
+    see https://discord.com/developers/docs/resources/invite#get-target-users-job-status
+    """
+
+    status: Literal[0, 1, 2, 3]
+    total_users: int
+    processed_users: int
+    created_at: datetime.datetime
+    completed_at: datetime.datetime | None = Field(...)
+    error_message: MissingOrNullable[str] = UNSET
 
 
 class InviteStageInstance(BaseModel):
@@ -4930,6 +4967,7 @@ __all__ = [
     "GuildCreateCompatRole",
     "GuildDelete",
     "GuildEmojisUpdate",
+    "GuildIncidentsData",
     "GuildIntegrationsUpdate",
     "GuildMember",
     "GuildMemberAdd",
@@ -4985,6 +5023,7 @@ __all__ = [
     "InviteGuild",
     "InviteMetadata",
     "InviteStageInstance",
+    "InviteTargetUsersJobStatus",
     "LinkChannelToLobbyParams",
     "ListActiveGuildThreadsResponse",
     "ListActiveGuildThreadsResponse",
@@ -5016,6 +5055,7 @@ __all__ = [
     "MessageUpdate",
     "ModalSubmitData",
     "ModifyChannelParams",
+    "ModifyGuildIncidentActionsParams",
     "ModifyGuildOnboardingParams",
     "ModifyGuildParams",
     "ModifyGuildScheduledEventParams",

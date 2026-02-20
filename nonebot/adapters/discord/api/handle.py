@@ -70,6 +70,7 @@ from .model import (
     GatewayBot,
     Guild,
     GuildApplicationCommandPermissions,
+    GuildIncidentsData,
     GuildMember,
     GuildOnboarding,
     GuildPreview,
@@ -84,6 +85,7 @@ from .model import (
     Integration,
     InteractionResponse,
     Invite,
+    InviteTargetUsersJobStatus,
     LinkChannelToLobbyParams,
     ListActiveGuildThreadsResponse,
     ListDefaultSoundboardSoundsResponse,
@@ -100,6 +102,7 @@ from .model import (
     ModifyCurrentUserVoiceStateParams,
     ModifyGuildChannelPositionParams,
     ModifyGuildEmojiParams,
+    ModifyGuildIncidentActionsParams,
     ModifyGuildMemberParams,
     ModifyGuildOnboardingParams,
     ModifyGuildParams,
@@ -788,6 +791,31 @@ class HandleMixin:
         return type_validate_python(
             GuildApplicationCommandPermissions, await _request(self, request)
         )
+
+    async def _api_batch_edit_application_command_permissions(
+        self: AdapterProtocol,
+        *,
+        application_id: SnowflakeType,
+        guild_id: SnowflakeType,
+        access_token: str,
+        permissions: list[GuildApplicationCommandPermissions],
+    ) -> None:
+        """Batch edit application command permissions.
+
+        see https://discord.com/developers/docs/interactions/application-commands#batch-edit-application-command-permissions
+        """
+        headers = {"Authorization": f"Bearer {access_token}"}
+        request = Request(
+            headers=headers,
+            method="PUT",
+            url=self.base_url
+            / f"applications/{application_id}/guilds/{guild_id}/commands/permissions",
+            json=[
+                model_dump(permission, omit_unset_values=True)
+                for permission in permissions
+            ],
+        )
+        await _request(self, request)
 
     # Receiving and Responding
 
@@ -3606,6 +3634,24 @@ class HandleMixin:
         )
         return type_validate_python(Guild, await _request(self, request))
 
+    async def _api_get_guild_role_member_counts(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+    ) -> dict[Snowflake, int]:
+        """Get guild role member counts.
+
+        see https://discord.com/developers/docs/resources/guild#get-guild-role-member-counts
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="GET",
+            url=self.base_url / f"guilds/{guild_id}/roles/member-counts",
+        )
+        return type_validate_python(dict[Snowflake, int], await _request(self, request))
+
     async def _api_get_guild_preview(
         self: AdapterProtocol, bot: "Bot", *, guild_id: SnowflakeType
     ) -> GuildPreview:
@@ -3693,6 +3739,37 @@ class HandleMixin:
             json=data,
         )
         return type_validate_python(Guild, await _request(self, request))
+
+    async def _api_modify_guild_incident_actions(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        guild_id: SnowflakeType,
+        invites_disabled_until: MissingOrNullable[datetime] = UNSET,
+        dms_disabled_until: MissingOrNullable[datetime] = UNSET,
+    ) -> GuildIncidentsData:
+        """Modify guild incident actions.
+
+        see https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        data = model_dump(
+            type_validate_python(
+                ModifyGuildIncidentActionsParams,
+                {
+                    "invites_disabled_until": invites_disabled_until,
+                    "dms_disabled_until": dms_disabled_until,
+                },
+            ),
+            omit_unset_values=True,
+        )
+        request = Request(
+            headers=headers,
+            method="PUT",
+            url=self.base_url / f"guilds/{guild_id}/incident-actions",
+            json=data,
+        )
+        return type_validate_python(GuildIncidentsData, await _request(self, request))
 
     @deprecated(
         "_api_delete_guild (DELETE /guilds/{guild_id}) is deprecated because "
@@ -5417,6 +5494,69 @@ class HandleMixin:
             url=self.base_url / f"invites/{invite_code}",
         )
         return type_validate_python(Invite, await _request(self, request))
+
+    async def _api_get_invite_target_users(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        invite_code: str,
+    ) -> bytes:
+        """Get invite target users.
+
+        see https://discord.com/developers/docs/resources/invite#get-target-users
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="GET",
+            url=self.base_url / f"invites/{invite_code}/target-users",
+        )
+        return await _request(self, request, parse_json=False)
+
+    async def _api_update_invite_target_users(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        invite_code: str,
+        target_users_file: File,
+    ) -> None:
+        """Update invite target users.
+
+        see https://discord.com/developers/docs/resources/invite#update-target-users
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="PUT",
+            url=self.base_url / f"invites/{invite_code}/target-users",
+            files={
+                "target_users_file": (
+                    target_users_file.filename,
+                    target_users_file.content,
+                )
+            },
+        )
+        await _request(self, request, parse_json=False)
+
+    async def _api_get_invite_target_users_job_status(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        invite_code: str,
+    ) -> InviteTargetUsersJobStatus:
+        """Get invite target users job status.
+
+        see https://discord.com/developers/docs/resources/invite#get-target-users-job-status
+        """
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
+        request = Request(
+            headers=headers,
+            method="GET",
+            url=self.base_url / f"invites/{invite_code}/target-users/job-status",
+        )
+        return type_validate_python(
+            InviteTargetUsersJobStatus, await _request(self, request)
+        )
 
     # Poll
 
