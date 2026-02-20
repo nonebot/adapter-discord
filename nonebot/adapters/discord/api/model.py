@@ -71,6 +71,7 @@ from .types import (
     InviteTargetType,
     InviteType,
     KeywordPresetType,
+    LobbyMemberFlags,
     MembershipState,
     MessageActivityType,
     MessageFlag,
@@ -4786,7 +4787,7 @@ class LobbyMember(BaseModel):
 
     id: Snowflake
     metadata: dict[str, str] | None
-    flags: Missing[int] = UNSET
+    flags: Missing[LobbyMemberFlags] = UNSET
 
 
 class Lobby(BaseModel):
@@ -4804,7 +4805,7 @@ class Lobby(BaseModel):
 
 class _LobbyMemberWriteParamsBase(BaseModel):
     metadata: Missing[dict[str, str]] = UNSET
-    flags: Missing[int] = UNSET
+    flags: Missing[LobbyMemberFlags] = UNSET
 
 
 class CreateLobbyMemberParams(_LobbyMemberWriteParamsBase):
