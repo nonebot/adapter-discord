@@ -1553,6 +1553,15 @@ class VisibilityType(IntEnum):
     """visible to everyone"""
 
 
+class LobbyMemberFlags(IntFlag):
+    """Lobby Member Flags
+
+    see https://discord.com/developers/docs/resources/lobby#lobby-member-object-lobby-member-flags
+    """
+
+    CAN_LINK_LOBBY = 1 << 0
+
+
 class WebhookType(IntEnum):
     """Webhook type.
 
@@ -1611,6 +1620,7 @@ __all__ = [
     "InviteTargetType",
     "InviteType",
     "KeywordPresetType",
+    "LobbyMemberFlags",
     "MFALevel",
     "MembershipState",
     "MessageActivityType",
