@@ -793,31 +793,6 @@ class HandleMixin:
             GuildApplicationCommandPermissions, await _request(self, request)
         )
 
-    async def _api_batch_edit_application_command_permissions(
-        self: AdapterProtocol,
-        *,
-        application_id: SnowflakeType,
-        guild_id: SnowflakeType,
-        access_token: str,
-        permissions: list[GuildApplicationCommandPermissions],
-    ) -> None:
-        """Batch edit application command permissions.
-
-        see https://discord.com/developers/docs/interactions/application-commands#batch-edit-application-command-permissions
-        """
-        headers = {"Authorization": f"Bearer {access_token}"}
-        request = Request(
-            headers=headers,
-            method="PUT",
-            url=self.base_url
-            / f"applications/{application_id}/guilds/{guild_id}/commands/permissions",
-            json=[
-                model_dump(permission, omit_unset_values=True)
-                for permission in permissions
-            ],
-        )
-        await _request(self, request)
-
     # Receiving and Responding
 
     # see https://discord.com/developers/docs/interactions/receiving-and-responding
