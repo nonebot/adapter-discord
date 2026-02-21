@@ -4715,8 +4715,8 @@ class SoundboardSound(BaseModel):
     name: str
     sound_id: Snowflake
     volume: float
-    emoji_id: Snowflake | None
-    emoji_name: str | None
+    emoji_id: Snowflake | None = Field(...)
+    emoji_name: str | None = Field(...)
     guild_id: Missing[Snowflake] = UNSET
     available: bool
     user: Missing["User"] = UNSET
@@ -4786,7 +4786,7 @@ class LobbyMember(BaseModel):
     """
 
     id: Snowflake
-    metadata: dict[str, str] | None
+    metadata: dict[str, str] | None = Field(...)
     flags: Missing[LobbyMemberFlags] = UNSET
 
 
@@ -4798,7 +4798,7 @@ class Lobby(BaseModel):
 
     id: Snowflake
     application_id: Snowflake
-    metadata: dict[str, str] | None
+    metadata: dict[str, str] | None = Field(...)
     members: list[LobbyMember]
     linked_channel: Missing["Channel"] = UNSET
 
