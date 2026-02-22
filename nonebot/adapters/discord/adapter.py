@@ -22,7 +22,7 @@ from .api.model import GatewayBot, User
 from .bot import Bot
 from .commands import sync_application_command
 from .config import BotInfo, Config
-from .event import Event, MessageEvent, ReadyEvent, event_classes
+from .event import Event, EventType, MessageEvent, ReadyEvent, event_classes
 from .exception import ApiNotAvailable
 from .payload import (
     Dispatch,
@@ -471,7 +471,7 @@ class Adapter(BaseAdapter, HandleMixin):
                 f"Unknown payload type: {payload.type}, detail: {payload!r}",
             )
             event = type_validate_python(Event, payload.data)
-            event.__type__ = payload.type
+            event.__type__ = EventType(payload.type)
             return event
         return type_validate_python(cast("type[Event]", EventClass), payload.data)
 
