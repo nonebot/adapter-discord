@@ -30,6 +30,7 @@ class CommandOptionType:
     def __init__(self, key: str | None = None) -> None:
         self.key = key
 
+    @override
     def __repr__(self) -> str:
         return f"ACommandOption(key={self.key!r})"
 
@@ -39,6 +40,7 @@ class OptionParam(Param):
         super().__init__(*args, **kwargs)
         self.key = key
 
+    @override
     def __repr__(self) -> str:
         return f"OptionParam(key={self.key!r})"
 
