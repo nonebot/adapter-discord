@@ -78,7 +78,7 @@ class OptionParam(Param):
 
     @override
     async def _solve(
-        self, event: ApplicationCommandInteractionEvent, **kwargs: Any
+        self, *, event: ApplicationCommandInteractionEvent, **kwargs: Any
     ) -> Any:
         options = self._get_options(event.data.options)
         if options is None:
