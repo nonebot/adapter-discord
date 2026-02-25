@@ -19,6 +19,7 @@ def _build_base_payload() -> dict[str, Any]:
         },
         "token": "token",
         "version": 1,
+        "attachment_size_limit": 0,
         "authorizing_integration_owners": {"0": "1"},
     }
 
