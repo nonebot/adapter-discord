@@ -9,7 +9,7 @@ from types import UnionType
 from typing import Any, cast
 from typing_extensions import override
 
-from nonebot.adapters import Adapter as BaseAdapter
+from nonebot.adapters import Adapter as BaseAdapter, Bot as BaseBot
 
 from nonebot.compat import type_validate_json, type_validate_python
 from nonebot.drivers import URL, Driver, ForwardDriver, Request, WebSocket
@@ -476,7 +476,7 @@ class Adapter(BaseAdapter, HandleMixin):
         return type_validate_python(cast("type[Event]", EventClass), payload.data)
 
     @override
-    async def _call_api(self, bot: Bot, api: str, **data: Any) -> Any:
+    async def _call_api(self, bot: BaseBot, api: str, **data: Any) -> Any:
         log("DEBUG", f"Calling API <y>{api}</y>")
         api_handler = getattr(self, f"_api_{api}", None)
         if api_handler is None:
