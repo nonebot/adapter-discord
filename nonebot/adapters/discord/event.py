@@ -240,11 +240,11 @@ class Event(BaseEvent):
     """Event"""
 
     __type__: EventType
-    timestamp: datetime = Field(default_factory=datetime.now)
+    __timestamp__: datetime = Field(default_factory=datetime.now)
 
     @property
     def time(self) -> datetime:
-        return self.timestamp
+        return self.__timestamp__
 
     @override
     def get_event_name(self) -> str:
