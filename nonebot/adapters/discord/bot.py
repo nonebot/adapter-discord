@@ -57,9 +57,7 @@ async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
 
 
 def _check_at_me(bot: "Bot", event: MessageEvent) -> None:  # noqa: C901
-    if event.mentions is not None and bot.self_info.id in [
-        user.id for user in event.mentions
-    ]:
+    if bot.self_info.id in [user.id for user in event.mentions]:
         event.to_me = True
 
     def _is_at_me_seg(segment: MessageSegment) -> bool:
