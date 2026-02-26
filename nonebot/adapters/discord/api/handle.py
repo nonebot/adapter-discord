@@ -5988,8 +5988,8 @@ class HandleMixin:
 
     async def _api_get_current_user_guilds(
         self: AdapterProtocol,
+        bot: "Bot",
         *,
-        access_token: str,
         before: SnowflakeType | None = None,
         after: SnowflakeType | None = None,
         limit: int | None = None,
@@ -5999,7 +5999,7 @@ class HandleMixin:
 
         see https://discord.com/developers/docs/resources/user#get-current-user-guilds
         """
-        headers = {"Authorization": f"Bearer {access_token}"}
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
         params = {
             "before": before,
             "after": after,
@@ -6018,15 +6018,15 @@ class HandleMixin:
 
     async def _api_get_current_user_guild_member(
         self: AdapterProtocol,
+        bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        access_token: str,
     ) -> GuildMember:
         """Get current user guild member.
 
         see https://discord.com/developers/docs/resources/user#get-current-user-guild-member
         """
-        headers = {"Authorization": f"Bearer {access_token}"}
+        headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
             headers=headers,
             method="GET",
