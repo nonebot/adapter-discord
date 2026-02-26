@@ -1,25 +1,11 @@
-from nonebot.adapters.discord.bot import Bot
-from nonebot.adapters.discord.config import BotInfo, Config
 from nonebot.adapters.discord.message import Message, MessageSegment, parse_message
+from tests.fake.doubles import DummyAdapter, DummyBot
 
-from nonebot.drivers import Request, Response
 import pytest
 
 
-class DummyAdapter:
-    def __init__(self, status_code: int = 200, content: bytes = b"binary") -> None:
-        self.discord_config = Config()
-        self.status_code = status_code
-        self.content = content
-        self.request_calls = 0
-
-    async def request(self, _request: Request) -> Response:
-        self.request_calls += 1
-        return Response(self.status_code, content=self.content)
-
-
-def _build_bot(adapter: DummyAdapter) -> Bot:
-    return Bot(adapter=adapter, self_id="1", bot_info=BotInfo(token="x" * 10))
+def _build_bot(adapter: DummyAdapter) -> DummyBot:
+    return DummyBot(adapter)
 
 
 @pytest.mark.anyio

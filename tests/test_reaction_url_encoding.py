@@ -1,42 +1,17 @@
 from collections.abc import Awaitable, Callable
-from types import SimpleNamespace
-from typing import Any
 
 import nonebot.adapters.discord.api.handle as handle_module
+from tests.fake.doubles import DummyAdapter, DummyBot
 
 from nonebot.drivers import Request
 import pytest
-from yarl import URL
 
-
-class DummyAdapter(handle_module.HandleMixin):
-    base_url = URL("https://discord.com/api/v10")
-    discord_config = SimpleNamespace(discord_api_timeout=10.0, discord_proxy=None)
-
-    @staticmethod
-    def get_authorization(bot_info: object) -> str:
-        del bot_info
-        return "Bot test-token"
-
-
-@pytest.fixture
-def adapter() -> DummyAdapter:
-    return DummyAdapter()
-
-
-@pytest.fixture
-def bot() -> SimpleNamespace:
-    return SimpleNamespace(bot_info=SimpleNamespace())
-
-
-MethodCaller = Callable[
-    [DummyAdapter, SimpleNamespace, str, int | None], Awaitable[None]
-]
+MethodCaller = Callable[[DummyAdapter, DummyBot, str, int | None], Awaitable[None]]
 
 
 async def _call_create_reaction(
     adapter: DummyAdapter,
-    bot: SimpleNamespace,
+    bot: DummyBot,
     emoji: str,
     emoji_id: int | None,
 ) -> None:
@@ -51,7 +26,7 @@ async def _call_create_reaction(
 
 async def _call_delete_own_reaction(
     adapter: DummyAdapter,
-    bot: SimpleNamespace,
+    bot: DummyBot,
     emoji: str,
     emoji_id: int | None,
 ) -> None:
@@ -66,7 +41,7 @@ async def _call_delete_own_reaction(
 
 async def _call_delete_user_reaction(
     adapter: DummyAdapter,
-    bot: SimpleNamespace,
+    bot: DummyBot,
     emoji: str,
     emoji_id: int | None,
 ) -> None:
@@ -82,7 +57,7 @@ async def _call_delete_user_reaction(
 
 async def _call_get_reactions(
     adapter: DummyAdapter,
-    bot: SimpleNamespace,
+    bot: DummyBot,
     emoji: str,
     emoji_id: int | None,
 ) -> None:
@@ -97,7 +72,7 @@ async def _call_get_reactions(
 
 async def _call_delete_all_reactions_for_emoji(
     adapter: DummyAdapter,
-    bot: SimpleNamespace,
+    bot: DummyBot,
     emoji: str,
     emoji_id: int | None,
 ) -> None:
@@ -127,8 +102,8 @@ async def _call_delete_all_reactions_for_emoji(
     ],
 )
 async def test_reaction_endpoints_encode_emoji_once(
-    adapter: DummyAdapter,
-    bot: SimpleNamespace,
+    dummy_adapter_list_response: DummyAdapter,
+    dummy_bot: DummyBot,
     monkeypatch: pytest.MonkeyPatch,
     case: tuple[MethodCaller, str, str, int | None, str],
 ) -> None:
@@ -140,14 +115,14 @@ async def test_reaction_endpoints_encode_emoji_once(
         request_obj: Request,
         *,
         parse_json: bool = True,
-    ) -> list[Any]:
+    ) -> list[object]:
         del _adapter, parse_json
         captured.append(str(request_obj.url))
         return []
 
     monkeypatch.setattr(handle_module, "_request", fake_request)
 
-    await caller(adapter, bot, emoji, emoji_id)
+    await caller(dummy_adapter_list_response, dummy_bot, emoji, emoji_id)
 
     assert captured
     assert captured[-1].endswith(

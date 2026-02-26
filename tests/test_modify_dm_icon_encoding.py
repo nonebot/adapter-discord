@@ -1,37 +1,16 @@
 import base64
-from types import SimpleNamespace
 
 import nonebot.adapters.discord.api.handle as handle_module
+from tests.fake.doubles import DummyAdapter, DummyBot
 
 from nonebot.drivers import Request
 import pytest
-from yarl import URL
-
-
-class DummyAdapter(handle_module.HandleMixin):
-    base_url = URL("https://discord.com/api/v10")
-    discord_config = SimpleNamespace(discord_api_timeout=10.0, discord_proxy=None)
-
-    @staticmethod
-    def get_authorization(bot_info: object) -> str:
-        del bot_info
-        return "Bot test-token"
-
-
-@pytest.fixture
-def adapter() -> DummyAdapter:
-    return DummyAdapter()
-
-
-@pytest.fixture
-def bot() -> SimpleNamespace:
-    return SimpleNamespace(bot_info=SimpleNamespace())
 
 
 @pytest.mark.asyncio
 async def test_modify_dm_icon_bytes_are_encoded_to_data_uri(
-    adapter: DummyAdapter,
-    bot: SimpleNamespace,
+    dummy_adapter: DummyAdapter,
+    dummy_bot: DummyBot,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     captured: dict[str, object] = {}
@@ -57,8 +36,8 @@ async def test_modify_dm_icon_bytes_are_encoded_to_data_uri(
     icon = b"\x89PNG\r\n\x1a\n\x00test"
     expected_icon = f"data:image/png;base64,{base64.b64encode(icon).decode('ascii')}"
 
-    await adapter._api_modify_DM(  # noqa: SLF001
-        bot=bot,
+    await dummy_adapter._api_modify_DM(  # noqa: SLF001
+        bot=dummy_bot,
         channel_id=1,
         name="group-dm",
         icon=icon,
@@ -71,12 +50,12 @@ async def test_modify_dm_icon_bytes_are_encoded_to_data_uri(
 
 @pytest.mark.asyncio
 async def test_modify_dm_invalid_icon_bytes_raise_value_error(
-    adapter: DummyAdapter,
-    bot: SimpleNamespace,
+    dummy_adapter: DummyAdapter,
+    dummy_bot: DummyBot,
 ) -> None:
     with pytest.raises(ValueError, match="unsupported image format"):
-        await adapter._api_modify_DM(  # noqa: SLF001
-            bot=bot,
+        await dummy_adapter._api_modify_DM(  # noqa: SLF001
+            bot=dummy_bot,
             channel_id=1,
             icon=b"not-an-image",
         )

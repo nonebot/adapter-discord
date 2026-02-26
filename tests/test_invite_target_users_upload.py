@@ -1,38 +1,17 @@
-from types import SimpleNamespace
 from typing import Any
 
 import nonebot.adapters.discord.api.handle as handle_module
 from nonebot.adapters.discord.api.model import File
+from tests.fake.doubles import DummyAdapter, DummyBot
 
 from nonebot.drivers import Request
 import pytest
-from yarl import URL
-
-
-class DummyAdapter(handle_module.HandleMixin):
-    base_url = URL("https://discord.com/api/v10")
-    discord_config = SimpleNamespace(discord_api_timeout=10.0, discord_proxy=None)
-
-    @staticmethod
-    def get_authorization(bot_info: object) -> str:
-        del bot_info
-        return "Bot test-token"
-
-
-@pytest.fixture
-def adapter() -> DummyAdapter:
-    return DummyAdapter()
-
-
-@pytest.fixture
-def bot() -> SimpleNamespace:
-    return SimpleNamespace(bot_info=SimpleNamespace())
 
 
 @pytest.mark.asyncio
 async def test_update_invite_target_users_uses_expected_multipart_field(
-    adapter: DummyAdapter,
-    bot: SimpleNamespace,
+    dummy_adapter: DummyAdapter,
+    dummy_bot: DummyBot,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     captured: dict[str, Any] = {}
@@ -50,8 +29,8 @@ async def test_update_invite_target_users_uses_expected_multipart_field(
     monkeypatch.setattr(handle_module, "_request", fake_request)
 
     target_users_file = File(content=b"123\n456\n", filename="users.csv")
-    await adapter._api_update_invite_target_users(  # noqa: SLF001
-        bot=bot,
+    await dummy_adapter._api_update_invite_target_users(  # noqa: SLF001
+        bot=dummy_bot,
         invite_code="abc123",
         target_users_file=target_users_file,
     )
