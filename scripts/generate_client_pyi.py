@@ -15,6 +15,7 @@ import re
 
 LINE_LENGTH = 88
 HASH_HEADER_PREFIX = "# Source SHA256: "
+SCRIPT_HASH_HEADER_PREFIX = "# Script SHA256: "
 
 MethodSignature = tuple[str, list[str], str | None, str | None, bool, bool]
 
@@ -489,15 +490,20 @@ def _calc_file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _extract_recorded_source_hash(client_path: Path) -> str | None:
+def _extract_recorded_hashes(client_path: Path) -> tuple[str | None, str | None]:
     if not client_path.exists():
-        return None
+        return None, None
+
+    source_hash: str | None = None
+    script_hash: str | None = None
 
     for line in client_path.read_text("utf-8").splitlines()[:20]:
         if line.startswith(HASH_HEADER_PREFIX):
-            return line[len(HASH_HEADER_PREFIX) :].strip()
+            source_hash = line[len(HASH_HEADER_PREFIX) :].strip()
+        if line.startswith(SCRIPT_HASH_HEADER_PREFIX):
+            script_hash = line[len(SCRIPT_HASH_HEADER_PREFIX) :].strip()
 
-    return None
+    return source_hash, script_hash
 
 
 def _build_generated_header(
@@ -505,6 +511,7 @@ def _build_generated_header(
     root: Path,
     handle_path: Path,
     source_hash: str,
+    script_hash: str,
     generated_at: str,
 ) -> list[str]:
     relative_source = handle_path.relative_to(root).as_posix()
@@ -514,6 +521,7 @@ def _build_generated_header(
         f"# Generated at: {generated_at}",
         f"# Source file: {relative_source}",
         f"{HASH_HEADER_PREFIX}{source_hash}",
+        f"{SCRIPT_HASH_HEADER_PREFIX}{script_hash}",
         "",
     ]
 
@@ -523,6 +531,7 @@ def _generate_stub(
     handle_path: Path,
     *,
     source_hash: str,
+    script_hash: str,
     generated_at: str,
 ) -> str:
     source = handle_path.read_text("utf-8")
@@ -535,6 +544,7 @@ def _generate_stub(
         root=root,
         handle_path=handle_path,
         source_hash=source_hash,
+        script_hash=script_hash,
         generated_at=generated_at,
     )
     lines.extend(_build_import_lines(methods, actual_imports, local_aliases))
@@ -546,10 +556,12 @@ def main() -> None:
     root = Path(__file__).resolve().parents[1]
     handle_path = root / "nonebot/adapters/discord/api/handle.py"
     client_path = root / "nonebot/adapters/discord/api/client.pyi"
+    script_path = Path(__file__).resolve()
 
     source_hash = _calc_file_sha256(handle_path)
-    previous_hash = _extract_recorded_source_hash(client_path)
-    if previous_hash == source_hash:
+    script_hash = _calc_file_sha256(script_path)
+    previous_source_hash, previous_script_hash = _extract_recorded_hashes(client_path)
+    if previous_source_hash == source_hash and previous_script_hash == script_hash:
         return
 
     generated_at = (
@@ -562,6 +574,7 @@ def main() -> None:
         root,
         handle_path,
         source_hash=source_hash,
+        script_hash=script_hash,
         generated_at=generated_at,
     )
     client_path.write_text(stub_content, "utf-8")
