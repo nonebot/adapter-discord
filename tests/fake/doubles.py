@@ -38,6 +38,6 @@ class DummyBot(Bot):
         *,
         token: str = "x" * 10,
     ) -> None:
-        if adapter is not None:
-            self.adapter = self._adapter = adapter
-        self._bot_info = BotInfo(token=token)
+        if adapter is None:
+            adapter = DummyAdapter()
+        super().__init__(adapter=adapter, self_id="1", bot_info=BotInfo(token=token))
