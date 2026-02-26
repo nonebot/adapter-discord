@@ -8,6 +8,7 @@ the ApiClient stub file for type checking.
 from __future__ import annotations
 
 import ast
+from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
 from pathlib import Path
@@ -17,7 +18,15 @@ LINE_LENGTH = 88
 HASH_HEADER_PREFIX = "# Source SHA256: "
 SCRIPT_HASH_HEADER_PREFIX = "# Script SHA256: "
 
-MethodSignature = tuple[str, list[str], str | None, str | None, bool, bool]
+
+@dataclass(frozen=True, slots=True)
+class MethodSignature:
+    public_name: str
+    params: list[str]
+    returns: str | None
+    docstring: str | None
+    has_kwonly: bool
+    is_overload: bool
 
 
 def _get_source_segment(source: str, node: ast.AST | None) -> str | None:
@@ -210,7 +219,14 @@ def _extract_method_signature(
         or (isinstance(decorator, ast.Attribute) and decorator.attr == "overload")
         for decorator in method.decorator_list
     )
-    return public_name, params, returns, docstring, has_kwonly, is_overload
+    return MethodSignature(
+        public_name=public_name,
+        params=params,
+        returns=returns,
+        docstring=docstring,
+        has_kwonly=has_kwonly,
+        is_overload=is_overload,
+    )
 
 
 def _collect_available_imports(source: str) -> dict[str, str]:
@@ -256,11 +272,11 @@ def _extract_used_types(
     used: set[str] = set()
     type_pattern = re.compile(r"\b([A-Z][A-Za-z0-9_]*)\b")
 
-    for _, params, returns, _, _, _ in signatures:
-        for param in params:
+    for signature in signatures:
+        for param in signature.params:
             used.update(type_pattern.findall(param))
-        if returns:
-            used.update(type_pattern.findall(returns))
+        if signature.returns:
+            used.update(type_pattern.findall(signature.returns))
 
     return used
 
@@ -303,10 +319,10 @@ def _annotation_texts(
     methods: list[MethodSignature],
 ) -> list[str]:
     texts: list[str] = []
-    for _, params, returns, _, _, _ in methods:
-        texts.extend(params)
-        if returns:
-            texts.append(returns)
+    for signature in methods:
+        texts.extend(signature.params)
+        if signature.returns:
+            texts.append(signature.returns)
     return texts
 
 
@@ -341,7 +357,7 @@ def _build_import_lines(  # noqa: C901
     need_datetime = any("datetime" in text for text in texts)
     need_literal = any("Literal" in text for text in texts)
     need_any = any(re.search(r"\bAny\b", text) for text in texts)
-    need_overload = any(is_overload for *_, is_overload in methods)
+    need_overload = any(method.is_overload for method in methods)
 
     typing_imports: list[str] = []
     if need_any:
@@ -449,38 +465,38 @@ def _build_class_lines(
     lines = ["class ApiClient:"]
     index = 0
     while index < len(methods):
-        public_name, *_ = methods[index]
+        public_name = methods[index].public_name
         grouped: list[MethodSignature] = []
-        while index < len(methods) and methods[index][0] == public_name:
+        while index < len(methods) and methods[index].public_name == public_name:
             grouped.append(methods[index])
             index += 1
 
-        overloads = [sig for sig in grouped if sig[-1]]
-        implementations = [sig for sig in grouped if not sig[-1]]
+        overloads = [sig for sig in grouped if sig.is_overload]
+        implementations = [sig for sig in grouped if not sig.is_overload]
 
         if overloads:
-            for _, params, returns, _, has_kwonly, _ in overloads:
+            for signature in overloads:
                 lines.append("    @overload")
                 lines.extend(
                     _build_method_stub(
                         public_name,
-                        params,
-                        returns,
+                        signature.params,
+                        signature.returns,
                         None,
-                        has_kwonly=has_kwonly,
+                        has_kwonly=signature.has_kwonly,
                     )
                 )
             continue
 
         if implementations:
-            _, params, returns, docstring, has_kwonly, _ = implementations[0]
+            signature = implementations[0]
             lines.extend(
                 _build_method_stub(
                     public_name,
-                    params,
-                    returns,
-                    docstring,
-                    has_kwonly=has_kwonly,
+                    signature.params,
+                    signature.returns,
+                    signature.docstring,
+                    has_kwonly=signature.has_kwonly,
                 )
             )
     return lines
