@@ -4,6 +4,7 @@ import inspect
 import sys
 from types import UnionType
 from typing_extensions import override
+import warnings
 
 from nonebot.adapters import Event as BaseEvent
 
@@ -245,6 +246,16 @@ class Event(BaseEvent):
     @property
     def time(self) -> datetime:
         return self.timestamp__
+
+    def __getattr__(self, name: str) -> datetime:
+        if name == "timestamp":
+            warnings.warn(
+                "Event.timestamp is deprecated, use Event.time",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return self.timestamp__
+        return super().__getattribute__(name)
 
     @override
     def get_event_name(self) -> str:
