@@ -2,7 +2,7 @@
 
 [project]
 name = "nonebot-adapter-discord"
-version = "1.0.0"
+version = "1.1.0"
 description = "Discord adapter for nonebot2"
 authors = [
     { name = "CMHopeSunshine", email = "277073121@qq.com" },
@@ -144,7 +144,7 @@ enableTypeIgnoreComments = false
 asyncio_mode = "auto"
 
 [tool.bumpversion]
-current_version = "1.0.0"
+current_version = "1.1.0"
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"
