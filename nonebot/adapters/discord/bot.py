@@ -376,7 +376,7 @@ class Bot(BaseBot, ApiClient):
             message
             if isinstance(message, Message)
             else Message(message)
-            if isinstance(message, MessageSegment | str)
+            if isinstance(message, MessageSegment)
             else _raise(ValueError("message must be str, MessageSegment or Message"))
         )
         message = message.sendable()
