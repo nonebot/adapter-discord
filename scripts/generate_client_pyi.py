@@ -24,7 +24,6 @@ import re
 
 from loguru import logger
 from rich.console import Console
-from rich.panel import Panel
 from rich.progress import (
     BarColumn,
     MofNCompleteColumn,
@@ -671,15 +670,7 @@ def main() -> None:
     )
 
     if previous_source_hash == source_hash and previous_script_hash == script_hash:
-        logger.info(
-            "Skip generation because hashes are unchanged",
-            rich=Panel.fit(
-                "Source hash and script hash are unchanged.\nSkip regenerating client.pyi.",
-                title="client.pyi",
-                border_style="yellow",
-            ),
-            alt="Skip generation because hashes are unchanged",
-        )
+        logger.success("Skip generation because hashes are unchanged")
         return
 
     generated_at = (
@@ -696,15 +687,7 @@ def main() -> None:
         generated_at=generated_at,
     )
     client_path.write_text(stub_content, "utf-8")
-    logger.success(
-        "Generated client.pyi",
-        rich=Panel.fit(
-            f"Output: {client_path}",
-            title="client.pyi",
-            border_style="green",
-        ),
-        alt=f"Generated client.pyi output={client_path}",
-    )
+    logger.success("Generated client.pyi")
 
 
 if __name__ == "__main__":
