@@ -23,9 +23,11 @@ from .api import (
     InteractionResponse,
     MessageGet,
     MessageReference,
+    MessageReferenceType,
     Snowflake,
     SnowflakeType,
     User,
+    is_not_unset,
 )
 from .config import BotInfo
 from .event import Event, InteractionCreateEvent, MessageEvent
@@ -44,6 +46,12 @@ AttachmentFetchOnError = Literal["raise", "skip"]
 async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
     message_reference = event.message_reference
     if message_reference is UNSET:
+        return
+
+    if (
+        is_not_unset(message_reference.type)
+        and message_reference.type == MessageReferenceType.FORWARD
+    ):
         return
 
     message_id = message_reference.message_id
