@@ -6332,6 +6332,56 @@ class HandleMixin:
         )
         await _request(self, request)
 
+    @overload
+    async def _api_execute_webhook(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        webhook_id: SnowflakeType,
+        token: str,
+        wait: Literal[True],
+        thread_id: SnowflakeType | None = None,
+        with_components: bool | None = None,
+        content: str | None = None,
+        username: str | None = None,
+        avatar_url: str | None = None,
+        tts: bool | None = None,
+        embeds: list[Embed] | None = None,
+        allowed_mentions: AllowedMention | None = None,
+        components: list[Component] | None = None,
+        files: list[File] | None = None,
+        attachments: list[AttachmentSend] | None = None,
+        flags: int | None = None,
+        thread_name: str | None = None,
+        applied_tags: list[SnowflakeType] | None = None,
+        poll: PollRequest | None = None,
+    ) -> MessageGet: ...
+
+    @overload
+    async def _api_execute_webhook(
+        self: AdapterProtocol,
+        bot: "Bot",
+        *,
+        webhook_id: SnowflakeType,
+        token: str,
+        wait: Literal[False] | None = None,
+        thread_id: SnowflakeType | None = None,
+        with_components: bool | None = None,
+        content: str | None = None,
+        username: str | None = None,
+        avatar_url: str | None = None,
+        tts: bool | None = None,
+        embeds: list[Embed] | None = None,
+        allowed_mentions: AllowedMention | None = None,
+        components: list[Component] | None = None,
+        files: list[File] | None = None,
+        attachments: list[AttachmentSend] | None = None,
+        flags: int | None = None,
+        thread_name: str | None = None,
+        applied_tags: list[SnowflakeType] | None = None,
+        poll: PollRequest | None = None,
+    ) -> None: ...
+
     async def _api_execute_webhook(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
