@@ -6356,6 +6356,7 @@ class HandleMixin:
         applied_tags: list[SnowflakeType] | None = None,
         poll: PollRequest | None = None,
     ) -> MessageGet: ...
+
     @overload
     async def _api_execute_webhook(
         self: AdapterProtocol,
@@ -6380,6 +6381,7 @@ class HandleMixin:
         applied_tags: list[SnowflakeType] | None = None,
         poll: PollRequest | None = None,
     ) -> None: ...
+
     async def _api_execute_webhook(  # noqa: PLR0913
         self: AdapterProtocol,
         bot: "Bot",
