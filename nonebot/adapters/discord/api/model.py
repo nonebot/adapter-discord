@@ -1599,7 +1599,10 @@ class MessageSnapshotMessage(BaseModel):
     edited_timestamp: datetime.datetime | None = Field(...)
     flags: Missing[MessageFlag] = UNSET
     mentions: list["User"]
-    mention_roles: list[Snowflake]
+    mention_roles: Missing[list[Snowflake]] = UNSET
+    components: Missing[list[DirectComponent]] = UNSET
+    sticker_items: Missing[list["StickerItem"]] = UNSET
+    stickers: Missing[list["Sticker"]] = UNSET
 
 
 class FollowedChannel(BaseModel):
