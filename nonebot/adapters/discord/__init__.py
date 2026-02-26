@@ -1,5 +1,5 @@
 from .adapter import Adapter
-from .api.types import UNSET
+from .api import UNSET, is_not_unset, is_unset
 from .bot import Bot
 from .commands import (
     ApplicationCommandMatcher,
@@ -260,6 +260,8 @@ __all__ = [
     "VoiceServerUpdateEvent",
     "VoiceStateUpdateEvent",
     "WebhooksUpdateEvent",
+    "is_not_unset",
+    "is_unset",
     "on_message_command",
     "on_slash_command",
     "on_user_command",
