@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "loguru>=0.7.3",
+#     "rich>=14.3.3",
+#     "richuru>=0.1.1",
+# ]
+# ///
 """Generate client.pyi from HandleMixin methods in handle.py.
 
 This script extracts method signatures from HandleMixin and generates
@@ -14,9 +22,34 @@ import hashlib
 from pathlib import Path
 import re
 
+from loguru import logger
+from rich.console import Console
+from rich.panel import Panel
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    TimeElapsedColumn,
+)
+from rich.table import Table
+from rich.theme import Theme
+from richuru import install
+
 LINE_LENGTH = 88
 HASH_HEADER_PREFIX = "# Source SHA256: "
 SCRIPT_HASH_HEADER_PREFIX = "# Script SHA256: "
+
+CONSOLE = Console(
+    stderr=True,
+    theme=Theme(
+        {
+            "logging.level.success": "green",
+            "logging.level.trace": "bright_black",
+        }
+    ),
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -292,11 +325,42 @@ def _find_handle_mixin(mod: ast.Module) -> ast.ClassDef:
 def _collect_method_signatures(
     source: str, mixin_class: ast.ClassDef
 ) -> list[MethodSignature]:
-    return [
-        _extract_method_signature(source, node)
+    async_methods = [
+        node
         for node in mixin_class.body
         if isinstance(node, ast.AsyncFunctionDef) and node.name.startswith("_api_")
     ]
+    logger.debug(
+        "Preparing to collect method signatures",
+        alt=f"Found {len(async_methods)} _api_ methods in HandleMixin",
+    )
+
+    signatures: list[MethodSignature] = []
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[bold cyan]{task.description}"),
+        BarColumn(bar_width=None),
+        MofNCompleteColumn(),
+        TextColumn("•"),
+        TimeElapsedColumn(),
+        console=CONSOLE,
+        transient=True,
+    ) as progress:
+        task_id = progress.add_task(
+            "Collecting method signatures", total=len(async_methods)
+        )
+        for method in async_methods:
+            signature = _extract_method_signature(source, method)
+            signatures.append(signature)
+            logger.debug(
+                "Collected signature name={name} overload={overload}",
+                name=signature.public_name,
+                overload=signature.is_overload,
+                alt=f"Collected {signature.public_name} (overload={signature.is_overload})",
+            )
+            progress.advance(task_id)
+
+    return signatures
 
 
 def _collect_actual_imports(
@@ -554,6 +618,17 @@ def _generate_stub(
     mod = ast.parse(source)
     mixin_class = _find_handle_mixin(mod)
     methods = _collect_method_signatures(source, mixin_class)
+    overload_count = sum(1 for method in methods if method.is_overload)
+    signature_summary = Table(title="Method Signatures", show_header=True)
+    signature_summary.add_column("Metric", style="cyan")
+    signature_summary.add_column("Value", style="green")
+    signature_summary.add_row("Total", str(len(methods)))
+    signature_summary.add_row("Overloads", str(overload_count))
+    logger.debug(
+        "Collected method signatures",
+        rich=signature_summary,
+        alt=f"Method signatures: total={len(methods)}, overloads={overload_count}",
+    )
     actual_imports, local_aliases = _collect_actual_imports(source, methods)
 
     lines = _build_generated_header(
@@ -569,6 +644,7 @@ def _generate_stub(
 
 
 def main() -> None:
+    install(rich_console=CONSOLE, level="DEBUG")
     root = Path(__file__).resolve().parents[1]
     handle_path = root / "nonebot/adapters/discord/api/handle.py"
     client_path = root / "nonebot/adapters/discord/api/client.pyi"
@@ -577,7 +653,33 @@ def main() -> None:
     source_hash = _calc_file_sha256(handle_path)
     script_hash = _calc_file_sha256(script_path)
     previous_source_hash, previous_script_hash = _extract_recorded_hashes(client_path)
+
+    hash_table = Table(title="client.pyi generation hashes", show_header=True)
+    hash_table.add_column("Type", style="cyan")
+    hash_table.add_column("Current", style="green")
+    hash_table.add_column("Previous", style="magenta")
+    hash_table.add_row("Source", source_hash, str(previous_source_hash))
+    hash_table.add_row("Script", script_hash, str(previous_script_hash))
+    logger.info(
+        "Checking client.pyi generation hashes",
+        rich=hash_table,
+        alt=(
+            "Checking client.pyi generation "
+            f"source={source_hash} script={script_hash} "
+            f"prev_source={previous_source_hash} prev_script={previous_script_hash}"
+        ),
+    )
+
     if previous_source_hash == source_hash and previous_script_hash == script_hash:
+        logger.info(
+            "Skip generation because hashes are unchanged",
+            rich=Panel.fit(
+                "Source hash and script hash are unchanged.\nSkip regenerating client.pyi.",
+                title="client.pyi",
+                border_style="yellow",
+            ),
+            alt="Skip generation because hashes are unchanged",
+        )
         return
 
     generated_at = (
@@ -594,6 +696,15 @@ def main() -> None:
         generated_at=generated_at,
     )
     client_path.write_text(stub_content, "utf-8")
+    logger.success(
+        "Generated client.pyi",
+        rich=Panel.fit(
+            f"Output: {client_path}",
+            title="client.pyi",
+            border_style="green",
+        ),
+        alt=f"Generated client.pyi output={client_path}",
+    )
 
 
 if __name__ == "__main__":
