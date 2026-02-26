@@ -9,7 +9,7 @@ from types import UnionType
 from typing import Any, cast
 from typing_extensions import override
 
-from nonebot.adapters import Adapter as BaseAdapter
+from nonebot.adapters import Adapter as BaseAdapter, Bot as BaseBot
 
 from nonebot.compat import type_validate_json, type_validate_python
 from nonebot.drivers import URL, Driver, ForwardDriver, Request, WebSocket
@@ -22,7 +22,7 @@ from .api.model import GatewayBot, User
 from .bot import Bot
 from .commands import sync_application_command
 from .config import BotInfo, Config
-from .event import Event, MessageEvent, ReadyEvent, event_classes
+from .event import Event, EventType, MessageEvent, ReadyEvent, event_classes
 from .exception import ApiNotAvailable
 from .payload import (
     Dispatch,
@@ -471,12 +471,12 @@ class Adapter(BaseAdapter, HandleMixin):
                 f"Unknown payload type: {payload.type}, detail: {payload!r}",
             )
             event = type_validate_python(Event, payload.data)
-            event.__type__ = payload.type
+            event.__type__ = EventType(payload.type)
             return event
         return type_validate_python(cast("type[Event]", EventClass), payload.data)
 
     @override
-    async def _call_api(self, bot: Bot, api: str, **data: Any) -> Any:
+    async def _call_api(self, bot: BaseBot, api: str, **data: Any) -> Any:
         log("DEBUG", f"Calling API <y>{api}</y>")
         api_handler = getattr(self, f"_api_{api}", None)
         if api_handler is None:

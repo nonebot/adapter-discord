@@ -3,8 +3,8 @@ from enum import Enum
 import inspect
 import sys
 from types import UnionType
-from typing import Literal
 from typing_extensions import override
+import warnings
 
 from nonebot.adapters import Event as BaseEvent
 
@@ -14,7 +14,6 @@ from pydantic import BaseModel, Field
 
 from .api import model as _model_module
 from .api.model import (
-    ApplicationCommandData,
     ApplicationCommandPermissions,
     AutoModerationActionExecution,
     AutoModerationRuleCreate,
@@ -35,7 +34,6 @@ from .api.model import (
     GuildDelete,
     GuildEmojisUpdate,
     GuildIntegrationsUpdate,
-    GuildMember,
     GuildMemberAdd,
     GuildMemberRemove,
     GuildMembersChunk,
@@ -53,21 +51,8 @@ from .api.model import (
     IntegrationCreate,
     IntegrationDelete,
     IntegrationUpdate,
-    InteractionCreate,
     InviteCreate,
-    MessageComponentData,
-    MessageCreate,
-    MessageDelete,
-    MessageDeleteBulk,
     MessageGet,
-    MessagePollVoteAdd,
-    MessagePollVoteRemove,
-    MessageReactionAdd,
-    MessageReactionRemove,
-    MessageReactionRemoveAll,
-    MessageReactionRemoveEmoji,
-    MessageUpdate,
-    ModalSubmitData,
     PresenceUpdate,
     Ready,
     Snowflake,
@@ -83,7 +68,6 @@ from .api.model import (
     ThreadMembersUpdate,
     ThreadMemberUpdate,
     ThreadUpdate,
-    TypingStart,
     UserUpdate,
     VoiceChannelEffectSend,
     VoiceChannelStartTimeUpdate,
@@ -92,7 +76,37 @@ from .api.model import (
     VoiceStateUpdate,
     WebhooksUpdate,
 )
-from .api.types import UNSET, InteractionType, Missing, is_unset
+from .api.models import (
+    ApplicationCommandAutoCompleteInteractionCreatePayload,
+    ApplicationCommandInteractionCreatePayload,
+    DirectMessageCreatePayload,
+    DirectMessageDeleteBulkPayload,
+    DirectMessageDeletePayload,
+    DirectMessagePollVoteAddPayload,
+    DirectMessagePollVoteRemovePayload,
+    DirectMessageReactionAddPayload,
+    DirectMessageReactionRemoveAllPayload,
+    DirectMessageReactionRemoveEmojiPayload,
+    DirectMessageReactionRemovePayload,
+    DirectMessageUpdatePayload,
+    DirectTypingStartPayload,
+    GuildMessageCreatePayload,
+    GuildMessageDeleteBulkPayload,
+    GuildMessageDeletePayload,
+    GuildMessagePollVoteAddPayload,
+    GuildMessagePollVoteRemovePayload,
+    GuildMessageReactionAddPayload,
+    GuildMessageReactionRemoveAllPayload,
+    GuildMessageReactionRemoveEmojiPayload,
+    GuildMessageReactionRemovePayload,
+    GuildMessageUpdatePayload,
+    GuildTypingStartPayload,
+    InteractionCreateBasePayload,
+    MessageComponentInteractionCreatePayload,
+    ModalSubmitInteractionCreatePayload,
+    PingInteractionCreatePayload,
+)
+from .api.types import UNSET, Missing, is_unset
 from .message import Message
 from .utils import log, model_dump
 
@@ -227,11 +241,21 @@ class Event(BaseEvent):
     """Event"""
 
     __type__: EventType
-    timestamp: datetime = Field(default_factory=datetime.now)
+    timestamp__: datetime = Field(default_factory=datetime.now)
 
     @property
     def time(self) -> datetime:
-        return self.timestamp
+        return self.timestamp__
+
+    def __getattr__(self, name: str) -> datetime:
+        if name == "timestamp":
+            warnings.warn(
+                "Event.timestamp is deprecated, use Event.time",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return self.timestamp__
+        return super().__getattribute__(name)
 
     @override
     def get_event_name(self) -> str:
@@ -298,7 +322,13 @@ class MessageEvent(Event, MessageGet):
 
     @property
     def original_message(self) -> Message:
-        return getattr(self, "_original_message", self.get_message())
+        return (
+            original_message
+            if isinstance(
+                (original_message := getattr(self, "_original_message", None)), Message
+            )
+            else self.get_message()
+        )
 
     @override
     def get_type(self) -> str:
@@ -789,11 +819,7 @@ class IntegrationDeleteEvent(IntegrationEvent, IntegrationDelete):
     __type__ = EventType.INTEGRATION_DELETE
 
 
-class InteractionCreateEvent(NoticeEvent, InteractionCreate):
-    """Interaction create event
-
-    see https://discord.com/developers/docs/topics/gateway-events#interaction-create"""
-
+class InteractionCreateEvent(NoticeEvent, InteractionCreateBasePayload):
     __type__ = EventType.INTERACTION_CREATE
 
     @override
@@ -806,30 +832,27 @@ class InteractionCreateEvent(NoticeEvent, InteractionCreate):
         raise ValueError(msg)
 
 
-class PingInteractionEvent(InteractionCreateEvent):
-    type: Literal[InteractionType.PING]
-    data: Literal[UNSET] = UNSET
+class PingInteractionEvent(InteractionCreateEvent, PingInteractionCreatePayload): ...
 
 
-class ApplicationCommandInteractionEvent(InteractionCreateEvent):
-    type: Literal[InteractionType.APPLICATION_COMMAND]
-    data: ApplicationCommandData
+class ApplicationCommandInteractionEvent(
+    InteractionCreateEvent, ApplicationCommandInteractionCreatePayload
+): ...
 
 
-class ApplicationCommandAutoCompleteInteractionEvent(InteractionCreateEvent):
-    type: Literal[InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE]
-    data: ApplicationCommandData
+class ApplicationCommandAutoCompleteInteractionEvent(
+    InteractionCreateEvent, ApplicationCommandAutoCompleteInteractionCreatePayload
+): ...
 
 
-class MessageComponentInteractionEvent(InteractionCreateEvent):
-    type: Literal[InteractionType.MESSAGE_COMPONENT]
-    data: MessageComponentData
-    message: MessageGet
+class MessageComponentInteractionEvent(
+    InteractionCreateEvent, MessageComponentInteractionCreatePayload
+): ...
 
 
-class ModalSubmitInteractionEvent(InteractionCreateEvent):
-    type: Literal[InteractionType.MODAL_SUBMIT]
-    data: ModalSubmitData
+class ModalSubmitInteractionEvent(
+    InteractionCreateEvent, ModalSubmitInteractionCreatePayload
+): ...
 
 
 class InviteCreateEvent(NoticeEvent, InviteCreate):
@@ -851,7 +874,7 @@ class InviteDeleteEvent(NoticeEvent):
     code: str
 
 
-class MessageCreateEvent(MessageEvent, MessageCreate):
+class MessageCreateEvent(MessageEvent):
     """Message Create Event
 
     see https://discord.com/developers/docs/topics/gateway-events#message-create
@@ -860,16 +883,14 @@ class MessageCreateEvent(MessageEvent, MessageCreate):
     __type__ = EventType.MESSAGE_CREATE
 
 
-class GuildMessageCreateEvent(MessageCreateEvent):
-    guild_id: Snowflake
+class GuildMessageCreateEvent(MessageCreateEvent, GuildMessageCreatePayload): ...
 
 
-class DirectMessageCreateEvent(MessageCreateEvent):
+class DirectMessageCreateEvent(MessageCreateEvent, DirectMessageCreatePayload):
     to_me: bool = True
-    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
 
 
-class MessageUpdateEvent(NoticeEvent, MessageUpdate):
+class MessageUpdateEvent(NoticeEvent):
     """Message Update Event
 
     see https://discord.com/developers/docs/topics/gateway-events#message-update
@@ -878,15 +899,13 @@ class MessageUpdateEvent(NoticeEvent, MessageUpdate):
     __type__ = EventType.MESSAGE_UPDATE
 
 
-class GuildMessageUpdateEvent(MessageUpdateEvent):
-    guild_id: Snowflake
+class GuildMessageUpdateEvent(MessageUpdateEvent, GuildMessageUpdatePayload): ...
 
 
-class DirectMessageUpdateEvent(MessageUpdateEvent):
-    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+class DirectMessageUpdateEvent(MessageUpdateEvent, DirectMessageUpdatePayload): ...
 
 
-class MessageDeleteEvent(NoticeEvent, MessageDelete):
+class MessageDeleteEvent(NoticeEvent):
     """Message Delete Event
 
     see https://discord.com/developers/docs/topics/gateway-events#message-delete
@@ -895,15 +914,13 @@ class MessageDeleteEvent(NoticeEvent, MessageDelete):
     __type__ = EventType.MESSAGE_DELETE
 
 
-class GuildMessageDeleteEvent(MessageDeleteEvent):
-    guild_id: Snowflake
+class GuildMessageDeleteEvent(MessageDeleteEvent, GuildMessageDeletePayload): ...
 
 
-class DirectMessageDeleteEvent(MessageDeleteEvent):
-    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+class DirectMessageDeleteEvent(MessageDeleteEvent, DirectMessageDeletePayload): ...
 
 
-class MessageDeleteBulkEvent(NoticeEvent, MessageDeleteBulk):
+class MessageDeleteBulkEvent(NoticeEvent):
     """Message Delete Bulk Event
 
     see https://discord.com/developers/docs/topics/gateway-events#message-delete-bulk
@@ -912,15 +929,17 @@ class MessageDeleteBulkEvent(NoticeEvent, MessageDeleteBulk):
     __type__ = EventType.MESSAGE_DELETE_BULK
 
 
-class GuildMessageDeleteBulkEvent(MessageDeleteBulkEvent):
-    guild_id: Snowflake
+class GuildMessageDeleteBulkEvent(
+    MessageDeleteBulkEvent, GuildMessageDeleteBulkPayload
+): ...
 
 
-class DirectMessageDeleteBulkEvent(MessageDeleteBulkEvent):
-    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+class DirectMessageDeleteBulkEvent(
+    MessageDeleteBulkEvent, DirectMessageDeleteBulkPayload
+): ...
 
 
-class MessageReactionAddEvent(NoticeEvent, MessageReactionAdd):
+class MessageReactionAddEvent(NoticeEvent):
     """
     Message Reaction Add Event
 
@@ -930,15 +949,17 @@ class MessageReactionAddEvent(NoticeEvent, MessageReactionAdd):
     __type__ = EventType.MESSAGE_REACTION_ADD
 
 
-class GuildMessageReactionAddEvent(MessageReactionAddEvent):
-    guild_id: Snowflake
+class GuildMessageReactionAddEvent(
+    MessageReactionAddEvent, GuildMessageReactionAddPayload
+): ...
 
 
-class DirectMessageReactionAddEvent(MessageReactionAddEvent):
-    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+class DirectMessageReactionAddEvent(
+    MessageReactionAddEvent, DirectMessageReactionAddPayload
+): ...
 
 
-class MessageReactionRemoveEvent(NoticeEvent, MessageReactionRemove):
+class MessageReactionRemoveEvent(NoticeEvent):
     """Message Reaction Remove Event
 
     see https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove
@@ -947,15 +968,17 @@ class MessageReactionRemoveEvent(NoticeEvent, MessageReactionRemove):
     __type__ = EventType.MESSAGE_REACTION_REMOVE
 
 
-class GuildMessageReactionRemoveEvent(MessageReactionRemoveEvent):
-    guild_id: Snowflake
+class GuildMessageReactionRemoveEvent(
+    MessageReactionRemoveEvent, GuildMessageReactionRemovePayload
+): ...
 
 
-class DirectMessageReactionRemoveEvent(MessageReactionRemoveEvent):
-    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+class DirectMessageReactionRemoveEvent(
+    MessageReactionRemoveEvent, DirectMessageReactionRemovePayload
+): ...
 
 
-class MessageReactionRemoveAllEvent(NoticeEvent, MessageReactionRemoveAll):
+class MessageReactionRemoveAllEvent(NoticeEvent):
     """Message Reaction Remove All Event
 
     see https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-all
@@ -964,15 +987,17 @@ class MessageReactionRemoveAllEvent(NoticeEvent, MessageReactionRemoveAll):
     __type__ = EventType.MESSAGE_REACTION_REMOVE_ALL
 
 
-class GuildMessageReactionRemoveAllEvent(MessageReactionRemoveAllEvent):
-    guild_id: Snowflake
+class GuildMessageReactionRemoveAllEvent(
+    MessageReactionRemoveAllEvent, GuildMessageReactionRemoveAllPayload
+): ...
 
 
-class DirectMessageReactionRemoveAllEvent(MessageReactionRemoveAllEvent):
-    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+class DirectMessageReactionRemoveAllEvent(
+    MessageReactionRemoveAllEvent, DirectMessageReactionRemoveAllPayload
+): ...
 
 
-class MessageReactionRemoveEmojiEvent(NoticeEvent, MessageReactionRemoveEmoji):
+class MessageReactionRemoveEmojiEvent(NoticeEvent):
     """Message Reaction Remove Emoji Event
 
     see https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-emoji
@@ -981,12 +1006,14 @@ class MessageReactionRemoveEmojiEvent(NoticeEvent, MessageReactionRemoveEmoji):
     __type__ = EventType.MESSAGE_REACTION_REMOVE_EMOJI
 
 
-class GuildMessageReactionRemoveEmojiEvent(MessageReactionRemoveEmojiEvent):
-    guild_id: Snowflake
+class GuildMessageReactionRemoveEmojiEvent(
+    MessageReactionRemoveEmojiEvent, GuildMessageReactionRemoveEmojiPayload
+): ...
 
 
-class DirectMessageReactionRemoveEmojiEvent(MessageReactionRemoveEmojiEvent):
-    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+class DirectMessageReactionRemoveEmojiEvent(
+    MessageReactionRemoveEmojiEvent, DirectMessageReactionRemoveEmojiPayload
+): ...
 
 
 class PresenceUpdateEvent(NoticeEvent, PresenceUpdate):
@@ -1055,7 +1082,7 @@ class SubscriptionDeleteEvent(SubscriptionEvent, SubscriptionDelete):
     __type__ = EventType.SUBSCRIPTION_DELETE
 
 
-class TypingStartEvent(NoticeEvent, TypingStart):
+class TypingStartEvent(NoticeEvent):
     """Typing Start Event
 
     see https://discord.com/developers/docs/topics/gateway-events#typing-start
@@ -1064,14 +1091,10 @@ class TypingStartEvent(NoticeEvent, TypingStart):
     __type__ = EventType.TYPING_START
 
 
-class GuildTypingStartEvent(TypingStartEvent):
-    guild_id: Snowflake
-    member: GuildMember
+class GuildTypingStartEvent(TypingStartEvent, GuildTypingStartPayload): ...
 
 
-class DirectTypingStartEvent(TypingStartEvent):
-    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
-    member: Literal[UNSET] = Field(UNSET, exclude=True)
+class DirectTypingStartEvent(TypingStartEvent, DirectTypingStartPayload): ...
 
 
 class UserUpdateEvent(NoticeEvent, UserUpdate):
@@ -1139,7 +1162,7 @@ class WebhooksUpdateEvent(NoticeEvent, WebhooksUpdate):
     __type__ = EventType.WEBHOOKS_UPDATE
 
 
-class MessagePollVoteAddEvent(NoticeEvent, MessagePollVoteAdd):
+class MessagePollVoteAddEvent(NoticeEvent):
     """Message Poll Vote Add Event
 
     see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-add
@@ -1148,15 +1171,17 @@ class MessagePollVoteAddEvent(NoticeEvent, MessagePollVoteAdd):
     __type__ = EventType.MESSAGE_POLL_VOTE_ADD
 
 
-class GuildMessagePollVoteAddEvent(MessagePollVoteAddEvent):
-    guild_id: Snowflake
+class GuildMessagePollVoteAddEvent(
+    MessagePollVoteAddEvent, GuildMessagePollVoteAddPayload
+): ...
 
 
-class DirectMessagePollVoteAddEvent(MessagePollVoteAddEvent):
-    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+class DirectMessagePollVoteAddEvent(
+    MessagePollVoteAddEvent, DirectMessagePollVoteAddPayload
+): ...
 
 
-class MessagePollVoteRemoveEvent(NoticeEvent, MessagePollVoteRemove):
+class MessagePollVoteRemoveEvent(NoticeEvent):
     """Message Poll Vote Remove Event
 
     see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-remove
@@ -1165,12 +1190,14 @@ class MessagePollVoteRemoveEvent(NoticeEvent, MessagePollVoteRemove):
     __type__ = EventType.MESSAGE_POLL_VOTE_REMOVE
 
 
-class GuildMessagePollVoteRemoveEvent(MessagePollVoteRemoveEvent):
-    guild_id: Snowflake
+class GuildMessagePollVoteRemoveEvent(
+    MessagePollVoteRemoveEvent, GuildMessagePollVoteRemovePayload
+): ...
 
 
-class DirectMessagePollVoteRemoveEvent(MessagePollVoteRemoveEvent):
-    guild_id: Literal[UNSET] = Field(UNSET, exclude=True)
+class DirectMessagePollVoteRemoveEvent(
+    MessagePollVoteRemoveEvent, DirectMessagePollVoteRemovePayload
+): ...
 
 
 event_classes: dict[str, type[Event] | UnionType] = {
@@ -1233,43 +1260,32 @@ event_classes: dict[str, type[Event] | UnionType] = {
         | ApplicationCommandAutoCompleteInteractionEvent
         | MessageComponentInteractionEvent
         | ModalSubmitInteractionEvent
-        | InteractionCreateEvent
     ),
     EventType.INVITE_CREATE.value: InviteCreateEvent,
     EventType.INVITE_DELETE.value: InviteDeleteEvent,
     EventType.MESSAGE_CREATE.value: (
-        GuildMessageCreateEvent | DirectMessageCreateEvent | MessageCreateEvent
+        GuildMessageCreateEvent | DirectMessageCreateEvent
     ),
     EventType.MESSAGE_UPDATE.value: (
-        GuildMessageUpdateEvent | DirectMessageUpdateEvent | MessageUpdateEvent
+        GuildMessageUpdateEvent | DirectMessageUpdateEvent
     ),
     EventType.MESSAGE_DELETE.value: (
-        GuildMessageDeleteEvent | DirectMessageDeleteEvent | MessageDeleteEvent
+        GuildMessageDeleteEvent | DirectMessageDeleteEvent
     ),
     EventType.MESSAGE_DELETE_BULK.value: (
-        GuildMessageDeleteBulkEvent
-        | DirectMessageDeleteBulkEvent
-        | MessageDeleteBulkEvent
+        GuildMessageDeleteBulkEvent | DirectMessageDeleteBulkEvent
     ),
     EventType.MESSAGE_REACTION_ADD.value: (
-        GuildMessageReactionAddEvent
-        | DirectMessageReactionAddEvent
-        | MessageReactionAddEvent
+        GuildMessageReactionAddEvent | DirectMessageReactionAddEvent
     ),
     EventType.MESSAGE_REACTION_REMOVE.value: (
-        GuildMessageReactionRemoveEvent
-        | DirectMessageReactionRemoveEvent
-        | MessageReactionRemoveEvent
+        GuildMessageReactionRemoveEvent | DirectMessageReactionRemoveEvent
     ),
     EventType.MESSAGE_REACTION_REMOVE_ALL.value: (
-        GuildMessageReactionRemoveAllEvent
-        | DirectMessageReactionRemoveAllEvent
-        | MessageReactionRemoveAllEvent
+        GuildMessageReactionRemoveAllEvent | DirectMessageReactionRemoveAllEvent
     ),
     EventType.MESSAGE_REACTION_REMOVE_EMOJI.value: (
-        GuildMessageReactionRemoveEmojiEvent
-        | DirectMessageReactionRemoveEmojiEvent
-        | MessageReactionRemoveEmojiEvent
+        GuildMessageReactionRemoveEmojiEvent | DirectMessageReactionRemoveEmojiEvent
     ),
     EventType.PRESENCE_UPDATE.value: PresenceUpdateEvent,
     EventType.STAGE_INSTANCE_CREATE.value: StageInstanceCreateEvent,
@@ -1278,9 +1294,7 @@ event_classes: dict[str, type[Event] | UnionType] = {
     EventType.SUBSCRIPTION_CREATE.value: SubscriptionCreateEvent,
     EventType.SUBSCRIPTION_UPDATE.value: SubscriptionUpdateEvent,
     EventType.SUBSCRIPTION_DELETE.value: SubscriptionDeleteEvent,
-    EventType.TYPING_START.value: (
-        GuildTypingStartEvent | DirectTypingStartEvent | TypingStartEvent
-    ),
+    EventType.TYPING_START.value: GuildTypingStartEvent | DirectTypingStartEvent,
     EventType.USER_UPDATE.value: UserUpdateEvent,
     EventType.VOICE_CHANNEL_STATUS_UPDATE.value: VoiceChannelStatusUpdateEvent,
     EventType.VOICE_CHANNEL_START_TIME_UPDATE.value: VoiceChannelStartTimeUpdateEvent,
@@ -1289,14 +1303,10 @@ event_classes: dict[str, type[Event] | UnionType] = {
     EventType.VOICE_SERVER_UPDATE.value: VoiceServerUpdateEvent,
     EventType.WEBHOOKS_UPDATE.value: WebhooksUpdateEvent,
     EventType.MESSAGE_POLL_VOTE_ADD.value: (
-        GuildMessagePollVoteAddEvent
-        | DirectMessagePollVoteAddEvent
-        | MessagePollVoteAddEvent
+        GuildMessagePollVoteAddEvent | DirectMessagePollVoteAddEvent
     ),
     EventType.MESSAGE_POLL_VOTE_REMOVE.value: (
-        GuildMessagePollVoteRemoveEvent
-        | DirectMessagePollVoteRemoveEvent
-        | MessagePollVoteRemoveEvent
+        GuildMessagePollVoteRemoveEvent | DirectMessagePollVoteRemoveEvent
     ),
 }
 

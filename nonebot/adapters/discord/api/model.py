@@ -86,7 +86,6 @@ from .types import (
     PremiumTier,
     PremiumType,
     PresenceStatus,
-    ReactionType,
     RoleFlag,
     SKUFlag,
     SKUType,
@@ -803,62 +802,6 @@ DirectComponent = ActionRow | TextInput
 
 # Receiving and Responding
 # see https://discord.com/developers/docs/interactions/receiving-and-responding
-
-
-class Interaction(BaseModel):
-    """An Interaction is the message that your application receives
-    when a user uses an application command or a message component.
-
-    see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
-    """
-
-    id: Snowflake
-    """ID of the interaction"""
-    application_id: Snowflake
-    """ID of the application this interaction is for"""
-    type: InteractionType
-    """Type of interaction"""
-    data: Missing["InteractionData"] = UNSET
-    """Interaction data payload
-    This is always present on application command, message component,
-    and modal submit interaction types.
-    It is optional for future-proofing against new interaction types"""
-    guild: Missing["InteractionGuild"] = UNSET
-    """Guild that the interaction was sent from"""
-    guild_id: Missing[Snowflake] = UNSET
-    """Guild that the interaction was sent from"""
-    channel: Missing["Channel"] = UNSET  # partial channel object
-    """Channel that the interaction was sent from"""
-    channel_id: Missing[Snowflake] = UNSET
-    """Channel that the interaction was sent from"""
-    member: Missing["GuildMember"] = UNSET  # guild member object
-    """Guild member data for the invoking user, including permissions"""
-    user: Missing["User"] = UNSET
-    """User object for the invoking user, if invoked in a DM"""
-    token: str
-    """Continuation token for responding to the interaction"""
-    version: int
-    """Read-only property, always 1"""
-    message: Missing["MessageGet"] = UNSET
-    """For components, the message they were attached to"""
-    app_permissions: Missing[str] = UNSET
-    """Bitwise set of permissions the app or bot has within the
-    channel the interaction was sent from"""
-    locale: Missing[str] = UNSET
-    """Selected language of the invoking user"""
-    guild_locale: Missing[str] = UNSET
-    """Guild's preferred locale, if invoked in a guild"""
-    entitlements: Missing[list["Entitlement"]] = UNSET
-    """For monetized apps, any entitlements for the
-    invoking user, representing access to premium SKUs"""
-    authorizing_integration_owners: dict[
-        ApplicationIntegrationType, Snowflake | Literal["0"]
-    ]
-    """Mapping of installation contexts that the interaction
-    was authorized for to related user or guild IDs.
-    See Authorizing Integration Owners Object for details"""
-    context: Missing[InteractionContextType] = UNSET
-    """Context where the interaction was triggered from"""
 
 
 class InteractionGuild(BaseModel):
@@ -3853,146 +3796,6 @@ class InviteDelete(BaseModel):
     code: str
 
 
-class MessageCreate(MessageGet):
-    """Message Create Event Fields
-
-    Sent when a message is created. The inner payload is a message object
-
-    see https://discord.com/developers/docs/topics/gateway-events#message-create
-    """
-
-    guild_id: Missing[Snowflake] = UNSET
-    member: Missing[GuildMember] = UNSET  # partial member object
-    mentions: list[User]
-
-
-class MessageUpdate(BaseModel):
-    """Message Update Event Fields
-
-    Unlike creates, message updates may contain only a subset of the full
-    message object payload (but will always contain an ID and channel_id).
-
-    see https://discord.com/developers/docs/topics/gateway-events#message-update
-    """
-
-    id: Snowflake
-    channel_id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-    member: Missing[GuildMember] = UNSET
-    author: Missing["User"] = UNSET
-    content: Missing[str] = UNSET
-    timestamp: Missing[datetime.datetime] = UNSET
-    edited_timestamp: MissingOrNullable[datetime.datetime] = UNSET
-    tts: Missing[bool] = UNSET
-    mention_everyone: Missing[bool] = UNSET
-    mentions: Missing[list[User]] = UNSET
-    mention_roles: Missing[list[Snowflake]] = UNSET
-    mention_channels: Missing[list["ChannelMention"]] = UNSET
-    attachments: Missing[list["Attachment"]] = UNSET
-    embeds: Missing[list["Embed"]] = UNSET
-    reactions: Missing[list["Reaction"]] = UNSET
-    nonce: Missing[int | str] = UNSET
-    pinned: Missing[bool] = UNSET
-    webhook_id: Missing[Snowflake] = UNSET
-    type: Missing[MessageType] = UNSET
-    activity: Missing["MessageActivity"] = UNSET
-    application: Missing[Application] = UNSET
-    application_id: Missing[Snowflake] = UNSET
-    message_reference: Missing["MessageReference"] = UNSET
-    flags: Missing[MessageFlag] = UNSET
-    message_snapshots: Missing[list["MessageSnapshot"]] = UNSET
-    referenced_message: MissingOrNullable["MessageGet"] = UNSET
-    interaction_metadata: Missing[MessageInteractionMetadata] = UNSET
-    interaction: Missing[MessageInteraction] = UNSET
-    thread: Missing[Channel] = UNSET
-    components: Missing[list[DirectComponent]] = UNSET
-    sticker_items: Missing[list["StickerItem"]] = UNSET
-    stickers: Missing[list["Sticker"]] = UNSET
-    position: Missing[int] = UNSET
-    role_subscription_data: Missing["RoleSubscriptionData"] = UNSET
-    resolved: Missing[ResolvedData] = UNSET
-    poll: Missing["Poll"] = UNSET
-    call: Missing["MessageCall"] = UNSET
-
-
-class MessageDelete(BaseModel):
-    """Message Delete Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#message-delete
-    """
-
-    id: Snowflake
-    channel_id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-
-
-class MessageDeleteBulk(BaseModel):
-    """Message Delete Bulk Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#message-delete-bulk
-    """
-
-    ids: list[Snowflake]
-    channel_id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-
-
-class MessageReactionAdd(BaseModel):
-    """Message Reaction Add Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#message-reaction-add
-    """
-
-    user_id: Snowflake
-    channel_id: Snowflake
-    message_id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-    member: Missing[GuildMember] = UNSET
-    emoji: Emoji  # partial emoji object
-    message_author_id: Missing[Snowflake] = UNSET
-    burst: bool
-    burst_colors: Missing[list[str]] = UNSET
-    type: ReactionType
-
-
-class MessageReactionRemove(BaseModel):
-    """Message Reaction Remove Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove
-    """
-
-    user_id: Snowflake
-    channel_id: Snowflake
-    message_id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-    emoji: Emoji  # partial emoji object
-    burst: bool
-    type: ReactionType
-
-
-class MessageReactionRemoveAll(BaseModel):
-    """Message Reaction Remove Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-all
-    """
-
-    channel_id: Snowflake
-    message_id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-
-
-class MessageReactionRemoveEmoji(BaseModel):
-    """Message Reaction Remove Emoji Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-emoji
-    """
-
-    channel_id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-    message_id: Snowflake
-    emoji: Emoji  # partial emoji object
-
-
 class PresenceUpdateUser(BaseModel):
     """Presence Update User Fields
 
@@ -4127,19 +3930,6 @@ class ActivityButtons(BaseModel):
     url: str
 
 
-class TypingStart(BaseModel):
-    """Typing Start Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#typing-start
-    """
-
-    channel_id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-    user_id: Snowflake
-    timestamp: datetime.datetime
-    member: Missing[GuildMember] = UNSET
-
-
 class UserUpdate(User):
     """User Update Event Fields
 
@@ -4204,16 +3994,6 @@ class WebhooksUpdate(BaseModel):
 
     guild_id: Snowflake
     channel_id: Snowflake
-
-
-class InteractionCreate(Interaction):
-    """Interaction Create Event Fields
-
-    Sent when a user uses an Application Command or Message Component.
-    Inner payload is an Interaction.
-
-    see https://discord.com/developers/docs/topics/gateway-events#interaction-create
-    """
 
 
 class StageInstanceCreate(StageInstance):
@@ -4680,32 +4460,6 @@ class VoiceChannelEffectSend(BaseModel):
     sound_volume: Missing[float] = UNSET
 
 
-class MessagePollVoteAdd(BaseModel):
-    """Message Poll Vote Add Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-add-message-poll-vote-add-fields
-    """
-
-    user_id: Snowflake
-    channel_id: Snowflake
-    message_id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-    answer_id: int
-
-
-class MessagePollVoteRemove(BaseModel):
-    """Message Poll Vote Remove Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-add-message-poll-vote-remove-fields
-    """
-
-    user_id: Snowflake
-    channel_id: Snowflake
-    message_id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-    answer_id: int
-
-
 class SoundboardSound(BaseModel):
     """Soundboard Sound Object
 
@@ -5010,12 +4764,10 @@ __all__ = [
     "IntegrationCreate",
     "IntegrationDelete",
     "IntegrationUpdate",
-    "Interaction",
     "InteractionCallbackAutocomplete",
     "InteractionCallbackData",
     "InteractionCallbackMessage",
     "InteractionCallbackModal",
-    "InteractionCreate",
     "InteractionData",
     "InteractionResponse",
     "Invite",
@@ -5035,23 +4787,13 @@ __all__ = [
     "MentionableOption",
     "MessageActivity",
     "MessageComponentData",
-    "MessageCreate",
-    "MessageDelete",
-    "MessageDeleteBulk",
     "MessageGet",
     "MessageInteraction",
     "MessageInteractionMetadata",
-    "MessagePollVoteAdd",
-    "MessagePollVoteRemove",
-    "MessageReactionAdd",
-    "MessageReactionRemove",
-    "MessageReactionRemoveAll",
-    "MessageReactionRemoveEmoji",
     "MessageReference",
     "MessageSend",
     "MessageSnapshot",
     "MessageSnapshotMessage",
-    "MessageUpdate",
     "ModalSubmitData",
     "ModifyChannelParams",
     "ModifyGuildIncidentActionsParams",
@@ -5124,7 +4866,6 @@ __all__ = [
     "ThreadMetadata",
     "ThreadUpdate",
     "TriggerMetadata",
-    "TypingStart",
     "UnavailableGuild",
     "UpdatePresence",
     "UpdateVoiceState",

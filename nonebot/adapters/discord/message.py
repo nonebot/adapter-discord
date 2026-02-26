@@ -4,10 +4,7 @@ from dataclasses import dataclass
 import datetime
 import re
 from typing import (
-    TYPE_CHECKING,
     Any,
-    Literal,
-    TypedDict,
     overload,
 )
 from typing_extensions import Self, override
@@ -26,7 +23,6 @@ from .api import (
     Button,
     Component,
     ComponentType,
-    DirectComponent,
     Embed,
     File,
     MessageGet,
@@ -233,10 +229,6 @@ class MessageSegment(BaseMessageSegment["Message"]):
         raise ValueError(msg)
 
 
-class StickerData(TypedDict):
-    id: Snowflake
-
-
 @dataclass
 class StickerSegment(MessageSegment):
     """Sticker segment.
@@ -244,17 +236,9 @@ class StickerSegment(MessageSegment):
     see https://discord.com/developers/docs/resources/channel#create-message
     """
 
-    if TYPE_CHECKING:
-        type: Literal["sticker"]
-        data: StickerData
-
     @override
     def __str__(self) -> str:
         return f"<Sticker:{self.data['id']}>"
-
-
-class ComponentData(TypedDict):
-    component: DirectComponent
 
 
 @dataclass
@@ -263,10 +247,6 @@ class ComponentSegment(MessageSegment):
 
     see https://discord.com/developers/docs/interactions/message-components
     """
-
-    if TYPE_CHECKING:
-        type: Literal["component"]
-        data: ComponentData
 
     @override
     def __str__(self) -> str:
@@ -298,12 +278,6 @@ class ComponentSegment(MessageSegment):
         return instance
 
 
-class CustomEmojiData(TypedDict):
-    name: str
-    id: str
-    animated: bool | None
-
-
 @dataclass
 class CustomEmojiSegment(MessageSegment):
     """Custom emoji segment.
@@ -311,19 +285,11 @@ class CustomEmojiSegment(MessageSegment):
     see https://discord.com/developers/docs/reference#message-formatting
     """
 
-    if TYPE_CHECKING:
-        type: Literal["custom_emoji"]
-        data: CustomEmojiData
-
     @override
     def __str__(self) -> str:
         if self.data.get("animated"):
             return f"<a:{self.data['name']}:{self.data['id']}>"
         return f"<:{self.data['name']}:{self.data['id']}>"
-
-
-class MentionUserData(TypedDict):
-    user_id: Snowflake
 
 
 @dataclass
@@ -333,17 +299,9 @@ class MentionUserSegment(MessageSegment):
     see https://discord.com/developers/docs/reference#message-formatting
     """
 
-    if TYPE_CHECKING:
-        type: Literal["mention_user"]
-        data: MentionUserData
-
     @override
     def __str__(self) -> str:
         return f"<@{self.data['user_id']}>"
-
-
-class MentionChannelData(TypedDict):
-    channel_id: Snowflake
 
 
 @dataclass
@@ -353,17 +311,9 @@ class MentionChannelSegment(MessageSegment):
     see https://discord.com/developers/docs/reference#message-formatting
     """
 
-    if TYPE_CHECKING:
-        type: Literal["mention_channel"]
-        data: MentionChannelData
-
     @override
     def __str__(self) -> str:
         return f"<#{self.data['channel_id']}>"
-
-
-class MentionRoleData(TypedDict):
-    role_id: Snowflake
 
 
 @dataclass
@@ -372,10 +322,6 @@ class MentionRoleSegment(MessageSegment):
 
     see https://discord.com/developers/docs/reference#message-formatting
     """
-
-    if TYPE_CHECKING:
-        type: Literal["mention_role"]
-        data: MentionRoleData
 
     @override
     def __str__(self) -> str:
@@ -389,17 +335,9 @@ class MentionEveryoneSegment(MessageSegment):
     see https://discord.com/developers/docs/reference#message-formatting
     """
 
-    if TYPE_CHECKING:
-        type: Literal["mention_everyone"]
-
     @override
     def __str__(self) -> str:
         return "@everyone"
-
-
-class TimestampData(TypedDict):
-    timestamp: int
-    style: TimeStampStyle | None
 
 
 @dataclass
@@ -408,10 +346,6 @@ class TimestampSegment(MessageSegment):
 
     see https://discord.com/developers/docs/reference#message-formatting-timestamp-styles
     """
-
-    if TYPE_CHECKING:
-        type: Literal["timestamp"]
-        data: TimestampData
 
     @override
     def __str__(self) -> str:
@@ -427,10 +361,6 @@ class TimestampSegment(MessageSegment):
         )
 
 
-class TextData(TypedDict):
-    text: str
-
-
 @dataclass
 class TextSegment(MessageSegment):
     """Text segment.
@@ -438,17 +368,9 @@ class TextSegment(MessageSegment):
     see https://discord.com/developers/docs/resources/channel#create-message
     """
 
-    if TYPE_CHECKING:
-        type: Literal["text"]
-        data: TextData
-
     @override
     def __str__(self) -> str:
         return self.data["text"]
-
-
-class EmbedData(TypedDict):
-    embed: Embed
 
 
 @dataclass
@@ -457,10 +379,6 @@ class EmbedSegment(MessageSegment):
 
     see https://discord.com/developers/docs/resources/message#embed-object
     """
-
-    if TYPE_CHECKING:
-        type: Literal["embed"]
-        data: EmbedData
 
     @override
     def __str__(self) -> str:
@@ -478,23 +396,12 @@ class EmbedSegment(MessageSegment):
         return instance
 
 
-class AttachmentData(TypedDict):
-    attachment: AttachmentSend
-    file: File | None
-    url: str | None
-    proxy_url: str | None
-
-
 @dataclass
 class AttachmentSegment(MessageSegment):
     """Attachment segment.
 
     see https://discord.com/developers/docs/reference#uploading-files
     """
-
-    if TYPE_CHECKING:
-        type: Literal["attachment"]
-        data: AttachmentData
 
     @override
     def __str__(self) -> str:
@@ -529,20 +436,12 @@ class AttachmentSegment(MessageSegment):
         return instance
 
 
-class ReferenceData(TypedDict):
-    reference: MessageReference
-
-
 @dataclass
 class ReferenceSegment(MessageSegment):
     """Reference segment.
 
     see https://discord.com/developers/docs/resources/message#message-reference-object
     """
-
-    if TYPE_CHECKING:
-        type: Literal["reference"]
-        data: ReferenceData
 
     @override
     def __str__(self) -> str:
@@ -562,20 +461,12 @@ class ReferenceSegment(MessageSegment):
         return instance
 
 
-class PollData(TypedDict):
-    poll: Poll | PollRequest
-
-
 @dataclass
 class PollSegment(MessageSegment):
     """Poll segment.
 
     see https://discord.com/developers/docs/resources/poll#poll-object
     """
-
-    if TYPE_CHECKING:
-        type: Literal["poll"]
-        data: PollData
 
     @override
     def __str__(self) -> str:

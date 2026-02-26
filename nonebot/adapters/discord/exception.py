@@ -1,4 +1,5 @@
 import json
+from typing_extensions import override
 
 from nonebot.drivers import Response
 from nonebot.exception import (
@@ -30,12 +31,14 @@ class ActionFailed(BaseActionFailed, DiscordAdapterException):
             body = json.loads(response.content)
             self._prepare_body(body)
 
+    @override
     def __repr__(self) -> str:
         return (
             f"<{self.__class__.__name__}: {self.status_code}, code={self.code}, "
             f"message={self.message}, data={self.data}, errors={self.errors}>"
         )
 
+    @override
     def __str__(self) -> str:
         return self.__repr__()
 
@@ -60,9 +63,11 @@ class NetworkError(BaseNetworkError, DiscordAdapterException):
         self.msg: str | None = msg
         """错误原因"""
 
+    @override
     def __repr__(self) -> str:
         return f"<NetWorkError message={self.msg}>"
 
+    @override
     def __str__(self) -> str:
         return self.__repr__()
 

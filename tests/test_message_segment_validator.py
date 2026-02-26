@@ -11,6 +11,7 @@ from nonebot.adapters.discord.api import (
     PollMedia,
     PollRequest,
 )
+from nonebot.adapters.discord.api.types import is_unset
 from nonebot.adapters.discord.message import Message, MessageSegment, parse_message
 
 from nonebot.compat import type_validate_python
@@ -38,6 +39,7 @@ def test_reference_segment_from_dict() -> None:
     )
     assert seg.type == "reference"
     assert isinstance(seg.data["reference"], MessageReference)
+    assert not is_unset(seg.data["reference"].message_id)
     assert int(seg.data["reference"].message_id) == 123
 
 

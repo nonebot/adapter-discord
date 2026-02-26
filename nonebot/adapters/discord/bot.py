@@ -1,8 +1,13 @@
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, NoReturn
 from typing_extensions import override
 
-from nonebot.adapters import Bot as BaseBot
+from nonebot.adapters import (
+    Bot as BaseBot,
+    Event as BaseEvent,
+    Message as BaseMessage,
+    MessageSegment as BaseMessageSegment,
+)
 
 from nonebot.drivers import Request
 from nonebot.message import handle_event
@@ -57,9 +62,7 @@ async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
 
 
 def _check_at_me(bot: "Bot", event: MessageEvent) -> None:  # noqa: C901
-    if event.mentions is not None and bot.self_info.id in [
-        user.id for user in event.mentions
-    ]:
+    if bot.self_info.id in [user.id for user in event.mentions]:
         event.to_me = True
 
     def _is_at_me_seg(segment: MessageSegment) -> bool:
@@ -108,12 +111,12 @@ class Bot(BaseBot, ApiClient):
     Discord 协议 Bot 适配。
     """
 
-    adapter: "Adapter"
+    _adapter: "Adapter"
 
     @override
     def __init__(self, adapter: "Adapter", self_id: str, bot_info: BotInfo) -> None:
         super().__init__(adapter, self_id)
-        self.adapter = adapter
+        self.adapter = self._adapter = adapter
         self._bot_info: BotInfo = bot_info
         self._application_id: Snowflake = Snowflake(self_id)
         self._session_id: str | None = None
@@ -297,10 +300,10 @@ class Bot(BaseBot, ApiClient):
             request = Request(
                 method="GET",
                 url=url,
-                timeout=timeout or self.adapter.discord_config.discord_api_timeout,
-                proxy=self.adapter.discord_config.discord_proxy,
+                timeout=timeout or self._adapter.discord_config.discord_api_timeout,
+                proxy=self._adapter.discord_config.discord_proxy,
             )
-            response = await self.adapter.request(request)
+            response = await self._adapter.request(request)
             if response.status_code != HTTPStatus.OK or not response.content:
                 return None
             content = (
@@ -339,8 +342,8 @@ class Bot(BaseBot, ApiClient):
     @override
     async def send(
         self,
-        event: Event,
-        message: str | Message | MessageSegment,
+        event: BaseEvent,
+        message: str | BaseMessage | BaseMessageSegment,
         tts: bool = False,
         nonce: int | str | None = None,
         allowed_mentions: AllowedMention | None = None,
@@ -364,8 +367,18 @@ class Bot(BaseBot, ApiClient):
         Returns:
             message model
         """
+
+        def _raise(exc: Exception) -> NoReturn:
+            raise exc
+
         message = MessageSegment.text(message) if isinstance(message, str) else message
-        message = message if isinstance(message, Message) else Message(message)
+        message = (
+            message
+            if isinstance(message, Message)
+            else Message(message)
+            if isinstance(message, MessageSegment)
+            else _raise(ValueError("message must be str, MessageSegment or Message"))
+        )
         message = message.sendable()
         if isinstance(event, InteractionCreateEvent):
             message_data = parse_message(message)
