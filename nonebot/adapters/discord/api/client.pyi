@@ -129,8 +129,12 @@ from .types import (
     VideoQualityMode,
 )
 
-NonSpamTriggerType: TypeAlias = Literal[TriggerType.KEYWORD, TriggerType.KEYWORD_PRESET, TriggerType.MENTION_SPAM, TriggerType.MEMBER_PROFILE]
-
+NonSpamTriggerType: TypeAlias = Literal[
+    TriggerType.KEYWORD,
+    TriggerType.KEYWORD_PRESET,
+    TriggerType.MENTION_SPAM,
+    TriggerType.MEMBER_PROFILE,
+]
 
 class ApiClient:
     async def get_global_application_commands(
@@ -547,9 +551,7 @@ class ApiClient:
         before: SnowflakeType | None = None,
         after: None = None,
         limit: int | None = None,
-    ) -> AuditLog:
-        ...
-
+    ) -> AuditLog: ...
     @overload
     async def get_guild_audit_log(
         self,
@@ -560,9 +562,7 @@ class ApiClient:
         before: None = None,
         after: SnowflakeType | None = None,
         limit: int | None = None,
-    ) -> AuditLog:
-        ...
-
+    ) -> AuditLog: ...
     async def list_auto_moderation_rules_for_guild(
         self,
         *,
@@ -598,9 +598,7 @@ class ApiClient:
         exempt_roles: list[SnowflakeType] | None = None,
         exempt_channels: list[SnowflakeType] | None = None,
         reason: str | None = None,
-    ) -> AutoModerationRule:
-        ...
-
+    ) -> AutoModerationRule: ...
     @overload
     async def create_auto_moderation_rule(
         self,
@@ -615,9 +613,7 @@ class ApiClient:
         exempt_roles: list[SnowflakeType] | None = None,
         exempt_channels: list[SnowflakeType] | None = None,
         reason: str | None = None,
-    ) -> AutoModerationRule:
-        ...
-
+    ) -> AutoModerationRule: ...
     async def modify_auto_moderation_rule(
         self,
         *,
@@ -741,9 +737,7 @@ class ApiClient:
         before: None = None,
         after: None = None,
         limit: int | None = None,
-    ) -> list[MessageGet]:
-        ...
-
+    ) -> list[MessageGet]: ...
     @overload
     async def get_channel_messages(
         self,
@@ -753,9 +747,7 @@ class ApiClient:
         before: SnowflakeType | None = None,
         after: None = None,
         limit: int | None = None,
-    ) -> list[MessageGet]:
-        ...
-
+    ) -> list[MessageGet]: ...
     @overload
     async def get_channel_messages(
         self,
@@ -765,9 +757,7 @@ class ApiClient:
         before: None = None,
         after: SnowflakeType | None = None,
         limit: int | None = None,
-    ) -> list[MessageGet]:
-        ...
-
+    ) -> list[MessageGet]: ...
     async def get_channel_message(
         self,
         *,
@@ -1889,9 +1879,7 @@ class ApiClient:
         limit: int | None = None,
         before: SnowflakeType | None = None,
         after: None = None,
-    ) -> list[Ban]:
-        ...
-
+    ) -> list[Ban]: ...
     @overload
     async def get_guild_bans(
         self,
@@ -1900,9 +1888,7 @@ class ApiClient:
         limit: int | None = None,
         before: None = None,
         after: SnowflakeType | None = None,
-    ) -> list[Ban]:
-        ...
-
+    ) -> list[Ban]: ...
     async def get_guild_ban(
         self,
         *,
@@ -1923,9 +1909,7 @@ class ApiClient:
         delete_message_days: int | None = None,
         delete_message_seconds: None = None,
         reason: str | None = None,
-    ) -> None:
-        ...
-
+    ) -> None: ...
     @overload
     async def create_guild_ban(
         self,
@@ -1935,9 +1919,7 @@ class ApiClient:
         delete_message_days: None = None,
         delete_message_seconds: int | None = None,
         reason: str | None = None,
-    ) -> None:
-        ...
-
+    ) -> None: ...
     async def remove_guild_ban(
         self,
         *,
@@ -2953,9 +2935,7 @@ class ApiClient:
         thread_name: str | None = None,
         applied_tags: list[SnowflakeType] | None = None,
         poll: PollRequest | None = None,
-    ) -> MessageGet:
-        ...
-
+    ) -> MessageGet: ...
     @overload
     async def execute_webhook(
         self,
@@ -2978,9 +2958,7 @@ class ApiClient:
         thread_name: str | None = None,
         applied_tags: list[SnowflakeType] | None = None,
         poll: PollRequest | None = None,
-    ) -> None:
-        ...
-
+    ) -> None: ...
     async def execute_slack_compatible_webhook(
         self,
         *,
