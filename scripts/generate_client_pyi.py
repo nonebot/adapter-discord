@@ -117,11 +117,39 @@ def _format_param(
     annotation: str | None,
     *,
     has_default: bool,
+    default_value: str | None,
 ) -> str:
     ann = _format_annotation(annotation)
     ann_str = f": {ann}" if ann else ""
-    default_str = " = ..." if has_default else ""
+    if has_default:
+        normalized_default = "..."
+        if default_value is not None:
+            candidate = " ".join(default_value.split())
+            if _is_simple_stub_default(candidate):
+                normalized_default = candidate
+        default_str = f" = {normalized_default}"
+    else:
+        default_str = ""
     return f"{name}{ann_str}{default_str}"
+
+
+def _is_simple_stub_default(default_expr: str) -> bool:
+    try:
+        node = ast.parse(default_expr, mode="eval").body
+    except SyntaxError:
+        return False
+
+    if isinstance(node, ast.Constant):
+        return node.value is None or isinstance(
+            node.value, bool | int | float | str | bytes
+        )
+
+    if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
+        return isinstance(node.operand, ast.Constant) and isinstance(
+            node.operand.value, int | float
+        )
+
+    return False
 
 
 def _extract_method_signature(
@@ -143,12 +171,29 @@ def _extract_method_signature(
             continue
         ann = _get_source_segment(source, arg.annotation)
         has_default = idx >= default_start
-        params.append(_format_param(arg.arg, ann, has_default=has_default))
+        default_node = defaults[idx - default_start] if has_default else None
+        default_value = _get_source_segment(source, default_node)
+        params.append(
+            _format_param(
+                arg.arg,
+                ann,
+                has_default=has_default,
+                default_value=default_value,
+            )
+        )
 
     for arg, default in zip(args.kwonlyargs, args.kw_defaults, strict=False):
         ann = _get_source_segment(source, arg.annotation)
         has_default = default is not None
-        params.append(_format_param(arg.arg, ann, has_default=has_default))
+        default_value = _get_source_segment(source, default)
+        params.append(
+            _format_param(
+                arg.arg,
+                ann,
+                has_default=has_default,
+                default_value=default_value,
+            )
+        )
 
     if args.kwarg is not None:
         ann = _get_source_segment(source, args.kwarg.annotation)
@@ -372,9 +417,11 @@ def _render_param_lines(param: str) -> list[str]:
         return [single_line]
 
     name, rest = param.split(": ", 1)
-    has_default = rest.endswith(" = ...")
-    annotation = rest[:-6] if has_default else rest
-    default = " = ..." if has_default else ""
+    annotation = rest
+    default = ""
+    if " = " in rest:
+        annotation, default_value = rest.rsplit(" = ", 1)
+        default = f" = {default_value}"
 
     if " | " in annotation:
         left, right = annotation.rsplit(" | ", 1)
