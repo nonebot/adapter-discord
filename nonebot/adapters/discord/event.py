@@ -311,7 +311,13 @@ class MessageEvent(Event, MessageGet):
 
     @property
     def original_message(self) -> Message:
-        return getattr(self, "_original_message", self.get_message())
+        return (
+            original_message
+            if isinstance(
+                (original_message := getattr(self, "_original_message", None)), Message
+            )
+            else self.get_message()
+        )
 
     @override
     def get_type(self) -> str:
