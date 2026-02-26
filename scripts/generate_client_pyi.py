@@ -16,6 +16,8 @@ import re
 LINE_LENGTH = 88
 HASH_HEADER_PREFIX = "# Source SHA256: "
 
+MethodSignature = tuple[str, list[str], str | None, str | None, bool, bool]
+
 
 def _get_source_segment(source: str, node: ast.AST | None) -> str | None:
     if node is None:
@@ -124,7 +126,7 @@ def _format_param(
 
 def _extract_method_signature(
     source: str, method: ast.AsyncFunctionDef
-) -> tuple[str, list[str], str | None, str | None, bool]:
+) -> MethodSignature:
     public_name = _strip_leading_underscore(method.name)
     docstring = _extract_docstring(method)
 
@@ -157,7 +159,12 @@ def _extract_method_signature(
 
     returns = _get_source_segment(source, method.returns)
 
-    return public_name, params, returns, docstring, has_kwonly
+    is_overload = any(
+        (isinstance(decorator, ast.Name) and decorator.id == "overload")
+        or (isinstance(decorator, ast.Attribute) and decorator.attr == "overload")
+        for decorator in method.decorator_list
+    )
+    return public_name, params, returns, docstring, has_kwonly, is_overload
 
 
 def _collect_available_imports(source: str) -> dict[str, str]:
@@ -178,14 +185,32 @@ def _collect_available_imports(source: str) -> dict[str, str]:
     return available
 
 
+def _collect_local_aliases(source: str) -> dict[str, str]:
+    mod = ast.parse(source)
+    aliases: dict[str, str] = {}
+    for node in mod.body:
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if not isinstance(target, ast.Name):
+            continue
+        value = _get_source_segment(source, node.value)
+        if value is None:
+            continue
+        normalized = _format_annotation(value)
+        normalized = re.sub(r",\s*\]", "]", normalized)
+        aliases[target.id] = normalized
+    return aliases
+
+
 def _extract_used_types(
-    signatures: list[tuple[str, list[str], str | None, str | None, bool]],
+    signatures: list[MethodSignature],
 ) -> set[str]:
     """Extract type names actually used in method signatures."""
     used: set[str] = set()
     type_pattern = re.compile(r"\b([A-Z][A-Za-z0-9_]*)\b")
 
-    for _, params, returns, _, _ in signatures:
+    for _, params, returns, _, _, _ in signatures:
         for param in params:
             used.update(type_pattern.findall(param))
         if returns:
@@ -204,40 +229,35 @@ def _find_handle_mixin(mod: ast.Module) -> ast.ClassDef:
 
 def _collect_method_signatures(
     source: str, mixin_class: ast.ClassDef
-) -> list[tuple[str, list[str], str | None, str | None, bool]]:
-    def is_overload(node: ast.AsyncFunctionDef) -> bool:
-        for decorator in node.decorator_list:
-            if isinstance(decorator, ast.Name) and decorator.id == "overload":
-                return True
-            if isinstance(decorator, ast.Attribute) and decorator.attr == "overload":
-                return True
-        return False
-
+) -> list[MethodSignature]:
     return [
         _extract_method_signature(source, node)
         for node in mixin_class.body
-        if (
-            isinstance(node, ast.AsyncFunctionDef)
-            and node.name.startswith("_api_")
-            and not is_overload(node)
-        )
+        if isinstance(node, ast.AsyncFunctionDef) and node.name.startswith("_api_")
     ]
 
 
 def _collect_actual_imports(
     source: str,
-    methods: list[tuple[str, list[str], str | None, str | None, bool]],
-) -> dict[str, str]:
+    methods: list[MethodSignature],
+) -> tuple[dict[str, str], dict[str, str]]:
     available_imports = _collect_available_imports(source)
+    local_aliases = _collect_local_aliases(source)
     used_types = _extract_used_types(methods)
-    return {name: cat for name, cat in available_imports.items() if name in used_types}
+    imports = {
+        name: cat for name, cat in available_imports.items() if name in used_types
+    }
+    aliases = {
+        name: value for name, value in local_aliases.items() if name in used_types
+    }
+    return imports, aliases
 
 
 def _annotation_texts(
-    methods: list[tuple[str, list[str], str | None, str | None, bool]],
+    methods: list[MethodSignature],
 ) -> list[str]:
     texts: list[str] = []
-    for _, params, returns, _, _ in methods:
+    for _, params, returns, _, _, _ in methods:
         texts.extend(params)
         if returns:
             texts.append(returns)
@@ -256,9 +276,10 @@ def _import_sort_key(name: str) -> tuple[int, str]:
     return (0 if name.isupper() else 1, name)
 
 
-def _build_import_lines(
-    methods: list[tuple[str, list[str], str | None, str | None, bool]],
+def _build_import_lines(  # noqa: C901
+    methods: list[MethodSignature],
     actual_imports: dict[str, str],
+    local_aliases: dict[str, str],
 ) -> list[str]:
     lines: list[str] = []
     model_imports = sorted(
@@ -274,12 +295,18 @@ def _build_import_lines(
     need_datetime = any("datetime" in text for text in texts)
     need_literal = any("Literal" in text for text in texts)
     need_any = any(re.search(r"\bAny\b", text) for text in texts)
+    need_overload = any(is_overload for *_, is_overload in methods)
 
     typing_imports: list[str] = []
     if need_any:
         typing_imports.append("Any")
     if need_literal:
         typing_imports.append("Literal")
+    if need_overload:
+        typing_imports.append("overload")
+    if local_aliases:
+        typing_imports.append("TypeAlias")
+    typing_imports = sorted(set(typing_imports))
 
     if need_datetime:
         lines.append("from datetime import datetime")
@@ -290,6 +317,15 @@ def _build_import_lines(
 
     _append_import_block(lines, "model", model_imports)
     _append_import_block(lines, "types", type_imports)
+
+    if model_imports or type_imports:
+        lines.append("")
+
+    for name, value in sorted(local_aliases.items()):
+        lines.append(f"{name}: TypeAlias = {value}")
+    if local_aliases:
+        lines.append("")
+
     lines.append("")
     return lines
 
@@ -360,19 +396,45 @@ def _render_param_lines(param: str) -> list[str]:
 
 
 def _build_class_lines(
-    methods: list[tuple[str, list[str], str | None, str | None, bool]],
+    methods: list[MethodSignature],
 ) -> list[str]:
     lines = ["class ApiClient:"]
-    for public_name, params, returns, docstring, has_kwonly in methods:
-        lines.extend(
-            _build_method_stub(
-                public_name,
-                params,
-                returns,
-                docstring,
-                has_kwonly=has_kwonly,
+    index = 0
+    while index < len(methods):
+        public_name, *_ = methods[index]
+        grouped: list[MethodSignature] = []
+        while index < len(methods) and methods[index][0] == public_name:
+            grouped.append(methods[index])
+            index += 1
+
+        overloads = [sig for sig in grouped if sig[-1]]
+        implementations = [sig for sig in grouped if not sig[-1]]
+
+        if overloads:
+            for _, params, returns, _, has_kwonly, _ in overloads:
+                lines.append("    @overload")
+                lines.extend(
+                    _build_method_stub(
+                        public_name,
+                        params,
+                        returns,
+                        None,
+                        has_kwonly=has_kwonly,
+                    )
+                )
+            continue
+
+        if implementations:
+            _, params, returns, docstring, has_kwonly, _ = implementations[0]
+            lines.extend(
+                _build_method_stub(
+                    public_name,
+                    params,
+                    returns,
+                    docstring,
+                    has_kwonly=has_kwonly,
+                )
             )
-        )
     return lines
 
 
@@ -420,7 +482,7 @@ def _generate_stub(
     mod = ast.parse(source)
     mixin_class = _find_handle_mixin(mod)
     methods = _collect_method_signatures(source, mixin_class)
-    actual_imports = _collect_actual_imports(source, methods)
+    actual_imports, local_aliases = _collect_actual_imports(source, methods)
 
     lines = _build_generated_header(
         root=root,
@@ -428,7 +490,7 @@ def _generate_stub(
         source_hash=source_hash,
         generated_at=generated_at,
     )
-    lines.extend(_build_import_lines(methods, actual_imports))
+    lines.extend(_build_import_lines(methods, actual_imports, local_aliases))
     lines.extend(_build_class_lines(methods))
     return "\n".join(lines)
 
