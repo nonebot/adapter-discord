@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "loguru>=0.7.3",
+#     "rich>=14.3.3",
+#     "richuru>=0.1.1",
+# ]
+# ///
 """Generate client.pyi from HandleMixin methods in handle.py.
 
 This script extracts method signatures from HandleMixin and generates
@@ -8,13 +16,49 @@ the ApiClient stub file for type checking.
 from __future__ import annotations
 
 import ast
+from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
 from pathlib import Path
 import re
 
+from loguru import logger
+from rich.console import Console
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+    TimeElapsedColumn,
+)
+from rich.table import Table
+from rich.theme import Theme
+from richuru import install
+
 LINE_LENGTH = 88
 HASH_HEADER_PREFIX = "# Source SHA256: "
+SCRIPT_HASH_HEADER_PREFIX = "# Script SHA256: "
+
+CONSOLE = Console(
+    stderr=True,
+    theme=Theme(
+        {
+            "logging.level.success": "green",
+            "logging.level.trace": "bright_black",
+        }
+    ),
+)
+
+
+@dataclass(frozen=True, slots=True)
+class MethodSignature:
+    public_name: str
+    params: list[str]
+    returns: str | None
+    docstring: str | None
+    has_kwonly: bool
+    is_overload: bool
 
 
 def _get_source_segment(source: str, node: ast.AST | None) -> str | None:
@@ -115,16 +159,44 @@ def _format_param(
     annotation: str | None,
     *,
     has_default: bool,
+    default_value: str | None,
 ) -> str:
     ann = _format_annotation(annotation)
     ann_str = f": {ann}" if ann else ""
-    default_str = " = ..." if has_default else ""
+    if has_default:
+        normalized_default = "..."
+        if default_value is not None:
+            candidate = " ".join(default_value.split())
+            if _is_simple_stub_default(candidate):
+                normalized_default = candidate
+        default_str = f" = {normalized_default}"
+    else:
+        default_str = ""
     return f"{name}{ann_str}{default_str}"
+
+
+def _is_simple_stub_default(default_expr: str) -> bool:
+    try:
+        node = ast.parse(default_expr, mode="eval").body
+    except SyntaxError:
+        return False
+
+    if isinstance(node, ast.Constant):
+        return node.value is None or isinstance(
+            node.value, bool | int | float | str | bytes
+        )
+
+    if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
+        return isinstance(node.operand, ast.Constant) and isinstance(
+            node.operand.value, int | float
+        )
+
+    return False
 
 
 def _extract_method_signature(
     source: str, method: ast.AsyncFunctionDef
-) -> tuple[str, list[str], str | None, str | None, bool]:
+) -> MethodSignature:
     public_name = _strip_leading_underscore(method.name)
     docstring = _extract_docstring(method)
 
@@ -141,12 +213,29 @@ def _extract_method_signature(
             continue
         ann = _get_source_segment(source, arg.annotation)
         has_default = idx >= default_start
-        params.append(_format_param(arg.arg, ann, has_default=has_default))
+        default_node = defaults[idx - default_start] if has_default else None
+        default_value = _get_source_segment(source, default_node)
+        params.append(
+            _format_param(
+                arg.arg,
+                ann,
+                has_default=has_default,
+                default_value=default_value,
+            )
+        )
 
     for arg, default in zip(args.kwonlyargs, args.kw_defaults, strict=False):
         ann = _get_source_segment(source, arg.annotation)
         has_default = default is not None
-        params.append(_format_param(arg.arg, ann, has_default=has_default))
+        default_value = _get_source_segment(source, default)
+        params.append(
+            _format_param(
+                arg.arg,
+                ann,
+                has_default=has_default,
+                default_value=default_value,
+            )
+        )
 
     if args.kwarg is not None:
         ann = _get_source_segment(source, args.kwarg.annotation)
@@ -157,7 +246,19 @@ def _extract_method_signature(
 
     returns = _get_source_segment(source, method.returns)
 
-    return public_name, params, returns, docstring, has_kwonly
+    is_overload = any(
+        (isinstance(decorator, ast.Name) and decorator.id == "overload")
+        or (isinstance(decorator, ast.Attribute) and decorator.attr == "overload")
+        for decorator in method.decorator_list
+    )
+    return MethodSignature(
+        public_name=public_name,
+        params=params,
+        returns=returns,
+        docstring=docstring,
+        has_kwonly=has_kwonly,
+        is_overload=is_overload,
+    )
 
 
 def _collect_available_imports(source: str) -> dict[str, str]:
@@ -178,18 +279,36 @@ def _collect_available_imports(source: str) -> dict[str, str]:
     return available
 
 
+def _collect_local_aliases(source: str) -> dict[str, str]:
+    mod = ast.parse(source)
+    aliases: dict[str, str] = {}
+    for node in mod.body:
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if not isinstance(target, ast.Name):
+            continue
+        value = _get_source_segment(source, node.value)
+        if value is None:
+            continue
+        normalized = _format_annotation(value)
+        normalized = re.sub(r",\s*\]", "]", normalized)
+        aliases[target.id] = normalized
+    return aliases
+
+
 def _extract_used_types(
-    signatures: list[tuple[str, list[str], str | None, str | None, bool]],
+    signatures: list[MethodSignature],
 ) -> set[str]:
     """Extract type names actually used in method signatures."""
     used: set[str] = set()
     type_pattern = re.compile(r"\b([A-Z][A-Za-z0-9_]*)\b")
 
-    for _, params, returns, _, _ in signatures:
-        for param in params:
+    for signature in signatures:
+        for param in signature.params:
             used.update(type_pattern.findall(param))
-        if returns:
-            used.update(type_pattern.findall(returns))
+        if signature.returns:
+            used.update(type_pattern.findall(signature.returns))
 
     return used
 
@@ -204,43 +323,69 @@ def _find_handle_mixin(mod: ast.Module) -> ast.ClassDef:
 
 def _collect_method_signatures(
     source: str, mixin_class: ast.ClassDef
-) -> list[tuple[str, list[str], str | None, str | None, bool]]:
-    def is_overload(node: ast.AsyncFunctionDef) -> bool:
-        for decorator in node.decorator_list:
-            if isinstance(decorator, ast.Name) and decorator.id == "overload":
-                return True
-            if isinstance(decorator, ast.Attribute) and decorator.attr == "overload":
-                return True
-        return False
-
-    return [
-        _extract_method_signature(source, node)
+) -> list[MethodSignature]:
+    async_methods = [
+        node
         for node in mixin_class.body
-        if (
-            isinstance(node, ast.AsyncFunctionDef)
-            and node.name.startswith("_api_")
-            and not is_overload(node)
-        )
+        if isinstance(node, ast.AsyncFunctionDef) and node.name.startswith("_api_")
     ]
+    logger.debug(
+        "Preparing to collect method signatures",
+        alt=f"Found {len(async_methods)} _api_ methods in HandleMixin",
+    )
+
+    signatures: list[MethodSignature] = []
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[bold cyan]{task.description}"),
+        BarColumn(bar_width=None),
+        MofNCompleteColumn(),
+        TextColumn("•"),
+        TimeElapsedColumn(),
+        console=CONSOLE,
+        transient=True,
+    ) as progress:
+        task_id = progress.add_task(
+            "Collecting method signatures", total=len(async_methods)
+        )
+        for method in async_methods:
+            signature = _extract_method_signature(source, method)
+            signatures.append(signature)
+            logger.debug(
+                "Collected signature name={name} overload={overload}",
+                name=signature.public_name,
+                overload=signature.is_overload,
+                alt=f"Collected {signature.public_name} (overload={signature.is_overload})",
+            )
+            progress.advance(task_id)
+
+    return signatures
 
 
 def _collect_actual_imports(
     source: str,
-    methods: list[tuple[str, list[str], str | None, str | None, bool]],
-) -> dict[str, str]:
+    methods: list[MethodSignature],
+) -> tuple[dict[str, str], dict[str, str]]:
     available_imports = _collect_available_imports(source)
+    local_aliases = _collect_local_aliases(source)
     used_types = _extract_used_types(methods)
-    return {name: cat for name, cat in available_imports.items() if name in used_types}
+    imports = {
+        name: cat for name, cat in available_imports.items() if name in used_types
+    }
+    aliases = {
+        name: value for name, value in local_aliases.items() if name in used_types
+    }
+    return imports, aliases
 
 
 def _annotation_texts(
-    methods: list[tuple[str, list[str], str | None, str | None, bool]],
+    methods: list[MethodSignature],
 ) -> list[str]:
     texts: list[str] = []
-    for _, params, returns, _, _ in methods:
-        texts.extend(params)
-        if returns:
-            texts.append(returns)
+    for signature in methods:
+        texts.extend(signature.params)
+        if signature.returns:
+            texts.append(signature.returns)
     return texts
 
 
@@ -256,9 +401,10 @@ def _import_sort_key(name: str) -> tuple[int, str]:
     return (0 if name.isupper() else 1, name)
 
 
-def _build_import_lines(
-    methods: list[tuple[str, list[str], str | None, str | None, bool]],
+def _build_import_lines(  # noqa: C901
+    methods: list[MethodSignature],
     actual_imports: dict[str, str],
+    local_aliases: dict[str, str],
 ) -> list[str]:
     lines: list[str] = []
     model_imports = sorted(
@@ -274,12 +420,18 @@ def _build_import_lines(
     need_datetime = any("datetime" in text for text in texts)
     need_literal = any("Literal" in text for text in texts)
     need_any = any(re.search(r"\bAny\b", text) for text in texts)
+    need_overload = any(method.is_overload for method in methods)
 
     typing_imports: list[str] = []
     if need_any:
         typing_imports.append("Any")
     if need_literal:
         typing_imports.append("Literal")
+    if need_overload:
+        typing_imports.append("overload")
+    if local_aliases:
+        typing_imports.append("TypeAlias")
+    typing_imports = sorted(set(typing_imports))
 
     if need_datetime:
         lines.append("from datetime import datetime")
@@ -290,6 +442,15 @@ def _build_import_lines(
 
     _append_import_block(lines, "model", model_imports)
     _append_import_block(lines, "types", type_imports)
+
+    if model_imports or type_imports:
+        lines.append("")
+
+    for name, value in sorted(local_aliases.items()):
+        lines.append(f"{name}: TypeAlias = {value}")
+    if local_aliases:
+        lines.append("")
+
     lines.append("")
     return lines
 
@@ -336,9 +497,11 @@ def _render_param_lines(param: str) -> list[str]:
         return [single_line]
 
     name, rest = param.split(": ", 1)
-    has_default = rest.endswith(" = ...")
-    annotation = rest[:-6] if has_default else rest
-    default = " = ..." if has_default else ""
+    annotation = rest
+    default = ""
+    if " = " in rest:
+        annotation, default_value = rest.rsplit(" = ", 1)
+        default = f" = {default_value}"
 
     if " | " in annotation:
         left, right = annotation.rsplit(" | ", 1)
@@ -360,19 +523,45 @@ def _render_param_lines(param: str) -> list[str]:
 
 
 def _build_class_lines(
-    methods: list[tuple[str, list[str], str | None, str | None, bool]],
+    methods: list[MethodSignature],
 ) -> list[str]:
     lines = ["class ApiClient:"]
-    for public_name, params, returns, docstring, has_kwonly in methods:
-        lines.extend(
-            _build_method_stub(
-                public_name,
-                params,
-                returns,
-                docstring,
-                has_kwonly=has_kwonly,
+    index = 0
+    while index < len(methods):
+        public_name = methods[index].public_name
+        grouped: list[MethodSignature] = []
+        while index < len(methods) and methods[index].public_name == public_name:
+            grouped.append(methods[index])
+            index += 1
+
+        overloads = [sig for sig in grouped if sig.is_overload]
+        implementations = [sig for sig in grouped if not sig.is_overload]
+
+        if overloads:
+            for signature in overloads:
+                lines.append("    @overload")
+                lines.extend(
+                    _build_method_stub(
+                        public_name,
+                        signature.params,
+                        signature.returns,
+                        None,
+                        has_kwonly=signature.has_kwonly,
+                    )
+                )
+            continue
+
+        if implementations:
+            signature = implementations[0]
+            lines.extend(
+                _build_method_stub(
+                    public_name,
+                    signature.params,
+                    signature.returns,
+                    signature.docstring,
+                    has_kwonly=signature.has_kwonly,
+                )
             )
-        )
     return lines
 
 
@@ -380,15 +569,20 @@ def _calc_file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _extract_recorded_source_hash(client_path: Path) -> str | None:
+def _extract_recorded_hashes(client_path: Path) -> tuple[str | None, str | None]:
     if not client_path.exists():
-        return None
+        return None, None
+
+    source_hash: str | None = None
+    script_hash: str | None = None
 
     for line in client_path.read_text("utf-8").splitlines()[:20]:
         if line.startswith(HASH_HEADER_PREFIX):
-            return line[len(HASH_HEADER_PREFIX) :].strip()
+            source_hash = line[len(HASH_HEADER_PREFIX) :].strip()
+        if line.startswith(SCRIPT_HASH_HEADER_PREFIX):
+            script_hash = line[len(SCRIPT_HASH_HEADER_PREFIX) :].strip()
 
-    return None
+    return source_hash, script_hash
 
 
 def _build_generated_header(
@@ -396,6 +590,7 @@ def _build_generated_header(
     root: Path,
     handle_path: Path,
     source_hash: str,
+    script_hash: str,
     generated_at: str,
 ) -> list[str]:
     relative_source = handle_path.relative_to(root).as_posix()
@@ -405,6 +600,7 @@ def _build_generated_header(
         f"# Generated at: {generated_at}",
         f"# Source file: {relative_source}",
         f"{HASH_HEADER_PREFIX}{source_hash}",
+        f"{SCRIPT_HASH_HEADER_PREFIX}{script_hash}",
         "",
     ]
 
@@ -414,33 +610,67 @@ def _generate_stub(
     handle_path: Path,
     *,
     source_hash: str,
+    script_hash: str,
     generated_at: str,
 ) -> str:
     source = handle_path.read_text("utf-8")
     mod = ast.parse(source)
     mixin_class = _find_handle_mixin(mod)
     methods = _collect_method_signatures(source, mixin_class)
-    actual_imports = _collect_actual_imports(source, methods)
+    overload_count = sum(1 for method in methods if method.is_overload)
+    signature_summary = Table(title="Method Signatures", show_header=True)
+    signature_summary.add_column("Metric", style="cyan")
+    signature_summary.add_column("Value", style="green")
+    signature_summary.add_row("Total", str(len(methods)))
+    signature_summary.add_row("Overloads", str(overload_count))
+    logger.debug(
+        "Collected method signatures",
+        rich=signature_summary,
+        alt=f"Method signatures: total={len(methods)}, overloads={overload_count}",
+    )
+    actual_imports, local_aliases = _collect_actual_imports(source, methods)
 
     lines = _build_generated_header(
         root=root,
         handle_path=handle_path,
         source_hash=source_hash,
+        script_hash=script_hash,
         generated_at=generated_at,
     )
-    lines.extend(_build_import_lines(methods, actual_imports))
+    lines.extend(_build_import_lines(methods, actual_imports, local_aliases))
     lines.extend(_build_class_lines(methods))
     return "\n".join(lines)
 
 
 def main() -> None:
+    install(rich_console=CONSOLE, level="DEBUG")
     root = Path(__file__).resolve().parents[1]
     handle_path = root / "nonebot/adapters/discord/api/handle.py"
     client_path = root / "nonebot/adapters/discord/api/client.pyi"
+    script_path = Path(__file__).resolve()
 
     source_hash = _calc_file_sha256(handle_path)
-    previous_hash = _extract_recorded_source_hash(client_path)
-    if previous_hash == source_hash:
+    script_hash = _calc_file_sha256(script_path)
+    previous_source_hash, previous_script_hash = _extract_recorded_hashes(client_path)
+
+    hash_table = Table(title="client.pyi generation hashes", show_header=True)
+    hash_table.add_column("Type", style="cyan")
+    hash_table.add_column("Current", style="green")
+    hash_table.add_column("Previous", style="magenta")
+    hash_table.add_row("Source", source_hash, str(previous_source_hash))
+    hash_table.add_row("Script", script_hash, str(previous_script_hash))
+    logger.info(
+        "Checking client.pyi generation hashes",
+        rich=hash_table,
+        alt=(
+            "Checking client.pyi generation "
+            f"source={source_hash} script={script_hash} "
+            f"prev_source={previous_source_hash} prev_script={previous_script_hash}"
+        ),
+    )
+
+    if previous_source_hash == source_hash and previous_script_hash == script_hash:
+        logger.success("Skip generation because hashes are unchanged")
         return
 
     generated_at = (
@@ -453,9 +683,11 @@ def main() -> None:
         root,
         handle_path,
         source_hash=source_hash,
+        script_hash=script_hash,
         generated_at=generated_at,
     )
     client_path.write_text(stub_content, "utf-8")
+    logger.success("Generated client.pyi")
 
 
 if __name__ == "__main__":

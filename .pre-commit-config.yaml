@@ -12,6 +12,10 @@ repos:
         name: generate client.pyi
         entry: scripts/generate_client_pyi.py
         language: python
+        additional_dependencies:
+          - loguru>=0.7.3
+          - rich>=14.3.3
+          - richuru>=0.1.1
         pass_filenames: false
         files: ^(nonebot/adapters/discord/api/handle\.py|scripts/generate_client_pyi\.py)$
 
