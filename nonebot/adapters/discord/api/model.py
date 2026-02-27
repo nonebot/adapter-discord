@@ -156,6 +156,7 @@ from .models.monetization import (
 from .models.oauth2 import AuthorizationResponse
 from .models.permissions import Role, RoleColors, RoleTags
 from .models.polls import (
+    AnswerVoters,
     Poll,
     PollAnswer,
     PollAnswerCount,
@@ -2097,16 +2098,6 @@ class BulkBan(BaseModel):
     """list of user ids, that were successfully banned"""
     failed_users: list[Snowflake]
     """list of user ids, that were not banned"""
-
-
-class AnswerVoters(BaseModel):
-    """get answer voter response
-
-    see https://discord.com/developers/docs/resources/poll#get-answer-voters-response-body
-    """
-
-    users: list[User]
-    """Users who voted for this answer"""
 
 
 class SoundboardSound(BaseModel):

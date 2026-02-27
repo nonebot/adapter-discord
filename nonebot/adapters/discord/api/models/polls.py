@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from ..types import UNSET, Missing
 
 if TYPE_CHECKING:
-    from ..model import Emoji
+    from ..model import Emoji, User
 
 
 class Poll(BaseModel):
@@ -105,3 +105,8 @@ class PollAnswerCount(BaseModel):
     id: int
     count: int
     me_voted: bool
+
+
+class AnswerVoters(BaseModel):
+    users: list[User]
+    """Users who voted for this answer"""
