@@ -127,6 +127,7 @@ from .models.lobby import (
     ModifyLobbyParams,
 )
 from .models.oauth2 import AuthorizationResponse
+from .models.permissions import Role, RoleColors, RoleTags
 from .models.polls import (
     Poll,
     PollAnswer,
@@ -186,7 +187,6 @@ from .types import (
     PremiumTier,
     PremiumType,
     PresenceStatus,
-    RoleFlag,
     SKUFlag,
     SKUType,
     SortOrderTypes,
@@ -2145,51 +2145,6 @@ class StageInstanceDelete(StageInstance):
 
 # Permissions
 # see https://discord.com/developers/docs/topics/permissions
-
-
-class RoleColors(BaseModel):
-    """Role colors.
-
-    see https://discord.com/developers/docs/topics/permissions#role-object-role-colors-object
-    """
-
-    primary_color: int
-    secondary_color: int | None = None
-    tertiary_color: int | None = None
-
-
-class Role(BaseModel):
-    """Role
-
-    see https://discord.com/developers/docs/topics/permissions#role-object"""
-
-    id: Snowflake
-    name: str
-    color: int
-    colors: Missing[RoleColors] = UNSET
-    hoist: bool
-    icon: MissingOrNullable[str] = UNSET
-    unicode_emoji: MissingOrNullable[str] = UNSET
-    position: int
-    permissions: str
-    managed: bool
-    mentionable: bool
-    tags: Missing["RoleTags"] = UNSET
-    flags: Missing[RoleFlag] = UNSET
-
-
-class RoleTags(BaseModel):
-    """Role tags.
-
-    see https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
-    """
-
-    bot_id: Missing[Snowflake] = UNSET
-    integration_id: Missing[Snowflake] = UNSET
-    premium_subscriber: Missing[None] = UNSET
-    subscription_listing_id: Missing[Snowflake] = UNSET
-    available_for_purchase: Missing[None] = UNSET
-    guild_connections: Missing[None] = UNSET
 
 
 class Entitlement(BaseModel):
