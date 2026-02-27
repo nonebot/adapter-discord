@@ -94,6 +94,7 @@ from .models.gateway_payloads import (
     UpdatePresence,
     UpdateVoiceState,
 )
+from .models.guild_members import ModifyCurrentMemberParams, ModifyGuildMemberParams
 from .models.guild_scheduled_events import (
     CreateGuildScheduledEventParams,
     GuildScheduledEvent,
@@ -893,35 +894,6 @@ class ModifyGuildChannelPositionParams(BaseModel):
     position: MissingOrNullable[int] = UNSET
     lock_permissions: MissingOrNullable[bool] = UNSET
     parent_id: MissingOrNullable[Snowflake] = UNSET
-
-
-class ModifyGuildMemberParams(BaseModel):
-    """Modify Guild Member Params.
-
-    All parameters are optional and nullable.
-
-    see https://discord.com/developers/docs/resources/guild#modify-guild-member
-    """
-
-    nick: MissingOrNullable[str] = UNSET
-    roles: MissingOrNullable[list[Snowflake]] = UNSET
-    mute: MissingOrNullable[bool] = UNSET
-    deaf: MissingOrNullable[bool] = UNSET
-    channel_id: MissingOrNullable[Snowflake] = UNSET
-    communication_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
-    flags: MissingOrNullable[GuildMemberFlags] = UNSET
-
-
-class ModifyCurrentMemberParams(BaseModel):
-    """Modify Current Member Params.
-
-    see https://discord.com/developers/docs/resources/guild#modify-current-member
-    """
-
-    nick: MissingOrNullable[str] = UNSET
-    banner: MissingOrNullable[str] = UNSET
-    avatar: MissingOrNullable[str] = UNSET
-    bio: MissingOrNullable[str] = UNSET
 
 
 # Guild
@@ -2277,8 +2249,10 @@ __all__ = [
     "MessageSnapshotMessage",
     "ModalSubmitData",
     "ModifyChannelParams",
+    "ModifyCurrentMemberParams",
     "ModifyCurrentUserParams",
     "ModifyGuildIncidentActionsParams",
+    "ModifyGuildMemberParams",
     "ModifyGuildOnboardingParams",
     "ModifyGuildParams",
     "ModifyGuildScheduledEventParams",
