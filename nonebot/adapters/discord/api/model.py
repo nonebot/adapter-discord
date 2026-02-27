@@ -69,6 +69,33 @@ from .models.auto_moderation import (
     CreateAndModifyAutoModerationRuleParams,
     TriggerMetadata,
 )
+from .models.channels import (
+    ArchivedThreadsResponse,
+    Channel,
+    DefaultReaction,
+    FollowedChannel,
+    ForumTag,
+    ForumTagRequest,
+    ModifyChannelParams,
+    ModifyGuildChannelPositionParams,
+    ModifyThreadParams,
+    Overwrite,
+    PartialOverwrite,
+    StartThreadFromMessageParams,
+    StartThreadWithoutMessageParams,
+    ThreadMember,
+    ThreadMetadata,
+)
+from .models.embeds import (
+    Embed,
+    EmbedAuthor,
+    EmbedField,
+    EmbedFooter,
+    EmbedImage,
+    EmbedProvider,
+    EmbedThumbnail,
+    EmbedVideo,
+)
 from .models.emoji import ApplicationEmojis, Emoji
 from .models.gateway import Gateway, GatewayBot, SessionStartLimit
 from .models.gateway_event_fields import (
@@ -144,6 +171,25 @@ from .models.lobby import (
     LobbyMember,
     ModifyLobbyParams,
 )
+from .models.messages import (
+    AllowedMention,
+    Attachment,
+    AttachmentSend,
+    ChannelMention,
+    CountDetails,
+    File,
+    MessageActivity,
+    MessageCall,
+    MessageEditParams,
+    MessageGet,
+    MessageReference,
+    MessageSend,
+    MessageSnapshot,
+    MessageSnapshotMessage,
+    Reaction,
+    RoleSubscriptionData,
+    WebhookMessageEditParams,
+)
 from .models.monetization import (
     SKU,
     Entitlement,
@@ -193,12 +239,8 @@ from .types import (
     ActivityAssetImage,
     ActivityFlags,
     ActivityType,
-    AllowedMentionType,
-    AttachmentFlag,
-    ChannelFlags,
     ChannelType,
     DefaultMessageNotificationLevel,
-    EmbedTypes,
     ExplicitContentFilterLevel,
     ForumLayoutTypes,
     GuildFeature,
@@ -206,10 +248,6 @@ from .types import (
     GuildNSFWLevel,
     IntegrationExpireBehaviors,
     InviteTargetType,
-    MessageActivityType,
-    MessageFlag,
-    MessageReferenceType,
-    MessageType,
     MFALevel,
     Missing,
     MissingOrNullable,
@@ -229,671 +267,6 @@ from .types import (
 
 # Channel
 # see https://discord.com/developers/docs/resources/channel
-
-
-class Channel(BaseModel):
-    """Represents a guild or DM channel within Discord.
-
-    see https://discord.com/developers/docs/resources/channel#channel-object"""
-
-    id: Snowflake
-    """the id of this channel"""
-    type: ChannelType
-    """the type of channel"""
-    guild_id: Missing[Snowflake] = UNSET
-    """the id of the guild (may be missing for some channel objects
-    received over gateway guild dispatches)"""
-    position: Missing[int] = UNSET
-    """sorting position of the channel"""
-    permission_overwrites: Missing[list["Overwrite"]] = UNSET
-    """explicit permission overwrites for members and roles"""
-    name: MissingOrNullable[str] = UNSET
-    """the name of the channel (1-100 characters)"""
-    topic: MissingOrNullable[str] = UNSET
-    """the channel topic (0-4096 characters for GUILD_FORUM channels,
-    0-1024 characters for all others)"""
-    nsfw: Missing[bool] = UNSET
-    """whether the channel is nsfw"""
-    last_message_id: MissingOrNullable[Snowflake] = UNSET
-    """the id of the last message sent in this channel
-    (or thread for GUILD_FORUM channels)
-    (may not point to an existing or valid message or thread)"""
-    bitrate: Missing[int] = UNSET
-    """the bitrate (in bits) of the voice channel"""
-    user_limit: Missing[int] = UNSET
-    """the user limit of the voice channel"""
-    rate_limit_per_user: Missing[int] = UNSET
-    """amount of seconds a user has to wait before sending another message (0-21600);
-    bots, as well as users with the permission manage_messages or
-    manage_channel, are unaffected"""
-    recipients: Missing[list["User"]] = UNSET
-    """the recipients of the DM"""
-    icon: MissingOrNullable[str] = UNSET
-    """icon hash of the group DM"""
-    owner_id: Missing[Snowflake] = UNSET
-    """id of the creator of the group DM or thread"""
-    application_id: Missing[Snowflake] = UNSET
-    """application id of the group DM creator if it is bot-created"""
-    managed: Missing[bool] = UNSET
-    """for group DM channels: whether the channel is managed
-    by an application via the gdm.join OAuth2 scope"""
-    parent_id: MissingOrNullable[Snowflake] = UNSET
-    """for guild channels: id of the parent category for a channel
-    (each parent category can contain up to 50 channels),
-    for threads: id of the text channel this thread was created"""
-    last_pin_timestamp: MissingOrNullable[datetime.datetime] = UNSET
-    """when the last pinned message was pinned.
-    This may be null in events such as GUILD_CREATE when a message is not pinned."""
-    rtc_region: MissingOrNullable[str] = UNSET
-    """voice region id for the voice channel, automatic when set to null"""
-    video_quality_mode: Missing[VideoQualityMode] = UNSET
-    """the camera video quality mode of the voice channel, 1 when not present"""
-    message_count: Missing[int] = UNSET
-    """number of messages (not including the initial message
-    or deleted messages) in a thread."""
-    member_count: Missing[int] = UNSET
-    """an approximate count of users in a thread, stops counting at 50"""
-    thread_metadata: Missing["ThreadMetadata"] = UNSET
-    """thread-specific fields not needed by other channels"""
-    member: Missing["ThreadMember"] = UNSET
-    """thread member object for the current user, if they have joined the thread,
-    only included on certain API endpoints"""
-    default_auto_archive_duration: Missing[int] = UNSET
-    """default duration, copied onto newly created threads, in minutes,
-    threads will stop showing in the channel list after the specified
-    period of inactivity, can be set to: 60, 1440, 4320, 10080"""
-    permissions: Missing[str] = UNSET
-    """computed permissions for the invoking user in the channel, including overwrites,
-    only included when part of the resolved data received on a slash command interaction
-    """
-    flags: Missing[ChannelFlags] = UNSET
-    """channel flags combined as a bitfield"""
-    total_message_sent: Missing[int] = UNSET
-    """number of messages ever sent in a thread, it's similar to message_count
-    on message creation, but will not decrement the number when a message is deleted"""
-    available_tags: Missing[list["ForumTag"]] = UNSET
-    """the set of tags that can be used in a GUILD_FORUM or a GUILD_MEDIA channel"""
-    applied_tags: Missing[list[Snowflake]] = UNSET
-    """the IDs of the set of tags that have been applied to a
-    thread in a GUILD_FORUM or a GUILD_MEDIA channel"""
-    default_reaction_emoji: MissingOrNullable["DefaultReaction"] = UNSET
-    """the emoji to show in the add reaction button on a
-    thread in a GUILD_FORUM channel"""
-    default_thread_rate_limit_per_user: Missing[int] = UNSET
-    """the initial rate_limit_per_user to set on newly created threads in a channel.
-    this field is copied to the thread at creation time and does not live update."""
-    default_sort_order: MissingOrNullable[SortOrderTypes] = UNSET
-    """the default sort order type used to order posts in GUILD_FORUM channels.
-    Defaults to null, which indicates a preferred sort order
-    hasn't been set by a channel admin"""
-    default_forum_layout: Missing[ForumLayoutTypes] = UNSET
-    """the default forum layout view used to display posts in GUILD_FORUM channels.
-    Defaults to 0, which indicates a layout view has not been set by a channel admin"""
-
-
-class MessageGet(BaseModel):
-    """Message
-
-    see https://discord.com/developers/docs/resources/message#message-object"""
-
-    id: Snowflake
-    channel_id: Snowflake
-    author: "User"
-    content: str
-    timestamp: datetime.datetime
-    edited_timestamp: datetime.datetime | None = Field(...)
-    tts: bool
-    mention_everyone: bool
-    mentions: list["User"]
-    mention_roles: list[Snowflake]
-    mention_channels: Missing[list["ChannelMention"]] = UNSET
-    attachments: list["Attachment"]
-    embeds: list["Embed"]
-    reactions: Missing[list["Reaction"]] = UNSET
-    nonce: Missing[int | str] = UNSET
-    pinned: bool
-    webhook_id: Missing[Snowflake] = UNSET
-    type: MessageType
-    activity: Missing["MessageActivity"] = UNSET
-    application: Missing[Application] = UNSET
-    application_id: Missing[Snowflake] = UNSET
-    message_reference: Missing["MessageReference"] = UNSET
-    flags: Missing[MessageFlag] = UNSET
-    message_snapshots: Missing[list["MessageSnapshot"]] = UNSET
-    referenced_message: MissingOrNullable["MessageGet"] = UNSET
-    interaction_metadata: Missing[MessageInteractionMetadata] = UNSET
-    interaction: Missing[MessageInteraction] = UNSET
-    thread: Missing[Channel] = UNSET
-    components: Missing[list[DirectComponent]] = UNSET
-    sticker_items: Missing[list["StickerItem"]] = UNSET
-    stickers: Missing[list["Sticker"]] = UNSET
-    position: Missing[int] = UNSET
-    role_subscription_data: Missing["RoleSubscriptionData"] = UNSET
-    resolved: Missing[ResolvedData] = UNSET
-    poll: Missing["Poll"] = UNSET
-    call: Missing["MessageCall"] = UNSET
-
-
-class MessageActivity(BaseModel):
-    """Message activity.
-
-    see https://discord.com/developers/docs/resources/message#message-object-message-activity-structure
-    """
-
-    type: MessageActivityType
-    party_id: Missing[str] = UNSET
-
-
-class MessageCall(BaseModel):
-    """Information about the call in a private channel.
-
-    see https://discord.com/developers/docs/resources/message#message-call-object
-    """
-
-    participants: list[Snowflake]
-    ended_timestamp: MissingOrNullable[datetime.datetime] = UNSET
-
-
-class MessageReference(BaseModel):
-    """Message reference.
-
-    see https://discord.com/developers/docs/resources/message#message-reference-object
-    """
-
-    type: Missing[MessageReferenceType] = UNSET
-    """type of reference."""
-    message_id: Missing[Snowflake] = UNSET
-    """id of the originating message"""
-    channel_id: Missing[Snowflake] = UNSET
-    """id of the originating message's channel.
-    channel_id is optional when creating a reply,
-    but will always be present when receiving an
-    event/response that includes this data model."""
-    guild_id: Missing[Snowflake] = UNSET
-    """id of the originating message's guild"""
-    fail_if_not_exists: Missing[bool] = UNSET
-    """when sending, whether to error if the referenced
-    message doesn't exist instead of sending
-    as a normal (non-reply) message, default true"""
-
-
-class MessageSnapshot(BaseModel):
-    """Message Snapshot
-
-    While message snapshots are able to support nested snapshots, we currently limit the depth of nesting to 1.
-    see https://discord.com/developers/docs/resources/message#message-snapshot-object
-    """
-
-    message: "MessageSnapshotMessage"
-
-
-class MessageSnapshotMessage(BaseModel):
-    """partial message object for Message Snapshot
-
-    see https://discord.com/developers/docs/resources/message#message-snapshot-object"""
-
-    type: MessageType
-    content: str
-    embeds: list["Embed"]
-    attachments: list["Attachment"]
-    timestamp: datetime.datetime
-    edited_timestamp: datetime.datetime | None = Field(...)
-    flags: Missing[MessageFlag] = UNSET
-    mentions: list["User"]
-    mention_roles: Missing[list[Snowflake]] = UNSET
-    components: Missing[list[DirectComponent]] = UNSET
-    sticker_items: Missing[list["StickerItem"]] = UNSET
-    stickers: Missing[list["Sticker"]] = UNSET
-
-
-class FollowedChannel(BaseModel):
-    """Followed channel.
-
-    see https://discord.com/developers/docs/resources/channel#followed-channel-object"""
-
-    channel_id: Snowflake
-    webhook_id: Snowflake
-
-
-class Reaction(BaseModel):
-    """Reaction.
-
-    see https://discord.com/developers/docs/resources/message#reaction-object"""
-
-    count: int
-    count_details: Missing["CountDetails"] = UNSET
-    me: bool
-    me_burst: Missing[bool] = UNSET
-    emoji: "Emoji"
-    burst_colors: Missing[list[str]] = UNSET
-
-
-class CountDetails(BaseModel):
-    """Reaction Count Details
-
-    see https://discord.com/developers/docs/resources/message#reaction-count-details-object
-    """
-
-    burst: int
-    normal: int
-
-
-class Overwrite(BaseModel):
-    """Overwrite.
-
-    see https://discord.com/developers/docs/resources/channel#overwrite-object"""
-
-    id: Snowflake
-    type: OverwriteType
-    allow: str
-    deny: str
-
-
-class PartialOverwrite(BaseModel):
-    """Partial overwrite.
-
-    Used in request payloads where `allow`/`deny` can be omitted or null.
-
-    see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
-    """
-
-    id: Snowflake
-    type: OverwriteType
-    allow: MissingOrNullable[str] = UNSET
-    deny: MissingOrNullable[str] = UNSET
-
-
-class ThreadMetadata(BaseModel):
-    """Thread metadata.
-
-    see https://discord.com/developers/docs/resources/channel#thread-metadata-object"""
-
-    archived: bool
-    auto_archive_duration: int
-    archive_timestamp: datetime.datetime
-    locked: bool
-    invitable: Missing[bool] = UNSET
-    create_timestamp: MissingOrNullable[datetime.datetime] = UNSET
-
-
-class ThreadMember(BaseModel):
-    """Thread member.
-
-    see https://discord.com/developers/docs/resources/channel#thread-member-object"""
-
-    id: Missing[Snowflake] = UNSET
-    user_id: Missing[Snowflake] = UNSET
-    join_timestamp: datetime.datetime
-    flags: int
-    member: Missing["GuildMember"] = UNSET
-
-
-class DefaultReaction(BaseModel):
-    """Default reaction.
-
-    see https://discord.com/developers/docs/resources/channel#default-reaction-object"""
-
-    emoji_id: str | None = None
-    emoji_name: str | None = None
-
-
-class ForumTag(BaseModel):
-    """An object that represents a tag that is able to be applied
-    to a thread in a GUILD_FORUM or GUILD_MEDIA channel.
-
-    see https://discord.com/developers/docs/resources/channel#forum-tag-object"""
-
-    id: Snowflake
-    name: str
-    moderated: bool
-    emoji_id: Snowflake | None = None
-    emoji_name: str | None = None
-
-
-class ForumTagRequest(BaseModel):
-    """Forum tag request.
-
-    see https://discord.com/developers/docs/resources/channel#forum-tag-object"""
-
-    id: Missing[Snowflake] = UNSET
-    name: str
-    moderated: Missing[bool] = UNSET
-    emoji_id: MissingOrNullable[Snowflake] = UNSET
-    emoji_name: MissingOrNullable[str] = UNSET
-
-
-class Embed(BaseModel):
-    """Embed
-
-    see https://discord.com/developers/docs/resources/channel#embed-object"""
-
-    title: Missing[str] = UNSET
-    type: Missing[EmbedTypes] = UNSET
-    description: Missing[str] = UNSET
-    url: Missing[str] = UNSET
-    timestamp: Missing[datetime.datetime] = UNSET
-    color: Missing[int] = UNSET
-    footer: Missing["EmbedFooter"] = UNSET
-    image: Missing["EmbedImage"] = UNSET
-    thumbnail: Missing["EmbedThumbnail"] = UNSET
-    video: Missing["EmbedVideo"] = UNSET
-    provider: Missing["EmbedProvider"] = UNSET
-    author: Missing["EmbedAuthor"] = UNSET
-    fields: Missing[list["EmbedField"]] = UNSET
-
-
-class EmbedThumbnail(BaseModel):
-    """Embed thumbnail.
-
-    see https://discord.com/developers/docs/resources/message#embed-object-embed-thumbnail-structure
-    """
-
-    url: str
-    proxy_url: Missing[str] = UNSET
-    height: Missing[int] = UNSET
-    width: Missing[int] = UNSET
-
-
-class EmbedVideo(BaseModel):
-    """Embed video.
-
-    see https://discord.com/developers/docs/resources/message#embed-object-embed-video-structure
-    """
-
-    url: Missing[str] = UNSET
-    proxy_url: Missing[str] = UNSET
-    height: Missing[int] = UNSET
-    width: Missing[int] = UNSET
-
-
-class EmbedImage(BaseModel):
-    """Embed image.
-
-    see https://discord.com/developers/docs/resources/message#embed-object-embed-image-structure
-    """
-
-    url: str
-    proxy_url: Missing[str] = UNSET
-    height: Missing[int] = UNSET
-    width: Missing[int] = UNSET
-
-
-class EmbedProvider(BaseModel):
-    """Embed provider.
-
-    see https://discord.com/developers/docs/resources/message#embed-object-embed-provider-structure
-    """
-
-    name: Missing[str] = UNSET
-    url: Missing[str] = UNSET
-
-
-class EmbedAuthor(BaseModel):
-    """Embed author.
-
-    see https://discord.com/developers/docs/resources/message#embed-object-embed-author-structure
-    """
-
-    name: str
-    url: Missing[str] = UNSET
-    icon_url: Missing[str] = UNSET
-    proxy_icon_url: Missing[str] = UNSET
-
-
-class EmbedFooter(BaseModel):
-    """Embed footer.
-
-    see https://discord.com/developers/docs/resources/message#embed-object-embed-footer-structure
-    """
-
-    text: str
-    icon_url: Missing[str] = UNSET
-    proxy_icon_url: Missing[str] = UNSET
-
-
-class EmbedField(BaseModel):
-    """Embed field.
-
-    see https://discord.com/developers/docs/resources/message#embed-object-embed-field-structure
-    """
-
-    name: str
-    value: str
-    inline: Missing[bool] = UNSET
-
-
-class Attachment(BaseModel):
-    """Attachment
-
-    see https://discord.com/developers/docs/resources/message#attachment-object"""
-
-    id: Snowflake
-    filename: str
-    title: Missing[str] = UNSET
-    description: Missing[str] = UNSET
-    content_type: Missing[str] = UNSET
-    size: int
-    url: str
-    proxy_url: str
-    height: MissingOrNullable[int] = UNSET
-    width: MissingOrNullable[int] = UNSET
-    ephemeral: Missing[bool] = UNSET
-    duration_secs: Missing[float] = UNSET
-    waveform: Missing[str] = UNSET
-    flags: Missing[AttachmentFlag] = UNSET
-
-
-class ChannelMention(BaseModel):
-    """Channel mention.
-
-    see https://discord.com/developers/docs/resources/message#channel-mention-object"""
-
-    id: str
-    guild_id: str
-    type: ChannelType
-    name: str
-
-
-class AllowedMention(BaseModel):
-    """The allowed mention field allows for more granular control over
-    mentions without various hacks to the message
-    content. This will always validate against message content to avoid
-    phantom pings (e.g. to ping everyone, you must
-    still have @everyone in the message content),
-    and check against user/bot permissions.
-
-    see https://discord.com/developers/docs/resources/message#allowed-mentions-object"""
-
-    parse: list[AllowedMentionType]
-    """An array of allowed mention types to parse from the content."""
-    roles: list[Snowflake]
-    """Array of role_ids to mention (Max size of 100)"""
-    users: list[Snowflake]
-    """	Array of user_ids to mention (Max size of 100)"""
-    replied_user: bool
-    """For replies, whether to mention the author of the message
-    being replied to (default false)"""
-
-
-class RoleSubscriptionData(BaseModel):
-    """Role subscription data.
-
-    see https://discord.com/developers/docs/resources/message#role-subscription-data-object
-    """
-
-    role_subscription_listing_id: str
-    tier_name: str
-    total_months_subscribed: int
-    is_renewal: bool
-
-
-class ArchivedThreadsResponse(BaseModel):
-    """Archived threads response.
-
-    see https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body
-    """
-
-    threads: list[Channel]
-    members: list[ThreadMember]
-    has_more: bool
-
-
-class File(BaseModel):
-    """File payload for multipart upload.
-
-    see https://discord.com/developers/docs/reference#uploading-files
-    """
-
-    content: bytes
-    filename: str
-
-
-class AttachmentSend(BaseModel):
-    """Attachment Send
-
-    see https://discord.com/developers/docs/resources/channel#attachment-object"""
-
-    id: Missing[int] = UNSET
-    filename: Missing[str] = UNSET
-    description: MissingOrNullable[str] = UNSET
-
-
-class MessageSend(BaseModel):
-    """Message Send
-
-    see https://discord.com/developers/docs/resources/message#create-message"""
-
-    content: Missing[str] = UNSET
-    nonce: Missing[int | str] = UNSET
-    enforce_nonce: Missing[bool] = UNSET
-    tts: Missing[bool] = UNSET
-    embeds: Missing[list[Embed]] = UNSET
-    allowed_mentions: Missing[AllowedMention] = UNSET
-    message_reference: Missing[MessageReference] = UNSET
-    components: Missing[list[DirectComponent]] = UNSET
-    sticker_ids: Missing[list[Snowflake]] = UNSET
-    files: Missing[list[File]] = UNSET
-    attachments: Missing[list[AttachmentSend]] = UNSET
-    flags: Missing[MessageFlag] = UNSET
-    poll: Missing["PollRequest"] = UNSET
-
-
-class MessageEditParams(BaseModel):
-    """Edit Message Parameters.
-
-    All parameters are optional and nullable.
-
-    see https://discord.com/developers/docs/resources/message#edit-message
-    """
-
-    content: MissingOrNullable[str] = UNSET
-    embeds: MissingOrNullable[list[Embed]] = UNSET
-    flags: MissingOrNullable[MessageFlag] = UNSET
-    allowed_mentions: MissingOrNullable[AllowedMention] = UNSET
-    components: MissingOrNullable[list[Component]] = UNSET
-    files: Missing[list[File]] = UNSET
-    attachments: MissingOrNullable[list[AttachmentSend]] = UNSET
-    sticker_ids: Missing[list[Snowflake]] = UNSET
-    poll: MissingOrNullable["PollRequest"] = UNSET
-
-
-class WebhookMessageEditParams(BaseModel):
-    """Edit Webhook Message Parameters.
-
-    All parameters are optional and nullable.
-
-    see https://discord.com/developers/docs/resources/webhook#edit-webhook-message
-    """
-
-    content: MissingOrNullable[str] = UNSET
-    embeds: MissingOrNullable[list[Embed]] = UNSET
-    flags: MissingOrNullable[MessageFlag] = UNSET
-    allowed_mentions: MissingOrNullable[AllowedMention] = UNSET
-    components: MissingOrNullable[list[Component]] = UNSET
-    files: Missing[list[File]] = UNSET
-    attachments: MissingOrNullable[list[AttachmentSend]] = UNSET
-    poll: MissingOrNullable["PollRequest"] = UNSET
-
-
-class ModifyChannelParams(BaseModel):
-    """Modify Channel Params
-
-    see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
-    """
-
-    # JSON Params (Guild channel)
-    # see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
-    name: Missing[str] = UNSET
-    type: Missing[ChannelType] = UNSET
-    position: MissingOrNullable[int] = UNSET
-    topic: MissingOrNullable[str] = UNSET
-    nsfw: MissingOrNullable[bool] = UNSET
-    rate_limit_per_user: MissingOrNullable[int] = UNSET
-    bitrate: MissingOrNullable[int] = UNSET
-    user_limit: MissingOrNullable[int] = UNSET
-    permission_overwrites: MissingOrNullable[list[PartialOverwrite]] = UNSET
-    parent_id: MissingOrNullable[Snowflake] = UNSET
-    rtc_region: MissingOrNullable[str] = UNSET
-    video_quality_mode: MissingOrNullable[VideoQualityMode] = UNSET
-    default_auto_archive_duration: MissingOrNullable[int] = UNSET
-    flags: Missing[ChannelFlags] = UNSET
-    available_tags: Missing[list[ForumTagRequest]] = UNSET
-    default_reaction_emoji: MissingOrNullable[DefaultReaction] = UNSET
-    default_thread_rate_limit_per_user: Missing[int] = UNSET
-    default_sort_order: MissingOrNullable[SortOrderTypes] = UNSET
-    default_forum_layout: Missing[ForumLayoutTypes] = UNSET
-
-
-class ModifyThreadParams(BaseModel):
-    """Modify Thread Params.
-
-    see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-thread
-    """
-
-    name: Missing[str] = UNSET
-    archived: Missing[bool] = UNSET
-    auto_archive_duration: Missing[int] = UNSET
-    locked: Missing[bool] = UNSET
-    invitable: Missing[bool] = UNSET
-    rate_limit_per_user: MissingOrNullable[int] = UNSET
-    flags: Missing[ChannelFlags] = UNSET
-    applied_tags: Missing[list[Snowflake]] = UNSET
-
-
-class StartThreadFromMessageParams(BaseModel):
-    """Start Thread From Message Params.
-
-    see https://discord.com/developers/docs/resources/channel#start-thread-from-message
-    """
-
-    name: str
-    auto_archive_duration: Missing[int] = UNSET
-    rate_limit_per_user: MissingOrNullable[int] = UNSET
-
-
-class StartThreadWithoutMessageParams(BaseModel):
-    """Start Thread Without Message Params.
-
-    see https://discord.com/developers/docs/resources/channel#start-thread-without-message
-    """
-
-    name: str
-    auto_archive_duration: Missing[int] = UNSET
-    type: Missing[ChannelType] = UNSET
-    invitable: Missing[bool] = UNSET
-    rate_limit_per_user: MissingOrNullable[int] = UNSET
-
-
-class ModifyGuildChannelPositionParams(BaseModel):
-    """Modify Guild Channel Position Params.
-
-    see https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions
-    """
-
-    id: Snowflake
-    position: MissingOrNullable[int] = UNSET
-    lock_permissions: MissingOrNullable[bool] = UNSET
-    parent_id: MissingOrNullable[Snowflake] = UNSET
 
 
 # Guild
@@ -2239,7 +1612,9 @@ __all__ = [
     "MembershipScreening",
     "MentionableOption",
     "MessageActivity",
+    "MessageCall",
     "MessageComponentData",
+    "MessageEditParams",
     "MessageGet",
     "MessageInteraction",
     "MessageInteractionMetadata",
@@ -2251,6 +1626,7 @@ __all__ = [
     "ModifyChannelParams",
     "ModifyCurrentMemberParams",
     "ModifyCurrentUserParams",
+    "ModifyGuildChannelPositionParams",
     "ModifyGuildIncidentActionsParams",
     "ModifyGuildMemberParams",
     "ModifyGuildOnboardingParams",
@@ -2260,12 +1636,14 @@ __all__ = [
     "ModifyGuildTemplateParams",
     "ModifyGuildWelcomeScreenParams",
     "ModifyLobbyParams",
+    "ModifyThreadParams",
     "NumberOption",
     "OnboardingPrompt",
     "OnboardingPromptOption",
     "OptionChoice",
     "OptionalAuditEntryInfo",
     "Overwrite",
+    "PartialOverwrite",
     "Poll",
     "PollAnswer",
     "PollAnswerCount",
@@ -2299,6 +1677,8 @@ __all__ = [
     "StageInstanceCreate",
     "StageInstanceDelete",
     "StageInstanceUpdate",
+    "StartThreadFromMessageParams",
+    "StartThreadWithoutMessageParams",
     "Sticker",
     "StickerItem",
     "StickerPack",
@@ -2337,6 +1717,7 @@ __all__ = [
     "VoiceState",
     "VoiceStateUpdate",
     "Webhook",
+    "WebhookMessageEditParams",
     "WebhooksUpdate",
     "WelcomeScreen",
     "WelcomeScreenChannel",
