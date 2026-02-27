@@ -68,7 +68,7 @@ from .models.auto_moderation import (
     CreateAndModifyAutoModerationRuleParams,
     TriggerMetadata,
 )
-from .models.emoji import Emoji
+from .models.emoji import ApplicationEmojis, Emoji
 from .models.gateway import Gateway, GatewayBot, SessionStartLimit
 from .models.gateway_event_fields import (
     StageInstanceCreate,
@@ -2085,14 +2085,6 @@ class ModifyGuildOnboardingParams(BaseModel):
     """Whether onboarding is enabled in the guild"""
     mode: Missing[OnboardingMode] = UNSET
     """Current mode of onboarding"""
-
-
-class ApplicationEmojis(BaseModel):
-    """a list of emoji objects for the given application under the items key.
-
-    see https://discord.com/developers/docs/resources/emoji#list-application-emojis"""
-
-    items: list[Emoji]
 
 
 class BulkBan(BaseModel):

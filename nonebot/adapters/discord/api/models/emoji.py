@@ -33,3 +33,12 @@ class Emoji(BaseModel):
     """whether this emoji is animated"""
     available: Missing[bool] = UNSET
     """whether this emoji can be used, may be false due to loss of Server Boosts"""
+
+
+class ApplicationEmojis(BaseModel):
+    """a list of emoji objects for the given application under the items key.
+
+    see https://discord.com/developers/docs/resources/emoji#list-application-emojis
+    """
+
+    items: list[Emoji]
