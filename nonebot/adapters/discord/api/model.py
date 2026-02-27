@@ -121,7 +121,11 @@ from .models.gateway_payloads import (
     UpdatePresence,
     UpdateVoiceState,
 )
-from .models.guild_members import ModifyCurrentMemberParams, ModifyGuildMemberParams
+from .models.guild_members import (
+    GuildMember,
+    ModifyCurrentMemberParams,
+    ModifyGuildMemberParams,
+)
 from .models.guild_scheduled_events import (
     CreateGuildScheduledEventParams,
     GuildScheduledEvent,
@@ -283,26 +287,6 @@ from .types import (
 
 # Guild
 # see https://discord.com/developers/docs/resources/guild
-class GuildMember(BaseModel):
-    """Guild Member
-
-    see https://discord.com/developers/docs/resources/guild#guild-member-object"""
-
-    user: Missing["User"] = UNSET
-    nick: MissingOrNullable[str] = UNSET
-    avatar: MissingOrNullable[str] = UNSET
-    roles: list[Snowflake]
-    joined_at: datetime.datetime
-    premium_since: MissingOrNullable[datetime.datetime] = UNSET
-    deaf: Missing[bool] = UNSET
-    mute: Missing[bool] = UNSET
-    flags: GuildMemberFlags
-    pending: Missing[bool] = UNSET
-    permissions: Missing[str] = UNSET
-    communication_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
-    avatar_decoration_data: MissingOrNullable["AvatarDecorationData"] = UNSET
-
-
 class Integration(BaseModel):
     """Integration
 
