@@ -72,10 +72,16 @@ from .models.auto_moderation import (
 from .models.channels import (
     ArchivedThreadsResponse,
     Channel,
+    ChannelCreate,
+    ChannelDelete,
+    ChannelPinsUpdate,
+    ChannelUpdate,
+    CreateGuildChannelParams,
     DefaultReaction,
     FollowedChannel,
     ForumTag,
     ForumTagRequest,
+    ListActiveGuildThreadsResponse,
     ModifyChannelParams,
     ModifyGuildChannelPositionParams,
     ModifyThreadParams,
@@ -83,8 +89,14 @@ from .models.channels import (
     PartialOverwrite,
     StartThreadFromMessageParams,
     StartThreadWithoutMessageParams,
+    ThreadCreate,
+    ThreadDelete,
+    ThreadListSync,
     ThreadMember,
+    ThreadMembersUpdate,
+    ThreadMemberUpdate,
     ThreadMetadata,
+    ThreadUpdate,
 )
 from .models.embeds import (
     Embed,
@@ -279,10 +291,8 @@ from .types import (
     ActivityAssetImage,
     ActivityFlags,
     ActivityType,
-    ChannelType,
     DefaultMessageNotificationLevel,
     ExplicitContentFilterLevel,
-    ForumLayoutTypes,
     GuildFeature,
     GuildMemberFlags,
     GuildNSFWLevel,
@@ -294,50 +304,14 @@ from .types import (
     PremiumTier,
     PremiumType,
     PresenceStatus,
-    SortOrderTypes,
     SystemChannelFlags,
     TriggerType,
     UserFlags,
     VerificationLevel,
-    VideoQualityMode,
 )
 
 # Channel
 # see https://discord.com/developers/docs/resources/channel
-
-
-class CreateGuildChannelParams(BaseModel):
-    """Create Guild Channel Params
-
-    see https://discord.com/developers/docs/resources/guild#create-guild-channel"""
-
-    name: str
-    type: ChannelType | None = None
-    topic: str | None = None
-    bitrate: int | None = None
-    user_limit: int | None = None
-    rate_limit_per_user: int | None = None
-    position: int | None = None
-    permission_overwrites: list["Overwrite"] | None = None
-    parent_id: Snowflake | None = None
-    nsfw: bool | None = None
-    rtc_region: str | None = None
-    video_quality_mode: VideoQualityMode | None = None
-    default_auto_archive_duration: int | None = None
-    default_reaction_emoji: DefaultReaction | None = None
-    available_tags: list[ForumTagRequest] | None = None
-    default_sort_order: SortOrderTypes | None = None
-    default_forum_layout: ForumLayoutTypes | None = None
-    default_thread_rate_limit_per_user: int | None = None
-
-
-class ListActiveGuildThreadsResponse(BaseModel):
-    """List Active Guild Threads Response
-
-    see https://discord.com/developers/docs/resources/guild#list-active-guild-threads"""
-
-    threads: list[Channel]
-    members: list[ThreadMember]
 
 
 class ModifyGuildEmojiParams(BaseModel):
@@ -464,94 +438,6 @@ class AutoModerationActionExecution(BaseModel):
     content: str
     matched_keyword: str | None = Field(...)
     matched_content: str | None = Field(...)
-
-
-class ChannelCreate(Channel):
-    """Channel Create Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#channel-create"""
-
-
-class ChannelUpdate(Channel):
-    """Channel Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#channel-update"""
-
-
-class ChannelDelete(Channel):
-    """Channel Delete Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#channel-delete"""
-
-
-class ThreadCreate(Channel):
-    """Thread Create Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#thread-create"""
-
-    newly_created: Missing[bool] = UNSET
-    thread_member: Missing[ThreadMember] = UNSET
-
-
-class ThreadUpdate(Channel):
-    """Thread Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#thread-update"""
-
-
-class ThreadDelete(BaseModel):
-    """Thread Delete Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#thread-delete"""
-
-    id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-    parent_id: MissingOrNullable[Snowflake] = UNSET
-    type: ChannelType
-
-
-class ThreadListSync(BaseModel):
-    """Thread List Sync Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#thread-list-sync
-    """
-
-    guild_id: Snowflake
-    channel_ids: Missing[list[Snowflake]] = UNSET
-    threads: list[Channel]
-    members: list[ThreadMember]
-
-
-class ThreadMemberUpdate(ThreadMember):
-    """Thread Member Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#thread-member-update
-    """
-
-    guild_id: Snowflake
-
-
-class ThreadMembersUpdate(BaseModel):
-    """Thread Members Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#thread-members-update
-    """
-
-    id: Snowflake
-    guild_id: Snowflake
-    member_count: int
-    added_members: Missing[list[ThreadMember]] = UNSET
-    removed_member_ids: Missing[list[Snowflake]] = UNSET
-
-
-class ChannelPinsUpdate(BaseModel):
-    """Channel Pins Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#channel-pins-update"""
-
-    guild_id: Missing[Snowflake] = UNSET
-    channel_id: Snowflake
-    last_pin_timestamp: Missing[datetime.datetime | None] = UNSET
 
 
 class GuildCreate(BaseModel):
