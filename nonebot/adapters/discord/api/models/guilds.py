@@ -22,9 +22,9 @@ from ..types import (
 )
 
 if TYPE_CHECKING:
+    from .guild_welcome import WelcomeScreen
     from .permissions import Role
     from .stickers import Sticker
-    from ..model import WelcomeScreen
 
 
 class Guild(BaseModel):

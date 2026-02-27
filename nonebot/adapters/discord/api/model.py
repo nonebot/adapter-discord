@@ -143,6 +143,11 @@ from .models.guild_templates import (
     GuildTemplateGuildRole,
     ModifyGuildTemplateParams,
 )
+from .models.guild_welcome import (
+    ModifyGuildWelcomeScreenParams,
+    WelcomeScreen,
+    WelcomeScreenChannel,
+)
 from .models.guilds import (
     CurrentUserGuild,
     Guild,
@@ -303,27 +308,6 @@ class Ban(BaseModel):
     user: "User"
 
 
-class WelcomeScreen(BaseModel):
-    """Welcome screen.
-
-    see https://discord.com/developers/docs/resources/guild#welcome-screen-object"""
-
-    description: str | None = None
-    welcome_channels: list["WelcomeScreenChannel"]
-
-
-class WelcomeScreenChannel(BaseModel):
-    """Welcome screen channel.
-
-    see https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure
-    """
-
-    channel_id: Snowflake
-    description: str
-    emoji_id: Snowflake | None = None
-    emoji_name: str | None = None
-
-
 class GuildOnboarding(BaseModel):
     """Guild onboarding.
 
@@ -468,17 +452,6 @@ class ListActiveGuildThreadsResponse(BaseModel):
 
     threads: list[Channel]
     members: list[ThreadMember]
-
-
-class ModifyGuildWelcomeScreenParams(BaseModel):
-    """Modify Guild Welcome Screen Params
-
-    see https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
-    """
-
-    enabled: MissingOrNullable[bool] = UNSET
-    welcome_channels: MissingOrNullable[list[WelcomeScreenChannel]] = UNSET
-    description: MissingOrNullable[str] = UNSET
 
 
 class ModifyGuildWidgetParams(BaseModel):
