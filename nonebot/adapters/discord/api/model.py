@@ -96,6 +96,7 @@ from .models.polls import (
 )
 from .models.snowflake import Snowflake, SnowflakeType
 from .models.teams import Team, TeamMember, TeamMemberUser
+from .models.voice import VoiceRegion, VoiceState
 from .types import (
     UNSET,
     ActivityAssetImage,
@@ -1841,40 +1842,6 @@ class ApplicationRoleConnection(BaseModel):
     platform_name: str | None = Field(...)
     platform_username: str | None = Field(...)
     metadata: dict  # object
-
-
-# Voice
-# see https://discord.com/developers/docs/resources/voice
-class VoiceState(BaseModel):
-    """Voice State
-
-    see https://discord.com/developers/docs/resources/voice#voice-state-object"""
-
-    guild_id: Missing[Snowflake] = UNSET
-    channel_id: Snowflake | None = Field(...)
-    user_id: Snowflake
-    member: Missing[GuildMember] = UNSET
-    session_id: str
-    deaf: bool
-    mute: bool
-    self_deaf: bool
-    self_mute: bool
-    self_stream: Missing[bool] = UNSET
-    self_video: bool
-    suppress: bool
-    request_to_speak_timestamp: datetime.datetime | None = Field(...)
-
-
-class VoiceRegion(BaseModel):
-    """Voice Region
-
-    see https://discord.com/developers/docs/resources/voice#voice-region-object"""
-
-    id: str
-    name: str
-    optimal: bool
-    deprecated: bool
-    custom: bool
 
 
 # Webhook
