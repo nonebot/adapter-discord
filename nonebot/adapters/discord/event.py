@@ -76,7 +76,7 @@ from .api.model import (
     VoiceStateUpdate,
     WebhooksUpdate,
 )
-from .api.models import (
+from .api.models.gateway_events import (
     ApplicationCommandAutoCompleteInteractionCreatePayload,
     ApplicationCommandInteractionCreatePayload,
     DirectMessageCreatePayload,
