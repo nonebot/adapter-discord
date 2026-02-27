@@ -117,6 +117,15 @@ from .models.invites import (
     InviteStageInstance,
     InviteTargetUsersJobStatus,
 )
+from .models.lobby import (
+    AddLobbyMemberParams,
+    CreateLobbyMemberParams,
+    CreateLobbyParams,
+    LinkChannelToLobbyParams,
+    Lobby,
+    LobbyMember,
+    ModifyLobbyParams,
+)
 from .models.oauth2 import AuthorizationResponse
 from .models.polls import (
     Poll,
@@ -164,7 +173,6 @@ from .types import (
     GuildScheduledEventRecurrenceRuleWeekday,
     IntegrationExpireBehaviors,
     InviteTargetType,
-    LobbyMemberFlags,
     MessageActivityType,
     MessageFlag,
     MessageReferenceType,
@@ -2495,82 +2503,6 @@ class ListDefaultSoundboardSoundsResponse(_SoundboardSoundsListResponse):
 
 # Lobby
 # see https://discord.com/developers/docs/resources/lobby
-
-
-class LobbyMember(BaseModel):
-    """Lobby Member Object.
-
-    see https://discord.com/developers/docs/resources/lobby#lobby-member-object
-    """
-
-    id: Snowflake
-    metadata: dict[str, str] | None = Field(...)
-    flags: Missing[LobbyMemberFlags] = UNSET
-
-
-class Lobby(BaseModel):
-    """Lobby Object.
-
-    see https://discord.com/developers/docs/resources/lobby#lobby-object
-    """
-
-    id: Snowflake
-    application_id: Snowflake
-    metadata: dict[str, str] | None = Field(...)
-    members: list[LobbyMember]
-    linked_channel: Missing["Channel"] = UNSET
-
-
-class _LobbyMemberWriteParamsBase(BaseModel):
-    metadata: Missing[dict[str, str]] = UNSET
-    flags: Missing[LobbyMemberFlags] = UNSET
-
-
-class CreateLobbyMemberParams(_LobbyMemberWriteParamsBase):
-    """Create Lobby Member Params.
-
-    see https://discord.com/developers/docs/resources/lobby#create-lobby
-    """
-
-    id: Snowflake
-
-
-class CreateLobbyParams(BaseModel):
-    """Create Lobby Params.
-
-    see https://discord.com/developers/docs/resources/lobby#create-lobby
-    """
-
-    metadata: Missing[dict[str, str]] = UNSET
-    members: Missing[list[CreateLobbyMemberParams]] = UNSET
-    idle_timeout_seconds: Missing[int] = UNSET
-
-
-class ModifyLobbyParams(BaseModel):
-    """Modify Lobby Params.
-
-    see https://discord.com/developers/docs/resources/lobby#modify-lobby
-    """
-
-    metadata: MissingOrNullable[dict[str, str]] = UNSET
-    idle_timeout_seconds: Missing[int] = UNSET
-
-
-class AddLobbyMemberParams(_LobbyMemberWriteParamsBase):
-    """Add Lobby Member Params.
-
-    see https://discord.com/developers/docs/resources/lobby#add-lobby-member
-    """
-
-
-class LinkChannelToLobbyParams(BaseModel):
-    """Link Channel to Lobby Params.
-
-    see https://discord.com/developers/docs/resources/lobby#link-channel-to-lobby
-    """
-
-    channel_id: MissingOrNullable[Snowflake] = UNSET
-
 
 _model_types_namespace = vars(sys.modules[__name__])
 
