@@ -95,6 +95,7 @@ from .models.polls import (
     PollResults,
 )
 from .models.snowflake import Snowflake, SnowflakeType
+from .models.stage_instance import StageInstance
 from .models.teams import Team, TeamMember, TeamMemberUser
 from .models.user import (
     ApplicationRoleConnection,
@@ -151,7 +152,6 @@ from .types import (
     SKUFlag,
     SKUType,
     SortOrderTypes,
-    StagePrivacyLevel,
     StickerFormatType,
     StickerType,
     SubscriptionStatus,
@@ -1708,25 +1708,6 @@ class InviteStageInstance(BaseModel):
             DeprecationWarning,
             stacklevel=2,
         )
-
-
-# Stage Instance
-# see https://discord.com/developers/docs/resources/stage-instance
-
-
-class StageInstance(BaseModel):
-    """Stage Instance
-
-    see https://discord.com/developers/docs/resources/stage-instance#stage-instance-object
-    """
-
-    id: Snowflake
-    guild_id: Snowflake
-    channel_id: Snowflake
-    topic: str
-    privacy_level: StagePrivacyLevel
-    discoverable_disabled: bool
-    guild_scheduled_event_id: Snowflake | None = None
 
 
 # Sticker
