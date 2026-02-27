@@ -152,12 +152,17 @@ from .models.guilds import (
     CurrentUserGuild,
     Guild,
     GuildIncidentsData,
+    GuildOnboarding,
     GuildPreview,
     GuildVanityURL,
     GuildWidget,
     GuildWidgetChannel,
     GuildWidgetSettings,
     GuildWidgetUser,
+    MembershipScreening,
+    ModifyGuildOnboardingParams,
+    OnboardingPrompt,
+    OnboardingPromptOption,
     UnavailableGuild,
 )
 from .models.integrations import (
@@ -279,8 +284,6 @@ from .types import (
     MFALevel,
     Missing,
     MissingOrNullable,
-    OnboardingMode,
-    OnboardingPromptType,
     OverwriteType,
     PremiumTier,
     PremiumType,
@@ -306,60 +309,6 @@ class Ban(BaseModel):
 
     reason: str | None = None
     user: "User"
-
-
-class GuildOnboarding(BaseModel):
-    """Guild onboarding.
-
-    see https://discord.com/developers/docs/resources/guild#guild-onboarding-object"""
-
-    guild_id: Snowflake
-    prompts: list["OnboardingPrompt"]
-    default_channel_ids: list[Snowflake]
-    enabled: bool
-    mode: OnboardingMode
-
-
-class OnboardingPrompt(BaseModel):
-    """Onboarding prompt.
-
-    see https://discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-prompt-structure
-    """
-
-    id: Snowflake
-    type: OnboardingPromptType
-    options: list["OnboardingPromptOption"]
-    title: str
-    single_select: bool
-    required: bool
-    in_onboarding: bool
-
-
-class OnboardingPromptOption(BaseModel):
-    """Onboarding prompt option.
-
-    When creating or updating a prompt option, the `emoji_id`, `emoji_name`, and
-    `emoji_animated` fields must be used instead of the emoji object.
-
-    see https://discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-prompt-option-structure
-    """
-
-    id: Snowflake
-    channel_ids: list[Snowflake]
-    role_ids: list[Snowflake]
-    emoji: Missing[Emoji] = UNSET
-    emoji_id: Missing[Snowflake] = UNSET
-    emoji_name: Missing[str] = UNSET
-    emoji_animated: Missing[bool] = UNSET
-    title: str
-    description: str | None = None
-
-
-class MembershipScreening(BaseModel):
-    """Membership screening.
-
-    see https://discord.com/developers/docs/resources/guild#membership-screening-object
-    """
 
 
 class CreateGuildParams(BaseModel):
@@ -1128,22 +1077,6 @@ class ActivityButtons(BaseModel):
 
 # Permissions
 # see https://discord.com/developers/docs/topics/permissions
-
-
-class ModifyGuildOnboardingParams(BaseModel):
-    """Modify Guild Onboarding Params
-
-    see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
-    """
-
-    prompts: Missing[list[OnboardingPrompt]] = UNSET
-    """Prompts shown during onboarding and in customize community"""
-    default_channel_ids: Missing[list[Snowflake]] = UNSET
-    """Channel IDs that members get opted into automatically"""
-    enabled: Missing[bool] = UNSET
-    """Whether onboarding is enabled in the guild"""
-    mode: Missing[OnboardingMode] = UNSET
-    """Current mode of onboarding"""
 
 
 class BulkBan(BaseModel):

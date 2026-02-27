@@ -16,6 +16,8 @@ from ..types import (
     MFALevel,
     Missing,
     MissingOrNullable,
+    OnboardingMode,
+    OnboardingPromptType,
     PremiumTier,
     SystemChannelFlags,
     VerificationLevel,
@@ -190,3 +192,44 @@ class GuildWidgetUser(BaseModel):
     avatar: str | None = None
     status: str
     avatar_url: str
+
+
+class GuildOnboarding(BaseModel):
+    guild_id: Snowflake
+    prompts: list[OnboardingPrompt]
+    default_channel_ids: list[Snowflake]
+    enabled: bool
+    mode: OnboardingMode
+
+
+class OnboardingPrompt(BaseModel):
+    id: Snowflake
+    type: OnboardingPromptType
+    options: list[OnboardingPromptOption]
+    title: str
+    single_select: bool
+    required: bool
+    in_onboarding: bool
+
+
+class OnboardingPromptOption(BaseModel):
+    id: Snowflake
+    channel_ids: list[Snowflake]
+    role_ids: list[Snowflake]
+    emoji: Missing[Emoji] = UNSET
+    emoji_id: Missing[Snowflake] = UNSET
+    emoji_name: Missing[str] = UNSET
+    emoji_animated: Missing[bool] = UNSET
+    title: str
+    description: str | None = None
+
+
+class MembershipScreening(BaseModel):
+    pass
+
+
+class ModifyGuildOnboardingParams(BaseModel):
+    prompts: Missing[list[OnboardingPrompt]] = UNSET
+    default_channel_ids: Missing[list[Snowflake]] = UNSET
+    enabled: Missing[bool] = UNSET
+    mode: Missing[OnboardingMode] = UNSET
