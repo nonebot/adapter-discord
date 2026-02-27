@@ -138,6 +138,17 @@ from .models.lobby import (
     LobbyMember,
     ModifyLobbyParams,
 )
+from .models.monetization import (
+    SKU,
+    Entitlement,
+    EntitlementCreate,
+    EntitlementDelete,
+    EntitlementUpdate,
+    Subscription,
+    SubscriptionCreate,
+    SubscriptionDelete,
+    SubscriptionUpdate,
+)
 from .models.oauth2 import AuthorizationResponse
 from .models.permissions import Role, RoleColors, RoleTags
 from .models.polls import (
@@ -174,7 +185,6 @@ from .types import (
     ChannelType,
     DefaultMessageNotificationLevel,
     EmbedTypes,
-    EntitlementType,
     ExplicitContentFilterLevel,
     ForumLayoutTypes,
     GuildFeature,
@@ -198,10 +208,7 @@ from .types import (
     PremiumTier,
     PremiumType,
     PresenceStatus,
-    SKUFlag,
-    SKUType,
     SortOrderTypes,
-    SubscriptionStatus,
     SystemChannelFlags,
     TriggerType,
     UserFlags,
@@ -2063,33 +2070,6 @@ class ActivityButtons(BaseModel):
 # see https://discord.com/developers/docs/topics/permissions
 
 
-class Entitlement(BaseModel):
-    """see https://discord.com/developers/docs/monetization/entitlements#entitlement-object"""
-
-    id: Snowflake
-    """ID of the entitlement"""
-    sku_id: Snowflake
-    """ID of the SKU"""
-    application_id: Snowflake
-    """ID of the parent application"""
-    user_id: Missing[Snowflake] = UNSET
-    """ID of the user that is granted access to the entitlement's sku"""
-    type: EntitlementType
-    """Type of entitlement"""
-    deleted: bool
-    """Entitlement was deleted"""
-    starts_at: Missing[datetime.datetime] = UNSET
-    """Start date at which the entitlement is valid.
-    Not present when using test entitlements."""
-    ends_at: Missing[datetime.datetime] = UNSET
-    """Date at which the entitlement is no longer valid.
-    Not present when using test entitlements."""
-    guild_id: Missing[Snowflake] = UNSET
-    """ID of the guild that is granted access to the entitlement's sku"""
-    consumed: Missing[bool] = UNSET
-    """For consumable items, whether or not the entitlement has been consumed"""
-
-
 class RecurrenceRule(BaseModel):
     """Discord's recurrence rule is a subset of the behaviors defined
     in the iCalendar RFC and implemented by python's dateutil rrule
@@ -2216,75 +2196,6 @@ class AnswerVoters(BaseModel):
 
     users: list[User]
     """Users who voted for this answer"""
-
-
-class SKU(BaseModel):
-    """https://discord.com/developers/docs/resources/sku#sku-object"""
-
-    id: Snowflake
-    type: SKUType
-    application_id: Snowflake
-    name: str
-    slug: str
-    flags: SKUFlag
-    dependent_sku_id: MissingOrNullable[Snowflake] = UNSET
-    manifest_labels: MissingOrNullable[list[str]] = UNSET
-    access_type: Missing[int] = UNSET
-    features: Missing[list[str]] = UNSET
-    release_date: MissingOrNullable[datetime.datetime] = UNSET
-    premium: Missing[bool] = UNSET
-    show_age_gate: Missing[bool] = UNSET
-
-
-class Subscription(BaseModel):
-    """https://discord.com/developers/docs/resources/subscription#subscription-object"""
-
-    id: Snowflake
-    user_id: Snowflake
-    sku_ids: list[Snowflake]
-    entitlement_ids: list[Snowflake]
-    renewal_sku_ids: MissingOrNullable[list[Snowflake]] = UNSET
-    current_period_start: datetime.datetime
-    current_period_end: datetime.datetime
-    status: SubscriptionStatus
-    canceled_at: datetime.datetime | None = None
-    country: Missing[str] = UNSET
-
-
-class EntitlementCreate(Entitlement):
-    """Entitlement Create Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#entitlement-create"""
-
-
-class EntitlementUpdate(Entitlement):
-    """Entitlement Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#entitlement-update"""
-
-
-class EntitlementDelete(Entitlement):
-    """Entitlement Delete Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#entitlement-delete"""
-
-
-class SubscriptionCreate(Subscription):
-    """Subscription Create Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#subscription-create"""
-
-
-class SubscriptionUpdate(Subscription):
-    """Subscription Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#subscription-update"""
-
-
-class SubscriptionDelete(Subscription):
-    """Subscription Delete Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#subscription-delete"""
 
 
 class SoundboardSound(BaseModel):
