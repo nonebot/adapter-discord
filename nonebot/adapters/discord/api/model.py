@@ -83,6 +83,7 @@ from .models.interactions import (
     ModalSubmitData,
     ResolvedData,
 )
+from .models.oauth2 import AuthorizationResponse
 from .models.polls import (
     Poll,
     PollAnswer,
@@ -2845,18 +2846,6 @@ class RoleTags(BaseModel):
     subscription_listing_id: Missing[Snowflake] = UNSET
     available_for_purchase: Missing[None] = UNSET
     guild_connections: Missing[None] = UNSET
-
-
-class AuthorizationResponse(BaseModel):
-    """Get Current Authorization Information Response
-
-    see https://discord.com/developers/docs/topics/oauth2#get-current-authorization-information
-    """
-
-    application: Application  # partial application object
-    scopes: list[str]
-    expires: datetime.datetime
-    user: Missing[User] = UNSET
 
 
 class Entitlement(BaseModel):
