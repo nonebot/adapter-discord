@@ -81,3 +81,9 @@ class ApplicationRoleConnection(BaseModel):
     platform_name: str | None = Field(...)
     platform_username: str | None = Field(...)
     metadata: dict  # object
+
+
+class ModifyCurrentUserParams(BaseModel):
+    username: Missing[str] = UNSET
+    avatar: MissingOrNullable[str] = UNSET
+    banner: MissingOrNullable[str] = UNSET

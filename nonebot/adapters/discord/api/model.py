@@ -182,6 +182,7 @@ from .models.user import (
     ApplicationRoleConnection,
     AvatarDecorationData,
     Connection,
+    ModifyCurrentUserParams,
     User,
 )
 from .models.voice import VoiceRegion, VoiceState
@@ -892,17 +893,6 @@ class ModifyGuildChannelPositionParams(BaseModel):
     position: MissingOrNullable[int] = UNSET
     lock_permissions: MissingOrNullable[bool] = UNSET
     parent_id: MissingOrNullable[Snowflake] = UNSET
-
-
-class ModifyCurrentUserParams(BaseModel):
-    """Modify Current User Params.
-
-    see https://discord.com/developers/docs/resources/user#modify-current-user
-    """
-
-    username: Missing[str] = UNSET
-    avatar: MissingOrNullable[str] = UNSET
-    banner: MissingOrNullable[str] = UNSET
 
 
 class ModifyGuildMemberParams(BaseModel):
@@ -2287,6 +2277,7 @@ __all__ = [
     "MessageSnapshotMessage",
     "ModalSubmitData",
     "ModifyChannelParams",
+    "ModifyCurrentUserParams",
     "ModifyGuildIncidentActionsParams",
     "ModifyGuildOnboardingParams",
     "ModifyGuildParams",
