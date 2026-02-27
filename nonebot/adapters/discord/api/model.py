@@ -67,6 +67,7 @@ from .models.auto_moderation import (
     CreateAndModifyAutoModerationRuleParams,
     TriggerMetadata,
 )
+from .models.emoji import Emoji
 from .models.interactions import (
     ApplicationCommandData,
     ApplicationCommandInteractionDataOption,
@@ -887,33 +888,6 @@ class ModifyCurrentMemberParams(BaseModel):
     banner: MissingOrNullable[str] = UNSET
     avatar: MissingOrNullable[str] = UNSET
     bio: MissingOrNullable[str] = UNSET
-
-
-# Emoji
-# see https://discord.com/developers/docs/resources/emoji
-
-
-class Emoji(BaseModel):
-    """Emoji Object
-
-    see https://discord.com/developers/docs/resources/emoji#emoji-object"""
-
-    id: Snowflake | None = None
-    """emoji id"""
-    name: str | None = None
-    """emoji name(can be null only in reaction emoji objects)"""
-    roles: Missing[list[Snowflake]] = UNSET
-    """roles allowed to use this emoji"""
-    user: Missing["User"] = UNSET
-    """user that created this emoji"""
-    require_colons: Missing[bool] = UNSET
-    """whether this emoji must be wrapped in colons"""
-    managed: Missing[bool] = UNSET
-    """whether this emoji is managed"""
-    animated: Missing[bool] = UNSET
-    """whether this emoji is animated"""
-    available: Missing[bool] = UNSET
-    """whether this emoji can be used, may be false due to loss of Server Boosts"""
 
 
 # Guild
