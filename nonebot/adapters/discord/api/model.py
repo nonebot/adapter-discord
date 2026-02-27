@@ -1,3 +1,5 @@
+# ruff: noqa: F401
+
 import datetime
 import inspect
 import sys
@@ -64,8 +66,12 @@ from .models.audit_log import (
 )
 from .models.auto_moderation import (
     AutoModerationAction,
+    AutoModerationActionExecution,
     AutoModerationActionMetadata,
     AutoModerationRule,
+    AutoModerationRuleCreate,
+    AutoModerationRuleDelete,
+    AutoModerationRuleUpdate,
     CreateAndModifyAutoModerationRuleParams,
     TriggerMetadata,
 )
@@ -111,10 +117,20 @@ from .models.embeds import (
 from .models.emoji import (
     ApplicationEmojis,
     Emoji,
-    ModifyGuildEmojiParams,  # noqa: F401
+    ModifyGuildEmojiParams,
 )
 from .models.gateway import Gateway, GatewayBot, SessionStartLimit
 from .models.gateway_event_fields import (
+    Activity,
+    ActivityAssets,
+    ActivityButtons,
+    ActivityEmoji,
+    ActivityParty,
+    ActivitySecrets,
+    ActivityTimestamps,
+    ClientStatus,
+    PresenceUpdate,
+    PresenceUpdateUser,
     StageInstanceCreate,
     StageInstanceDelete,
     StageInstanceUpdate,
@@ -164,7 +180,7 @@ from .models.guild_welcome import (
     WelcomeScreen,
     WelcomeScreenChannel,
 )
-from .models.guilds import (  # noqa: F401
+from .models.guilds import (
     Ban,
     BulkBan,
     CreateGuildParams,
@@ -213,6 +229,8 @@ from .models.interactions import (
 )
 from .models.invites import (
     Invite,
+    InviteCreate,
+    InviteDelete,
     InviteGuild,
     InviteMetadata,
     InviteStageInstance,
@@ -258,7 +276,7 @@ from .models.monetization import (
     SubscriptionUpdate,
 )
 from .models.oauth2 import AuthorizationResponse
-from .models.permissions import (  # noqa: F401
+from .models.permissions import (
     CreateGuildRoleParams,
     ModifyGuildRoleParams,
     ModifyGuildRolePositionParams,
@@ -287,7 +305,7 @@ from .models.soundboard import (
 )
 from .models.stage_instance import StageInstance
 from .models.stickers import (
-    ModifyGuildStickerParams,  # noqa: F401
+    ModifyGuildStickerParams,
     Sticker,
     StickerItem,
     StickerPack,
@@ -302,12 +320,12 @@ from .models.user import (
     User,
 )
 from .models.voice import (
-    ModifyCurrentUserVoiceStateParams,  # noqa: F401
+    ModifyCurrentUserVoiceStateParams,
     VoiceRegion,
     VoiceState,
 )
 from .models.webhooks import (
-    CreateWebhookParams,  # noqa: F401
+    CreateWebhookParams,
     ExecuteWebhookParams,
     Webhook,
 )
@@ -337,46 +355,6 @@ from .types import (
 
 # Channel
 # see https://discord.com/developers/docs/resources/channel
-
-
-class AutoModerationRuleCreate(AutoModerationRule):
-    """Auto Moderation Rule Create Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-create
-    """
-
-
-class AutoModerationRuleUpdate(AutoModerationRule):
-    """Auto Moderation Rule Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-update
-    """
-
-
-class AutoModerationRuleDelete(AutoModerationRule):
-    """Auto Moderation Rule Delete Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-delete
-    """
-
-
-class AutoModerationActionExecution(BaseModel):
-    """Auto Moderation Action Execution Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#auto-moderation-action-execution
-    """
-
-    guild_id: Snowflake
-    action: AutoModerationAction
-    rule_id: Snowflake
-    rule_trigger_type: TriggerType
-    user_id: Snowflake
-    channel_id: Missing[Snowflake] = UNSET
-    message_id: Missing[Snowflake] = UNSET
-    alert_system_message_id: Missing[Snowflake] = UNSET
-    content: str
-    matched_keyword: str | None = Field(...)
-    matched_content: str | None = Field(...)
 
 
 class GuildCreate(BaseModel):
@@ -662,169 +640,6 @@ class GuildScheduledEventUserRemove(BaseModel):
     guild_scheduled_event_id: Snowflake
     user_id: Snowflake
     guild_id: Snowflake
-
-
-class InviteCreate(BaseModel):
-    """Invite Create Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#invite-create"""
-
-    channel_id: Snowflake
-    code: str
-    created_at: datetime.datetime
-    guild_id: Missing[Snowflake] = UNSET
-    inviter: Missing[User] = UNSET
-    max_age: int
-    max_uses: int
-    target_type: Missing[InviteTargetType] = UNSET
-    target_user: Missing[User] = UNSET
-    target_application: Missing[Application] = UNSET  # partial application object
-    temporary: bool
-    uses: int
-
-
-class InviteDelete(BaseModel):
-    """Invite Delete Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#invite-delete"""
-
-    channel_id: Snowflake
-    guild_id: Missing[Snowflake] = UNSET
-    code: str
-
-
-class PresenceUpdateUser(BaseModel):
-    """Presence Update User Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#presence-update"""
-
-    id: Snowflake
-    username: Missing[str] = UNSET
-    discriminator: Missing[str] = UNSET
-    global_name: MissingOrNullable[str] = UNSET
-    avatar: MissingOrNullable[str] = UNSET
-    bot: Missing[bool] = UNSET
-    system: Missing[bool] = UNSET
-    mfa_enabled: Missing[bool] = UNSET
-    banner: MissingOrNullable[str] = UNSET
-    accent_color: MissingOrNullable[int] = UNSET
-    locale: Missing[str] = UNSET
-    verified: Missing[bool] = UNSET
-    email: MissingOrNullable[str] = UNSET
-    flags: Missing[int] = UNSET
-    premium_type: Missing[PremiumType] = UNSET
-    public_flags: Missing[UserFlags] = UNSET
-    avatar_decoration_data: MissingOrNullable["AvatarDecorationData"] = UNSET
-
-
-class PresenceUpdate(BaseModel):
-    """Presence Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#presence-update
-    """
-
-    user: PresenceUpdateUser
-    guild_id: Snowflake
-    status: PresenceStatus
-    activities: list["Activity"]
-    client_status: "ClientStatus"
-
-
-class ClientStatus(BaseModel):
-    """Client Status
-
-    see https://discord.com/developers/docs/topics/gateway-events#client-status-object
-    """
-
-    desktop: Missing[str] = UNSET
-    mobile: Missing[str] = UNSET
-    web: Missing[str] = UNSET
-
-
-class Activity(BaseModel):
-    """Activity
-
-    see https://discord.com/developers/docs/topics/gateway-events#activity-object"""
-
-    name: str
-    type: ActivityType
-    url: MissingOrNullable[str] = UNSET
-    created_at: int
-    timestamps: Missing["ActivityTimestamps"] = UNSET
-    application_id: Missing[Snowflake] = UNSET
-    details: MissingOrNullable[str] = UNSET
-    state: MissingOrNullable[str] = UNSET
-    emoji: MissingOrNullable["ActivityEmoji"] = UNSET
-    party: Missing["ActivityParty"] = UNSET
-    assets: Missing["ActivityAssets"] = UNSET
-    secrets: Missing["ActivitySecrets"] = UNSET
-    instance: Missing[bool] = UNSET
-    flags: Missing[ActivityFlags] = UNSET
-    buttons: Missing[list["ActivityButtons"]] = UNSET
-
-
-class ActivityTimestamps(BaseModel):
-    """Activity Timestamps
-
-    see https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
-    """
-
-    start: Missing[int] = UNSET
-    end: Missing[int] = UNSET
-
-
-class ActivityEmoji(BaseModel):
-    """Activity Emoji
-
-    see https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji
-    """
-
-    name: str
-    id: Missing[Snowflake] = UNSET
-    animated: Missing[bool] = UNSET
-
-
-class ActivityParty(BaseModel):
-    """Activity Party
-
-    see https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-party
-    """
-
-    id: Missing[str] = UNSET
-    size: Missing[tuple[int, int]] = UNSET
-
-
-class ActivityAssets(BaseModel):
-    """Activity Assets
-
-    see https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-assets
-    """
-
-    large_image: Missing[ActivityAssetImage] = UNSET
-    large_text: Missing[str] = UNSET
-    small_image: Missing[ActivityAssetImage] = UNSET
-    small_text: Missing[str] = UNSET
-
-
-class ActivitySecrets(BaseModel):
-    """Activity Secrets
-
-    see https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-secrets
-    """
-
-    join: Missing[str] = UNSET
-    spectate: Missing[str] = UNSET
-    match: Missing[str] = UNSET
-
-
-class ActivityButtons(BaseModel):
-    """Activity Buttons
-
-    see https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons
-    """
-
-    label: str
-    url: str
 
 
 # Permissions
