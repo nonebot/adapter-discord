@@ -68,6 +68,18 @@ from .models.auto_moderation import (
 )
 from .models.emoji import Emoji
 from .models.gateway import Gateway, GatewayBot, SessionStartLimit
+from .models.gateway_event_fields import (
+    StageInstanceCreate,
+    StageInstanceDelete,
+    StageInstanceUpdate,
+    UserUpdate,
+    VoiceChannelEffectSend,
+    VoiceChannelStartTimeUpdate,
+    VoiceChannelStatusUpdate,
+    VoiceServerUpdate,
+    VoiceStateUpdate,
+    WebhooksUpdate,
+)
 from .models.gateway_payloads import (
     ApplicationReady,
     Hello,
@@ -155,7 +167,6 @@ from .types import (
     ActivityFlags,
     ActivityType,
     AllowedMentionType,
-    AnimationType,
     ApplicationFlag,
     ApplicationIntegrationType,
     AttachmentFlag,
@@ -2048,101 +2059,6 @@ class ActivityButtons(BaseModel):
     url: str
 
 
-class UserUpdate(User):
-    """User Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#user-update"""
-
-
-class VoiceStateUpdate(VoiceState):
-    """Voice State Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#voice-state-update
-    """
-
-
-class VoiceChannelStatusUpdate(BaseModel):
-    """Voice Channel Status Update Event Fields
-
-    This gateway dispatch is observed in production but is not yet fully
-    documented on Discord's public Gateway Events page.
-
-    Field shape is based on:
-    - https://github.com/discord/discord-api-docs/pull/6398
-    - https://github.com/discord/discord-api-docs/pull/6400
-    """
-
-    id: Snowflake
-    guild_id: Snowflake
-    status: str | None = None
-
-
-class VoiceChannelStartTimeUpdate(BaseModel):
-    """Voice Channel Start Time Update Event Fields
-
-    This gateway dispatch is observed in production but is not yet fully
-    documented on Discord's public Gateway Events page.
-
-    Field shape is based on observed payloads and community implementations.
-    """
-
-    id: Snowflake
-    guild_id: Snowflake
-    voice_start_time: datetime.datetime | None = None
-
-
-class VoiceServerUpdate(BaseModel):
-    """Voice Server Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#voice-server-update
-    """
-
-    token: str
-    guild_id: Snowflake
-    endpoint: str | None = Field(...)
-
-
-class WebhooksUpdate(BaseModel):
-    """Webhooks Update Event Fields
-
-    Sent when a guild channel's webhook is created, updated, or deleted.
-
-    see https://discord.com/developers/docs/topics/gateway-events#webhooks-update
-    """
-
-    guild_id: Snowflake
-    channel_id: Snowflake
-
-
-class StageInstanceCreate(StageInstance):
-    """Stage Instance Create Event Fields
-
-    Sent when a Stage instance is created (i.e. the Stage is now "live").
-    Inner payload is a Stage instance
-
-    see https://discord.com/developers/docs/topics/gateway-events#stage-instance-create
-    """
-
-
-class StageInstanceUpdate(StageInstance):
-    """Stage Instance Update Event Fields
-
-    Sent when a Stage instance has been updated. Inner payload is a Stage instance
-
-    see https://discord.com/developers/docs/topics/gateway-events#stage-instance-update
-    """
-
-
-class StageInstanceDelete(StageInstance):
-    """Stage Instance Delete Event Fields
-
-    Sent when a Stage instance has been deleted (i.e. the Stage has been closed).
-    Inner payload is a Stage instance
-
-    see https://discord.com/developers/docs/topics/gateway-events#stage-instance-delete
-    """
-
-
 # Permissions
 # see https://discord.com/developers/docs/topics/permissions
 
@@ -2369,22 +2285,6 @@ class SubscriptionDelete(Subscription):
     """Subscription Delete Event Fields
 
     see https://discord.com/developers/docs/topics/gateway-events#subscription-delete"""
-
-
-class VoiceChannelEffectSend(BaseModel):
-    """Voice Channel Effect Send Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#voice-channel-effect-send-voice-channel-effect-send-event-fields
-    """
-
-    channel_id: Snowflake
-    guild_id: Snowflake
-    user_id: Snowflake
-    emoji: MissingOrNullable[Emoji] = UNSET
-    animation_type: MissingOrNullable[AnimationType] = UNSET
-    animation_id: Missing[int] = UNSET
-    sound_id: Missing[Snowflake | int] = UNSET
-    sound_volume: Missing[float] = UNSET
 
 
 class SoundboardSound(BaseModel):
