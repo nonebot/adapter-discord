@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel
 
@@ -119,6 +119,49 @@ class ApplicationIntegrationTypeConfiguration(BaseModel):
     """
 
     oauth2_install_params: Missing[InstallParams] = UNSET
+
+
+class ActivityInstance(BaseModel):
+    """Activity Instance
+
+    see https://discord.com/developers/docs/resources/application#get-application-activity-instance-activity-instance-object
+    """
+
+    application_id: Snowflake
+    """Application ID"""
+
+    instance_id: str
+    """Activity Instance ID"""
+
+    launch_id: Snowflake
+    """Unique identifier for the launch"""
+
+    location: ActivityLocation
+    """The Location the instance is runnning in"""
+
+    users: list[Snowflake]
+    """The IDs of the Users currently connected to the instance"""
+
+
+class ActivityLocation(BaseModel):
+    """The Activity Location is an object that describes
+    the location in which an activity instance is running.
+
+    see https://discord.com/developers/docs/resources/application#get-application-activity-instance-activity-location-object
+    """
+
+    id: str
+    """The unique identifier for the location"""
+
+    kind: Literal["gc", "pc"]
+    """Enum describing kind of location
+
+    'gc' The Location is a Guild Channel
+    'pc' The Location is a Private Channel, such as a DM or GDM
+    """
+
+    channel_id: Snowflake
+    guild_id: MissingOrNullable[Snowflake] = UNSET
 
 
 # Application Role Connection Metadata
