@@ -149,6 +149,8 @@ from .models.guild_welcome import (
     WelcomeScreenChannel,
 )
 from .models.guilds import (
+    Ban,
+    BulkBan,
     CurrentUserGuild,
     Guild,
     GuildIncidentsData,
@@ -298,17 +300,6 @@ from .types import (
 
 # Channel
 # see https://discord.com/developers/docs/resources/channel
-
-
-# Guild
-# see https://discord.com/developers/docs/resources/guild
-class Ban(BaseModel):
-    """Ban
-
-    see https://discord.com/developers/docs/resources/guild#ban-object"""
-
-    reason: str | None = None
-    user: "User"
 
 
 class CreateGuildParams(BaseModel):
@@ -1077,18 +1068,6 @@ class ActivityButtons(BaseModel):
 
 # Permissions
 # see https://discord.com/developers/docs/topics/permissions
-
-
-class BulkBan(BaseModel):
-    """bulk ban response
-
-    see https://discord.com/developers/docs/resources/guild#bulk-guild-ban-bulk-ban-response
-    """
-
-    banned_users: list[Snowflake]
-    """list of user ids, that were successfully banned"""
-    failed_users: list[Snowflake]
-    """list of user ids, that were not banned"""
 
 
 # Lobby

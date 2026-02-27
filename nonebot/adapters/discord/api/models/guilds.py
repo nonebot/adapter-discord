@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from .emoji import Emoji
 from .snowflake import Snowflake
+from .user import User
 from ..types import (
     UNSET,
     DefaultMessageNotificationLevel,
@@ -233,3 +234,13 @@ class ModifyGuildOnboardingParams(BaseModel):
     default_channel_ids: Missing[list[Snowflake]] = UNSET
     enabled: Missing[bool] = UNSET
     mode: Missing[OnboardingMode] = UNSET
+
+
+class Ban(BaseModel):
+    reason: str | None = None
+    user: User
+
+
+class BulkBan(BaseModel):
+    banned_users: list[Snowflake]
+    failed_users: list[Snowflake]
