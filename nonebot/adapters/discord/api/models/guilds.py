@@ -145,6 +145,11 @@ class GuildWidgetSettings(BaseModel):
     channel_id: Snowflake | None = None
 
 
+class ModifyGuildWidgetParams(BaseModel):
+    enabled: Missing[bool] = UNSET
+    channel_id: MissingOrNullable[Snowflake] = UNSET
+
+
 class GuildWidget(BaseModel):
     """Guild Widget
 

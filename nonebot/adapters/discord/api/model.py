@@ -163,6 +163,7 @@ from .models.guilds import (
     GuildWidgetUser,
     MembershipScreening,
     ModifyGuildOnboardingParams,
+    ModifyGuildWidgetParams,  # noqa: F401
     OnboardingPrompt,
     OnboardingPromptOption,
     UnavailableGuild,
@@ -392,16 +393,6 @@ class ListActiveGuildThreadsResponse(BaseModel):
 
     threads: list[Channel]
     members: list[ThreadMember]
-
-
-class ModifyGuildWidgetParams(BaseModel):
-    """Modify Guild Widget Params.
-
-    see https://discord.com/developers/docs/resources/guild#modify-guild-widget
-    """
-
-    enabled: Missing[bool] = UNSET
-    channel_id: MissingOrNullable[Snowflake] = UNSET
 
 
 class ModifyGuildEmojiParams(BaseModel):
