@@ -78,4 +78,9 @@ class ExecuteWebhookParams(BaseModel):
     flags: Missing[MessageFlag] = UNSET
     thread_name: Missing[str] = UNSET
     applied_tags: Missing[list[Snowflake]] = UNSET
+
+
+class CreateWebhookParams(BaseModel):
+    name: str
+    avatar: MissingOrNullable[str] = UNSET
     poll: Missing[PollRequest] = UNSET

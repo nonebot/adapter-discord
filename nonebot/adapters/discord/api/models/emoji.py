@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel
 
 from .snowflake import Snowflake
-from ..types import UNSET, Missing
+from ..types import UNSET, Missing, MissingOrNullable
 
 if TYPE_CHECKING:
     from ..model import User
@@ -42,3 +42,8 @@ class ApplicationEmojis(BaseModel):
     """
 
     items: list[Emoji]
+
+
+class ModifyGuildEmojiParams(BaseModel):
+    name: Missing[str] = UNSET
+    roles: MissingOrNullable[list[Snowflake]] = UNSET

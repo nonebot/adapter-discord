@@ -108,7 +108,11 @@ from .models.embeds import (
     EmbedThumbnail,
     EmbedVideo,
 )
-from .models.emoji import ApplicationEmojis, Emoji
+from .models.emoji import (
+    ApplicationEmojis,
+    Emoji,
+    ModifyGuildEmojiParams,  # noqa: F401
+)
 from .models.gateway import Gateway, GatewayBot, SessionStartLimit
 from .models.gateway_event_fields import (
     StageInstanceCreate,
@@ -254,7 +258,14 @@ from .models.monetization import (
     SubscriptionUpdate,
 )
 from .models.oauth2 import AuthorizationResponse
-from .models.permissions import Role, RoleColors, RoleTags
+from .models.permissions import (  # noqa: F401
+    CreateGuildRoleParams,
+    ModifyGuildRoleParams,
+    ModifyGuildRolePositionParams,
+    Role,
+    RoleColors,
+    RoleTags,
+)
 from .models.polls import (
     AnswerVoters,
     Poll,
@@ -275,7 +286,13 @@ from .models.soundboard import (
     SoundboardSound,
 )
 from .models.stage_instance import StageInstance
-from .models.stickers import Sticker, StickerItem, StickerPack, StickerPacksResponse
+from .models.stickers import (
+    ModifyGuildStickerParams,  # noqa: F401
+    Sticker,
+    StickerItem,
+    StickerPack,
+    StickerPacksResponse,
+)
 from .models.teams import Team, TeamMember, TeamMemberUser
 from .models.user import (
     ApplicationRoleConnection,
@@ -284,8 +301,16 @@ from .models.user import (
     ModifyCurrentUserParams,
     User,
 )
-from .models.voice import VoiceRegion, VoiceState
-from .models.webhooks import ExecuteWebhookParams, Webhook
+from .models.voice import (
+    ModifyCurrentUserVoiceStateParams,  # noqa: F401
+    VoiceRegion,
+    VoiceState,
+)
+from .models.webhooks import (
+    CreateWebhookParams,  # noqa: F401
+    ExecuteWebhookParams,
+    Webhook,
+)
 from .types import (
     UNSET,
     ActivityAssetImage,
@@ -312,92 +337,6 @@ from .types import (
 
 # Channel
 # see https://discord.com/developers/docs/resources/channel
-
-
-class ModifyGuildEmojiParams(BaseModel):
-    """Modify Guild Emoji Params.
-
-    see https://discord.com/developers/docs/resources/emoji#modify-guild-emoji
-    """
-
-    name: Missing[str] = UNSET
-    roles: MissingOrNullable[list[Snowflake]] = UNSET
-
-
-class ModifyGuildStickerParams(BaseModel):
-    """Modify Guild Sticker Params.
-
-    see https://discord.com/developers/docs/resources/sticker#modify-guild-sticker
-    """
-
-    name: Missing[str] = UNSET
-    description: MissingOrNullable[str] = UNSET
-    tags: Missing[str] = UNSET
-
-
-class ModifyGuildRoleParams(BaseModel):
-    """Modify Guild Role Params.
-
-    All parameters are optional and nullable.
-
-    see https://discord.com/developers/docs/resources/guild#modify-guild-role
-    """
-
-    name: MissingOrNullable[str] = UNSET
-    permissions: MissingOrNullable[str] = UNSET
-    color: MissingOrNullable[int] = UNSET
-    colors: Missing["RoleColors"] = UNSET
-    hoist: MissingOrNullable[bool] = UNSET
-    icon: MissingOrNullable[str] = UNSET
-    unicode_emoji: MissingOrNullable[str] = UNSET
-    mentionable: MissingOrNullable[bool] = UNSET
-
-
-class CreateGuildRoleParams(BaseModel):
-    """Create Guild Role Params.
-
-    see https://discord.com/developers/docs/resources/guild#create-guild-role
-    """
-
-    name: Missing[str] = UNSET
-    permissions: Missing[str] = UNSET
-    color: Missing[int] = UNSET
-    colors: Missing["RoleColors"] = UNSET
-    hoist: Missing[bool] = UNSET
-    icon: MissingOrNullable[str] = UNSET
-    unicode_emoji: MissingOrNullable[str] = UNSET
-    mentionable: Missing[bool] = UNSET
-
-
-class ModifyGuildRolePositionParams(BaseModel):
-    """Modify Guild Role Position Params.
-
-    see https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
-    """
-
-    id: Snowflake
-    position: MissingOrNullable[int] = UNSET
-
-
-class CreateWebhookParams(BaseModel):
-    """Create Webhook Params.
-
-    see https://discord.com/developers/docs/resources/webhook#create-webhook
-    """
-
-    name: str
-    avatar: MissingOrNullable[str] = UNSET
-
-
-class ModifyCurrentUserVoiceStateParams(BaseModel):
-    """Modify Current User Voice State Params.
-
-    see https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state
-    """
-
-    channel_id: Missing[Snowflake] = UNSET
-    suppress: Missing[bool] = UNSET
-    request_to_speak_timestamp: MissingOrNullable[datetime.datetime] = UNSET
 
 
 class AutoModerationRuleCreate(AutoModerationRule):

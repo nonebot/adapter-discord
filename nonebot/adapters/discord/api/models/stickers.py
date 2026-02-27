@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, Field
 
 from .snowflake import Snowflake
-from ..types import UNSET, Missing, StickerFormatType, StickerType
+from ..types import UNSET, Missing, MissingOrNullable, StickerFormatType, StickerType
 
 if TYPE_CHECKING:
     from ..model import User
@@ -65,3 +65,9 @@ class StickerPacksResponse(BaseModel):
     """
 
     sticker_packs: list[StickerPack]
+
+
+class ModifyGuildStickerParams(BaseModel):
+    name: Missing[str] = UNSET
+    description: MissingOrNullable[str] = UNSET
+    tags: Missing[str] = UNSET
