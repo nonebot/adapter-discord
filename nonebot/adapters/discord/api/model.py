@@ -68,6 +68,7 @@ from .models.auto_moderation import (
     TriggerMetadata,
 )
 from .models.emoji import Emoji
+from .models.gateway import Gateway, GatewayBot, SessionStartLimit
 from .models.interactions import (
     ApplicationCommandData,
     ApplicationCommandInteractionDataOption,
@@ -1707,41 +1708,6 @@ class InviteStageInstance(BaseModel):
             DeprecationWarning,
             stacklevel=2,
         )
-
-
-# Webhook
-# see https://discord.com/developers/docs/resources/webhook
-# gateway
-# see https://discord.com/developers/docs/topics/gateway
-
-
-class Gateway(BaseModel):
-    """Get Gateway Response
-
-    see https://discord.com/developers/docs/topics/gateway#get-gateway"""
-
-    url: str
-
-
-class GatewayBot(BaseModel):
-    """Get Gateway Bot Response
-
-    see https://discord.com/developers/docs/topics/gateway#get-gateway-bot"""
-
-    url: str
-    shards: int
-    session_start_limit: "SessionStartLimit"
-
-
-class SessionStartLimit(BaseModel):
-    """Session start limit
-
-    see https://discord.com/developers/docs/topics/gateway#session-start-limit-object"""
-
-    total: int
-    remaining: int
-    reset_after: int
-    max_concurrency: int
 
 
 # gateway events
