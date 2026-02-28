@@ -3,37 +3,38 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from ..model import (
-    Application,
+from .application import Application
+from .channels import Channel
+from .embeds import Embed
+from .emoji import Emoji
+from .guild_members import GuildMember
+from .interactions import (
     ApplicationCommandData,
-    Attachment,
-    Channel,
-    ChannelMention,
-    DirectComponent,
-    Embed,
-    Emoji,
-    Entitlement,
-    GuildMember,
     InteractionData,
     InteractionGuild,
-    MessageActivity,
-    MessageCall,
     MessageComponentData,
-    MessageGet,
     MessageInteraction,
     MessageInteractionMetadata,
+    ModalSubmitData,
+    ResolvedData,
+)
+from .message_components import DirectComponent
+from .messages import (
+    Attachment,
+    ChannelMention,
+    MessageActivity,
+    MessageCall,
+    MessageGet,
     MessageReference,
     MessageSnapshot,
-    ModalSubmitData,
-    Poll,
     Reaction,
-    ResolvedData,
     RoleSubscriptionData,
-    Snowflake,
-    Sticker,
-    StickerItem,
-    User,
 )
+from .monetization import Entitlement
+from .polls import Poll
+from .snowflake import Snowflake
+from .stickers import Sticker, StickerItem
+from .user import User
 from ..types import (
     UNSET,
     ApplicationIntegrationType,
