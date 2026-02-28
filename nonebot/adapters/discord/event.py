@@ -12,8 +12,8 @@ from nonebot.compat import PYDANTIC_V2
 from nonebot.utils import escape_tag
 from pydantic import BaseModel, Field
 
-from .api import model as _model_module
-from .api.model import (
+from .api import models as _model_module
+from .api.models import (
     ApplicationCommandPermissions,
     AutoModerationActionExecution,
     AutoModerationRuleCreate,
