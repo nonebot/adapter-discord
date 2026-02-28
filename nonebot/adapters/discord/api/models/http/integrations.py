@@ -57,32 +57,3 @@ class Integration(BaseModel):
     revoked: Missing[bool] = UNSET
     application: Missing[IntegrationApplication] = UNSET
     scopes: Missing[list[str]] = UNSET  # TODO: OAuth2 scopes
-
-
-class IntegrationCreate(Integration):
-    """Integration Create Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#integration-create
-    """
-
-    guild_id: Snowflake
-
-
-class IntegrationUpdate(Integration):
-    """Integration Update Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#integration-update
-    """
-
-    guild_id: Snowflake
-
-
-class IntegrationDelete(BaseModel):
-    """Integration Delete Event Fields
-
-    see https://discord.com/developers/docs/topics/gateway-events#integration-delete
-    """
-
-    id: Snowflake
-    guild_id: Snowflake
-    application_id: Missing[Snowflake] = UNSET
