@@ -1,18 +1,9 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
-
 from ..common.guild_welcome import (
     WelcomeScreen,
     WelcomeScreenChannel,
 )
-from ...types import UNSET, MissingOrNullable
-
-
-class ModifyGuildWelcomeScreenParams(BaseModel):
-    enabled: MissingOrNullable[bool] = UNSET
-    welcome_channels: MissingOrNullable[list[WelcomeScreenChannel]] = UNSET
-    description: MissingOrNullable[str] = UNSET
-
+from ..request.guild_welcome import ModifyGuildWelcomeScreenParams
 
 __all__ = ["ModifyGuildWelcomeScreenParams", "WelcomeScreen", "WelcomeScreenChannel"]
