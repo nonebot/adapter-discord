@@ -17,7 +17,7 @@ from nonebot.drivers import Request, Response
 from nonebot.utils import escape_tag
 from yarl import URL
 
-from .model import (
+from .models import (
     SKU,
     ActivityInstance,
     AddLobbyMemberParams,
