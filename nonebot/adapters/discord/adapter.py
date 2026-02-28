@@ -18,14 +18,9 @@ from nonebot.plugin import get_plugin_config
 from nonebot.utils import escape_tag
 
 from .api.handle import HandleMixin
-from .api.models import GatewayBot, User
-from .bot import Bot
-from .commands import sync_application_command
-from .config import BotInfo, Config
-from .event import Event, EventType, MessageEvent, ReadyEvent, event_classes
-from .exception import ApiNotAvailable
-from .payload import (
+from .api.models import (
     Dispatch,
+    GatewayBot,
     Heartbeat,
     HeartbeatAck,
     Hello,
@@ -35,7 +30,13 @@ from .payload import (
     PayloadType,
     Reconnect,
     Resume,
+    User,
 )
+from .bot import Bot
+from .commands import sync_application_command
+from .config import BotInfo, Config
+from .event import Event, EventType, MessageEvent, ReadyEvent, event_classes
+from .exception import ApiNotAvailable
 from .utils import decompress_data, log, model_dump
 
 RECONNECT_INTERVAL = 3.0

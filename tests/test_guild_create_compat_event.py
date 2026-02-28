@@ -1,6 +1,6 @@
 from nonebot.adapters.discord.adapter import Adapter
+from nonebot.adapters.discord.api.models import Dispatch, Opcode
 from nonebot.adapters.discord.event import GuildCreateCompatEvent
-from nonebot.adapters.discord.payload import Dispatch, Opcode
 
 from nonebot.compat import type_validate_python
 import pytest

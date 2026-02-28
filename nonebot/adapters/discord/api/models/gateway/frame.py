@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from enum import IntEnum
 from typing import Annotated, Literal, TypeAlias
 
 from nonebot.compat import PYDANTIC_V2, ConfigDict
 from pydantic import BaseModel, Field
 
-from .api.models import (
+from ..gateway_payloads import (
     Hello as HelloData,
     Identify as IdentifyData,
     Resume as ResumeData,
@@ -25,7 +27,6 @@ class Opcode(IntEnum):
 class Payload(BaseModel):
     if PYDANTIC_V2:
         model_config = ConfigDict(extra="allow", populate_by_name=True)
-
     else:
 
         class Config(ConfigDict):
@@ -74,7 +75,7 @@ class HeartbeatAck(Payload):
 
 PayloadType: TypeAlias = (
     Annotated[
-        Dispatch | Reconnect | InvalidSession | Hello | HeartbeatAck,
+        Dispatch | Heartbeat | Reconnect | InvalidSession | Hello | HeartbeatAck,
         Field(discriminator="opcode"),
     ]
     | Payload
