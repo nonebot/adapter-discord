@@ -9,8 +9,8 @@ from ...types import UNSET, Missing, UpdatePresenceStatusType
 
 if TYPE_CHECKING:
     from .gateway_event_fields import Activity, PresenceUpdate
-    from ..common.user import User
     from ..common.guilds import UnavailableGuild
+    from ..common.user import User
 
 
 class Identify(BaseModel):

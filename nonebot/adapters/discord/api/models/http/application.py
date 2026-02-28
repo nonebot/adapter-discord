@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from nonebot.adapters.discord.api.models.request.application import (
+    EditCurrentApplicationParams,
+)
+
 from ..common.application import (
     ActivityInstance,
     ActivityLocation,
@@ -8,10 +12,6 @@ from ..common.application import (
     ApplicationRoleConnectionMetadata,
     InstallParams,
 )
-from nonebot.adapters.discord.api.models.request.application import (
-    EditCurrentApplicationParams,
-)
-
 
 __all__ = [
     "ActivityInstance",

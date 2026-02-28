@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from ..common.snowflake import Snowflake
-from ..common.user import User
 from ..common.emoji import Emoji
+from ..common.snowflake import Snowflake
 from ..common.stage_instance import StageInstance
+from ..common.user import User
 from ..common.voice import VoiceState
 from ...types import (
     UNSET,
