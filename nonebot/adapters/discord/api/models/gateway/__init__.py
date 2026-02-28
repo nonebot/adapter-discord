@@ -1,115 +1,106 @@
 from __future__ import annotations
 
-from importlib import import_module
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .auto_moderation_events import (
-        AutoModerationActionExecution,
-        AutoModerationRuleCreate,
-        AutoModerationRuleDelete,
-        AutoModerationRuleUpdate,
-    )
-    from .channel_events import (
-        ChannelCreate,
-        ChannelDelete,
-        ChannelPinsUpdate,
-        ChannelUpdate,
-        ThreadCreate,
-        ThreadDelete,
-        ThreadListSync,
-        ThreadMembersUpdate,
-        ThreadMemberUpdate,
-        ThreadUpdate,
-    )
-    from .frame import (
-        Dispatch,
-        Heartbeat,
-        HeartbeatAck,
-        Hello,
-        Identify,
-        InvalidSession,
-        Opcode,
-        Payload,
-        PayloadType,
-        Reconnect,
-        Resume,
-    )
-    from .gateway_event_fields import (
-        Activity,
-        ActivityAssets,
-        ActivityButtons,
-        ActivityEmoji,
-        ActivityParty,
-        ActivitySecrets,
-        ActivityTimestamps,
-        ClientStatus,
-        PresenceUpdate,
-        PresenceUpdateUser,
-        StageInstanceCreate,
-        StageInstanceDelete,
-        StageInstanceUpdate,
-        UserUpdate,
-        VoiceChannelEffectSend,
-        VoiceChannelStartTimeUpdate,
-        VoiceChannelStatusUpdate,
-        VoiceServerUpdate,
-        VoiceStateUpdate,
-        WebhooksUpdate,
-    )
-    from .gateway_payloads import (
-        ApplicationReady,
-        Hello as HelloData,
-        Identify as IdentifyData,
-        IdentifyConnectionProperties,
-        Ready,
-        RequestGuildMembers,
-        Resume as ResumeData,
-        UpdatePresence,
-        UpdateVoiceState,
-    )
-    from .guild_events import (
-        GuildAuditLogEntryCreate,
-        GuildBanAdd,
-        GuildBanRemove,
-        GuildCreate,
-        GuildCreateCompat,
-        GuildCreateCompatChannel,
-        GuildCreateCompatOverwrite,
-        GuildCreateCompatRole,
-        GuildDelete,
-        GuildEmojisUpdate,
-        GuildIntegrationsUpdate,
-        GuildMemberAdd,
-        GuildMemberRemove,
-        GuildMembersChunk,
-        GuildMemberUpdate,
-        GuildRoleCreate,
-        GuildRoleDelete,
-        GuildRoleUpdate,
-        GuildScheduledEventCreate,
-        GuildScheduledEventDelete,
-        GuildScheduledEventUpdate,
-        GuildScheduledEventUserAdd,
-        GuildScheduledEventUserRemove,
-        GuildStickersUpdate,
-        GuildUpdate,
-    )
-    from .integration_events import (
-        IntegrationCreate,
-        IntegrationDelete,
-        IntegrationUpdate,
-    )
-    from .invite_events import InviteCreate, InviteDelete
-    from .monetization_events import (
-        EntitlementCreate,
-        EntitlementDelete,
-        EntitlementUpdate,
-        SubscriptionCreate,
-        SubscriptionDelete,
-        SubscriptionUpdate,
-    )
-
+from .auto_moderation_events import (
+    AutoModerationActionExecution,
+    AutoModerationRuleCreate,
+    AutoModerationRuleDelete,
+    AutoModerationRuleUpdate,
+)
+from .channel_events import (
+    ChannelCreate,
+    ChannelDelete,
+    ChannelPinsUpdate,
+    ChannelUpdate,
+    ThreadCreate,
+    ThreadDelete,
+    ThreadListSync,
+    ThreadMembersUpdate,
+    ThreadMemberUpdate,
+    ThreadUpdate,
+)
+from .frame import (
+    Dispatch,
+    Heartbeat,
+    HeartbeatAck,
+    Hello,
+    Identify,
+    InvalidSession,
+    Opcode,
+    Payload,
+    PayloadType,
+    Reconnect,
+    Resume,
+)
+from .gateway_event_fields import (
+    Activity,
+    ActivityAssets,
+    ActivityButtons,
+    ActivityEmoji,
+    ActivityParty,
+    ActivitySecrets,
+    ActivityTimestamps,
+    ClientStatus,
+    PresenceUpdate,
+    PresenceUpdateUser,
+    StageInstanceCreate,
+    StageInstanceDelete,
+    StageInstanceUpdate,
+    UserUpdate,
+    VoiceChannelEffectSend,
+    VoiceChannelStartTimeUpdate,
+    VoiceChannelStatusUpdate,
+    VoiceServerUpdate,
+    VoiceStateUpdate,
+    WebhooksUpdate,
+)
+from .gateway_payloads import (
+    ApplicationReady,
+    Hello as HelloData,
+    Identify as IdentifyData,
+    IdentifyConnectionProperties,
+    Ready,
+    RequestGuildMembers,
+    Resume as ResumeData,
+    UpdatePresence,
+    UpdateVoiceState,
+)
+from .guild_events import (
+    GuildAuditLogEntryCreate,
+    GuildBanAdd,
+    GuildBanRemove,
+    GuildCreate,
+    GuildCreateCompat,
+    GuildCreateCompatChannel,
+    GuildCreateCompatOverwrite,
+    GuildCreateCompatRole,
+    GuildDelete,
+    GuildEmojisUpdate,
+    GuildIntegrationsUpdate,
+    GuildMemberAdd,
+    GuildMemberRemove,
+    GuildMembersChunk,
+    GuildMemberUpdate,
+    GuildRoleCreate,
+    GuildRoleDelete,
+    GuildRoleUpdate,
+    GuildScheduledEventCreate,
+    GuildScheduledEventDelete,
+    GuildScheduledEventUpdate,
+    GuildScheduledEventUserAdd,
+    GuildScheduledEventUserRemove,
+    GuildStickersUpdate,
+    GuildUpdate,
+)
+from .integration_events import IntegrationCreate, IntegrationDelete, IntegrationUpdate
+from .invite_events import InviteCreate, InviteDelete
+from .monetization_events import (
+    EntitlementCreate,
+    EntitlementDelete,
+    EntitlementUpdate,
+    SubscriptionCreate,
+    SubscriptionDelete,
+    SubscriptionUpdate,
+)
 
 __all__ = [
     "Activity",
@@ -203,122 +194,3 @@ __all__ = [
     "VoiceStateUpdate",
     "WebhooksUpdate",
 ]
-
-
-_EXPORTS: dict[str, tuple[str, str]] = {
-    "Activity": (".gateway_event_fields", "Activity"),
-    "ActivityAssets": (".gateway_event_fields", "ActivityAssets"),
-    "ActivityButtons": (".gateway_event_fields", "ActivityButtons"),
-    "ActivityEmoji": (".gateway_event_fields", "ActivityEmoji"),
-    "ActivityParty": (".gateway_event_fields", "ActivityParty"),
-    "ActivitySecrets": (".gateway_event_fields", "ActivitySecrets"),
-    "ActivityTimestamps": (".gateway_event_fields", "ActivityTimestamps"),
-    "ApplicationReady": (".gateway_payloads", "ApplicationReady"),
-    "AutoModerationActionExecution": (
-        ".auto_moderation_events",
-        "AutoModerationActionExecution",
-    ),
-    "AutoModerationRuleCreate": (".auto_moderation_events", "AutoModerationRuleCreate"),
-    "AutoModerationRuleDelete": (".auto_moderation_events", "AutoModerationRuleDelete"),
-    "AutoModerationRuleUpdate": (".auto_moderation_events", "AutoModerationRuleUpdate"),
-    "ChannelCreate": (".channel_events", "ChannelCreate"),
-    "ChannelDelete": (".channel_events", "ChannelDelete"),
-    "ChannelPinsUpdate": (".channel_events", "ChannelPinsUpdate"),
-    "ChannelUpdate": (".channel_events", "ChannelUpdate"),
-    "ClientStatus": (".gateway_event_fields", "ClientStatus"),
-    "Dispatch": (".frame", "Dispatch"),
-    "EntitlementCreate": (".monetization_events", "EntitlementCreate"),
-    "EntitlementDelete": (".monetization_events", "EntitlementDelete"),
-    "EntitlementUpdate": (".monetization_events", "EntitlementUpdate"),
-    "GuildAuditLogEntryCreate": (".guild_events", "GuildAuditLogEntryCreate"),
-    "GuildBanAdd": (".guild_events", "GuildBanAdd"),
-    "GuildBanRemove": (".guild_events", "GuildBanRemove"),
-    "GuildCreate": (".guild_events", "GuildCreate"),
-    "GuildCreateCompat": (".guild_events", "GuildCreateCompat"),
-    "GuildCreateCompatChannel": (".guild_events", "GuildCreateCompatChannel"),
-    "GuildCreateCompatOverwrite": (".guild_events", "GuildCreateCompatOverwrite"),
-    "GuildCreateCompatRole": (".guild_events", "GuildCreateCompatRole"),
-    "GuildDelete": (".guild_events", "GuildDelete"),
-    "GuildEmojisUpdate": (".guild_events", "GuildEmojisUpdate"),
-    "GuildIntegrationsUpdate": (".guild_events", "GuildIntegrationsUpdate"),
-    "GuildMemberAdd": (".guild_events", "GuildMemberAdd"),
-    "GuildMemberRemove": (".guild_events", "GuildMemberRemove"),
-    "GuildMemberUpdate": (".guild_events", "GuildMemberUpdate"),
-    "GuildMembersChunk": (".guild_events", "GuildMembersChunk"),
-    "GuildRoleCreate": (".guild_events", "GuildRoleCreate"),
-    "GuildRoleDelete": (".guild_events", "GuildRoleDelete"),
-    "GuildRoleUpdate": (".guild_events", "GuildRoleUpdate"),
-    "GuildScheduledEventCreate": (".guild_events", "GuildScheduledEventCreate"),
-    "GuildScheduledEventDelete": (".guild_events", "GuildScheduledEventDelete"),
-    "GuildScheduledEventUpdate": (".guild_events", "GuildScheduledEventUpdate"),
-    "GuildScheduledEventUserAdd": (".guild_events", "GuildScheduledEventUserAdd"),
-    "GuildScheduledEventUserRemove": (".guild_events", "GuildScheduledEventUserRemove"),
-    "GuildStickersUpdate": (".guild_events", "GuildStickersUpdate"),
-    "GuildUpdate": (".guild_events", "GuildUpdate"),
-    "Heartbeat": (".frame", "Heartbeat"),
-    "HeartbeatAck": (".frame", "HeartbeatAck"),
-    "Hello": (".frame", "Hello"),
-    "HelloData": (".gateway_payloads", "Hello"),
-    "Identify": (".frame", "Identify"),
-    "IdentifyConnectionProperties": (
-        ".gateway_payloads",
-        "IdentifyConnectionProperties",
-    ),
-    "IdentifyData": (".gateway_payloads", "Identify"),
-    "IntegrationCreate": (".integration_events", "IntegrationCreate"),
-    "IntegrationDelete": (".integration_events", "IntegrationDelete"),
-    "IntegrationUpdate": (".integration_events", "IntegrationUpdate"),
-    "InvalidSession": (".frame", "InvalidSession"),
-    "InviteCreate": (".invite_events", "InviteCreate"),
-    "InviteDelete": (".invite_events", "InviteDelete"),
-    "Opcode": (".frame", "Opcode"),
-    "Payload": (".frame", "Payload"),
-    "PayloadType": (".frame", "PayloadType"),
-    "PresenceUpdate": (".gateway_event_fields", "PresenceUpdate"),
-    "PresenceUpdateUser": (".gateway_event_fields", "PresenceUpdateUser"),
-    "Ready": (".gateway_payloads", "Ready"),
-    "Reconnect": (".frame", "Reconnect"),
-    "RequestGuildMembers": (".gateway_payloads", "RequestGuildMembers"),
-    "Resume": (".frame", "Resume"),
-    "ResumeData": (".gateway_payloads", "Resume"),
-    "StageInstanceCreate": (".gateway_event_fields", "StageInstanceCreate"),
-    "StageInstanceDelete": (".gateway_event_fields", "StageInstanceDelete"),
-    "StageInstanceUpdate": (".gateway_event_fields", "StageInstanceUpdate"),
-    "SubscriptionCreate": (".monetization_events", "SubscriptionCreate"),
-    "SubscriptionDelete": (".monetization_events", "SubscriptionDelete"),
-    "SubscriptionUpdate": (".monetization_events", "SubscriptionUpdate"),
-    "ThreadCreate": (".channel_events", "ThreadCreate"),
-    "ThreadDelete": (".channel_events", "ThreadDelete"),
-    "ThreadListSync": (".channel_events", "ThreadListSync"),
-    "ThreadMemberUpdate": (".channel_events", "ThreadMemberUpdate"),
-    "ThreadMembersUpdate": (".channel_events", "ThreadMembersUpdate"),
-    "ThreadUpdate": (".channel_events", "ThreadUpdate"),
-    "UpdatePresence": (".gateway_payloads", "UpdatePresence"),
-    "UpdateVoiceState": (".gateway_payloads", "UpdateVoiceState"),
-    "UserUpdate": (".gateway_event_fields", "UserUpdate"),
-    "VoiceChannelEffectSend": (".gateway_event_fields", "VoiceChannelEffectSend"),
-    "VoiceChannelStartTimeUpdate": (
-        ".gateway_event_fields",
-        "VoiceChannelStartTimeUpdate",
-    ),
-    "VoiceChannelStatusUpdate": (".gateway_event_fields", "VoiceChannelStatusUpdate"),
-    "VoiceServerUpdate": (".gateway_event_fields", "VoiceServerUpdate"),
-    "VoiceStateUpdate": (".gateway_event_fields", "VoiceStateUpdate"),
-    "WebhooksUpdate": (".gateway_event_fields", "WebhooksUpdate"),
-}
-
-
-def __getattr__(name: str) -> object:
-    try:
-        module_name, attr_name = _EXPORTS[name]
-    except KeyError:
-        raise AttributeError(name) from None
-
-    module = import_module(module_name, __name__)
-    value = getattr(module, attr_name)
-    globals()[name] = value
-    return value
-
-
-def __dir__() -> list[str]:
-    return sorted(set(globals()) | set(__all__))

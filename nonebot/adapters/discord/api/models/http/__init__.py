@@ -1,150 +1,145 @@
 from __future__ import annotations
 
-from importlib import import_module
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .application import (
-        ActivityInstance,
-        ActivityLocation,
-        Application,
-        ApplicationIntegrationTypeConfiguration,
-        ApplicationRoleConnectionMetadata,
-        EditCurrentApplicationParams,
-        InstallParams,
-    )
-    from .audit_log import (
-        AuditLog,
-        AuditLogChange,
-        AuditLogChangeException,
-        AuditLogEntry,
-        OptionalAuditEntryInfo,
-    )
-    from .auto_moderation import (
-        AutoModerationAction,
-        AutoModerationActionMetadata,
-        AutoModerationRule,
-        CreateAndModifyAutoModerationRuleParams,
-        TriggerMetadata,
-    )
-    from .channels import (
-        ArchivedThreadsResponse,
-        Channel,
-        CreateGuildChannelParams,
-        DefaultReaction,
-        FollowedChannel,
-        ForumTag,
-        ForumTagRequest,
-        ListActiveGuildThreadsResponse,
-        ModifyChannelParams,
-        ModifyGuildChannelPositionParams,
-        ModifyThreadParams,
-        Overwrite,
-        PartialOverwrite,
-        StartThreadFromMessageParams,
-        StartThreadWithoutMessageParams,
-        ThreadMember,
-        ThreadMetadata,
-    )
-    from .emoji import ApplicationEmojis, Emoji, ModifyGuildEmojiParams
-    from .gateway import Gateway, GatewayBot, SessionStartLimit
-    from .guild_members import (
-        GuildMember,
-        ModifyCurrentMemberParams,
-        ModifyGuildMemberParams,
-    )
-    from .guild_scheduled_events import (
-        CreateGuildScheduledEventParams,
-        GuildScheduledEvent,
-        GuildScheduledEventEntityMetadata,
-        GuildScheduledEventRecurrenceRuleN_WeekdayStructure,
-        GuildScheduledEventUser,
-        ModifyGuildScheduledEventParams,
-        RecurrenceRule,
-    )
-    from .guild_templates import (
-        CreateGuildTemplateParams,
-        GuildTemplate,
-        GuildTemplateGuild,
-        GuildTemplateGuildChannel,
-        GuildTemplateGuildRole,
-        ModifyGuildTemplateParams,
-    )
-    from .guild_welcome import (
-        ModifyGuildWelcomeScreenParams,
-        WelcomeScreen,
-        WelcomeScreenChannel,
-    )
-    from .guilds import (
-        Ban,
-        BulkBan,
-        CreateGuildParams,
-        CurrentUserGuild,
-        Guild,
-        GuildIncidentsData,
-        GuildOnboarding,
-        GuildPreview,
-        GuildVanityURL,
-        GuildWidget,
-        GuildWidgetChannel,
-        GuildWidgetSettings,
-        GuildWidgetUser,
-        MembershipScreening,
-        ModifyGuildIncidentActionsParams,
-        ModifyGuildOnboardingParams,
-        ModifyGuildParams,
-        ModifyGuildWidgetParams,
-        OnboardingPrompt,
-        OnboardingPromptOption,
-        UnavailableGuild,
-    )
-    from .integrations import Integration, IntegrationAccount, IntegrationApplication
-    from .invites import (
-        Invite,
-        InviteGuild,
-        InviteMetadata,
-        InviteStageInstance,
-        InviteTargetUsersJobStatus,
-    )
-    from .lobby import (
-        AddLobbyMemberParams,
-        CreateLobbyMemberParams,
-        CreateLobbyParams,
-        LinkChannelToLobbyParams,
-        Lobby,
-        LobbyMember,
-        ModifyLobbyParams,
-    )
-    from .monetization import SKU, Entitlement, Subscription
-    from .polls import (
-        AnswerVoters,
-        Poll,
-        PollAnswer,
-        PollAnswerCount,
-        PollAnswerRequest,
-        PollMedia,
-        PollRequest,
-        PollResults,
-    )
-    from .soundboard import (
-        CreateGuildSoundboardSoundParams,
-        ListDefaultSoundboardSoundsResponse,
-        ListGuildSoundboardSoundsResponse,
-        ModifyGuildSoundboardSoundParams,
-        SendSoundboardSoundParams,
-        SoundboardSound,
-    )
-    from .stage_instance import StageInstance
-    from .stickers import (
-        ModifyGuildStickerParams,
-        Sticker,
-        StickerItem,
-        StickerPack,
-        StickerPacksResponse,
-    )
-    from .voice import ModifyCurrentUserVoiceStateParams, VoiceRegion, VoiceState
-    from .webhooks import CreateWebhookParams, ExecuteWebhookParams, Webhook
-
+from .application import (
+    ActivityInstance,
+    ActivityLocation,
+    Application,
+    ApplicationIntegrationTypeConfiguration,
+    ApplicationRoleConnectionMetadata,
+    EditCurrentApplicationParams,
+    InstallParams,
+)
+from .audit_log import (
+    AuditLog,
+    AuditLogChange,
+    AuditLogChangeException,
+    AuditLogEntry,
+    OptionalAuditEntryInfo,
+)
+from .auto_moderation import (
+    AutoModerationAction,
+    AutoModerationActionMetadata,
+    AutoModerationRule,
+    CreateAndModifyAutoModerationRuleParams,
+    TriggerMetadata,
+)
+from .channels import (
+    ArchivedThreadsResponse,
+    Channel,
+    CreateGuildChannelParams,
+    DefaultReaction,
+    FollowedChannel,
+    ForumTag,
+    ForumTagRequest,
+    ListActiveGuildThreadsResponse,
+    ModifyChannelParams,
+    ModifyGuildChannelPositionParams,
+    ModifyThreadParams,
+    Overwrite,
+    PartialOverwrite,
+    StartThreadFromMessageParams,
+    StartThreadWithoutMessageParams,
+    ThreadMember,
+    ThreadMetadata,
+)
+from .emoji import ApplicationEmojis, Emoji, ModifyGuildEmojiParams
+from .gateway import Gateway, GatewayBot, SessionStartLimit
+from .guild_members import (
+    GuildMember,
+    ModifyCurrentMemberParams,
+    ModifyGuildMemberParams,
+)
+from .guild_scheduled_events import (
+    CreateGuildScheduledEventParams,
+    GuildScheduledEvent,
+    GuildScheduledEventEntityMetadata,
+    GuildScheduledEventRecurrenceRuleN_WeekdayStructure,
+    GuildScheduledEventUser,
+    ModifyGuildScheduledEventParams,
+    RecurrenceRule,
+)
+from .guild_templates import (
+    CreateGuildTemplateParams,
+    GuildTemplate,
+    GuildTemplateGuild,
+    GuildTemplateGuildChannel,
+    GuildTemplateGuildRole,
+    ModifyGuildTemplateParams,
+)
+from .guild_welcome import (
+    ModifyGuildWelcomeScreenParams,
+    WelcomeScreen,
+    WelcomeScreenChannel,
+)
+from .guilds import (
+    Ban,
+    BulkBan,
+    CreateGuildParams,
+    CurrentUserGuild,
+    Guild,
+    GuildIncidentsData,
+    GuildOnboarding,
+    GuildPreview,
+    GuildVanityURL,
+    GuildWidget,
+    GuildWidgetChannel,
+    GuildWidgetSettings,
+    GuildWidgetUser,
+    MembershipScreening,
+    ModifyGuildIncidentActionsParams,
+    ModifyGuildOnboardingParams,
+    ModifyGuildParams,
+    ModifyGuildWidgetParams,
+    OnboardingPrompt,
+    OnboardingPromptOption,
+    UnavailableGuild,
+)
+from .integrations import Integration, IntegrationAccount, IntegrationApplication
+from .invites import (
+    Invite,
+    InviteGuild,
+    InviteMetadata,
+    InviteStageInstance,
+    InviteTargetUsersJobStatus,
+)
+from .lobby import (
+    AddLobbyMemberParams,
+    CreateLobbyMemberParams,
+    CreateLobbyParams,
+    LinkChannelToLobbyParams,
+    Lobby,
+    LobbyMember,
+    ModifyLobbyParams,
+)
+from .monetization import SKU, Entitlement, Subscription
+from .polls import (
+    AnswerVoters,
+    Poll,
+    PollAnswer,
+    PollAnswerCount,
+    PollAnswerRequest,
+    PollMedia,
+    PollRequest,
+    PollResults,
+)
+from .soundboard import (
+    CreateGuildSoundboardSoundParams,
+    ListDefaultSoundboardSoundsResponse,
+    ListGuildSoundboardSoundsResponse,
+    ModifyGuildSoundboardSoundParams,
+    SendSoundboardSoundParams,
+    SoundboardSound,
+)
+from .stage_instance import StageInstance
+from .stickers import (
+    ModifyGuildStickerParams,
+    Sticker,
+    StickerItem,
+    StickerPack,
+    StickerPacksResponse,
+)
+from .voice import ModifyCurrentUserVoiceStateParams, VoiceRegion, VoiceState
+from .webhooks import CreateWebhookParams, ExecuteWebhookParams, Webhook
 
 __all__ = [
     "SKU",
@@ -272,219 +267,3 @@ __all__ = [
     "WelcomeScreen",
     "WelcomeScreenChannel",
 ]
-
-
-_EXPORTS: dict[str, tuple[str, str]] = {
-    "ActivityInstance": (".application", "ActivityInstance"),
-    "ActivityLocation": (".application", "ActivityLocation"),
-    "AddLobbyMemberParams": (".lobby", "AddLobbyMemberParams"),
-    "AnswerVoters": (".polls", "AnswerVoters"),
-    "Application": (".application", "Application"),
-    "ApplicationEmojis": (".emoji", "ApplicationEmojis"),
-    "ApplicationIntegrationTypeConfiguration": (
-        ".application",
-        "ApplicationIntegrationTypeConfiguration",
-    ),
-    "ApplicationRoleConnectionMetadata": (
-        ".application",
-        "ApplicationRoleConnectionMetadata",
-    ),
-    "ArchivedThreadsResponse": (".channels", "ArchivedThreadsResponse"),
-    "AuditLog": (".audit_log", "AuditLog"),
-    "AuditLogChange": (".audit_log", "AuditLogChange"),
-    "AuditLogChangeException": (".audit_log", "AuditLogChangeException"),
-    "AuditLogEntry": (".audit_log", "AuditLogEntry"),
-    "AutoModerationAction": (".auto_moderation", "AutoModerationAction"),
-    "AutoModerationActionMetadata": (
-        ".auto_moderation",
-        "AutoModerationActionMetadata",
-    ),
-    "AutoModerationRule": (".auto_moderation", "AutoModerationRule"),
-    "Ban": (".guilds", "Ban"),
-    "BulkBan": (".guilds", "BulkBan"),
-    "Channel": (".channels", "Channel"),
-    "CreateAndModifyAutoModerationRuleParams": (
-        ".auto_moderation",
-        "CreateAndModifyAutoModerationRuleParams",
-    ),
-    "CreateGuildChannelParams": (".channels", "CreateGuildChannelParams"),
-    "CreateGuildParams": (".guilds", "CreateGuildParams"),
-    "CreateGuildScheduledEventParams": (
-        ".guild_scheduled_events",
-        "CreateGuildScheduledEventParams",
-    ),
-    "CreateGuildSoundboardSoundParams": (
-        ".soundboard",
-        "CreateGuildSoundboardSoundParams",
-    ),
-    "CreateGuildTemplateParams": (".guild_templates", "CreateGuildTemplateParams"),
-    "CreateLobbyMemberParams": (".lobby", "CreateLobbyMemberParams"),
-    "CreateLobbyParams": (".lobby", "CreateLobbyParams"),
-    "CreateWebhookParams": (".webhooks", "CreateWebhookParams"),
-    "CurrentUserGuild": (".guilds", "CurrentUserGuild"),
-    "DefaultReaction": (".channels", "DefaultReaction"),
-    "EditCurrentApplicationParams": (
-        ".application",
-        "EditCurrentApplicationParams",
-    ),
-    "Emoji": (".emoji", "Emoji"),
-    "Entitlement": (".monetization", "Entitlement"),
-    "ExecuteWebhookParams": (".webhooks", "ExecuteWebhookParams"),
-    "FollowedChannel": (".channels", "FollowedChannel"),
-    "ForumTag": (".channels", "ForumTag"),
-    "ForumTagRequest": (".channels", "ForumTagRequest"),
-    "Gateway": (".gateway", "Gateway"),
-    "GatewayBot": (".gateway", "GatewayBot"),
-    "Guild": (".guilds", "Guild"),
-    "GuildIncidentsData": (".guilds", "GuildIncidentsData"),
-    "GuildMember": (".guild_members", "GuildMember"),
-    "GuildOnboarding": (".guilds", "GuildOnboarding"),
-    "GuildPreview": (".guilds", "GuildPreview"),
-    "GuildScheduledEvent": (".guild_scheduled_events", "GuildScheduledEvent"),
-    "GuildScheduledEventEntityMetadata": (
-        ".guild_scheduled_events",
-        "GuildScheduledEventEntityMetadata",
-    ),
-    "GuildScheduledEventRecurrenceRuleN_WeekdayStructure": (
-        ".guild_scheduled_events",
-        "GuildScheduledEventRecurrenceRuleN_WeekdayStructure",
-    ),
-    "GuildScheduledEventUser": (
-        ".guild_scheduled_events",
-        "GuildScheduledEventUser",
-    ),
-    "GuildTemplate": (".guild_templates", "GuildTemplate"),
-    "GuildTemplateGuild": (".guild_templates", "GuildTemplateGuild"),
-    "GuildTemplateGuildChannel": (
-        ".guild_templates",
-        "GuildTemplateGuildChannel",
-    ),
-    "GuildTemplateGuildRole": (".guild_templates", "GuildTemplateGuildRole"),
-    "GuildVanityURL": (".guilds", "GuildVanityURL"),
-    "GuildWidget": (".guilds", "GuildWidget"),
-    "GuildWidgetChannel": (".guilds", "GuildWidgetChannel"),
-    "GuildWidgetSettings": (".guilds", "GuildWidgetSettings"),
-    "GuildWidgetUser": (".guilds", "GuildWidgetUser"),
-    "InstallParams": (".application", "InstallParams"),
-    "Integration": (".integrations", "Integration"),
-    "IntegrationAccount": (".integrations", "IntegrationAccount"),
-    "IntegrationApplication": (".integrations", "IntegrationApplication"),
-    "Invite": (".invites", "Invite"),
-    "InviteGuild": (".invites", "InviteGuild"),
-    "InviteMetadata": (".invites", "InviteMetadata"),
-    "InviteStageInstance": (".invites", "InviteStageInstance"),
-    "InviteTargetUsersJobStatus": (
-        ".invites",
-        "InviteTargetUsersJobStatus",
-    ),
-    "LinkChannelToLobbyParams": (".lobby", "LinkChannelToLobbyParams"),
-    "ListActiveGuildThreadsResponse": (
-        ".channels",
-        "ListActiveGuildThreadsResponse",
-    ),
-    "ListDefaultSoundboardSoundsResponse": (
-        ".soundboard",
-        "ListDefaultSoundboardSoundsResponse",
-    ),
-    "ListGuildSoundboardSoundsResponse": (
-        ".soundboard",
-        "ListGuildSoundboardSoundsResponse",
-    ),
-    "Lobby": (".lobby", "Lobby"),
-    "LobbyMember": (".lobby", "LobbyMember"),
-    "MembershipScreening": (".guilds", "MembershipScreening"),
-    "ModifyChannelParams": (".channels", "ModifyChannelParams"),
-    "ModifyCurrentMemberParams": (".guild_members", "ModifyCurrentMemberParams"),
-    "ModifyCurrentUserVoiceStateParams": (
-        ".voice",
-        "ModifyCurrentUserVoiceStateParams",
-    ),
-    "ModifyGuildChannelPositionParams": (
-        ".channels",
-        "ModifyGuildChannelPositionParams",
-    ),
-    "ModifyGuildEmojiParams": (".emoji", "ModifyGuildEmojiParams"),
-    "ModifyGuildIncidentActionsParams": (
-        ".guilds",
-        "ModifyGuildIncidentActionsParams",
-    ),
-    "ModifyGuildMemberParams": (".guild_members", "ModifyGuildMemberParams"),
-    "ModifyGuildOnboardingParams": (
-        ".guilds",
-        "ModifyGuildOnboardingParams",
-    ),
-    "ModifyGuildParams": (".guilds", "ModifyGuildParams"),
-    "ModifyGuildScheduledEventParams": (
-        ".guild_scheduled_events",
-        "ModifyGuildScheduledEventParams",
-    ),
-    "ModifyGuildSoundboardSoundParams": (
-        ".soundboard",
-        "ModifyGuildSoundboardSoundParams",
-    ),
-    "ModifyGuildStickerParams": (".stickers", "ModifyGuildStickerParams"),
-    "ModifyGuildTemplateParams": (
-        ".guild_templates",
-        "ModifyGuildTemplateParams",
-    ),
-    "ModifyGuildWelcomeScreenParams": (
-        ".guild_welcome",
-        "ModifyGuildWelcomeScreenParams",
-    ),
-    "ModifyGuildWidgetParams": (".guilds", "ModifyGuildWidgetParams"),
-    "ModifyLobbyParams": (".lobby", "ModifyLobbyParams"),
-    "ModifyThreadParams": (".channels", "ModifyThreadParams"),
-    "OnboardingPrompt": (".guilds", "OnboardingPrompt"),
-    "OnboardingPromptOption": (".guilds", "OnboardingPromptOption"),
-    "OptionalAuditEntryInfo": (".audit_log", "OptionalAuditEntryInfo"),
-    "Overwrite": (".channels", "Overwrite"),
-    "PartialOverwrite": (".channels", "PartialOverwrite"),
-    "Poll": (".polls", "Poll"),
-    "PollAnswer": (".polls", "PollAnswer"),
-    "PollAnswerCount": (".polls", "PollAnswerCount"),
-    "PollAnswerRequest": (".polls", "PollAnswerRequest"),
-    "PollMedia": (".polls", "PollMedia"),
-    "PollRequest": (".polls", "PollRequest"),
-    "PollResults": (".polls", "PollResults"),
-    "RecurrenceRule": (".guild_scheduled_events", "RecurrenceRule"),
-    "SKU": (".monetization", "SKU"),
-    "SendSoundboardSoundParams": (".soundboard", "SendSoundboardSoundParams"),
-    "SessionStartLimit": (".gateway", "SessionStartLimit"),
-    "SoundboardSound": (".soundboard", "SoundboardSound"),
-    "StageInstance": (".stage_instance", "StageInstance"),
-    "StartThreadFromMessageParams": (".channels", "StartThreadFromMessageParams"),
-    "StartThreadWithoutMessageParams": (
-        ".channels",
-        "StartThreadWithoutMessageParams",
-    ),
-    "Sticker": (".stickers", "Sticker"),
-    "StickerItem": (".stickers", "StickerItem"),
-    "StickerPack": (".stickers", "StickerPack"),
-    "StickerPacksResponse": (".stickers", "StickerPacksResponse"),
-    "Subscription": (".monetization", "Subscription"),
-    "ThreadMember": (".channels", "ThreadMember"),
-    "ThreadMetadata": (".channels", "ThreadMetadata"),
-    "TriggerMetadata": (".auto_moderation", "TriggerMetadata"),
-    "UnavailableGuild": (".guilds", "UnavailableGuild"),
-    "VoiceRegion": (".voice", "VoiceRegion"),
-    "VoiceState": (".voice", "VoiceState"),
-    "Webhook": (".webhooks", "Webhook"),
-    "WelcomeScreen": (".guild_welcome", "WelcomeScreen"),
-    "WelcomeScreenChannel": (".guild_welcome", "WelcomeScreenChannel"),
-}
-
-
-def __getattr__(name: str) -> object:
-    try:
-        module_name, attr_name = _EXPORTS[name]
-    except KeyError:
-        raise AttributeError(name) from None
-
-    module = import_module(module_name, __name__)
-    value = getattr(module, attr_name)
-    globals()[name] = value
-    return value
-
-
-def __dir__() -> list[str]:
-    return sorted(set(globals()) | set(__all__))
