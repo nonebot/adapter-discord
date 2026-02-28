@@ -4,7 +4,7 @@ from typing import Annotated, Literal, TypeAlias
 from nonebot.compat import PYDANTIC_V2, ConfigDict
 from pydantic import BaseModel, Field
 
-from .api.model import (
+from .api.models import (
     Hello as HelloData,
     Identify as IdentifyData,
     Resume as ResumeData,

@@ -18,7 +18,7 @@ from nonebot.plugin import get_plugin_config
 from nonebot.utils import escape_tag
 
 from .api.handle import HandleMixin
-from .api.model import GatewayBot, User
+from .api.models import GatewayBot, User
 from .bot import Bot
 from .commands import sync_application_command
 from .config import BotInfo, Config
