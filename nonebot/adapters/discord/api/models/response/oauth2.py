@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from ...types import UNSET, Missing
 
 if TYPE_CHECKING:
-    from .user import User
+    from ..common.user import User
     from ..http.application import Application
 
 

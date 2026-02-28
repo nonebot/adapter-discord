@@ -18,29 +18,19 @@ from .common.embeds import (
     EmbedVideo,
 )
 from .common.messages import (
-    AllowedMention,
     Attachment,
-    AttachmentSend,
     ChannelMention,
     CountDetails,
-    File,
     MessageActivity,
     MessageCall,
-    MessageEditParams,
     MessageGet,
     MessageReference,
-    MessageSend,
     MessageSnapshot,
     MessageSnapshotMessage,
     Reaction,
     RoleSubscriptionData,
-    WebhookMessageEditParams,
 )
-from .common.oauth2 import AuthorizationResponse
 from .common.permissions import (
-    CreateGuildRoleParams,
-    ModifyGuildRoleParams,
-    ModifyGuildRolePositionParams,
     Role,
     RoleColors,
     RoleTags,
@@ -51,7 +41,6 @@ from .common.user import (
     ApplicationRoleConnection,
     AvatarDecorationData,
     Connection,
-    ModifyCurrentUserParams,
     User,
 )
 from .gateway.auto_moderation_events import (
@@ -363,6 +352,21 @@ from .interactions.message_components import (
     SelectOption,
     TextInput,
 )
+from .request.messages import (
+    AllowedMention,
+    AttachmentSend,
+    File,
+    MessageEditParams,
+    MessageSend,
+)
+from .request.permissions import (
+    CreateGuildRoleParams,
+    ModifyGuildRoleParams,
+    ModifyGuildRolePositionParams,
+)
+from .request.user import ModifyCurrentUserParams
+from .request.webhooks import WebhookMessageEditParams
+from .response.oauth2 import AuthorizationResponse
 from ..types import (
     UNSET,
     ActivityAssetImage,

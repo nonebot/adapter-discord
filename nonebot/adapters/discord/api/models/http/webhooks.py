@@ -11,8 +11,8 @@ from ...types import UNSET, MessageFlag, Missing, MissingOrNullable, WebhookType
 if TYPE_CHECKING:
     from .polls import PollRequest
     from ..common.embeds import Embed
-    from ..common.messages import AllowedMention, AttachmentSend, File
     from ..common.user import User
+    from ..request.messages import AllowedMention, AttachmentSend, File
 
 
 class SourceGuild(BaseModel):
