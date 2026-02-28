@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..http.monetization import Entitlement, Subscription
+from ..common.monetization import Entitlement, Subscription
 
 
 class EntitlementCreate(Entitlement):

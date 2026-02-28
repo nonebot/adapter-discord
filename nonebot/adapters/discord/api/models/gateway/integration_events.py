@@ -3,7 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 from ..common.snowflake import Snowflake
-from ..http.integrations import Integration
+from ..common.integrations import Integration
 from ...types import UNSET, Missing
 
 

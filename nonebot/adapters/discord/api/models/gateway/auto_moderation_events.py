@@ -3,7 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from ..common.snowflake import Snowflake
-from ..http.auto_moderation import AutoModerationAction, AutoModerationRule
+from ..common.auto_moderation import AutoModerationAction, AutoModerationRule
 from ...types import UNSET, Missing, TriggerType
 
 

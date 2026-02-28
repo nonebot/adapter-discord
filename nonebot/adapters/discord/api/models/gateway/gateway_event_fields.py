@@ -7,9 +7,9 @@ from pydantic import BaseModel, Field
 
 from ..common.snowflake import Snowflake
 from ..common.user import User
-from ..http.emoji import Emoji
-from ..http.stage_instance import StageInstance
-from ..http.voice import VoiceState
+from ..common.emoji import Emoji
+from ..common.stage_instance import StageInstance
+from ..common.voice import VoiceState
 from ...types import (
     UNSET,
     ActivityAssetImage,

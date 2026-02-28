@@ -5,7 +5,7 @@ import datetime
 from pydantic import BaseModel
 
 from ..common.snowflake import Snowflake
-from ..http.channels import Channel, ThreadMember
+from ..common.channels import Channel, ThreadMember
 from ...types import UNSET, ChannelType, Missing, MissingOrNullable
 
 

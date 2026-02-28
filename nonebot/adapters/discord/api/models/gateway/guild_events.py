@@ -9,16 +9,16 @@ from .gateway_event_fields import PresenceUpdate
 from ..common.permissions import Role
 from ..common.snowflake import Snowflake
 from ..common.user import AvatarDecorationData, User
-from ..http.audit_log import AuditLogEntry
-from ..http.channels import Channel
-from ..http.emoji import Emoji
-from ..http.guild_members import GuildMember
-from ..http.guild_scheduled_events import GuildScheduledEvent
-from ..http.guild_welcome import WelcomeScreen
-from ..http.guilds import Guild, UnavailableGuild
-from ..http.stage_instance import StageInstance
-from ..http.stickers import Sticker
-from ..http.voice import VoiceState
+from ..common.audit_log import AuditLogEntry
+from ..common.channels import Channel
+from ..common.emoji import Emoji
+from ..common.guild_members import GuildMember
+from ..common.guild_scheduled_events import GuildScheduledEvent
+from ..common.guild_welcome import WelcomeScreen
+from ..common.guilds import Guild, UnavailableGuild
+from ..common.stage_instance import StageInstance
+from ..common.stickers import Sticker
+from ..common.voice import VoiceState
 from ...types import (
     UNSET,
     DefaultMessageNotificationLevel,

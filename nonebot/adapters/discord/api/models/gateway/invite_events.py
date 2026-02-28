@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from ..common.snowflake import Snowflake
 from ..common.user import User
-from ..http.application import Application
+from ..common.application import Application
 from ...types import UNSET, InviteTargetType, Missing
 
 

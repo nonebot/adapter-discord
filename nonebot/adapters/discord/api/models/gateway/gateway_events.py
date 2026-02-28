@@ -17,13 +17,13 @@ from ..common.messages import (
 )
 from ..common.snowflake import Snowflake
 from ..common.user import User
-from ..http.application import Application
-from ..http.channels import Channel
-from ..http.emoji import Emoji
-from ..http.guild_members import GuildMember
-from ..http.monetization import Entitlement
-from ..http.polls import Poll
-from ..http.stickers import Sticker, StickerItem
+from ..common.application import Application
+from ..common.channels import Channel
+from ..common.emoji import Emoji
+from ..common.guild_members import GuildMember
+from ..common.monetization import Entitlement
+from ..common.polls import Poll
+from ..common.stickers import Sticker, StickerItem
 from ..interactions.interactions import (
     ApplicationCommandData,
     InteractionData,
