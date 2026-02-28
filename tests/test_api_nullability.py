@@ -6,7 +6,7 @@ from nonebot.adapters.discord.api import (
     SelectMenu,
     SelectOption,
 )
-from nonebot.adapters.discord.api.model import (
+from nonebot.adapters.discord.api.models import (
     ExecuteWebhookParams,
     File,
     MessageEditParams,

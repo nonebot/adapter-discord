@@ -1,7 +1,7 @@
 from typing import Any
 
 import nonebot.adapters.discord.api.handle as handle_module
-from nonebot.adapters.discord.api.model import File
+from nonebot.adapters.discord.api.models import File
 from tests.fake.doubles import DummyAdapter, DummyBot
 
 from nonebot.drivers import Request
