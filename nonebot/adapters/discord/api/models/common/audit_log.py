@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
+from .interactions import ApplicationCommand
 from .snowflake import Snowflake
-from ..interactions.application_commands import ApplicationCommand
 from ...types import UNSET, AuditLogEventType, Missing
 
 if TYPE_CHECKING:

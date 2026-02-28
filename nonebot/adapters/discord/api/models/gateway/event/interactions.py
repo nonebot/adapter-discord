@@ -6,17 +6,17 @@ from pydantic import BaseModel
 
 from ...common.channels import Channel
 from ...common.guild_members import GuildMember
-from ...common.messages import MessageGet
-from ...common.monetization import Entitlement
-from ...common.snowflake import Snowflake
-from ...common.user import User
-from ...interactions.interactions import (
+from ...common.interactions import (
     ApplicationCommandData,
     InteractionData,
     InteractionGuild,
     MessageComponentData,
     ModalSubmitData,
 )
+from ...common.messages import MessageGet
+from ...common.monetization import Entitlement
+from ...common.snowflake import Snowflake
+from ...common.user import User
 from ....types import (
     UNSET,
     ApplicationIntegrationType,

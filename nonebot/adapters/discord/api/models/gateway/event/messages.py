@@ -9,6 +9,12 @@ from ...common.channels import Channel
 from ...common.embeds import Embed
 from ...common.emoji import Emoji
 from ...common.guild_members import GuildMember
+from ...common.interactions import (
+    DirectComponent,
+    MessageInteraction,
+    MessageInteractionMetadata,
+    ResolvedData,
+)
 from ...common.messages import (
     Attachment,
     ChannelMention,
@@ -24,12 +30,6 @@ from ...common.polls import Poll
 from ...common.snowflake import Snowflake
 from ...common.stickers import Sticker, StickerItem
 from ...common.user import User
-from ...interactions.interactions import (
-    MessageInteraction,
-    MessageInteractionMetadata,
-    ResolvedData,
-)
-from ...interactions.message_components import DirectComponent
 from ....types import (
     UNSET,
     MessageFlag,

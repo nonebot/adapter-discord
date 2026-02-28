@@ -9,9 +9,9 @@ from ...types import UNSET, AllowedMentionType, MessageFlag, Missing, MissingOrN
 
 if TYPE_CHECKING:
     from ..common.embeds import Embed
+    from ..common.interactions import Component, DirectComponent
     from ..common.messages import MessageReference
     from ..http.polls import PollRequest
-    from ..interactions.message_components import Component, DirectComponent
 
 
 class AllowedMention(BaseModel):

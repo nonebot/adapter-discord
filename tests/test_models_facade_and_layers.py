@@ -42,30 +42,35 @@ def test_models_layer_dependencies() -> None:
         / "models"
     )
 
-    # 规则1: common/ 禁止 import-from request*/response*/gateway*
+    # 规则1: common/ 禁止 import-from request*/response*/gateway*/interactions*/http*
     common_path = base_path / "common"
     for py_file in common_path.rglob("*.py"):
         tree = ast.parse(py_file.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom) and node.module:
-                forbidden = ("request", "response", "gateway")
-                if any(node.module.startswith(f) for f in forbidden):
+                forbidden = ("request", "response", "gateway", "interactions", "http")
+                is_local_common_interactions = (
+                    node.module.startswith("interactions") and node.level == 1
+                )
+                if any(node.module.startswith(f) for f in forbidden) and not (
+                    is_local_common_interactions
+                ):
                     msg = (
                         f"Illegal import in {py_file}: from {node.module} import ... "
-                        "(common layer should not depend on request/response/gateway)",
+                        "(common layer should not depend on request/response/gateway/interactions/http)",
                     )
                     raise AssertionError(msg)
 
-    # 规则2: gateway/ 禁止 import-from request*/response*/http*
+    # 规则2: gateway/ 禁止 import-from request*/response*/interactions*/http*
     gateway_path = base_path / "gateway"
     for py_file in gateway_path.rglob("*.py"):
         tree = ast.parse(py_file.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom) and node.module:
-                forbidden = ("request", "response", "http")
+                forbidden = ("request", "response", "interactions", "http")
                 if any(node.module.startswith(f) for f in forbidden):
                     msg = (
                         f"Illegal import in {py_file}: from {node.module} import ... "
-                        "(gateway layer should not depend on request/response/http)",
+                        "(gateway layer should not depend on request/response/interactions/http)",
                     )
                     raise AssertionError(msg)

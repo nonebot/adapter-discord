@@ -19,19 +19,19 @@ from ...types import (
 )
 
 if TYPE_CHECKING:
+    from .application import Application
+    from .channels import Channel
     from .embeds import Embed
-    from .user import User
-    from ..http.application import Application
-    from ..http.channels import Channel
-    from ..http.emoji import Emoji
-    from ..http.polls import Poll
-    from ..http.stickers import Sticker, StickerItem
-    from ..interactions.interactions import (
+    from .emoji import Emoji
+    from .interactions import (
+        DirectComponent,
         MessageInteraction,
         MessageInteractionMetadata,
         ResolvedData,
     )
-    from ..interactions.message_components import DirectComponent
+    from .polls import Poll
+    from .stickers import Sticker, StickerItem
+    from .user import User
 
 
 class MessageGet(BaseModel):

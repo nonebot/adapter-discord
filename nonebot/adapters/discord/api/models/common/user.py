@@ -16,7 +16,7 @@ from ...types import (
 )
 
 if TYPE_CHECKING:
-    from ..http.integrations import Integration
+    from .integrations import Integration
 
 
 class User(BaseModel):

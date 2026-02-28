@@ -11,7 +11,7 @@ from ...types import UNSET, MessageFlag, Missing, MissingOrNullable
 if TYPE_CHECKING:
     from .polls import PollRequest
     from ..common.embeds import Embed
-    from ..interactions.message_components import Component, DirectComponent
+    from ..common.interactions import Component, DirectComponent
 
 
 class ExecuteWebhookParams(BaseModel):
