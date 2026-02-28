@@ -2,17 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal
 
-from nonebot.adapters.discord.api.models.application_commands import (
-    ApplicationCommandOptionChoice,
-)
-from nonebot.adapters.discord.api.models.message_components import (
-    Component,
-)
-from nonebot.adapters.discord.api.models.snowflake import Snowflake
-
 from pydantic import BaseModel
 
-from ..types import (
+from .application_commands import ApplicationCommandOptionChoice
+from .message_components import Component
+from ..snowflake import Snowflake
+from ...types import (
     UNSET,
     ApplicationCommandOptionType,
     ApplicationCommandType,
@@ -26,7 +21,7 @@ from ..types import (
 )
 
 if TYPE_CHECKING:
-    from ..model import (
+    from .. import (
         AllowedMention,
         Attachment,
         AttachmentSend,

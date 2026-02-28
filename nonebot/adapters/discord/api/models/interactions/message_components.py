@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, Field
 
-from .snowflake import Snowflake
-from ..types import (
+from ..snowflake import Snowflake
+from ...types import (
     UNSET,
     ButtonStyle,
     ChannelType,
@@ -15,7 +15,7 @@ from ..types import (
 )
 
 if TYPE_CHECKING:
-    from ..model import Channel, GuildMember, Role, User
+    from .. import Channel, GuildMember, Role, User
 
 
 class ActionRow(BaseModel):

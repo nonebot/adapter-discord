@@ -8,7 +8,7 @@ from .channels import Channel
 from .embeds import Embed
 from .emoji import Emoji
 from .guild_members import GuildMember
-from .interactions import (
+from .interactions.interactions import (
     ApplicationCommandData,
     InteractionData,
     InteractionGuild,
@@ -18,7 +18,7 @@ from .interactions import (
     ModalSubmitData,
     ResolvedData,
 )
-from .message_components import DirectComponent
+from .interactions.message_components import DirectComponent
 from .messages import (
     Attachment,
     ChannelMention,

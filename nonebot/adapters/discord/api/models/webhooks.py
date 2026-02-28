@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from .message_components import DirectComponent
+from .interactions.message_components import DirectComponent
 from .snowflake import Snowflake
 from ..types import UNSET, MessageFlag, Missing, MissingOrNullable, WebhookType
 

@@ -16,30 +16,6 @@ from .application import (
     EditCurrentApplicationParams,
     InstallParams,
 )
-from .application_commands import (
-    AnyCommandOption,
-    ApplicationCommand,
-    ApplicationCommandBulkOverwriteParams,
-    ApplicationCommandCreate,
-    ApplicationCommandEditParams,
-    ApplicationCommandOption,
-    ApplicationCommandOptionChoice,
-    ApplicationCommandPermissions,
-    AttachmentOption,
-    BooleanOption,
-    ChannelOption,
-    CommandOptionBase,
-    GuildApplicationCommandPermissions,
-    IntegerOption,
-    MentionableOption,
-    NumberOption,
-    OptionChoice,
-    RoleOption,
-    StringOption,
-    SubCommandGroupOption,
-    SubCommandOption,
-    UserOption,
-)
 from .audit_log import (
     AuditLog,
     AuditLogChange,
@@ -98,7 +74,6 @@ from .embeds import (
     EmbedVideo,
 )
 from .emoji import ApplicationEmojis, Emoji, ModifyGuildEmojiParams
-from .gateway import Gateway, GatewayBot, SessionStartLimit
 from .gateway_event_fields import (
     Activity,
     ActivityAssets,
@@ -207,6 +182,7 @@ from .guilds import (
     OnboardingPromptOption,
     UnavailableGuild,
 )
+from .http.gateway import Gateway, GatewayBot, SessionStartLimit
 from .integrations import (
     Integration,
     IntegrationAccount,
@@ -215,7 +191,31 @@ from .integrations import (
     IntegrationDelete,
     IntegrationUpdate,
 )
-from .interactions import (
+from .interactions.application_commands import (
+    AnyCommandOption,
+    ApplicationCommand,
+    ApplicationCommandBulkOverwriteParams,
+    ApplicationCommandCreate,
+    ApplicationCommandEditParams,
+    ApplicationCommandOption,
+    ApplicationCommandOptionChoice,
+    ApplicationCommandPermissions,
+    AttachmentOption,
+    BooleanOption,
+    ChannelOption,
+    CommandOptionBase,
+    GuildApplicationCommandPermissions,
+    IntegerOption,
+    MentionableOption,
+    NumberOption,
+    OptionChoice,
+    RoleOption,
+    StringOption,
+    SubCommandGroupOption,
+    SubCommandOption,
+    UserOption,
+)
+from .interactions.interactions import (
     ApplicationCommandData,
     ApplicationCommandInteractionDataOption,
     InteractionCallbackAutocomplete,
@@ -230,6 +230,18 @@ from .interactions import (
     MessageInteractionMetadata,
     ModalSubmitData,
     ResolvedData,
+)
+from .interactions.message_components import (
+    ActionRow,
+    Button,
+    Component,
+    ComponentEmoji,
+    DirectComponent,
+    SelectDefaultValue,
+    SelectMenu,
+    SelectMenuResolved,
+    SelectOption,
+    TextInput,
 )
 from .invites import (
     Invite,
@@ -248,18 +260,6 @@ from .lobby import (
     Lobby,
     LobbyMember,
     ModifyLobbyParams,
-)
-from .message_components import (
-    ActionRow,
-    Button,
-    Component,
-    ComponentEmoji,
-    DirectComponent,
-    SelectDefaultValue,
-    SelectMenu,
-    SelectMenuResolved,
-    SelectOption,
-    TextInput,
 )
 from .messages import (
     AllowedMention,
