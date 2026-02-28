@@ -1,52 +1,22 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from ..common.snowflake import Snowflake
+from ..common.voice import VoiceRegion, VoiceState
 from ...types import UNSET, Missing, MissingOrNullable
-
-if TYPE_CHECKING:
-    from .guild_members import GuildMember
-
-
-class VoiceState(BaseModel):
-    """Voice State
-
-    see https://discord.com/developers/docs/resources/voice#voice-state-object
-    """
-
-    guild_id: Missing[Snowflake] = UNSET
-    channel_id: Snowflake | None = Field(...)
-    user_id: Snowflake
-    member: Missing[GuildMember] = UNSET
-    session_id: str
-    deaf: bool
-    mute: bool
-    self_deaf: bool
-    self_mute: bool
-    self_stream: Missing[bool] = UNSET
-    self_video: bool
-    suppress: bool
-    request_to_speak_timestamp: datetime.datetime | None = Field(...)
-
-
-class VoiceRegion(BaseModel):
-    """Voice Region
-
-    see https://discord.com/developers/docs/resources/voice#voice-region-object
-    """
-
-    id: str
-    name: str
-    optimal: bool
-    deprecated: bool
-    custom: bool
 
 
 class ModifyCurrentUserVoiceStateParams(BaseModel):
     channel_id: Missing[Snowflake] = UNSET
     suppress: Missing[bool] = UNSET
     request_to_speak_timestamp: MissingOrNullable[datetime.datetime] = UNSET
+
+
+__all__ = [
+    "ModifyCurrentUserVoiceStateParams",
+    "VoiceRegion",
+    "VoiceState",
+]

@@ -1,54 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from ..common.snowflake import Snowflake
-from ...types import UNSET, Missing, MissingOrNullable, StickerFormatType, StickerType
-
-if TYPE_CHECKING:
-    from ..common.user import User
-
-
-class Sticker(BaseModel):
-    """Sticker Object
-
-    see https://discord.com/developers/docs/resources/sticker#sticker-object
-    """
-
-    id: Snowflake
-    pack_id: Missing[Snowflake] = UNSET
-    name: str
-    description: str | None = Field(...)
-    tags: str
-    asset: Missing[str] = UNSET
-    """Deprecated. previously the sticker asset hash, now an empty string"""
-    type: StickerType
-    format_type: StickerFormatType
-    available: Missing[bool] = UNSET
-    guild_id: Missing[Snowflake] = UNSET
-    user: Missing[User] = UNSET
-    sort_value: Missing[int] = UNSET
-
-
-class StickerItem(BaseModel):
-    """Sticker item.
-
-    see https://discord.com/developers/docs/resources/sticker#sticker-item-object
-    """
-
-    id: Snowflake
-    name: str
-    format_type: StickerFormatType
+from ..common.stickers import Sticker, StickerItem
+from ...types import UNSET, Missing, MissingOrNullable
 
 
 class StickerPack(BaseModel):
-    """Sticker pack.
-
-    see https://discord.com/developers/docs/resources/sticker#sticker-pack-object
-    """
-
     id: Snowflake
     stickers: list[Sticker]
     name: str
@@ -59,11 +18,6 @@ class StickerPack(BaseModel):
 
 
 class StickerPacksResponse(BaseModel):
-    """List Nitro Sticker Packs Response.
-
-    see https://discord.com/developers/docs/resources/sticker#list-sticker-packs
-    """
-
     sticker_packs: list[StickerPack]
 
 
@@ -71,3 +25,12 @@ class ModifyGuildStickerParams(BaseModel):
     name: Missing[str] = UNSET
     description: MissingOrNullable[str] = UNSET
     tags: Missing[str] = UNSET
+
+
+__all__ = [
+    "ModifyGuildStickerParams",
+    "Sticker",
+    "StickerItem",
+    "StickerPack",
+    "StickerPacksResponse",
+]
