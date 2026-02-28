@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from .application_commands import ApplicationCommandOptionChoice
 from .message_components import Component
-from ..snowflake import Snowflake
+from ..common.snowflake import Snowflake
 from ...types import (
     UNSET,
     ApplicationCommandOptionType,

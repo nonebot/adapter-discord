@@ -3,7 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from .snowflake import Snowflake
-from ..types import MembershipState, TeamMemberRoleType
+from ...types import MembershipState, TeamMemberRoleType
 
 
 # Teams

@@ -7,14 +7,14 @@ from pydantic import BaseModel, Field
 
 from .audit_log import AuditLogEntry
 from .emoji import Emoji
-from .gateway_event_fields import PresenceUpdate
 from .guild_members import GuildMember
 from .guild_scheduled_events import GuildScheduledEvent
-from .snowflake import Snowflake
 from .stage_instance import StageInstance
-from .user import AvatarDecorationData, User
 from .voice import VoiceState
-from ..types import (
+from ..common.snowflake import Snowflake
+from ..common.user import AvatarDecorationData, User
+from ..gateway.gateway_event_fields import PresenceUpdate
+from ...types import (
     UNSET,
     DefaultMessageNotificationLevel,
     ExplicitContentFilterLevel,
@@ -35,8 +35,9 @@ from ..types import (
 if TYPE_CHECKING:
     from .channels import Channel
     from .guild_welcome import WelcomeScreen
-    from .permissions import Role
     from .stickers import Sticker
+
+from ..common.permissions import Role
 
 
 class Guild(BaseModel):

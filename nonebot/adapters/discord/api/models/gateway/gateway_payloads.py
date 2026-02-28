@@ -4,11 +4,13 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from .snowflake import Snowflake
-from ..types import UNSET, Missing, UpdatePresenceStatusType
+from ..common.snowflake import Snowflake
+from ...types import UNSET, Missing, UpdatePresenceStatusType
 
 if TYPE_CHECKING:
-    from ..model import Activity, PresenceUpdate, UnavailableGuild, User
+    from .gateway_event_fields import Activity, PresenceUpdate
+    from ..common.user import User
+    from ..http.guilds import UnavailableGuild
 
 
 class Identify(BaseModel):

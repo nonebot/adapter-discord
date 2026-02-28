@@ -7,7 +7,100 @@ import sys
 from nonebot.compat import PYDANTIC_V2
 from pydantic import BaseModel
 
-from .application import (
+from .common.embeds import (
+    Embed,
+    EmbedAuthor,
+    EmbedField,
+    EmbedFooter,
+    EmbedImage,
+    EmbedProvider,
+    EmbedThumbnail,
+    EmbedVideo,
+)
+from .common.messages import (
+    AllowedMention,
+    Attachment,
+    AttachmentSend,
+    ChannelMention,
+    CountDetails,
+    File,
+    MessageActivity,
+    MessageCall,
+    MessageEditParams,
+    MessageGet,
+    MessageReference,
+    MessageSend,
+    MessageSnapshot,
+    MessageSnapshotMessage,
+    Reaction,
+    RoleSubscriptionData,
+    WebhookMessageEditParams,
+)
+from .common.oauth2 import AuthorizationResponse
+from .common.permissions import (
+    CreateGuildRoleParams,
+    ModifyGuildRoleParams,
+    ModifyGuildRolePositionParams,
+    Role,
+    RoleColors,
+    RoleTags,
+)
+from .common.snowflake import Snowflake, SnowflakeType
+from .common.teams import Team, TeamMember, TeamMemberUser
+from .common.user import (
+    ApplicationRoleConnection,
+    AvatarDecorationData,
+    Connection,
+    ModifyCurrentUserParams,
+    User,
+)
+from .gateway.frame import (
+    Dispatch,
+    Heartbeat,
+    HeartbeatAck,
+    Hello,
+    Identify,
+    InvalidSession,
+    Opcode,
+    Payload,
+    PayloadType,
+    Reconnect,
+    Resume,
+)
+from .gateway.gateway_event_fields import (
+    Activity,
+    ActivityAssets,
+    ActivityButtons,
+    ActivityEmoji,
+    ActivityParty,
+    ActivitySecrets,
+    ActivityTimestamps,
+    ClientStatus,
+    PresenceUpdate,
+    PresenceUpdateUser,
+    StageInstanceCreate,
+    StageInstanceDelete,
+    StageInstanceUpdate,
+    UserUpdate,
+    VoiceChannelEffectSend,
+    VoiceChannelStartTimeUpdate,
+    VoiceChannelStatusUpdate,
+    VoiceServerUpdate,
+    VoiceStateUpdate,
+    WebhooksUpdate,
+)
+from .gateway.gateway_payloads import (
+    ApplicationReady,
+    Hello as HelloData,
+    Identify as IdentifyData,
+    IdentifyConnectionProperties,
+    Ready,
+    RequestGuildMembers,
+    Resume as ResumeData,
+    UpdatePresence,
+    UpdateVoiceState,
+)
+from .http.application import (
     ActivityInstance,
     ActivityLocation,
     Application,
@@ -16,14 +109,14 @@ from .application import (
     EditCurrentApplicationParams,
     InstallParams,
 )
-from .audit_log import (
+from .http.audit_log import (
     AuditLog,
     AuditLogChange,
     AuditLogChangeException,
     AuditLogEntry,
     OptionalAuditEntryInfo,
 )
-from .auto_moderation import (
+from .http.auto_moderation import (
     AutoModerationAction,
     AutoModerationActionExecution,
     AutoModerationActionMetadata,
@@ -34,7 +127,7 @@ from .auto_moderation import (
     CreateAndModifyAutoModerationRuleParams,
     TriggerMetadata,
 )
-from .channels import (
+from .http.channels import (
     ArchivedThreadsResponse,
     Channel,
     ChannelCreate,
@@ -63,69 +156,14 @@ from .channels import (
     ThreadMetadata,
     ThreadUpdate,
 )
-from .embeds import (
-    Embed,
-    EmbedAuthor,
-    EmbedField,
-    EmbedFooter,
-    EmbedImage,
-    EmbedProvider,
-    EmbedThumbnail,
-    EmbedVideo,
-)
-from .emoji import ApplicationEmojis, Emoji, ModifyGuildEmojiParams
-from .gateway.frame import (
-    Dispatch,
-    Heartbeat,
-    HeartbeatAck,
-    Hello,
-    Identify,
-    InvalidSession,
-    Opcode,
-    Payload,
-    PayloadType,
-    Reconnect,
-    Resume,
-)
-from .gateway_event_fields import (
-    Activity,
-    ActivityAssets,
-    ActivityButtons,
-    ActivityEmoji,
-    ActivityParty,
-    ActivitySecrets,
-    ActivityTimestamps,
-    ClientStatus,
-    PresenceUpdate,
-    PresenceUpdateUser,
-    StageInstanceCreate,
-    StageInstanceDelete,
-    StageInstanceUpdate,
-    UserUpdate,
-    VoiceChannelEffectSend,
-    VoiceChannelStartTimeUpdate,
-    VoiceChannelStatusUpdate,
-    VoiceServerUpdate,
-    VoiceStateUpdate,
-    WebhooksUpdate,
-)
-from .gateway_payloads import (
-    ApplicationReady,
-    Hello as HelloData,
-    Identify as IdentifyData,
-    IdentifyConnectionProperties,
-    Ready,
-    RequestGuildMembers,
-    Resume as ResumeData,
-    UpdatePresence,
-    UpdateVoiceState,
-)
-from .guild_members import (
+from .http.emoji import ApplicationEmojis, Emoji, ModifyGuildEmojiParams
+from .http.gateway import Gateway, GatewayBot, SessionStartLimit
+from .http.guild_members import (
     GuildMember,
     ModifyCurrentMemberParams,
     ModifyGuildMemberParams,
 )
-from .guild_scheduled_events import (
+from .http.guild_scheduled_events import (
     CreateGuildScheduledEventParams,
     GuildScheduledEvent,
     GuildScheduledEventEntityMetadata,
@@ -134,7 +172,7 @@ from .guild_scheduled_events import (
     ModifyGuildScheduledEventParams,
     RecurrenceRule,
 )
-from .guild_templates import (
+from .http.guild_templates import (
     CreateGuildTemplateParams,
     GuildTemplate,
     GuildTemplateGuild,
@@ -142,12 +180,12 @@ from .guild_templates import (
     GuildTemplateGuildRole,
     ModifyGuildTemplateParams,
 )
-from .guild_welcome import (
+from .http.guild_welcome import (
     ModifyGuildWelcomeScreenParams,
     WelcomeScreen,
     WelcomeScreenChannel,
 )
-from .guilds import (
+from .http.guilds import (
     Ban,
     BulkBan,
     CreateGuildParams,
@@ -195,8 +233,7 @@ from .guilds import (
     OnboardingPromptOption,
     UnavailableGuild,
 )
-from .http.gateway import Gateway, GatewayBot, SessionStartLimit
-from .integrations import (
+from .http.integrations import (
     Integration,
     IntegrationAccount,
     IntegrationApplication,
@@ -204,6 +241,67 @@ from .integrations import (
     IntegrationDelete,
     IntegrationUpdate,
 )
+from .http.invites import (
+    Invite,
+    InviteCreate,
+    InviteDelete,
+    InviteGuild,
+    InviteMetadata,
+    InviteStageInstance,
+    InviteTargetUsersJobStatus,
+)
+from .http.lobby import (
+    AddLobbyMemberParams,
+    CreateLobbyMemberParams,
+    CreateLobbyParams,
+    LinkChannelToLobbyParams,
+    Lobby,
+    LobbyMember,
+    ModifyLobbyParams,
+)
+from .http.monetization import (
+    SKU,
+    Entitlement,
+    EntitlementCreate,
+    EntitlementDelete,
+    EntitlementUpdate,
+    Subscription,
+    SubscriptionCreate,
+    SubscriptionDelete,
+    SubscriptionUpdate,
+)
+from .http.polls import (
+    AnswerVoters,
+    Poll,
+    PollAnswer,
+    PollAnswerCount,
+    PollAnswerRequest,
+    PollMedia,
+    PollRequest,
+    PollResults,
+)
+from .http.soundboard import (
+    CreateGuildSoundboardSoundParams,
+    ListDefaultSoundboardSoundsResponse,
+    ListGuildSoundboardSoundsResponse,
+    ModifyGuildSoundboardSoundParams,
+    SendSoundboardSoundParams,
+    SoundboardSound,
+)
+from .http.stage_instance import StageInstance
+from .http.stickers import (
+    ModifyGuildStickerParams,
+    Sticker,
+    StickerItem,
+    StickerPack,
+    StickerPacksResponse,
+)
+from .http.voice import (
+    ModifyCurrentUserVoiceStateParams,
+    VoiceRegion,
+    VoiceState,
+)
+from .http.webhooks import CreateWebhookParams, ExecuteWebhookParams, Webhook
 from .interactions.application_commands import (
     AnyCommandOption,
     ApplicationCommand,
@@ -256,104 +354,6 @@ from .interactions.message_components import (
     SelectOption,
     TextInput,
 )
-from .invites import (
-    Invite,
-    InviteCreate,
-    InviteDelete,
-    InviteGuild,
-    InviteMetadata,
-    InviteStageInstance,
-    InviteTargetUsersJobStatus,
-)
-from .lobby import (
-    AddLobbyMemberParams,
-    CreateLobbyMemberParams,
-    CreateLobbyParams,
-    LinkChannelToLobbyParams,
-    Lobby,
-    LobbyMember,
-    ModifyLobbyParams,
-)
-from .messages import (
-    AllowedMention,
-    Attachment,
-    AttachmentSend,
-    ChannelMention,
-    CountDetails,
-    File,
-    MessageActivity,
-    MessageCall,
-    MessageEditParams,
-    MessageGet,
-    MessageReference,
-    MessageSend,
-    MessageSnapshot,
-    MessageSnapshotMessage,
-    Reaction,
-    RoleSubscriptionData,
-    WebhookMessageEditParams,
-)
-from .monetization import (
-    SKU,
-    Entitlement,
-    EntitlementCreate,
-    EntitlementDelete,
-    EntitlementUpdate,
-    Subscription,
-    SubscriptionCreate,
-    SubscriptionDelete,
-    SubscriptionUpdate,
-)
-from .oauth2 import AuthorizationResponse
-from .permissions import (
-    CreateGuildRoleParams,
-    ModifyGuildRoleParams,
-    ModifyGuildRolePositionParams,
-    Role,
-    RoleColors,
-    RoleTags,
-)
-from .polls import (
-    AnswerVoters,
-    Poll,
-    PollAnswer,
-    PollAnswerCount,
-    PollAnswerRequest,
-    PollMedia,
-    PollRequest,
-    PollResults,
-)
-from .snowflake import Snowflake, SnowflakeType
-from .soundboard import (
-    CreateGuildSoundboardSoundParams,
-    ListDefaultSoundboardSoundsResponse,
-    ListGuildSoundboardSoundsResponse,
-    ModifyGuildSoundboardSoundParams,
-    SendSoundboardSoundParams,
-    SoundboardSound,
-)
-from .stage_instance import StageInstance
-from .stickers import (
-    ModifyGuildStickerParams,
-    Sticker,
-    StickerItem,
-    StickerPack,
-    StickerPacksResponse,
-)
-from .teams import Team, TeamMember, TeamMemberUser
-from .user import (
-    ApplicationRoleConnection,
-    AvatarDecorationData,
-    Connection,
-    ModifyCurrentUserParams,
-    User,
-)
-from .voice import (
-    ModifyCurrentUserVoiceStateParams,
-    VoiceRegion,
-    VoiceState,
-)
-from .webhooks import CreateWebhookParams, ExecuteWebhookParams, Webhook
 from ..types import (
     UNSET,
     ActivityAssetImage,

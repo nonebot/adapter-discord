@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel
 
-from .snowflake import Snowflake
-from ..types import (
+from ..common.snowflake import Snowflake
+from ...types import (
     UNSET,
     ApplicationFlag,
     ApplicationIntegrationType,
@@ -15,7 +15,9 @@ from ..types import (
 )
 
 if TYPE_CHECKING:
-    from ..model import Guild, Team, User
+    from .guilds import Guild
+    from ..common.teams import Team
+    from ..common.user import User
 
 
 # Application

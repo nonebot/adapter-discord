@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from .snowflake import Snowflake
-from ..types import StagePrivacyLevel
+from ..common.snowflake import Snowflake
+from ...types import StagePrivacyLevel
 
 
 class StageInstance(BaseModel):

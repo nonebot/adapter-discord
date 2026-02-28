@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from .snowflake import Snowflake
-from ..types import (
+from ..common.snowflake import Snowflake
+from ...types import (
     UNSET,
     ChannelFlags,
     ChannelType,
@@ -20,8 +20,7 @@ from ..types import (
 
 if TYPE_CHECKING:
     from .guild_members import GuildMember
-    from .user import User
-
+from ..common.user import User
 
 # Channel
 # see https://discord.com/developers/docs/resources/channel

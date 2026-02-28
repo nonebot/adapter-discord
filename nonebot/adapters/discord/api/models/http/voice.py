@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from .snowflake import Snowflake
-from ..types import UNSET, Missing, MissingOrNullable
+from ..common.snowflake import Snowflake
+from ...types import UNSET, Missing, MissingOrNullable
 
 if TYPE_CHECKING:
-    from ..model import GuildMember
+    from .guild_members import GuildMember
 
 
 class VoiceState(BaseModel):

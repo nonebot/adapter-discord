@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from ..types import UNSET, Missing
+from ...types import UNSET, Missing
 
 if TYPE_CHECKING:
-    from ..model import Emoji, User
+    from .emoji import Emoji
+    from ..common.user import User
 
 
 class Poll(BaseModel):

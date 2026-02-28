@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, Field
 
-from ..snowflake import Snowflake
+from ..common.snowflake import Snowflake
 from ...types import (
     UNSET,
     ButtonStyle,

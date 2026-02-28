@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from .snowflake import Snowflake
-from ..types import UNSET, Missing, MissingOrNullable, StickerFormatType, StickerType
+from ..common.snowflake import Snowflake
+from ...types import UNSET, Missing, MissingOrNullable, StickerFormatType, StickerType
 
 if TYPE_CHECKING:
-    from ..model import User
+    from ..common.user import User
 
 
 class Sticker(BaseModel):

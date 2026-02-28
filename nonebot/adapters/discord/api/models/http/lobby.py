@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from .snowflake import Snowflake
-from ..types import UNSET, LobbyMemberFlags, Missing, MissingOrNullable
+from ..common.snowflake import Snowflake
+from ...types import UNSET, LobbyMemberFlags, Missing, MissingOrNullable
 
 if TYPE_CHECKING:
-    from ..model import Channel
+    from .channels import Channel
 
 
 class LobbyMember(BaseModel):

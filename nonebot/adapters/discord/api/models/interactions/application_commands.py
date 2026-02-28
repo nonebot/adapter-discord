@@ -8,7 +8,7 @@ if PYDANTIC_V2 or TYPE_CHECKING:
 else:
     from pydantic.generics import GenericModel
 
-from ..snowflake import Snowflake
+from ..common.snowflake import Snowflake
 from ...types import (
     UNSET,
     ApplicationCommandOptionType,

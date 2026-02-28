@@ -4,8 +4,8 @@ import datetime
 
 from pydantic import BaseModel
 
-from .snowflake import Snowflake
-from ..types import (
+from ..common.snowflake import Snowflake
+from ...types import (
     UNSET,
     EntitlementType,
     Missing,

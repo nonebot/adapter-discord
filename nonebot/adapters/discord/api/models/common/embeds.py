@@ -4,7 +4,7 @@ import datetime
 
 from pydantic import BaseModel
 
-from ..types import UNSET, EmbedTypes, Missing
+from ...types import UNSET, EmbedTypes, Missing
 
 
 class Embed(BaseModel):

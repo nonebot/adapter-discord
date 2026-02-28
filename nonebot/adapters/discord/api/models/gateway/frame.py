@@ -6,7 +6,7 @@ from typing import Annotated, Literal, TypeAlias
 from nonebot.compat import PYDANTIC_V2, ConfigDict
 from pydantic import BaseModel, Field
 
-from ..gateway_payloads import (
+from .gateway_payloads import (
     Hello as HelloData,
     Identify as IdentifyData,
     Resume as ResumeData,

@@ -4,19 +4,15 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from .interactions.message_components import DirectComponent
-from .snowflake import Snowflake
-from ..types import UNSET, MessageFlag, Missing, MissingOrNullable, WebhookType
+from ..common.snowflake import Snowflake
+from ..interactions.message_components import DirectComponent
+from ...types import UNSET, MessageFlag, Missing, MissingOrNullable, WebhookType
 
 if TYPE_CHECKING:
-    from ..model import (
-        AllowedMention,
-        AttachmentSend,
-        Embed,
-        File,
-        PollRequest,
-        User,
-    )
+    from .polls import PollRequest
+    from ..common.embeds import Embed
+    from ..common.messages import AllowedMention, AttachmentSend, File
+    from ..common.user import User
 
 
 class SourceGuild(BaseModel):

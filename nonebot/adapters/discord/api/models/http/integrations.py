@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from .snowflake import Snowflake
-from ..types import UNSET, IntegrationExpireBehaviors, Missing
+from ..common.snowflake import Snowflake
+from ...types import UNSET, IntegrationExpireBehaviors, Missing
 
 if TYPE_CHECKING:
-    from ..model import User
+    from ..common.user import User
 
 
 class IntegrationAccount(BaseModel):

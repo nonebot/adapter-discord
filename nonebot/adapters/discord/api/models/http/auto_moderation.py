@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from .snowflake import Snowflake
-from ..types import (
+from ..common.snowflake import Snowflake
+from ...types import (
     UNSET,
     AutoModerationActionType,
     AutoModerationRuleEventType,

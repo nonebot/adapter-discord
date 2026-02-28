@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, Field
 
 from .snowflake import Snowflake
-from ..types import (
+from ...types import (
     UNSET,
     ConnectionServiceType,
     Missing,
@@ -16,7 +16,7 @@ from ..types import (
 )
 
 if TYPE_CHECKING:
-    from ..model import Integration
+    from ..http.integrations import Integration
 
 
 class User(BaseModel):

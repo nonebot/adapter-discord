@@ -6,8 +6,8 @@ import warnings
 
 from pydantic import BaseModel, Field
 
-from .snowflake import Snowflake
-from ..types import (
+from ..common.snowflake import Snowflake
+from ...types import (
     UNSET,
     GuildFeature,
     GuildNSFWLevel,
@@ -19,7 +19,11 @@ from ..types import (
 )
 
 if TYPE_CHECKING:
-    from ..model import Application, Channel, GuildMember, GuildScheduledEvent, User
+    from .application import Application
+    from .channels import Channel
+    from .guild_members import GuildMember
+    from .guild_scheduled_events import GuildScheduledEvent
+    from ..common.user import User
 
 
 class Invite(BaseModel):

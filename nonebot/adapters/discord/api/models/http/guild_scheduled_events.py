@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from .snowflake import Snowflake
-from ..types import (
+from ..common.snowflake import Snowflake
+from ...types import (
     UNSET,
     GuildScheduledEventEntityType,
     GuildScheduledEventPrivacyLevel,
@@ -19,7 +19,8 @@ from ..types import (
 )
 
 if TYPE_CHECKING:
-    from ..model import GuildMember, User
+    from .guild_members import GuildMember
+    from ..common.user import User
 
 
 class RecurrenceRule(BaseModel):

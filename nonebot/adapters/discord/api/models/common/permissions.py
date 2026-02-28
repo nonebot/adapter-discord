@@ -3,7 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 from .snowflake import Snowflake
-from ..types import UNSET, Missing, MissingOrNullable, RoleFlag
+from ...types import UNSET, Missing, MissingOrNullable, RoleFlag
 
 
 class RoleColors(BaseModel):

@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from .emoji import Emoji
-from .snowflake import Snowflake
-from .stage_instance import StageInstance
-from .user import User
-from .voice import VoiceState
-from ..types import (
+from ..common.snowflake import Snowflake
+from ..common.user import User
+from ..http.emoji import Emoji
+from ..http.stage_instance import StageInstance
+from ..http.voice import VoiceState
+from ...types import (
     UNSET,
     ActivityAssetImage,
     ActivityFlags,
@@ -24,7 +24,7 @@ from ..types import (
 )
 
 if TYPE_CHECKING:
-    from .user import AvatarDecorationData
+    from ..common.user import AvatarDecorationData
 
 
 class UserUpdate(User):

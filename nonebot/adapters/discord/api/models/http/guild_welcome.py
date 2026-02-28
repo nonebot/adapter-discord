@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from .snowflake import Snowflake
-from ..types import UNSET, MissingOrNullable
+from ..common.snowflake import Snowflake
+from ...types import UNSET, MissingOrNullable
 
 
 class WelcomeScreen(BaseModel):

@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from .snowflake import Snowflake
-from ..types import UNSET, GuildMemberFlags, Missing, MissingOrNullable
+from ..common.snowflake import Snowflake
+from ...types import UNSET, GuildMemberFlags, Missing, MissingOrNullable
 
 if TYPE_CHECKING:
-    from ..model import AvatarDecorationData, User
+    from ..common.user import AvatarDecorationData, User
 
 
 class GuildMember(BaseModel):

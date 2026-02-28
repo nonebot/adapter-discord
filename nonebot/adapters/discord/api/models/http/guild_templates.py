@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from .snowflake import Snowflake
-from ..types import (
+from ..common.snowflake import Snowflake
+from ...types import (
     UNSET,
     ChannelType,
     DefaultMessageNotificationLevel,
@@ -20,7 +20,9 @@ from ..types import (
 )
 
 if TYPE_CHECKING:
-    from ..model import DefaultReaction, Emoji, ForumTag, Overwrite, User
+    from .channels import DefaultReaction, ForumTag, Overwrite
+    from .emoji import Emoji
+    from ..common.user import User
 
 
 class CreateGuildTemplateParams(BaseModel):

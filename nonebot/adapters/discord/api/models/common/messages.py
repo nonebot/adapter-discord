@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, Field
 
 from .snowflake import Snowflake
-from ..types import (
+from ...types import (
     UNSET,
     AllowedMentionType,
     AttachmentFlag,
@@ -20,22 +20,19 @@ from ..types import (
 )
 
 if TYPE_CHECKING:
-    from .channels import Channel
     from .embeds import Embed
-    from ..model import (
-        Application,
-        Component,
-        DirectComponent,
-        Emoji,
+    from .user import User
+    from ..http.application import Application
+    from ..http.channels import Channel
+    from ..http.emoji import Emoji
+    from ..http.polls import Poll, PollRequest
+    from ..http.stickers import Sticker, StickerItem
+    from ..interactions.interactions import (
         MessageInteraction,
         MessageInteractionMetadata,
-        Poll,
-        PollRequest,
         ResolvedData,
-        Sticker,
-        StickerItem,
-        User,
     )
+    from ..interactions.message_components import Component, DirectComponent
 
 
 class MessageGet(BaseModel):

@@ -4,19 +4,17 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
-from .interactions.application_commands import ApplicationCommand
-from .snowflake import Snowflake
-from ..types import UNSET, AuditLogEventType, Missing
+from ..common.snowflake import Snowflake
+from ..interactions.application_commands import ApplicationCommand
+from ...types import UNSET, AuditLogEventType, Missing
 
 if TYPE_CHECKING:
-    from ..model import (
-        AutoModerationRule,
-        Channel,
-        GuildScheduledEvent,
-        Integration,
-        User,
-        Webhook,
-    )
+    from .auto_moderation import AutoModerationRule
+    from .channels import Channel
+    from .guild_scheduled_events import GuildScheduledEvent
+    from .integrations import Integration
+    from .webhooks import Webhook
+    from ..common.user import User
 
 
 # Audit Log
