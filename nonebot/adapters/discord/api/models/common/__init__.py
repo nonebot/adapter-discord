@@ -10,6 +10,14 @@ from .embeds import (
     EmbedThumbnail,
     EmbedVideo,
 )
+from .invites import (
+    Invite,
+    InviteGuild,
+    InviteMetadata,
+    InviteStageInstance,
+    InviteTargetUsersJobStatus,
+)
+from .lobby import Lobby, LobbyMember
 from .messages import (
     Attachment,
     ChannelMention,
@@ -28,6 +36,7 @@ from .permissions import (
     RoleColors,
     RoleTags,
 )
+from .soundboard import SoundboardSound
 from .snowflake import Snowflake, SnowflakeType
 from .teams import Team, TeamMember, TeamMemberUser
 from .user import (
@@ -36,6 +45,7 @@ from .user import (
     Connection,
     User,
 )
+from .webhooks import SourceChannel, SourceGuild, Webhook
 
 __all__ = [
     "ApplicationRoleConnection",
@@ -52,6 +62,13 @@ __all__ = [
     "EmbedProvider",
     "EmbedThumbnail",
     "EmbedVideo",
+    "Invite",
+    "InviteGuild",
+    "InviteMetadata",
+    "InviteStageInstance",
+    "InviteTargetUsersJobStatus",
+    "Lobby",
+    "LobbyMember",
     "MessageActivity",
     "MessageCall",
     "MessageGet",
@@ -63,10 +80,14 @@ __all__ = [
     "RoleColors",
     "RoleSubscriptionData",
     "RoleTags",
+    "SoundboardSound",
     "Snowflake",
     "SnowflakeType",
+    "SourceChannel",
+    "SourceGuild",
     "Team",
     "TeamMember",
     "TeamMemberUser",
     "User",
+    "Webhook",
 ]

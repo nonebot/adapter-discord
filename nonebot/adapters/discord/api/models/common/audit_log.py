@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from .guild_scheduled_events import GuildScheduledEvent
     from .integrations import Integration
     from .user import User
-    from ..http.webhooks import Webhook
+    from .webhooks import Webhook
 
 
 class AuditLog(BaseModel):

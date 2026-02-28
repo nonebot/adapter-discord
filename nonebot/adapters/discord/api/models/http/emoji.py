@@ -1,15 +1,7 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
-
-from ..common.emoji import ApplicationEmojis, Emoji
-from ..common.snowflake import Snowflake
-from ...types import UNSET, Missing, MissingOrNullable
-
-
-class ModifyGuildEmojiParams(BaseModel):
-    name: Missing[str] = UNSET
-    roles: MissingOrNullable[list[Snowflake]] = UNSET
-
+from ..common.emoji import Emoji
+from ..request import ModifyGuildEmojiParams
+from ..response import ApplicationEmojis
 
 __all__ = ["ApplicationEmojis", "Emoji", "ModifyGuildEmojiParams"]

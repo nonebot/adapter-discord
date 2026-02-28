@@ -5,4 +5,23 @@ See https://discord.com/developers/docs/reference
 
 from __future__ import annotations
 
-__all__: list[str] = []
+from .emoji import ModifyGuildEmojiParams
+from .polls import PollAnswerRequest, PollRequest
+from .soundboard import (
+    CreateGuildSoundboardSoundParams,
+    ModifyGuildSoundboardSoundParams,
+    SendSoundboardSoundParams,
+)
+from .stickers import ModifyGuildStickerParams
+from .voice import ModifyCurrentUserVoiceStateParams
+
+__all__ = [
+    "CreateGuildSoundboardSoundParams",
+    "ModifyCurrentUserVoiceStateParams",
+    "ModifyGuildEmojiParams",
+    "ModifyGuildSoundboardSoundParams",
+    "ModifyGuildStickerParams",
+    "PollAnswerRequest",
+    "PollRequest",
+    "SendSoundboardSoundParams",
+]

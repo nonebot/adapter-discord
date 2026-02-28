@@ -5,12 +5,34 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel
 
 from .messages import AllowedMention, AttachmentSend, File
+from ..common.snowflake import Snowflake
 from ...types import UNSET, MessageFlag, Missing, MissingOrNullable
 
 if TYPE_CHECKING:
+    from .polls import PollRequest
     from ..common.embeds import Embed
-    from ..http.polls import PollRequest
-    from ..interactions.message_components import Component
+    from ..interactions.message_components import Component, DirectComponent
+
+
+class ExecuteWebhookParams(BaseModel):
+    content: Missing[str] = UNSET
+    username: Missing[str] = UNSET
+    avatar_url: Missing[str] = UNSET
+    tts: Missing[bool] = UNSET
+    embeds: Missing[list[Embed]] = UNSET
+    allowed_mentions: Missing[AllowedMention] = UNSET
+    components: Missing[list[DirectComponent]] = UNSET
+    files: Missing[list[File]] = UNSET
+    attachments: Missing[list[AttachmentSend]] = UNSET
+    flags: Missing[MessageFlag] = UNSET
+    thread_name: Missing[str] = UNSET
+    applied_tags: Missing[list[Snowflake]] = UNSET
+
+
+class CreateWebhookParams(BaseModel):
+    name: str
+    avatar: MissingOrNullable[str] = UNSET
+    poll: Missing[PollRequest] = UNSET
 
 
 class WebhookMessageEditParams(BaseModel):
@@ -29,3 +51,10 @@ class WebhookMessageEditParams(BaseModel):
     files: Missing[list[File]] = UNSET
     attachments: MissingOrNullable[list[AttachmentSend]] = UNSET
     poll: MissingOrNullable[PollRequest] = UNSET
+
+
+__all__ = [
+    "CreateWebhookParams",
+    "ExecuteWebhookParams",
+    "WebhookMessageEditParams",
+]
