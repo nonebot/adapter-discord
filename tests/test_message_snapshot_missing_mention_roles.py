@@ -1,4 +1,4 @@
-from nonebot.adapters.discord.api.model import MessageGet
+from nonebot.adapters.discord.api.models import MessageGet
 from nonebot.adapters.discord.api.types import is_unset
 
 from nonebot.compat import type_validate_python

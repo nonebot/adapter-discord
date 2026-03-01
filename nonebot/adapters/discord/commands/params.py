@@ -6,13 +6,13 @@ from nonebot.dependencies import Param
 from nonebot.params import Depends
 
 from ..api import (
+    ApplicationCommandInteractionDataOption,
     ApplicationCommandOptionType,
     ApplicationCommandType,
     MessageGet,
     Snowflake,
     User,
 )
-from ..api.model import ApplicationCommandInteractionDataOption
 from ..api.types import Missing, is_not_unset, is_unset
 from ..event import ApplicationCommandInteractionEvent
 

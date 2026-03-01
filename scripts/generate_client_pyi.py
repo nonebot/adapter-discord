@@ -269,7 +269,13 @@ def _collect_available_imports(source: str) -> dict[str, str]:
     for node in mod.body:
         if isinstance(node, ast.ImportFrom):
             module = node.module or ""
-            is_model = module in ("model", ".model") or module.endswith(".model")
+            is_model = (
+                module in ("model", "models", ".model", ".models")
+                or module.endswith((".model", ".models"))
+                or module.startswith(("model.", "models."))
+                or ".model." in module
+                or ".models." in module
+            )
             is_types = module in ("types", ".types") or module.endswith(".types")
             if is_model or is_types:
                 category = "model" if is_model else "types"
@@ -440,7 +446,7 @@ def _build_import_lines(  # noqa: C901
     if need_datetime or typing_imports:
         lines.append("")
 
-    _append_import_block(lines, "model", model_imports)
+    _append_import_block(lines, "models", model_imports)
     _append_import_block(lines, "types", type_imports)
 
     if model_imports or type_imports:

@@ -3,7 +3,7 @@ from typing import Any, Literal
 
 from nonebot.compat import type_validate_python
 
-from .model import (
+from .models import (
     ExecuteWebhookParams,
     InteractionCallbackMessage,
     InteractionResponse,

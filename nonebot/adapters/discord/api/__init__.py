@@ -1,5 +1,5 @@
 from .client import ApiClient as ApiClient
-from .model import (
+from .models import (
     SKU,
     ActionRow,
     Activity,

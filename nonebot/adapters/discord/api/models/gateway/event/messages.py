@@ -1,104 +1,43 @@
+from __future__ import annotations
+
 import datetime
-from typing import Literal
 
 from pydantic import BaseModel
 
-from ..model import (
-    Application,
-    ApplicationCommandData,
-    Attachment,
-    Channel,
-    ChannelMention,
+from ...common.application import Application
+from ...common.channels import Channel
+from ...common.embeds import Embed
+from ...common.emoji import Emoji
+from ...common.guild_members import GuildMember
+from ...common.interactions import (
     DirectComponent,
-    Embed,
-    Emoji,
-    Entitlement,
-    GuildMember,
-    InteractionData,
-    InteractionGuild,
-    MessageActivity,
-    MessageCall,
-    MessageComponentData,
-    MessageGet,
     MessageInteraction,
     MessageInteractionMetadata,
+    ResolvedData,
+)
+from ...common.messages import (
+    Attachment,
+    ChannelMention,
+    MessageActivity,
+    MessageCall,
+    MessageGet,
     MessageReference,
     MessageSnapshot,
-    ModalSubmitData,
-    Poll,
     Reaction,
-    ResolvedData,
     RoleSubscriptionData,
-    Snowflake,
-    Sticker,
-    StickerItem,
-    User,
 )
-from ..types import (
+from ...common.polls import Poll
+from ...common.snowflake import Snowflake
+from ...common.stickers import Sticker, StickerItem
+from ...common.user import User
+from ....types import (
     UNSET,
-    ApplicationIntegrationType,
-    InteractionContextType,
-    InteractionType,
     MessageFlag,
     MessageType,
     Missing,
     MissingOrNullable,
     ReactionType,
 )
-
-
-class InteractionCreateBasePayload(BaseModel):
-    id: Snowflake
-    application_id: Snowflake
-    attachment_size_limit: int
-    guild: Missing[InteractionGuild] = UNSET
-    guild_id: Missing[Snowflake] = UNSET
-    channel: Missing[Channel] = UNSET
-    channel_id: Missing[Snowflake] = UNSET
-    member: Missing[GuildMember] = UNSET
-    user: Missing[User] = UNSET
-    token: str
-    version: int
-    app_permissions: Missing[str] = UNSET
-    locale: Missing[str] = UNSET
-    guild_locale: Missing[str] = UNSET
-    entitlements: Missing[list[Entitlement]] = UNSET
-    authorizing_integration_owners: dict[
-        ApplicationIntegrationType, Snowflake | Literal["0"]
-    ]
-    context: Missing[InteractionContextType] = UNSET
-
-
-class PingInteractionCreatePayload(InteractionCreateBasePayload):
-    type: Literal[InteractionType.PING]
-    data: Missing[InteractionData] = UNSET
-    message: Missing[MessageGet] = UNSET
-
-
-class ApplicationCommandInteractionCreatePayload(InteractionCreateBasePayload):
-    type: Literal[InteractionType.APPLICATION_COMMAND]
-    data: ApplicationCommandData
-    message: Missing[MessageGet] = UNSET
-
-
-class ApplicationCommandAutoCompleteInteractionCreatePayload(
-    InteractionCreateBasePayload
-):
-    type: Literal[InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE]
-    data: ApplicationCommandData
-    message: Missing[MessageGet] = UNSET
-
-
-class MessageComponentInteractionCreatePayload(InteractionCreateBasePayload):
-    type: Literal[InteractionType.MESSAGE_COMPONENT]
-    data: MessageComponentData
-    message: MessageGet
-
-
-class ModalSubmitInteractionCreatePayload(InteractionCreateBasePayload):
-    type: Literal[InteractionType.MODAL_SUBMIT]
-    data: ModalSubmitData
-    message: Missing[MessageGet] = UNSET
 
 
 class MessageCreateBasePayload(MessageGet):
@@ -333,3 +272,50 @@ class GuildTypingStartPayload(TypingStartBasePayload):
 class DirectTypingStartPayload(TypingStartBasePayload):
     guild_id: Missing[Snowflake] = UNSET
     member: Missing[GuildMember] = UNSET
+
+
+__all__ = [
+    "DirectMessageCreatePayload",
+    "DirectMessageDeleteBulkPayload",
+    "DirectMessageDeletePayload",
+    "DirectMessagePollVoteAddPayload",
+    "DirectMessagePollVoteRemovePayload",
+    "DirectMessageReactionAddPayload",
+    "DirectMessageReactionRemoveAllPayload",
+    "DirectMessageReactionRemoveEmojiPayload",
+    "DirectMessageReactionRemovePayload",
+    "DirectMessageUpdatePayload",
+    "DirectTypingStartPayload",
+    "GuildMessageCreatePayload",
+    "GuildMessageDeleteBulkPayload",
+    "GuildMessageDeletePayload",
+    "GuildMessagePollVoteAddPayload",
+    "GuildMessagePollVoteRemovePayload",
+    "GuildMessageReactionAddPayload",
+    "GuildMessageReactionRemoveAllPayload",
+    "GuildMessageReactionRemoveEmojiPayload",
+    "GuildMessageReactionRemovePayload",
+    "GuildMessageUpdatePayload",
+    "GuildTypingStartPayload",
+    "MessageCreateBasePayload",
+    "MessageCreatePayload",
+    "MessageDeleteBasePayload",
+    "MessageDeleteBulkBasePayload",
+    "MessageDeleteBulkPayload",
+    "MessageDeletePayload",
+    "MessagePollVoteAddPayload",
+    "MessagePollVoteBasePayload",
+    "MessagePollVoteRemovePayload",
+    "MessageReactionAddBasePayload",
+    "MessageReactionAddPayload",
+    "MessageReactionRemoveAllBasePayload",
+    "MessageReactionRemoveAllPayload",
+    "MessageReactionRemoveBasePayload",
+    "MessageReactionRemoveEmojiBasePayload",
+    "MessageReactionRemoveEmojiPayload",
+    "MessageReactionRemovePayload",
+    "MessageUpdateBasePayload",
+    "MessageUpdatePayload",
+    "TypingStartBasePayload",
+    "TypingStartPayload",
+]

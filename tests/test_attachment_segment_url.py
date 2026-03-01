@@ -1,4 +1,4 @@
-from nonebot.adapters.discord.api.model import MessageGet
+from nonebot.adapters.discord.api.models import MessageGet
 from nonebot.adapters.discord.message import Message, MessageSegment, parse_message
 
 from nonebot.compat import type_validate_python

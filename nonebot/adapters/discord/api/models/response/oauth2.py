@@ -1,0 +1,24 @@
+from __future__ import annotations
+
+import datetime
+from typing import TYPE_CHECKING
+
+from pydantic import BaseModel
+
+from ...types import UNSET, Missing
+
+if TYPE_CHECKING:
+    from ..common.user import User
+    from ..http.application import Application
+
+
+class AuthorizationResponse(BaseModel):
+    """Get Current Authorization Information Response
+
+    see https://discord.com/developers/docs/topics/oauth2#get-current-authorization-information
+    """
+
+    application: Application
+    scopes: list[str]
+    expires: datetime.datetime
+    user: Missing[User] = UNSET
