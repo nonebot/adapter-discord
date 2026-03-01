@@ -74,7 +74,7 @@ class HeartbeatAck(Payload):
 
 PayloadType: TypeAlias = (
     Annotated[
-        Dispatch | Reconnect | InvalidSession | Hello | HeartbeatAck,
+        Dispatch | Heartbeat | Reconnect | InvalidSession | Hello | HeartbeatAck,
         Field(discriminator="opcode"),
     ]
     | Payload
