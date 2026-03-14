@@ -815,6 +815,15 @@ class GuildFeature(StrEnum):
     TICKETED_EVENTS_ENABLED = "TICKETED_EVENTS_ENABLED"
     """guild has enabled ticketed events"""
     TICKETING_ENABLED = "TICKETING_ENABLED"
+    TIERLESS_BOOSTING_SYSTEM_MESSAGE = "TIERLESS_BOOSTING_SYSTEM_MESSAGE"
+    """Server uses tierless boosting system messages (gradually rolling out to servers).
+
+    This feature is part of Discord's tierless boosting experiment where servers can use
+    Boosts to unlock perks without needing to reach specific levels. Currently in
+    limited rollout - not documented in official API docs yet.
+
+    see https://discord.com/blog/get-more-from-your-boosts-with-new-server-perks
+    """
     VANITY_URL = "VANITY_URL"
     """guild has access to set a vanity URL"""
     VERIFIED = "VERIFIED"
