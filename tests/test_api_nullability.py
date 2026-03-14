@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import json
 
 from nonebot.adapters.discord.api import (
@@ -7,6 +8,7 @@ from nonebot.adapters.discord.api import (
     SelectOption,
 )
 from nonebot.adapters.discord.api.model import (
+    Embed,
     ExecuteWebhookParams,
     File,
     MessageEditParams,
@@ -40,6 +42,16 @@ def test_parse_data_message_send_omits_unset_fields() -> None:
 def test_parse_data_execute_webhook_omits_unset_fields() -> None:
     payload = parse_data({}, ExecuteWebhookParams)["json"]
     assert payload == {}
+
+
+def test_parse_data_serializes_embed_timestamp() -> None:
+    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=timezone.utc)
+    payload = parse_data(
+        {"embeds": [Embed(timestamp=timestamp)]},
+        MessageSend,
+    )["json"]
+
+    assert payload["embeds"][0]["timestamp"] == timestamp.isoformat()
 
 
 def test_parse_data_multipart_keeps_null_attachments() -> None:
@@ -101,6 +113,22 @@ def test_parse_forum_thread_message_keeps_name() -> None:
 def test_parse_forum_thread_message_without_content() -> None:
     payload = parse_forum_thread_message({"name": "thread-name"})["json"]
     assert payload["message"] == {}
+
+
+def test_parse_forum_thread_message_serializes_embed_timestamp_in_multipart() -> None:
+    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=timezone.utc)
+    res = parse_forum_thread_message(
+        {
+            "name": "thread-name",
+            "files": [File(content=b"1", filename="a.txt")],
+            "embeds": [Embed(timestamp=timestamp)],
+        }
+    )
+    multipart = res["files"]
+    _, payload_json, _ = multipart["payload_json"]
+    payload = json.loads(payload_json)
+
+    assert payload["message"]["embeds"][0]["timestamp"] == timestamp.isoformat()
 
 
 def test_parse_forum_thread_message_maps_message_attachment_id() -> None:

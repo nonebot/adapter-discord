@@ -1,3 +1,4 @@
+from datetime import date, datetime, time
 from typing import Any
 import zlib
 
@@ -22,6 +23,20 @@ def omit_unset(data: Any) -> Any:  # noqa: ANN401
     return data
 
 
+def _serialize_datetime_values(data: Any) -> Any:  # noqa: ANN401
+    """Recursively convert datetime-like values into JSON-safe strings."""
+
+    if isinstance(data, dict):
+        return data.__class__(
+            (k, _serialize_datetime_values(v)) for k, v in data.items()
+        )
+    if isinstance(data, list | tuple | set):
+        return data.__class__(_serialize_datetime_values(i) for i in data)
+    if isinstance(data, datetime | date | time):
+        return data.isoformat()
+    return data
+
+
 def model_dump(  # noqa: PLR0913
     model: BaseModel,
     include: set[str] | None = None,
@@ -43,8 +58,8 @@ def model_dump(  # noqa: PLR0913
         exclude_none=exclude_none,
     )
     if omit_unset_values:
-        return omit_unset(data)
-    return data
+        data = omit_unset(data)
+    return _serialize_datetime_values(data)
 
 
 def escape(s: str) -> str:
