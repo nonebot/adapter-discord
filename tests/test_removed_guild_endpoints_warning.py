@@ -20,14 +20,16 @@ def patch_api_runtime(monkeypatch: pytest.MonkeyPatch) -> None:
     def fake_type_validate_python(_type: object, value: object) -> object:
         return value
 
-    def fake_model_dump(value: object, **_kwargs: object) -> object:
+    def fake_encode_model_json_data(value: object, **_kwargs: object) -> object:
         return value
 
     monkeypatch.setattr(handle_module, "_request", fake_request)
     monkeypatch.setattr(
         handle_module, "type_validate_python", fake_type_validate_python
     )
-    monkeypatch.setattr(handle_module, "model_dump", fake_model_dump)
+    monkeypatch.setattr(
+        handle_module, "encode_model_json_data", fake_encode_model_json_data
+    )
 
 
 async def _call_create_guild(adapter: DummyAdapter, bot: DummyBot) -> None:

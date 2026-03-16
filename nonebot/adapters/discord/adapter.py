@@ -3,7 +3,6 @@ from collections.abc import Callable, Mapping
 import contextlib
 from functools import lru_cache
 import inspect
-import json
 import sys
 from types import UnionType
 from typing import Any, cast
@@ -36,7 +35,8 @@ from .payload import (
     Reconnect,
     Resume,
 )
-from .utils import decompress_data, log, model_dump
+from .serialization import encode_model_json_text
+from .utils import decompress_data, log
 
 RECONNECT_INTERVAL = 3.0
 
@@ -297,7 +297,7 @@ class Adapter(BaseAdapter, HandleMixin):
             {"data": bot.sequence if bot.has_sequence else None},
         )
         with contextlib.suppress(Exception):
-            await ws.send(json.dumps(model_dump(payload, by_alias=True)))
+            await ws.send(encode_model_json_text(payload, by_alias=True))
 
     async def _heartbeat_task(
         self, ws: WebSocket, bot: Bot, heartbeat_interval: int
@@ -342,13 +342,8 @@ class Adapter(BaseAdapter, HandleMixin):
 
         try:
             await ws.send(
-                json.dumps(
-                    model_dump(
-                        payload,
-                        by_alias=True,
-                        exclude_none=True,
-                        omit_unset_values=True,
-                    )
+                encode_model_json_text(
+                    payload, by_alias=True, exclude_none=True, omit_unset_values=True
                 )
             )
         except Exception as e:
