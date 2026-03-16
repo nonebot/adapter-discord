@@ -179,7 +179,7 @@ def _build_multipart_payload(
 
 def encode_prepared_request(
     prepared: PreparedRequest,
-) -> dict[Literal["files", "json"], Any]:
+) -> EncodedPreparedRequest:
     payload = encode_model_json_data(
         prepared.body,
         include=prepared.include,
