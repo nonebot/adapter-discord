@@ -1,12 +1,22 @@
-from datetime import date, datetime, time
-from typing import Any
+from typing import Any, TypeAlias
 import zlib
 
-from nonebot.compat import model_dump as model_dump_
+from nonebot.compat import PYDANTIC_V2
 from nonebot.utils import logger_wrapper
 from pydantic import BaseModel
 
 from .api.types import UNSET
+
+if PYDANTIC_V2:
+    from pydantic.main import IncEx
+else:
+    IncEx: TypeAlias = (
+        set[int]
+        | set[str]
+        | dict[int, "IncEx | bool"]
+        | dict[str, "IncEx | bool"]
+        | None
+    )
 
 log = logger_wrapper("Discord")
 
@@ -23,24 +33,11 @@ def omit_unset(data: Any) -> Any:  # noqa: ANN401
     return data
 
 
-def _serialize_datetime_values(data: Any) -> Any:  # noqa: ANN401
-    """Recursively convert datetime-like values into JSON-safe strings."""
-
-    if isinstance(data, dict):
-        return data.__class__(
-            (k, _serialize_datetime_values(v)) for k, v in data.items()
-        )
-    if isinstance(data, list | tuple | set):
-        return data.__class__(_serialize_datetime_values(i) for i in data)
-    if isinstance(data, datetime | date | time):
-        return data.isoformat()
-    return data
-
-
+# TODO)): Switch back to nonebot.compat.model_dump. Wait for the next release.
 def model_dump(  # noqa: PLR0913
     model: BaseModel,
-    include: set[str] | None = None,
-    exclude: set[str] | None = None,
+    include: IncEx | None = None,
+    exclude: IncEx | None = None,
     *,
     by_alias: bool = False,
     exclude_unset: bool = False,
@@ -48,18 +45,29 @@ def model_dump(  # noqa: PLR0913
     exclude_none: bool = False,
     omit_unset_values: bool = False,
 ) -> dict[str, Any]:
-    data = model_dump_(
-        model,
-        include=include,
-        exclude=exclude,
-        by_alias=by_alias,
-        exclude_unset=exclude_unset,
-        exclude_defaults=exclude_defaults,
-        exclude_none=exclude_none,
-    )
+    """Dump a model to Python data; transport JSON encoding lives elsewhere."""
+
+    if PYDANTIC_V2:
+        data = model.model_dump(
+            include=include,
+            exclude=exclude,
+            by_alias=by_alias,
+            exclude_unset=exclude_unset,
+            exclude_defaults=exclude_defaults,
+            exclude_none=exclude_none,
+        )
+    else:
+        data = model.dict(
+            include=include,
+            exclude=exclude,
+            by_alias=by_alias,
+            exclude_unset=exclude_unset,
+            exclude_defaults=exclude_defaults,
+            exclude_none=exclude_none,
+        )
     if omit_unset_values:
         data = omit_unset(data)
-    return _serialize_datetime_values(data)
+    return data
 
 
 def escape(s: str) -> str:

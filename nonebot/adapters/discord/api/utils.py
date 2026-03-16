@@ -1,46 +1,35 @@
-import json
-from typing import Any, Literal
+from typing import Any
 
 from nonebot.compat import type_validate_python
+from pydantic import BaseModel
 
 from .model import (
     ExecuteWebhookParams,
+    File,
     InteractionCallbackMessage,
     InteractionResponse,
     MessageEditParams,
     MessageSend,
+    Snowflake,
     WebhookMessageEditParams,
 )
-from .types import UNSET
-from ..utils import model_dump
+from .types import UNSET, Missing, MissingOrNullable
+from ..serialization import PreparedRequest, prepare_request
 
 
-def _build_multipart_payload(
-    payload: dict[str, Any],
-    files: list[Any],
-    *,
-    attachment_owner: dict[str, Any] | None = None,
-) -> dict[Literal["files", "json"], Any]:
-    multipart: dict[str, Any] = {}
-    container = payload if attachment_owner is None else attachment_owner
-    has_attachments = "attachments" in container
-    attachments = container.get("attachments", [])
-    if isinstance(attachments, list):
-        attachments = container.pop("attachments", [])
+class ForumThreadMessageRequest(BaseModel):
+    name: str
+    auto_archive_duration: Missing[int] = UNSET
+    rate_limit_per_user: MissingOrNullable[int] = UNSET
+    applied_tags: Missing[list[Snowflake]] = UNSET
+    message: MessageSend
 
-    for index, file in enumerate(files):
-        if isinstance(attachments, list):
-            for attachment in attachments:
-                if attachment.get("filename") == file.filename:
-                    attachment["id"] = index
-                    break
-        multipart[f"files[{index}]"] = (file.filename, file.content)
 
-    if isinstance(attachments, list) and has_attachments:
-        container["attachments"] = attachments
-    multipart["payload_json"] = (None, json.dumps(payload), "application/json")
-    result: dict[Literal["files", "json"], Any] = {"files": multipart}
-    return result
+def _extract_files(model: BaseModel) -> list[File] | None:
+    files = getattr(model, "files", None)
+    if files is None or files is UNSET or len(files) == 0:
+        return None
+    return files
 
 
 def parse_data(
@@ -51,22 +40,17 @@ def parse_data(
         | MessageSend
         | WebhookMessageEditParams
     ],
-) -> dict[Literal["files", "json"], Any]:
+) -> PreparedRequest:
     model = type_validate_python(model_class, data)
-    payload: dict[str, Any] = model_dump(
+    return prepare_request(
         model,
+        files=_extract_files(model),
         exclude={"files"},
         omit_unset_values=True,
     )
-    files = getattr(model, "files", None)
-    if files is not None and files is not UNSET and len(files) > 0:
-        return _build_multipart_payload(payload, files)
-    return {"json": payload}
 
 
-def parse_forum_thread_message(
-    data: dict[str, Any],
-) -> dict[Literal["files", "json"], Any]:
+def parse_forum_thread_message(data: dict[str, Any]) -> PreparedRequest:
     message_data = {
         key: value
         for key, value in data.items()
@@ -74,14 +58,10 @@ def parse_forum_thread_message(
         not in {"name", "auto_archive_duration", "rate_limit_per_user", "applied_tags"}
         and value is not None
     }
-    model = type_validate_python(MessageSend, message_data)
-    payload: dict[str, Any] = {"name": data["name"]}
-    content: dict[str, Any] = model_dump(
-        model,
-        exclude={"files"},
-        exclude_none=True,
-        omit_unset_values=True,
-    )
+    payload: dict[str, Any] = {
+        "name": data["name"],
+        "message": message_data,
+    }
     auto_archive_duration = data.get("auto_archive_duration", UNSET)
     if auto_archive_duration is not UNSET and auto_archive_duration is not None:
         payload["auto_archive_duration"] = auto_archive_duration
@@ -91,35 +71,29 @@ def parse_forum_thread_message(
     applied_tags = data.get("applied_tags", UNSET)
     if applied_tags is not UNSET and applied_tags is not None:
         payload["applied_tags"] = applied_tags
-    payload["message"] = content
-    if model.files is not UNSET and model.files:
-        return _build_multipart_payload(
-            payload,
-            model.files,
-            attachment_owner=payload["message"],
-        )
-    return {"json": payload}
 
-
-def parse_interaction_response(
-    response: InteractionResponse,
-) -> dict[Literal["files", "json"], Any]:
-    payload: dict[str, Any] = model_dump(
-        response,
+    model = type_validate_python(ForumThreadMessageRequest, payload)
+    return prepare_request(
+        model,
+        files=_extract_files(model.message),
+        attachment_owner_path=("message",),
+        exclude={"message": {"files"}},
         exclude_none=True,
         omit_unset_values=True,
     )
+
+
+def parse_interaction_response(response: InteractionResponse) -> PreparedRequest:
+    exclude = None
+    files = None
     if response.data and isinstance(response.data, InteractionCallbackMessage):
-        payload["data"] = model_dump(
-            response.data,
-            exclude={"files"},
-            exclude_none=True,
-            omit_unset_values=True,
-        )
-        if response.data.files:
-            return _build_multipart_payload(
-                payload,
-                response.data.files,
-                attachment_owner=payload["data"],
-            )
-    return {"json": payload}
+        exclude = {"data": {"files"}}
+        files = _extract_files(response.data)
+    return prepare_request(
+        response,
+        files=files,
+        attachment_owner_path=("data",),
+        exclude=exclude,
+        exclude_none=True,
+        omit_unset_values=True,
+    )
