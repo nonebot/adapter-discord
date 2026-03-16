@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 import json
-from typing import Any, Literal
+from typing import Any, TypeAlias, TypedDict
 
 from nonebot.compat import PYDANTIC_V2
+from nonebot.internal.driver import FileTypes
 from pydantic import BaseModel
 
 if PYDANTIC_V2:
@@ -15,6 +16,19 @@ from .utils import IncEx, model_dump
 
 if PYDANTIC_V2:
     _JSON_ADAPTER = TypeAdapter(Any)
+
+MultipartFormData: TypeAlias = dict[str, FileTypes]
+
+
+class JsonTransportRequest(TypedDict):
+    json: dict[str, Any]
+
+
+class MultipartTransportRequest(TypedDict):
+    files: MultipartFormData
+
+
+EncodedPreparedRequest: TypeAlias = JsonTransportRequest | MultipartTransportRequest
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,7 +75,11 @@ def prepare_request(  # noqa: PLR0913
 def encode_json_text(value: object) -> str:
     if PYDANTIC_V2:
         return _JSON_ADAPTER.dump_json(value).decode()
-    return json.dumps(value, default=pydantic_encoder)
+    return json.dumps(
+        value,
+        default=pydantic_encoder,
+        separators=(",", ":"),
+    )
 
 
 def encode_model_json_text(  # noqa: PLR0913
@@ -133,8 +151,8 @@ def _build_multipart_payload(
     files: list[File],
     *,
     attachment_owner_path: tuple[str, ...] = (),
-) -> dict[str, Any]:
-    multipart: dict[str, Any] = {}
+) -> MultipartFormData:
+    multipart: MultipartFormData = {}
     container = _resolve_attachment_owner(payload, attachment_owner_path)
     has_attachments = "attachments" in container
     attachments = container.get("attachments", [])
@@ -151,7 +169,11 @@ def _build_multipart_payload(
 
     if isinstance(attachments, list) and has_attachments:
         container["attachments"] = attachments
-    multipart["payload_json"] = (None, encode_json_text(payload), "application/json")
+    multipart["payload_json"] = (
+        None,
+        encode_json_text(payload).encode(),
+        "application/json",
+    )
     return multipart
 
 

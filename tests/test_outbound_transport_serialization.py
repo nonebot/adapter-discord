@@ -60,8 +60,8 @@ def _payload_json_text(
     files: Sequence[tuple[str, tuple[object, object, object | None]]] | None,
 ) -> str:
     payload_json = _files_to_mapping(files)["payload_json"][1]
-    assert isinstance(payload_json, str)
-    return payload_json
+    assert isinstance(payload_json, (bytes, str))
+    return payload_json.decode() if isinstance(payload_json, bytes) else payload_json
 
 
 def _assert_transport_datetime(actual: str, expected: datetime) -> None:
