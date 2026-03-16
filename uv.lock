@@ -516,7 +516,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-adapter-discord"
-version = "1.1.2"
+version = "1.1.6"
 source = { editable = "." }
 dependencies = [
     { name = "nonebot2" },
@@ -524,12 +524,15 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "loguru" },
     { name = "nonebug" },
     { name = "nonemoji" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
+    { name = "rich" },
+    { name = "richuru" },
     { name = "ruff" },
 ]
 scripts = [
@@ -549,12 +552,15 @@ requires-dist = [{ name = "nonebot2", specifier = ">=2.4.4" }]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "loguru", specifier = ">=0.7.3" },
     { name = "nonebug", specifier = ">=0.4.0,<0.5.0" },
     { name = "nonemoji", specifier = ">=0.1.2,<0.2.0" },
     { name = "pre-commit", specifier = ">=4.5.0,<5.0.0" },
     { name = "pytest", specifier = ">=7.0.0,<10.0.0" },
     { name = "pytest-asyncio", specifier = ">=1.1.0,<2.0.0" },
     { name = "pytest-cov", specifier = ">=7.0.0" },
+    { name = "rich", specifier = ">=14.3.3" },
+    { name = "richuru", specifier = ">=0.1.1" },
     { name = "ruff", specifier = ">=0.15.0,<1.0.0" },
 ]
 scripts = [
