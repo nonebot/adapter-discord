@@ -198,7 +198,12 @@ from ..exception import (
     RateLimitException,
     UnauthorizedException,
 )
-from ..utils import decompress_data, log, model_dump, omit_unset
+from ..serialization import (
+    encode_json_text,
+    encode_model_json_data,
+    encode_prepared_request,
+)
+from ..utils import decompress_data, log, omit_unset
 
 if TYPE_CHECKING:
     from ..bot import Bot
@@ -321,7 +326,7 @@ def _build_command_payloads(
             command_type=command_model.type,
             description=command_model.description,
         )
-        command_data = model_dump(
+        command_data = encode_model_json_data(
             command_model,
             omit_unset_values=True,
             exclude_none=True,
@@ -408,7 +413,7 @@ class HandleMixin:
             "contexts": contexts,
         }
         data = {key: value for key, value in data.items() if value is not None}
-        payload = model_dump(
+        payload = encode_model_json_data(
             type_validate_python(ApplicationCommandCreate, data),
             omit_unset_values=True,
             exclude_none=True,
@@ -476,7 +481,7 @@ class HandleMixin:
             "integration_types": integration_types,
             "contexts": contexts,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(ApplicationCommandEditParams, data),
             omit_unset_values=True,
         )
@@ -592,7 +597,7 @@ class HandleMixin:
             "nsfw": nsfw,
         }
         data = {key: value for key, value in data.items() if value is not None}
-        payload = model_dump(
+        payload = encode_model_json_data(
             type_validate_python(ApplicationCommandCreate, data),
             omit_unset_values=True,
             exclude_none=True,
@@ -658,7 +663,7 @@ class HandleMixin:
             "default_permission": default_permission,
             "nsfw": nsfw,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(ApplicationCommandEditParams, data),
             omit_unset_values=True,
         )
@@ -784,7 +789,7 @@ class HandleMixin:
             / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",
             json={
                 "permissions": [
-                    model_dump(permission, omit_unset_values=True)
+                    encode_model_json_data(permission, omit_unset_values=True)
                     for permission in permissions
                 ]
             },
@@ -809,7 +814,7 @@ class HandleMixin:
 
         see https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response
         """
-        params = parse_interaction_response(response)
+        params = encode_prepared_request(parse_interaction_response(response))
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         query = {"with_response": _bool_query(value=with_response)}
         request = Request(
@@ -884,9 +889,11 @@ class HandleMixin:
             "attachments": attachments,
             "poll": poll,
         }
-        request_kwargs = parse_data(
-            data,
-            WebhookMessageEditParams,
+        request_kwargs = encode_prepared_request(
+            parse_data(
+                data,
+                WebhookMessageEditParams,
+            )
         )
         request = Request(
             headers=headers,
@@ -962,9 +969,11 @@ class HandleMixin:
             "attachments": attachments,
             "flags": flags,
         }
-        request_kwargs = parse_data(
-            {key: value for key, value in data.items() if value is not None},
-            ExecuteWebhookParams,
+        request_kwargs = encode_prepared_request(
+            parse_data(
+                {key: value for key, value in data.items() if value is not None},
+                ExecuteWebhookParams,
+            )
         )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
@@ -1036,9 +1045,11 @@ class HandleMixin:
             "attachments": attachments,
             "poll": poll,
         }
-        request_kwargs = parse_data(
-            data,
-            WebhookMessageEditParams,
+        request_kwargs = encode_prepared_request(
+            parse_data(
+                data,
+                WebhookMessageEditParams,
+            )
         )
         request = Request(
             headers=headers,
@@ -1119,7 +1130,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/application#edit-current-application
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 EditCurrentApplicationParams,
                 {
@@ -1207,7 +1218,7 @@ class HandleMixin:
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         payload = [
-            model_dump(
+            encode_model_json_data(
                 type_validate_python(ApplicationRoleConnectionMetadata, record),
                 omit_unset_values=True,
             )
@@ -1441,7 +1452,7 @@ class HandleMixin:
             "exempt_roles": exempt_roles,
             "exempt_channels": exempt_channels,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(CreateAndModifyAutoModerationRuleParams, data),
             exclude_none=True,
             omit_unset_values=True,
@@ -1492,7 +1503,7 @@ class HandleMixin:
             "exempt_roles": exempt_roles,
             "exempt_channels": exempt_channels,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 CreateAndModifyAutoModerationRuleParams,
                 {key: value for key, value in data.items() if value is not None},
@@ -1630,7 +1641,7 @@ class HandleMixin:
             "default_sort_order": default_sort_order,
             "default_forum_layout": default_forum_layout,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyChannelParams,
                 data,
@@ -1667,7 +1678,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyThreadParams,
                 {
@@ -1873,9 +1884,11 @@ class HandleMixin:
             "flags": flags,
             "poll": poll,
         }
-        params = parse_data(
-            {key: value for key, value in data.items() if value is not None},
-            MessageSend,
+        params = encode_prepared_request(
+            parse_data(
+                {key: value for key, value in data.items() if value is not None},
+                MessageSend,
+            )
         )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
@@ -2111,9 +2124,11 @@ class HandleMixin:
             "sticker_ids": sticker_ids,
             "poll": poll,
         }
-        params = parse_data(
-            data,
-            MessageEditParams,
+        params = encode_prepared_request(
+            parse_data(
+                data,
+                MessageEditParams,
+            )
         )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
@@ -2274,7 +2289,7 @@ class HandleMixin:
                     target_users_file.filename,
                     target_users_file.content,
                 ),
-                "payload_json": (None, json.dumps(payload), "application/json"),
+                "payload_json": (None, encode_json_text(payload), "application/json"),
             }
             request = Request(
                 headers=headers,
@@ -2471,7 +2486,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 StartThreadFromMessageParams,
                 {
@@ -2516,7 +2531,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 StartThreadWithoutMessageParams,
                 {
@@ -2574,7 +2589,7 @@ class HandleMixin:
             "attachments": attachments,
             "flags": flags,
         }
-        params = parse_forum_thread_message(data)
+        params = encode_prepared_request(parse_forum_thread_message(data))
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
@@ -2889,7 +2904,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyGuildEmojiParams, {"name": name, "roles": roles}
             ),
@@ -3042,7 +3057,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/soundboard#send-soundboard-sound
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 SendSoundboardSoundParams,
                 {
@@ -3132,7 +3147,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/soundboard#create-guild-soundboard-sound
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 CreateGuildSoundboardSoundParams,
                 {
@@ -3169,7 +3184,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/soundboard#modify-guild-soundboard-sound
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyGuildSoundboardSoundParams,
                 {
@@ -3223,7 +3238,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/lobby#create-lobby
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 CreateLobbyParams,
                 {
@@ -3273,7 +3288,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/lobby#modify-lobby
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyLobbyParams,
                 {
@@ -3323,7 +3338,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/lobby#add-lobby-member
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 AddLobbyMemberParams,
                 {
@@ -3390,7 +3405,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/lobby#link-channel-to-lobby
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 LinkChannelToLobbyParams,
                 {
@@ -3580,7 +3595,7 @@ class HandleMixin:
             "system_channel_id": system_channel_id,
             "system_channel_flags": system_channel_flags,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(CreateGuildParams, data), omit_unset_values=True
         )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
@@ -3701,7 +3716,7 @@ class HandleMixin:
             "premium_progress_bar_enabled": premium_progress_bar_enabled,
             "safety_alerts_channel_id": safety_alerts_channel_id,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyGuildParams,
                 data,
@@ -3729,7 +3744,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyGuildIncidentActionsParams,
                 {
@@ -3830,7 +3845,7 @@ class HandleMixin:
             "available_tags": available_tags,
             "default_sort_order": default_sort_order,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(CreateGuildChannelParams, data), omit_unset_values=True
         )
         request = Request(
@@ -3872,7 +3887,7 @@ class HandleMixin:
             )
             channels = [channel]
         payload = [
-            model_dump(
+            encode_model_json_data(
                 type_validate_python(ModifyGuildChannelPositionParams, channel),
                 omit_unset_values=True,
             )
@@ -4031,7 +4046,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyGuildMemberParams,
                 {
@@ -4072,7 +4087,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyCurrentMemberParams,
                 {
@@ -4452,7 +4467,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 CreateGuildRoleParams,
                 {
@@ -4502,7 +4517,7 @@ class HandleMixin:
             )
             roles = [role]
         payload = [
-            model_dump(
+            encode_model_json_data(
                 type_validate_python(ModifyGuildRolePositionParams, role),
                 omit_unset_values=True,
             )
@@ -4539,7 +4554,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyGuildRoleParams,
                 {
@@ -4766,7 +4781,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyGuildWidgetParams,
                 {"enabled": enabled, "channel_id": channel_id},
@@ -4870,7 +4885,7 @@ class HandleMixin:
             "welcome_channels": welcome_channels,
             "description": description,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyGuildWelcomeScreenParams,
                 data,
@@ -4924,7 +4939,7 @@ class HandleMixin:
             "enabled": enabled,
             "mode": mode,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(ModifyGuildOnboardingParams, data),
             omit_unset_values=True,
         )
@@ -5002,7 +5017,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyCurrentUserVoiceStateParams,
                 {
@@ -5123,7 +5138,7 @@ class HandleMixin:
             "image": image,
             "recurrence_rule": recurrence_rule,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(CreateGuildScheduledEventParams, data),
             exclude_none=True,
             omit_unset_values=True,
@@ -5197,7 +5212,7 @@ class HandleMixin:
             "image": image,
             "recurrence_rule": recurrence_rule,
         }
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyGuildScheduledEventParams,
                 data,
@@ -5338,7 +5353,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/guild-template#create-guild-template
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 CreateGuildTemplateParams,
                 {"name": name, "description": description},
@@ -5386,7 +5401,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/guild-template#modify-guild-template
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyGuildTemplateParams,
                 {"name": name, "description": description},
@@ -5832,7 +5847,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyGuildStickerParams,
                 {"name": name, "description": description, "tags": tags},
@@ -5971,7 +5986,7 @@ class HandleMixin:
         see https://discord.com/developers/docs/resources/user#modify-current-user
         """
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(
                 ModifyCurrentUserParams,
                 {"username": username, "avatar": avatar, "banner": banner},
@@ -6176,7 +6191,7 @@ class HandleMixin:
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         if reason:
             headers["X-Audit-Log-Reason"] = reason
-        data = model_dump(
+        data = encode_model_json_data(
             type_validate_python(CreateWebhookParams, {"name": name, "avatar": avatar}),
             omit_unset_values=True,
         )
@@ -6443,9 +6458,11 @@ class HandleMixin:
             "applied_tags": applied_tags,
             "poll": poll,
         }
-        request_kwargs = parse_data(
-            {key: value for key, value in payload.items() if value is not None},
-            ExecuteWebhookParams,
+        request_kwargs = encode_prepared_request(
+            parse_data(
+                {key: value for key, value in payload.items() if value is not None},
+                ExecuteWebhookParams,
+            )
         )
         headers = {"Authorization": self.get_authorization(bot.bot_info)}
         request = Request(
@@ -6576,9 +6593,11 @@ class HandleMixin:
             "attachments": attachments,
             "poll": poll,
         }
-        request_kwargs = parse_data(
-            data,
-            WebhookMessageEditParams,
+        request_kwargs = encode_prepared_request(
+            parse_data(
+                data,
+                WebhookMessageEditParams,
+            )
         )
         request = Request(
             headers=headers,
