@@ -117,20 +117,25 @@ def encode_model_json_data(  # noqa: PLR0913
     exclude_none: bool = False,
     omit_unset_values: bool = False,
 ) -> dict[str, Any]:
-    # Keep JSON-data and JSON-text transport encoding on one path so HTTP bodies,
-    # multipart payload_json, and gateway frames cannot drift apart.
-    return json.loads(
-        encode_model_json_text(
-            model,
-            include=include,
-            exclude=exclude,
-            by_alias=by_alias,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
-            omit_unset_values=omit_unset_values,
-        )
+    payload = model_dump(
+        model,
+        include=include,
+        exclude=exclude,
+        by_alias=by_alias,
+        exclude_unset=exclude_unset,
+        exclude_defaults=exclude_defaults,
+        exclude_none=exclude_none,
+        omit_unset_values=omit_unset_values,
     )
+    if PYDANTIC_V2:
+        json_payload = _JSON_ADAPTER.dump_python(payload, mode="json")
+        if not isinstance(json_payload, dict):
+            msg = "transport JSON encoding must produce a mapping"
+            raise TypeError(msg)
+        return json_payload
+    # Pydantic v1 has no public JSON-mode-to-Python API; keep the proven
+    # text roundtrip there and optimize only the v2 path.
+    return json.loads(encode_json_text(payload))
 
 
 def _resolve_attachment_owner(
