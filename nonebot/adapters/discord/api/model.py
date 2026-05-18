@@ -641,9 +641,9 @@ class ComponentEmoji(BaseModel):
     see https://discord.com/developers/docs/interactions/message-components#button-object
     """
 
-    id: Missing[str | None] = UNSET
+    id: MissingOrNullable[Snowflake] = UNSET
     """emoji id"""
-    name: Missing[str | None] = UNSET
+    name: MissingOrNullable[str] = UNSET
     """emoji name"""
     animated: Missing[bool] = UNSET
     """whether this emoji is animated"""

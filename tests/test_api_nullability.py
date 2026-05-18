@@ -4,9 +4,11 @@ from typing import Any
 
 from nonebot.adapters.discord.api import (
     ActionRow,
+    ComponentEmoji,
     ComponentType,
     SelectMenu,
     SelectOption,
+    Snowflake,
 )
 from nonebot.adapters.discord.api.model import (
     Embed,
@@ -22,6 +24,8 @@ from nonebot.adapters.discord.serialization import (
     encode_prepared_request,
 )
 from nonebot.adapters.discord.utils import omit_unset
+
+from nonebot.compat import type_validate_python
 
 
 def _json_payload(prepared: PreparedRequest) -> dict[str, Any]:
@@ -133,6 +137,22 @@ def test_parse_data_keeps_action_row_type_for_components() -> None:
     )
     assert "content" not in payload
     assert int(payload["components"][0]["type"]) == int(ComponentType.ActionRow)
+
+
+def test_component_emoji_allows_missing_partial_fields() -> None:
+    emoji = type_validate_python(ComponentEmoji, {"name": "🔗"})
+
+    assert emoji.id is UNSET
+    assert emoji.name == "🔗"
+    assert emoji.animated is UNSET
+
+
+def test_component_emoji_id_is_nullable_snowflake() -> None:
+    emoji = type_validate_python(ComponentEmoji, {"id": "41771983429993937"})
+
+    assert isinstance(emoji.id, Snowflake)
+    assert emoji.id == Snowflake(41771983429993937)
+    assert emoji.name is UNSET
 
 
 def test_parse_forum_thread_message_keeps_name() -> None:
