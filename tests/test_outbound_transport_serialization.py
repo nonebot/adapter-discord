@@ -27,6 +27,7 @@ from nonebot.adapters.discord.config import BotInfo
 from tests.fake.doubles import DummyAdapter, DummyBot
 
 from nonebot.drivers import URL, Request, WebSocket
+from nonebot.utils import UNSET
 import pytest
 
 
@@ -341,4 +342,4 @@ async def test_gateway_websocket_request_does_not_inherit_api_timeout(
         )
 
     assert captured_request is not None
-    assert captured_request.timeout is None
+    assert captured_request.timeout is UNSET
