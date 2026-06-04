@@ -342,5 +342,6 @@ async def test_gateway_websocket_request_does_not_inherit_api_timeout(
 
     assert captured_request is not None
     assert isinstance(captured_request.timeout, Timeout)
+    assert captured_request.timeout.connect == adapter.discord_config.discord_api_timeout
     assert captured_request.timeout.read is None
     assert captured_request.timeout.close == 10.0
