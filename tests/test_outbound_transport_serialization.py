@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import json
 from typing_extensions import override
 
+from nonebot.adapters.discord import adapter as adapter_module
 from nonebot.adapters.discord.api import handle
 from nonebot.adapters.discord.api.model import (
     AttachmentSend,
@@ -14,6 +15,7 @@ from nonebot.adapters.discord.api.model import (
     InteractionResponse,
     RecurrenceRule,
     Snowflake,
+    User,
 )
 from nonebot.adapters.discord.api.types import (
     GuildScheduledEventEntityType,
@@ -21,9 +23,10 @@ from nonebot.adapters.discord.api.types import (
     GuildScheduledEventRecurrenceRuleFrequency,
     InteractionCallbackType,
 )
+from nonebot.adapters.discord.config import BotInfo
 from tests.fake.doubles import DummyAdapter, DummyBot
 
-from nonebot.drivers import Request, WebSocket
+from nonebot.drivers import URL, Request, WebSocket
 import pytest
 
 
@@ -283,3 +286,59 @@ async def test_gateway_heartbeat_uses_transport_json_text() -> None:
     await adapter._heartbeat(ws, bot)  # noqa: SLF001
 
     assert ws.sent == ['{"op":1,"d":42}']
+
+
+@pytest.mark.asyncio
+async def test_gateway_websocket_request_does_not_inherit_api_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    adapter = DummyAdapter()
+    adapter.discord_config.discord_api_timeout = 30.0
+    bot_info = BotInfo(token="x" * 10)
+    captured_request: Request | None = None
+
+    class StopForwardError(Exception):
+        pass
+
+    class StopWebSocket:
+        async def __aenter__(self) -> None:
+            msg = "websocket request captured"
+            raise RuntimeError(msg)
+
+        async def __aexit__(
+            self,
+            _exc_type: object,
+            _exc: object,
+            _traceback: object,
+        ) -> None:
+            return None
+
+    async def fake_get_bot_user(_bot_info: BotInfo) -> User:
+        return User(
+            id=Snowflake(1),
+            username="bot",
+            discriminator="0000",
+            avatar=None,
+        )
+
+    def fake_websocket(request: Request) -> StopWebSocket:
+        nonlocal captured_request
+        captured_request = request
+        return StopWebSocket()
+
+    async def stop_reconnect_sleep(_delay: float) -> None:
+        raise StopForwardError
+
+    monkeypatch.setattr(adapter, "_get_bot_user", fake_get_bot_user)
+    monkeypatch.setattr(adapter, "websocket", fake_websocket)
+    monkeypatch.setattr(adapter_module.asyncio, "sleep", stop_reconnect_sleep)
+
+    with pytest.raises(StopForwardError):
+        await adapter._forward_ws(  # noqa: SLF001
+            bot_info,
+            URL("wss://gateway.discord.gg"),
+            (0, 1),
+        )
+
+    assert captured_request is not None
+    assert captured_request.timeout is None

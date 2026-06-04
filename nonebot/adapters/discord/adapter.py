@@ -184,7 +184,6 @@ class Adapter(BaseAdapter, HandleMixin):
             url=ws_url,
             headers=headers,
             params=params,
-            timeout=self.discord_config.discord_api_timeout,
             proxy=self.discord_config.discord_proxy,
         )
         heartbeat_task: asyncio.Task | None = None
