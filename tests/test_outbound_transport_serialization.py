@@ -1,11 +1,11 @@
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Awaitable, Sequence
 from datetime import datetime, timezone
 import json
 from typing_extensions import override
 
-from nonebot.adapters.discord import adapter as adapter_module
 from nonebot.adapters.discord.api import handle
 from nonebot.adapters.discord.api.model import (
     AttachmentSend,
@@ -331,7 +331,7 @@ async def test_gateway_websocket_request_does_not_inherit_api_timeout(
 
     monkeypatch.setattr(adapter, "_get_bot_user", fake_get_bot_user)
     monkeypatch.setattr(adapter, "websocket", fake_websocket)
-    monkeypatch.setattr(adapter_module.asyncio, "sleep", stop_reconnect_sleep)
+    monkeypatch.setattr(asyncio, "sleep", stop_reconnect_sleep)
 
     with pytest.raises(StopForwardError):
         await adapter._forward_ws(  # noqa: SLF001
