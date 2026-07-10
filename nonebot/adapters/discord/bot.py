@@ -1,6 +1,7 @@
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any, Literal, NoReturn
+from typing import TYPE_CHECKING, Any, Literal, NoReturn, TypeVar, cast
 from typing_extensions import override
+import warnings
 
 from nonebot.adapters import (
     Bot as BaseBot,
@@ -13,26 +14,37 @@ from nonebot.drivers import Request
 from nonebot.message import handle_event
 from yarl import URL
 
-from .api import (
-    UNSET,
+from .api.client import ApiClient
+from .config import BotInfo
+from .domains.interaction.conversion import to_followup_message, to_interaction_callback
+from .domains.interaction.lifecycle import (
+    InteractionResponder,
+    current_interaction_responder,
+)
+from .domains.message.conversion import compile_message, to_message_send
+from .domains.models import (
     AllowedMention,
-    ApiClient,
+    Component,
     File,
-    InteractionCallbackMessage,
     InteractionCallbackType,
     InteractionResponse,
+    MessageFlag,
     MessageGet,
     MessageReference,
     MessageReferenceType,
-    Snowflake,
-    SnowflakeType,
     User,
-    is_not_unset,
 )
-from .config import BotInfo
 from .event import Event, InteractionCreateEvent, MessageEvent
 from .exception import ActionFailed
-from .message import Message, MessageSegment, parse_message
+from .message import Message, MessageSegment
+from .protocol import (
+    UNSET,
+    MissingOrNullable,
+    Snowflake,
+    SnowflakeType,
+    is_not_unset,
+    is_unset,
+)
 from .utils import log
 
 if TYPE_CHECKING:
@@ -41,6 +53,11 @@ if TYPE_CHECKING:
 
 DISCORD_ATTACHMENT_HOSTS = {"cdn.discordapp.com", "media.discordapp.net"}
 AttachmentFetchOnError = Literal["raise", "skip"]
+T = TypeVar("T")
+
+
+def _none_if_unset(value: MissingOrNullable[T]) -> T | None:
+    return None if is_unset(value) else value
 
 
 async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
@@ -192,7 +209,16 @@ class Bot(BaseBot, ApiClient):
         if isinstance(event, MessageEvent):
             await _check_reply(self, event)
             _check_at_me(self, event)
-        await handle_event(self, event)
+        if not isinstance(event, InteractionCreateEvent):
+            await handle_event(self, event)
+            return
+
+        responder = InteractionResponder.from_event(self, event)
+        context_token = current_interaction_responder.set(responder)
+        try:
+            await handle_event(self, event)
+        finally:
+            current_interaction_responder.reset(context_token)
 
     async def fetch_attachments(  # noqa: PLR0913
         self,
@@ -336,15 +362,34 @@ class Bot(BaseBot, ApiClient):
     ) -> MessageGet:
         message = MessageSegment.text(message) if isinstance(message, str) else message
         message = message if isinstance(message, Message) else Message(message)
-        message = message.sendable()
-        message_data = parse_message(message)
+        parts = compile_message(message.sendable())
+        request = to_message_send(
+            parts,
+            nonce=nonce if nonce is not None else UNSET,
+            tts=tts,
+            allowed_mentions=(
+                allowed_mentions if allowed_mentions is not None else UNSET
+            ),
+        )
 
         return await self.create_message(
             channel_id=channel_id,
-            nonce=nonce,
-            tts=tts,
-            allowed_mentions=allowed_mentions,
-            **message_data,
+            content=_none_if_unset(request.content),
+            nonce=_none_if_unset(request.nonce),
+            enforce_nonce=_none_if_unset(request.enforce_nonce),
+            tts=_none_if_unset(request.tts),
+            embeds=_none_if_unset(request.embeds),
+            allowed_mentions=_none_if_unset(request.allowed_mentions),
+            message_reference=_none_if_unset(request.message_reference),
+            components=_none_if_unset(request.components),
+            sticker_ids=cast(
+                "list[SnowflakeType] | None",
+                _none_if_unset(request.sticker_ids),
+            ),
+            files=_none_if_unset(request.files),
+            attachments=_none_if_unset(request.attachments),
+            flags=_none_if_unset(request.flags),
+            poll=_none_if_unset(request.poll),
         )
 
     @override
@@ -389,11 +434,31 @@ class Bot(BaseBot, ApiClient):
         )
         message = message.sendable()
         if isinstance(event, InteractionCreateEvent):
-            message_data = parse_message(message)
+            raw_flags = params.get("flags")
+            flags = (
+                None
+                if raw_flags is None
+                else raw_flags
+                if isinstance(raw_flags, MessageFlag)
+                else MessageFlag(raw_flags)
+            )
+            responder = current_interaction_responder.get()
+            if responder is not None:
+                return await responder.respond_with_flags(
+                    message,
+                    flags=flags,
+                    tts=tts,
+                    allowed_mentions=allowed_mentions,
+                )
+
+            parts = compile_message(message)
             response = InteractionResponse(
                 type=InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
-                data=InteractionCallbackMessage(
-                    tts=tts, allowed_mentions=allowed_mentions, **message_data
+                data=to_interaction_callback(
+                    parts,
+                    tts=tts,
+                    allowed_mentions=allowed_mentions,
+                    flags=flags,
                 ),
             )
             try:
@@ -403,10 +468,30 @@ class Bot(BaseBot, ApiClient):
                     response=response,
                 )
             except ActionFailed:
+                warnings.warn(
+                    "Automatic interaction followup after ActionFailed is deprecated "
+                    "and will be removed in 2.0; use CommandResponse or "
+                    "InteractionResponder to manage response state explicitly",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+                followup = to_followup_message(
+                    parts, flags=flags if flags is not None else UNSET
+                )
                 return await self.create_followup_message(
                     application_id=event.application_id,
                     interaction_token=event.token,
-                    **message_data,
+                    content=_none_if_unset(followup.content),
+                    tts=_none_if_unset(followup.tts),
+                    embeds=_none_if_unset(followup.embeds),
+                    allowed_mentions=_none_if_unset(followup.allowed_mentions),
+                    components=cast(
+                        "list[Component] | None",
+                        _none_if_unset(followup.components),
+                    ),
+                    files=_none_if_unset(followup.files),
+                    attachments=_none_if_unset(followup.attachments),
+                    flags=_none_if_unset(followup.flags),
                 )
             return await self.get_origin_interaction_response(
                 application_id=event.application_id,
@@ -421,12 +506,30 @@ class Bot(BaseBot, ApiClient):
         if reply_message:
             message += MessageSegment.reference(MessageReference(message_id=event.id))
 
-        message_data = parse_message(message)
-
+        request = to_message_send(
+            compile_message(message),
+            nonce=nonce if nonce is not None else UNSET,
+            tts=tts,
+            allowed_mentions=allowed_mentions
+            if allowed_mentions is not None
+            else UNSET,
+        )
         return await self.create_message(
             channel_id=event.channel_id,
-            nonce=nonce,
-            tts=tts,
-            allowed_mentions=allowed_mentions,
-            **message_data,
+            content=_none_if_unset(request.content),
+            nonce=_none_if_unset(request.nonce),
+            enforce_nonce=_none_if_unset(request.enforce_nonce),
+            tts=_none_if_unset(request.tts),
+            embeds=_none_if_unset(request.embeds),
+            allowed_mentions=_none_if_unset(request.allowed_mentions),
+            message_reference=_none_if_unset(request.message_reference),
+            components=_none_if_unset(request.components),
+            sticker_ids=cast(
+                "list[SnowflakeType] | None",
+                _none_if_unset(request.sticker_ids),
+            ),
+            files=_none_if_unset(request.files),
+            attachments=_none_if_unset(request.attachments),
+            flags=_none_if_unset(request.flags),
+            poll=_none_if_unset(request.poll),
         )

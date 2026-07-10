@@ -1,6 +1,8 @@
 from collections.abc import Callable, Iterable, Sequence
 from datetime import datetime, timedelta
 from typing import Any
+from typing_extensions import deprecated
+import warnings
 
 from nonebot.adapters import MessageTemplate
 
@@ -27,27 +29,24 @@ from nonebot.rule import Rule
 from nonebot.typing import T_Handler, T_PermissionChecker, T_RuleChecker, T_State
 
 from .params import OptionParam
+from .response import get_command_response
 from .storage import (
     _application_command_storage,
 )
-from ..api import (
-    UNSET,
+from ..bot import Bot
+from ..domains.interaction.conversion import to_origin_edit
+from ..domains.message.conversion import compile_message
+from ..domains.models import (
     AnyCommandOption,
     ApplicationCommandCreate,
     ApplicationCommandOptionType,
     ApplicationCommandType,
-    InteractionCallbackType,
-    InteractionResponse,
     MessageFlag,
     MessageGet,
-    Missing,
-    Snowflake,
-    SnowflakeType,
 )
-from ..api.types import is_unset
-from ..bot import Bot
 from ..event import ApplicationCommandInteractionEvent
-from ..message import Message, MessageSegment, parse_message
+from ..message import Message, MessageSegment
+from ..protocol import UNSET, Missing, Snowflake, SnowflakeType, is_unset
 
 type_str_mapping = {
     ApplicationCommandOptionType.USER: "users",
@@ -55,6 +54,18 @@ type_str_mapping = {
     ApplicationCommandOptionType.ROLE: "roles",
     ApplicationCommandOptionType.ATTACHMENT: "attachments",
 }
+_DEFERRED_RESPONSE_DEPRECATION = (
+    "ApplicationCommandMatcher.send_deferred_response() is deprecated and will be "
+    "removed in 2.0; inject CommandResponse and call response.defer()"
+)
+_RESPONSE_DEPRECATION = (
+    "ApplicationCommandMatcher.send_response() is deprecated and will be removed in "
+    "2.0; inject CommandResponse and call response.respond()"
+)
+_FOLLOWUP_DEPRECATION = (
+    "ApplicationCommandMatcher.send_followup_msg() is deprecated and will be "
+    "removed in 2.0; inject CommandResponse and call response.followup()"
+)
 
 
 class ApplicationCommandConfig(ApplicationCommandCreate):
@@ -65,26 +76,21 @@ class ApplicationCommandMatcher(Matcher):
     application_command: ApplicationCommandConfig
 
     @classmethod
+    @deprecated(_DEFERRED_RESPONSE_DEPRECATION, category=None)
     async def send_deferred_response(cls) -> None:
+        del cls
+        warnings.warn(_DEFERRED_RESPONSE_DEPRECATION, DeprecationWarning, stacklevel=2)
         event = current_event.get()
         bot = current_bot.get()
-        if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
-            bot, Bot
-        ):
-            msg = "Invalid event or bot"
-            raise ValueError(msg)  # noqa: TRY004
-        await bot.create_interaction_response(
-            interaction_id=event.id,
-            interaction_token=event.token,
-            response=InteractionResponse(
-                type=InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
-            ),
-        )
+        response = get_command_response(event, bot)
+        await response.defer()
 
     @classmethod
+    @deprecated(_RESPONSE_DEPRECATION, category=None)
     async def send_response(
         cls, message: str | Message | MessageSegment | MessageTemplate
     ) -> None:
+        warnings.warn(_RESPONSE_DEPRECATION, DeprecationWarning, stacklevel=2)
         return await cls.send(message)
 
     @classmethod
@@ -118,11 +124,20 @@ class ApplicationCommandMatcher(Matcher):
             _message = message.format(**state)
         else:
             _message = message
-        message_data = parse_message(_message)
+        request = to_origin_edit(compile_message(_message))
         await bot.edit_origin_interaction_response(
             application_id=event.application_id,
             interaction_token=event.token,
-            **message_data,
+            content=None if is_unset(request.content) else request.content,
+            embeds=None if is_unset(request.embeds) else request.embeds,
+            flags=None if is_unset(request.flags) else request.flags,
+            allowed_mentions=(
+                None if is_unset(request.allowed_mentions) else request.allowed_mentions
+            ),
+            components=None if is_unset(request.components) else request.components,
+            files=UNSET if is_unset(request.files) else request.files,
+            attachments=None if is_unset(request.attachments) else request.attachments,
+            poll=None if is_unset(request.poll) else request.poll,
         )
 
     @classmethod
@@ -140,31 +155,22 @@ class ApplicationCommandMatcher(Matcher):
         )
 
     @classmethod
+    @deprecated(_FOLLOWUP_DEPRECATION, category=None)
     async def send_followup_msg(
         cls,
         message: str | Message | MessageSegment | MessageTemplate,
         flags: MessageFlag | None = None,
     ) -> MessageGet:
+        warnings.warn(_FOLLOWUP_DEPRECATION, DeprecationWarning, stacklevel=2)
         event = current_event.get()
         bot = current_bot.get()
         state = current_matcher.get().state
-        if not isinstance(event, ApplicationCommandInteractionEvent) or not isinstance(
-            bot, Bot
-        ):
-            msg = "Invalid event or bot"
-            raise ValueError(msg)  # noqa: TRY004
+        response = get_command_response(event, bot)
         if isinstance(message, MessageTemplate):
             _message = message.format(**state)
         else:
             _message = message
-        message_data = parse_message(_message)
-        if flags:
-            message_data["flags"] = int(flags)
-        return await bot.create_followup_message(
-            application_id=event.application_id,
-            interaction_token=event.token,
-            **message_data,
-        )
+        return await response.followup_with_flags(_message, flags=flags)
 
     @classmethod
     async def get_followup_msg(cls, message_id: SnowflakeType) -> MessageGet:
@@ -199,12 +205,21 @@ class ApplicationCommandMatcher(Matcher):
             _message = message.format(**state)
         else:
             _message = message
-        message_data = parse_message(_message)
+        request = to_origin_edit(compile_message(_message))
         return await bot.edit_followup_message(
             application_id=event.application_id,
             interaction_token=event.token,
             message_id=message_id,
-            **message_data,
+            content=None if is_unset(request.content) else request.content,
+            embeds=None if is_unset(request.embeds) else request.embeds,
+            flags=None if is_unset(request.flags) else request.flags,
+            allowed_mentions=(
+                None if is_unset(request.allowed_mentions) else request.allowed_mentions
+            ),
+            components=None if is_unset(request.components) else request.components,
+            files=UNSET if is_unset(request.files) else request.files,
+            attachments=None if is_unset(request.attachments) else request.attachments,
+            poll=None if is_unset(request.poll) else request.poll,
         )
 
     @classmethod

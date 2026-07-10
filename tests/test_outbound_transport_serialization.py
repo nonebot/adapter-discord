@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 import json
 from typing_extensions import override
 
-from nonebot.adapters.discord.api import handle
 from nonebot.adapters.discord.api.model import (
     AttachmentSend,
     Embed,
@@ -24,29 +23,28 @@ from nonebot.adapters.discord.api.types import (
     InteractionCallbackType,
 )
 from nonebot.adapters.discord.config import BotInfo
+from nonebot.adapters.discord.exception import DiscordAdapterException
 from tests.fake.doubles import DummyAdapter, DummyBot
 
 from nonebot.drivers import URL, Request, Timeout, WebSocket
 import pytest
 
 
-class CapturedRequestError(Exception):
+class CapturedRequestError(DiscordAdapterException):
     def __init__(self, request: Request) -> None:
-        super().__init__("request captured")
+        super().__init__()
         self.request = request
 
 
 async def _capture_request(
     monkeypatch: pytest.MonkeyPatch,
+    adapter: DummyAdapter,
     coro: Awaitable[object],
 ) -> Request:
-    async def fake_request(
-        _adapter: object, request: Request, *, parse_json: bool = True
-    ) -> None:
-        del _adapter, parse_json
+    async def fake_request(request: Request) -> None:
         raise CapturedRequestError(request)
 
-    monkeypatch.setattr(handle, "_request", fake_request)
+    monkeypatch.setattr(adapter, "request", fake_request)
     with pytest.raises(CapturedRequestError) as excinfo:
         await coro
     return excinfo.value.request
@@ -81,6 +79,7 @@ async def test_create_message_request_uses_transport_payload_json(
 
     request = await _capture_request(
         monkeypatch,
+        adapter,
         adapter._api_create_message(  # noqa: SLF001
             bot,
             channel_id=1,
@@ -106,6 +105,7 @@ async def test_forum_thread_request_keeps_nested_message_payload(
 
     request = await _capture_request(
         monkeypatch,
+        adapter,
         adapter._api_start_thread_in_forum_channel(  # noqa: SLF001
             bot,
             channel_id=1,
@@ -134,6 +134,7 @@ async def test_interaction_response_request_keeps_nested_data_payload(
 
     request = await _capture_request(
         monkeypatch,
+        adapter,
         adapter._api_create_interaction_response(  # noqa: SLF001
             bot,
             interaction_id=1,
@@ -165,6 +166,7 @@ async def test_modify_guild_member_request_serializes_datetime(
 
     request = await _capture_request(
         monkeypatch,
+        adapter,
         adapter._api_modify_guild_member(  # noqa: SLF001
             bot,
             guild_id=1,
@@ -189,6 +191,7 @@ async def test_modify_current_user_voice_state_request_serializes_datetime(
 
     request = await _capture_request(
         monkeypatch,
+        adapter,
         adapter._api_modify_current_user_voice_state(  # noqa: SLF001
             bot,
             guild_id=1,
@@ -212,6 +215,7 @@ async def test_create_guild_schedule_event_request_serializes_recurrence_rule(
 
     request = await _capture_request(
         monkeypatch,
+        adapter,
         adapter._api_create_guild_schedule_event(  # noqa: SLF001
             bot,
             guild_id=1,

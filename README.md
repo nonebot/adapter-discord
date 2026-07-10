@@ -110,87 +110,46 @@ DISCORD_HANDLE_SELF_MESSAGE=True
 DISCORD_PROXY='http://127.0.0.1:6666'
 ```
 
-## 插件示例
+## 常见用法
 
-以下是一个简单的插件示例，展示各种消息段：
+常见插件只需要使用 `Bot.send`、`Message` 和 `MessageSegment`。`Bot.send` 接受字符串、`Message` 或 `MessageSegment`，并负责将消息编译为 Discord 请求；不需要先调用 `parse_message` 或手工拼装 payload。
 
 ```python
-import datetime
-
 from nonebot import on_command
 from nonebot.params import CommandArg
 
-from nonebot.adapters.discord import Bot, MessageEvent, MessageSegment, Message
-from nonebot.adapters.discord.api import *
+from nonebot.adapters.discord import Bot, Message, MessageEvent, MessageSegment
 
-matcher = on_command('send')
+matcher = on_command("send")
 
 
 @matcher.handle()
 async def ready(bot: Bot, event: MessageEvent, msg: Message = CommandArg()):
-    # 调用discord的api
-    self_info = await bot.get_current_user()  # 获取机器人自身信息
-    user = await bot.get_user(user_id=event.user_id)  # 获取指定用户信息
-    ...
-    # 各种消息段
-    msg = msg.extract_plain_text()
-    if msg == 'mention_me':
-        # 发送一个提及你的消息
-        await matcher.finish(MessageSegment.mention_user(event.user_id))
-    elif msg == 'time':
-        # 发送一个时间，使用相对时间（RelativeTime）样式
-        await matcher.finish(MessageSegment.timestamp(datetime.datetime.now(),
-                                                      style=TimeStampStyle.RelativeTime))
-    elif msg == 'mention_everyone':
-        # 发送一个提及全体成员的消息
-        await matcher.finish(MessageSegment.mention_everyone())
-    elif msg == 'mention_channel':
-        # 发送一个提及当前频道的消息
-        await matcher.finish(MessageSegment.mention_channel(event.channel_id))
-    elif msg == 'embed':
-        # 发送一个嵌套消息，其中包含a embed标题，nonebot logo描述和来自网络url的logo图片
-        await matcher.finish(MessageSegment.embed(
-            Embed(title='a embed',
-                  type=EmbedTypes.image,
-                  description='nonebot logo',
-                  image=EmbedImage(
-                      url='https://nonebot.dev/logo.png'))))
-    elif msg == 'attachment':
-        # 发送一个附件，其中包含来自本地的logo.png图片
-        with open('logo.png', 'rb') as f:
-            await matcher.finish(MessageSegment.attachment(file='logo.png',
-                                                           content=f.read()))
-    elif msg == 'component':
-        # 发送一个复杂消息，其中包含一个当前时间，一个字符串选择菜单，一个用户选择菜单和一个按钮
-        time_now = MessageSegment.timestamp(datetime.datetime.now())
-        string_select = MessageSegment.component(
-            SelectMenu(type=ComponentType.StringSelect,
-                       custom_id='string select',
-                       placeholder='select a value',
-                       options=[
-                           SelectOption(label='A', value='a'),
-                           SelectOption(label='B', value='b'),
-                           SelectOption(label='C', value='c')]))
-        select = MessageSegment.component(SelectMenu(
-            type=ComponentType.UserInput,
-            custom_id='user_input',
-            placeholder='please select a user'))
-        button = MessageSegment.component(
-            Button(label='button',
-                   custom_id='button',
-                   style=ButtonStyle.Primary))
-        await matcher.finish('now time:' + time_now + string_select + select + button)
+    text = msg.extract_plain_text()
+    message = Message()
+
+    if text == "mention_me":
+        message += MessageSegment.text("你好，")
+        message += MessageSegment.mention_user(event.user_id)
+    elif text == "attachment":
+        with open("logo.png", "rb") as file:
+            message += MessageSegment.attachment(
+                file="logo.png",
+                content=file.read(),
+            )
     else:
-        # 发送一个文本消息
-        await matcher.finish(MessageSegment.text(msg))
+        message += MessageSegment.text(text)
+
+    await bot.send(event, message)
 ```
 
-以下是一个 Discord 斜杠命令的插件示例：
+以下是一个 Discord 斜杠命令的插件示例。首次响应有三秒时限；耗时任务应通过依赖注入取得 `CommandResponse`，先 `defer()`，完成后再 `respond()`。`CommandResponse` 只能在适配器正在处理 interaction 的上下文中注入，不能在普通事件或脱离处理上下文的代码中取得。
 
 ```python
 import asyncio
 from typing import Optional
 
+from nonebot.adapters.discord import CommandResponse
 from nonebot.adapters.discord.api import (
     IntegerOption,
     NumberOption,
@@ -245,27 +204,29 @@ matcher = on_slash_command(
 
 @matcher.handle_sub_command("add")
 async def handle_user_add(
-    plugin: CommandOption[str], priority: CommandOption[Optional[int]]
+    plugin: CommandOption[str],
+    priority: CommandOption[Optional[int]],
+    response: CommandResponse,
 ):
-    # Discord 要求斜杠命令必须在 3 秒内给出首次响应，否则返回 404。
-    # 如果处理逻辑耗时较长（如查询数据库），需要先调用 send_deferred_response()
-    # 将命令转为「延迟响应」模式，获得最多 15 分钟的处理时间。
-    await matcher.send_deferred_response()
+    # defer() 占用首次响应；ephemeral=True 使原始响应仅对调用者可见。
+    await response.defer(ephemeral=True)
     await asyncio.sleep(2)
-    await matcher.edit_response(f"你添加了插件 {plugin}，优先级 {priority}")
+    await response.respond(f"你添加了插件 {plugin}，优先级 {priority}")
     await asyncio.sleep(2)
-    fm = await matcher.send_followup_msg(
+    followup = await response.followup(
         f"你添加了插件 {plugin}，优先级 {priority} (新消息)"
     )
     await asyncio.sleep(2)
     await matcher.edit_followup_msg(
-        fm.id, f"你添加了插件 {plugin}，优先级 {priority} (新消息修改后)"
+        followup.id,
+        f"你添加了插件 {plugin}，优先级 {priority} (新消息修改后)",
     )
 
 
 @matcher.handle_sub_command("remove")
 async def handle_user_remove(
-    plugin: CommandOption[str], time: CommandOption[Optional[float]]
+    plugin: CommandOption[str],
+    time: CommandOption[Optional[float]],
 ):
     await matcher.send(f"你移除了插件 {plugin}，时长 {time}")
 
@@ -274,3 +235,24 @@ async def handle_user_remove(
 async def handle_admin_ban(user: CommandOption[User]):
     await matcher.finish(f"你禁用了用户 {user.username}")
 ```
+
+## 1.x 迁移与弃用
+
+新代码应传递 `Message`/`MessageSegment` 给 `Bot.send` 或 `Bot.send_to`，并为斜杠命令注入 `CommandResponse`。以下 1.x 兼容接口仍然保留，但 removal target 是 **2.0**：
+
+- `nonebot.adapters.discord.message.parse_message`；
+- `ApplicationCommandMatcher.send_deferred_response`；
+- `ApplicationCommandMatcher.send_response`；
+- `ApplicationCommandMatcher.send_followup_msg`。
+
+此外，在没有 managed interaction context 时，`Bot.send(interaction, ...)` 遇到 `ActionFailed` 后自动创建 followup 的 legacy fallback 也会在 **2.0** 删除。请改为在 interaction handler 中注入 `CommandResponse`，显式调用 `defer()`、`respond()` 或 `followup()`，以便由状态机管理首次响应。
+
+## 高级 raw API
+
+`nonebot.adapters.discord.api` 是长期保留的高级 raw API，**不弃用，也不会随上述 2.0 迁移删除**。需要直接构造 Discord request/response model 或调用原始 endpoint 时，可以继续使用：
+
+```python
+from nonebot.adapters.discord.api import *
+```
+
+例如 raw 用户仍可直接调用 `bot.create_interaction_response`，以及 original response 的 `get_origin_interaction_response`、`edit_origin_interaction_response`、`delete_origin_interaction_response` 和 followup 的 `create/get/edit/delete_followup_message` CRUD。高层 `CommandResponse` 只是 interaction handler 内更安全的常见路径，不会取代或隐藏这些 raw endpoint。

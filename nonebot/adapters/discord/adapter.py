@@ -4,7 +4,6 @@ import contextlib
 from functools import lru_cache
 import inspect
 import sys
-from types import UnionType
 from typing import Any, cast
 from typing_extensions import override
 
@@ -17,11 +16,12 @@ from nonebot.plugin import get_plugin_config
 from nonebot.utils import escape_tag
 
 from .api.handle import HandleMixin
-from .api.model import GatewayBot, User
 from .bot import Bot
 from .commands import sync_application_command
 from .config import BotInfo, Config
-from .event import Event, EventType, MessageEvent, ReadyEvent, event_classes
+from .domains.gateway.factory import EVENT_FACTORY
+from .domains.models import GatewayBot, User
+from .event import Event, MessageEvent, ReadyEvent
 from .exception import ApiNotAvailable
 from .payload import (
     Dispatch,
@@ -36,6 +36,7 @@ from .payload import (
     Resume,
 )
 from .serialization import encode_model_json_text
+from .transport.exchange import REST_EXCHANGE, BotAuth, JsonResponse, RestCall
 from .utils import decompress_data, log
 
 RECONNECT_INTERVAL = 3.0
@@ -132,38 +133,37 @@ class Adapter(BaseAdapter, HandleMixin):
             )
 
     async def _get_gateway_bot(self, bot_info: BotInfo) -> GatewayBot:
-        headers = {"Authorization": self.get_authorization(bot_info)}
-        request = Request(
-            headers=headers,
-            method="GET",
-            url=self.base_url / "gateway/bot",
-            timeout=self.discord_config.discord_api_timeout,
-            proxy=self.discord_config.discord_proxy,
+        gateway_info = await REST_EXCHANGE.execute(
+            self,
+            RestCall(
+                method="GET",
+                url=self.base_url / "gateway/bot",
+                response=JsonResponse(GatewayBot, allow_empty=True),
+                auth=BotAuth(bot_info),
+            ),
         )
-        resp = await self.request(request)
-        if not resp.content:
+        if gateway_info is None:
             msg = "Failed to get gateway info"
             raise ValueError(msg)
-        gateway_info = type_validate_json(GatewayBot, resp.content)
         if not gateway_info.url or gateway_info.url.isspace():
             msg = "Failed to get gateway url"
             raise ValueError(msg)
         return gateway_info
 
     async def _get_bot_user(self, bot_info: BotInfo) -> User:
-        headers = {"Authorization": self.get_authorization(bot_info)}
-        request = Request(
-            method="GET",
-            url=self.base_url / "users/@me",
-            headers=headers,
-            timeout=self.discord_config.discord_api_timeout,
-            proxy=self.discord_config.discord_proxy,
+        user = await REST_EXCHANGE.execute(
+            self,
+            RestCall(
+                method="GET",
+                url=self.base_url / "users/@me",
+                response=JsonResponse(User, allow_empty=True),
+                auth=BotAuth(bot_info),
+            ),
         )
-        resp = await self.request(request)
-        if not resp.content:
+        if user is None:
             msg = "Failed to get bot user info"
             raise ValueError(msg)
-        return type_validate_json(User, resp.content)
+        return user
 
     async def _forward_ws(  # noqa: C901
         self,
@@ -461,18 +461,7 @@ class Adapter(BaseAdapter, HandleMixin):
 
     @classmethod
     def payload_to_event(cls, payload: Dispatch) -> Event:
-        EventClass: type[Event] | UnionType | None = event_classes.get(  # noqa: N806
-            payload.type, None
-        )
-        if not EventClass:
-            log(
-                "WARNING",
-                f"Unknown payload type: {payload.type}, detail: {payload!r}",
-            )
-            event = type_validate_python(Event, payload.data)
-            event.__type__ = EventType(payload.type)
-            return event
-        return type_validate_python(cast("type[Event]", EventClass), payload.data)
+        return EVENT_FACTORY.from_dispatch(payload)
 
     @override
     async def _call_api(self, bot: BaseBot, api: str, **data: Any) -> Any:
