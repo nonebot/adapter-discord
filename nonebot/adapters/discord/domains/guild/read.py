@@ -1,7 +1,5 @@
 """Canonical guild.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -73,8 +71,8 @@ class Guild(BaseModel):
     verification_level: VerificationLevel
     default_message_notifications: DefaultMessageNotificationLevel
     explicit_content_filter: ExplicitContentFilterLevel
-    roles: list[Role]
-    emojis: list[Emoji]
+    roles: list["Role"]
+    emojis: list["Emoji"]
     features: list[GuildFeature]
     mfa_level: MFALevel
     application_id: Snowflake | None = Field(...)
@@ -94,12 +92,12 @@ class Guild(BaseModel):
     max_stage_video_channel_users: Missing[int] = UNSET
     approximate_member_count: Missing[int] = UNSET
     approximate_presence_count: Missing[int] = UNSET
-    welcome_screen: Missing[WelcomeScreen] = UNSET
+    welcome_screen: Missing["WelcomeScreen"] = UNSET
     nsfw_level: GuildNSFWLevel
-    stickers: Missing[list[Sticker]] = UNSET
+    stickers: Missing[list["Sticker"]] = UNSET
     premium_progress_bar_enabled: bool
     safety_alerts_channel_id: MissingOrNullable[Snowflake] = UNSET
-    incidents_data: MissingOrNullable[GuildIncidentsData] = UNSET
+    incidents_data: MissingOrNullable["GuildIncidentsData"] = UNSET
 
 
 class GuildIncidentsData(BaseModel):
@@ -148,12 +146,12 @@ class GuildPreview(BaseModel):
     icon: str | None = None
     splash: str | None = None
     discovery_splash: str | None = None
-    emojis: list[Emoji]
+    emojis: list["Emoji"]
     features: list[GuildFeature]
     approximate_member_count: int
     approximate_presence_count: int
     description: str | None = None
-    stickers: list[Sticker]
+    stickers: list["Sticker"]
 
 
 class GuildWidgetSettings(BaseModel):
@@ -174,8 +172,8 @@ class GuildWidget(BaseModel):
     id: Snowflake
     name: str
     instant_invite: str | None = None
-    channels: list[GuildWidgetChannel]
-    members: list[GuildWidgetUser]
+    channels: list["GuildWidgetChannel"]
+    members: list["GuildWidgetUser"]
     presence_count: int
 
 
@@ -221,7 +219,7 @@ class GuildMember(BaseModel):
 
     see https://discord.com/developers/docs/resources/guild#guild-member-object"""
 
-    user: Missing[User] = UNSET
+    user: Missing["User"] = UNSET
     nick: MissingOrNullable[str] = UNSET
     avatar: MissingOrNullable[str] = UNSET
     roles: list[Snowflake]
@@ -233,7 +231,7 @@ class GuildMember(BaseModel):
     pending: Missing[bool] = UNSET
     permissions: Missing[str] = UNSET
     communication_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
-    avatar_decoration_data: MissingOrNullable[AvatarDecorationData] = UNSET
+    avatar_decoration_data: MissingOrNullable["AvatarDecorationData"] = UNSET
 
 
 class Integration(BaseModel):
@@ -250,12 +248,12 @@ class Integration(BaseModel):
     enable_emoticons: Missing[bool] = UNSET
     expire_behavior: Missing[IntegrationExpireBehaviors] = UNSET
     expire_grace_period: Missing[int] = UNSET
-    user: Missing[User] = UNSET
-    account: IntegrationAccount
+    user: Missing["User"] = UNSET
+    account: "IntegrationAccount"
     synced_at: Missing[datetime.datetime] = UNSET
     subscriber_count: Missing[int] = UNSET
     revoked: Missing[bool] = UNSET
-    application: Missing[IntegrationApplication] = UNSET
+    application: Missing["IntegrationApplication"] = UNSET
     scopes: Missing[list[str]] = UNSET  # TODO: OAuth2 scopes
 
 
@@ -279,7 +277,7 @@ class IntegrationApplication(BaseModel):
     name: str
     icon: str | None = None
     description: str
-    bot: Missing[User] = UNSET
+    bot: Missing["User"] = UNSET
 
 
 class Ban(BaseModel):
@@ -288,7 +286,7 @@ class Ban(BaseModel):
     see https://discord.com/developers/docs/resources/guild#ban-object"""
 
     reason: str | None = None
-    user: User
+    user: "User"
 
 
 class WelcomeScreen(BaseModel):
@@ -297,7 +295,7 @@ class WelcomeScreen(BaseModel):
     see https://discord.com/developers/docs/resources/guild#welcome-screen-object"""
 
     description: str | None = None
-    welcome_channels: list[WelcomeScreenChannel]
+    welcome_channels: list["WelcomeScreenChannel"]
 
 
 class WelcomeScreenChannel(BaseModel):
@@ -318,7 +316,7 @@ class GuildOnboarding(BaseModel):
     see https://discord.com/developers/docs/resources/guild#guild-onboarding-object"""
 
     guild_id: Snowflake
-    prompts: list[OnboardingPrompt]
+    prompts: list["OnboardingPrompt"]
     default_channel_ids: list[Snowflake]
     enabled: bool
     mode: OnboardingMode
@@ -332,7 +330,7 @@ class OnboardingPrompt(BaseModel):
 
     id: Snowflake
     type: OnboardingPromptType
-    options: list[OnboardingPromptOption]
+    options: list["OnboardingPromptOption"]
     title: str
     single_select: bool
     required: bool
@@ -351,7 +349,7 @@ class OnboardingPromptOption(BaseModel):
     id: Snowflake
     channel_ids: list[Snowflake]
     role_ids: list[Snowflake]
-    emoji: Missing[Emoji] = UNSET
+    emoji: Missing["Emoji"] = UNSET
     emoji_id: Missing[Snowflake] = UNSET
     emoji_name: Missing[str] = UNSET
     emoji_animated: Missing[bool] = UNSET
@@ -371,8 +369,8 @@ class ListActiveGuildThreadsResponse(BaseModel):
 
     see https://discord.com/developers/docs/resources/guild#list-active-guild-threads"""
 
-    threads: list[Channel]
-    members: list[ThreadMember]
+    threads: list["Channel"]
+    members: list["ThreadMember"]
 
 
 class GuildScheduledEvent(BaseModel):
@@ -393,11 +391,11 @@ class GuildScheduledEvent(BaseModel):
     status: GuildScheduledEventStatus
     entity_type: GuildScheduledEventEntityType
     entity_id: Snowflake | None = None
-    entity_metadata: GuildScheduledEventEntityMetadata | None = None
-    creator: Missing[User] = UNSET
+    entity_metadata: "GuildScheduledEventEntityMetadata | None" = None
+    creator: Missing["User"] = UNSET
     user_count: Missing[int] = UNSET
     image: MissingOrNullable[str] = UNSET
-    recurrence_rule: RecurrenceRule | None = None
+    recurrence_rule: "RecurrenceRule | None" = None
 
 
 class GuildScheduledEventEntityMetadata(BaseModel):
@@ -416,7 +414,7 @@ class GuildScheduledEventUser(BaseModel):
     """
 
     guild_scheduled_event_id: Snowflake
-    user: User
+    user: "User"
     member: Missing[GuildMember] = UNSET
 
 
@@ -431,11 +429,11 @@ class GuildTemplate(BaseModel):
     description: str | None = None
     usage_count: int
     creator_id: Snowflake
-    creator: User
+    creator: "User"
     created_at: datetime.datetime
     updated_at: datetime.datetime
     source_guild_id: Snowflake
-    serialized_source_guild: GuildTemplateGuild
+    serialized_source_guild: "GuildTemplateGuild"
     is_dirty: bool | None = None
 
 
@@ -457,8 +455,8 @@ class GuildTemplateGuild(BaseModel):
     system_channel_id: Snowflake | None = None
     system_channel_flags: SystemChannelFlags
     icon_hash: MissingOrNullable[str] = UNSET
-    roles: list[GuildTemplateGuildRole]
-    channels: list[GuildTemplateGuildChannel]
+    roles: list["GuildTemplateGuildRole"]
+    channels: list["GuildTemplateGuildChannel"]
 
 
 class GuildTemplateGuildRole(BaseModel):
@@ -494,14 +492,14 @@ class GuildTemplateGuildChannel(BaseModel):
     rate_limit_per_user: Missing[int] = UNSET
     parent_id: MissingOrNullable[Snowflake] = UNSET
     default_auto_archive_duration: MissingOrNullable[int] = UNSET
-    permission_overwrites: Missing[list[Overwrite]] = UNSET
-    available_tags: MissingOrNullable[list[ForumTag]] = UNSET
+    permission_overwrites: Missing[list["Overwrite"]] = UNSET
+    available_tags: MissingOrNullable[list["ForumTag"]] = UNSET
     template: Missing[str] = UNSET
-    default_reaction_emoji: MissingOrNullable[DefaultReaction] = UNSET
+    default_reaction_emoji: MissingOrNullable["DefaultReaction"] = UNSET
     default_thread_rate_limit_per_user: MissingOrNullable[int] = UNSET
     default_sort_order: MissingOrNullable[SortOrderTypes] = UNSET
     default_forum_layout: MissingOrNullable[ForumLayoutTypes] = UNSET
-    icon_emoji: MissingOrNullable[Emoji] = UNSET
+    icon_emoji: MissingOrNullable["Emoji"] = UNSET
     theme_color: MissingOrNullable[int] = UNSET
 
 
@@ -532,7 +530,7 @@ class Role(BaseModel):
     permissions: str
     managed: bool
     mentionable: bool
-    tags: Missing[RoleTags] = UNSET
+    tags: Missing["RoleTags"] = UNSET
     flags: Missing[RoleFlag] = UNSET
 
 
@@ -568,7 +566,7 @@ class RecurrenceRule(BaseModel):
     frecency of WEEKLY and an interval of 2 would be "every-other week"""
     by_weekday: list[GuildScheduledEventRecurrenceRuleWeekday] | None = None
     """Set of specific days within a week for the event to recur on"""
-    by_n_weekday: list[GuildScheduledEventRecurrenceRuleN_WeekdayStructure] | None = (
+    by_n_weekday: list["GuildScheduledEventRecurrenceRuleN_WeekdayStructure"] | None = (
         None
     )
     """List of specific days within a specific week (1-5) to recur on"""

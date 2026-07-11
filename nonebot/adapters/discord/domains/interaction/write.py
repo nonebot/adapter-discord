@@ -1,7 +1,5 @@
 """Canonical interaction.write models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -30,22 +28,22 @@ class InteractionCallbackMessage(BaseModel):
     """is the response TTS"""
     content: str | None = None
     """message content"""
-    embeds: list[Embed] | None = None
+    embeds: list["Embed"] | None = None
     """supports up to 10 embeds"""
-    allowed_mentions: AllowedMention | None = None
+    allowed_mentions: "AllowedMention | None" = None
     """allowed mentions object"""
     flags: MessageFlag | None = None
     """message flags combined as a bitfield
     (only SUPPRESS_EMBEDS and EPHEMERAL can be set)"""
-    components: list[Component] | None = None
+    components: list["Component"] | None = None
     """message components"""
-    attachments: list[AttachmentSend] | None = None
+    attachments: list["AttachmentSend"] | None = None
     """attachment objects with filename and description.
     See Uploading Files for details."""
-    poll: PollRequest | None = None
+    poll: "PollRequest | None" = None
     """Details about the poll"""
 
-    files: list[File] | None = None
+    files: list["File"] | None = None
 
 
 class InteractionCallbackAutocomplete(BaseModel):
@@ -54,7 +52,7 @@ class InteractionCallbackAutocomplete(BaseModel):
     see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete
     """
 
-    choices: list[ApplicationCommandOptionChoice]
+    choices: list["ApplicationCommandOptionChoice"]
     """autocomplete choices (max of 25 choices)"""
 
 
@@ -70,7 +68,7 @@ class InteractionCallbackModal(BaseModel):
     """a developer-defined identifier for the modal, max 100 characters"""
     title: str
     """the title of the popup modal, max 45 characters"""
-    components: list[Component]
+    components: list["Component"]
     """between 1 and 5 (inclusive) components that make up the modal"""
 
 

@@ -1,7 +1,5 @@
 """Stable public facade for Discord enum and sentinel types."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 from ._public_module import bind_public_module

@@ -1,7 +1,5 @@
 """Stable public facade for canonical Discord Pydantic models."""
 
-from __future__ import annotations
-
 from importlib import import_module
 from types import ModuleType
 from typing import TYPE_CHECKING

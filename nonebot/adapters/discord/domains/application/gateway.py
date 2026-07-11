@@ -1,7 +1,5 @@
 """Canonical application.gateway models."""
 
-from __future__ import annotations
-
 from ..application.read import Entitlement, Subscription
 
 

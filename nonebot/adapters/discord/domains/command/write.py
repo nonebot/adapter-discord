@@ -1,7 +1,5 @@
 """Canonical command.write models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -29,7 +27,7 @@ class ApplicationCommandCreate(BaseModel):
     name_localizations: MissingOrNullable[dict[str, str]] = UNSET
     description: Missing[str] = UNSET
     description_localizations: MissingOrNullable[dict[str, str]] = UNSET
-    options: Missing[list[AnyCommandOption]] = UNSET
+    options: Missing[list["AnyCommandOption"]] = UNSET
     default_member_permissions: MissingOrNullable[str] = UNSET
     dm_permission: MissingOrNullable[bool] = UNSET
     default_permission: Missing[bool] = UNSET
@@ -51,7 +49,7 @@ class ApplicationCommandBulkOverwriteParams(BaseModel):
     name_localizations: dict[str, str] | None = None
     description: str | None = None
     description_localizations: dict[str, str] | None = None
-    options: list[AnyCommandOption] | None = None
+    options: list["AnyCommandOption"] | None = None
     default_member_permissions: str | None = None
     dm_permission: bool | None = None
     default_permission: bool | None = None
@@ -70,7 +68,7 @@ class ApplicationCommandEditParams(BaseModel):
     name_localizations: MissingOrNullable[dict[str, str]] = UNSET
     description: Missing[str] = UNSET
     description_localizations: MissingOrNullable[dict[str, str]] = UNSET
-    options: Missing[list[AnyCommandOption]] = UNSET
+    options: Missing[list["AnyCommandOption"]] = UNSET
     default_member_permissions: MissingOrNullable[str] = UNSET
     dm_permission: MissingOrNullable[bool] = UNSET
     default_permission: Missing[bool] = UNSET

@@ -1,7 +1,5 @@
 """Canonical moderation.gateway models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -39,7 +37,7 @@ class AutoModerationActionExecution(BaseModel):
     """
 
     guild_id: Snowflake
-    action: AutoModerationAction
+    action: "AutoModerationAction"
     rule_id: Snowflake
     rule_trigger_type: TriggerType
     user_id: Snowflake

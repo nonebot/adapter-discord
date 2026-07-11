@@ -1,7 +1,5 @@
 """Canonical application.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -47,24 +45,24 @@ class Application(BaseModel):
     bot_require_code_grant: bool
     """when true the app's bot will only join upon completion
     of the full oauth2 code grant flow"""
-    bot: Missing[User] = UNSET  # partial user object
+    bot: Missing["User"] = UNSET  # partial user object
     """Partial user object for the bot user associated with the app"""
     terms_of_service_url: Missing[str] = UNSET
     """the url of the app's terms of service"""
     privacy_policy_url: Missing[str] = UNSET
     """the url of the app's privacy policy"""
-    owner: Missing[User] = UNSET  # partial user object
+    owner: Missing["User"] = UNSET  # partial user object
     """partial user object containing info on the owner of the application"""
     verify_key: str
     """the hex encoded key for verification in
     interactions and the GameSDK's GetTicket"""
-    team: Team | None = None
+    team: "Team | None" = None
     """if the application belongs to a team, this will
     be a list of the members of that team"""
     guild_id: Missing[Snowflake] = UNSET
     """if this application is a game sold on Discord,
     this field will be the guild to which it has been linked"""
-    guild: Missing[Guild] = UNSET  # partial guild object
+    guild: Missing["Guild"] = UNSET  # partial guild object
     """Partial object of the associated guild"""
     primary_sku_id: Missing[Snowflake] = UNSET
     """if this application is a game sold on Discord,
@@ -98,12 +96,12 @@ class Application(BaseModel):
     """List of webhook event types the app subscribes to"""
     tags: Missing[list[str]] = UNSET
     """up to 5 tags describing the content and functionality of the application"""
-    install_params: Missing[InstallParams] = UNSET
+    install_params: Missing["InstallParams"] = UNSET
     """settings for the application's default in-app authorization link, if enabled"""
     integration_types_config: Missing[
         dict[
             ApplicationIntegrationType,
-            ApplicationIntegrationTypeConfiguration,
+            "ApplicationIntegrationTypeConfiguration",
         ]
     ] = UNSET
     """Default scopes and permissions for each supported
@@ -183,7 +181,7 @@ class Team(BaseModel):
 
     icon: str | None = Field(...)
     id: str
-    members: list[TeamMember]
+    members: list["TeamMember"]
     name: str
     owner_user_id: Snowflake
 
@@ -196,7 +194,7 @@ class TeamMember(BaseModel):
 
     membership_state: MembershipState
     team_id: Snowflake
-    user: TeamMemberUser
+    user: "TeamMemberUser"
     role: TeamMemberRoleType
 
 
@@ -221,7 +219,7 @@ class AuthorizationResponse(BaseModel):
     application: Application  # partial application object
     scopes: list[str]
     expires: datetime.datetime
-    user: Missing[User] = UNSET
+    user: Missing["User"] = UNSET
 
 
 class Entitlement(BaseModel):

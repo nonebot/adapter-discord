@@ -1,7 +1,5 @@
 """Canonical Discord domain ownership manifests."""
 
-from __future__ import annotations
-
 DOMAIN_TYPE_MODULES: tuple[str, ...] = (
     "nonebot.adapters.discord.domains.command.types",
     "nonebot.adapters.discord.domains.component.types",

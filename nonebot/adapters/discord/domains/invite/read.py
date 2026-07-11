@@ -1,7 +1,5 @@
 """Canonical invite.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -35,17 +33,17 @@ class Invite(BaseModel):
 
     type: InviteType
     code: str
-    guild: Missing[InviteGuild] = UNSET
-    channel: Channel | None = Field(...)  # partial channel object
-    inviter: Missing[User] = UNSET
+    guild: Missing["InviteGuild"] = UNSET
+    channel: "Channel | None" = Field(...)  # partial channel object
+    inviter: Missing["User"] = UNSET
     target_type: Missing[InviteTargetType] = UNSET
-    target_user: Missing[User] = UNSET
-    target_application: Missing[Application] = UNSET  # partial application object
+    target_user: Missing["User"] = UNSET
+    target_application: Missing["Application"] = UNSET  # partial application object
     approximate_presence_count: Missing[int] = UNSET
     approximate_member_count: Missing[int] = UNSET
     expires_at: MissingOrNullable[datetime.datetime] = UNSET
-    stage_instance: Missing[InviteStageInstance] = UNSET
-    guild_scheduled_event: Missing[GuildScheduledEvent] = UNSET
+    stage_instance: Missing["InviteStageInstance"] = UNSET
+    guild_scheduled_event: Missing["GuildScheduledEvent"] = UNSET
     uses: Missing[int] = UNSET
     max_uses: Missing[int] = UNSET
     max_age: Missing[int] = UNSET
@@ -115,7 +113,7 @@ class InviteStageInstance(BaseModel):
     see https://discord.com/developers/docs/resources/invite#invite-stage-instance-object
     """
 
-    members: list[GuildMember]  # partial guild member objects
+    members: list["GuildMember"]  # partial guild member objects
     participant_count: int
     speaker_count: int
     topic: str

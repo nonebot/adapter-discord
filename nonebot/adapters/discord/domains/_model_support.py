@@ -1,7 +1,5 @@
 """Private common imports for canonical Discord domain models."""
 
-from __future__ import annotations
-
 import datetime
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 import warnings

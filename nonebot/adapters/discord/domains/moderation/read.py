@@ -1,7 +1,5 @@
 """Canonical moderation.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -33,21 +31,21 @@ class AuditLog(BaseModel):
 
     see https://discord.com/developers/docs/resources/audit-log#audit-log-object"""
 
-    application_commands: list[ApplicationCommand]
+    application_commands: list["ApplicationCommand"]
     """List of application commands referenced in the audit log"""
-    audit_log_entries: list[AuditLogEntry]
+    audit_log_entries: list["AuditLogEntry"]
     """List of audit log entries, sorted from most to least recent"""
-    auto_moderation_rules: list[AutoModerationRule]
+    auto_moderation_rules: list["AutoModerationRule"]
     """List of auto moderation rules referenced in the audit log"""
-    guild_scheduled_events: list[GuildScheduledEvent]
+    guild_scheduled_events: list["GuildScheduledEvent"]
     """List of guild scheduled events referenced in the audit log"""
-    integrations: list[Integration]  # partial integration object
+    integrations: list["Integration"]  # partial integration object
     """List of partial integration objects"""
-    threads: list[Channel]  # thread-specific channel objects
+    threads: list["Channel"]  # thread-specific channel objects
     """List of threads referenced in the audit log"""
-    users: list[User]
+    users: list["User"]
     """List of users referenced in the audit log"""
-    webhooks: list[Webhook]
+    webhooks: list["Webhook"]
     """List of webhooks referenced in the audit log"""
 
 
@@ -59,7 +57,7 @@ class AuditLogEntry(BaseModel):
 
     target_id: str | None = None
     """ID of the affected entity (webhook, user, role, etc.)"""
-    changes: Missing[list[AuditLogChange]] = UNSET
+    changes: Missing[list["AuditLogChange"]] = UNSET
     """Changes made to the target_id"""
     user_id: Snowflake | None = None
     """User or app that made the changes"""
@@ -67,7 +65,7 @@ class AuditLogEntry(BaseModel):
     """ID of the entry"""
     action_type: AuditLogEventType
     """Type of action that occurred"""
-    options: Missing[OptionalAuditEntryInfo] = UNSET
+    options: Missing["OptionalAuditEntryInfo"] = UNSET
     """Additional info for certain event types"""
     reason: Missing[str] = UNSET
     """Reason for the change (1-512 characters)"""
@@ -147,9 +145,9 @@ class AutoModerationRule(BaseModel):
     """the rule event type"""
     trigger_type: TriggerType
     """the rule trigger type"""
-    trigger_metadata: TriggerMetadata
+    trigger_metadata: "TriggerMetadata"
     """the rule trigger metadata"""
-    actions: list[AutoModerationAction]
+    actions: list["AutoModerationAction"]
     """the actions which will execute when the rule is triggered"""
     enabled: bool
     """whether the rule is enabled"""
@@ -190,7 +188,7 @@ class AutoModerationAction(BaseModel):
 
     type: AutoModerationActionType
     """the type of action"""
-    metadata: Missing[AutoModerationActionMetadata] = UNSET
+    metadata: Missing["AutoModerationActionMetadata"] = UNSET
     """additional metadata needed during execution for this specific action type"""
 
 

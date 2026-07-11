@@ -1,7 +1,5 @@
 """Canonical webhook.write models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -34,13 +32,13 @@ class WebhookMessageEditParams(BaseModel):
     """
 
     content: MissingOrNullable[str] = UNSET
-    embeds: MissingOrNullable[list[Embed]] = UNSET
+    embeds: MissingOrNullable[list["Embed"]] = UNSET
     flags: MissingOrNullable[MessageFlag] = UNSET
-    allowed_mentions: MissingOrNullable[AllowedMention] = UNSET
-    components: MissingOrNullable[list[Component]] = UNSET
-    files: Missing[list[File]] = UNSET
-    attachments: MissingOrNullable[list[AttachmentSend]] = UNSET
-    poll: MissingOrNullable[PollRequest] = UNSET
+    allowed_mentions: MissingOrNullable["AllowedMention"] = UNSET
+    components: MissingOrNullable[list["Component"]] = UNSET
+    files: Missing[list["File"]] = UNSET
+    attachments: MissingOrNullable[list["AttachmentSend"]] = UNSET
+    poll: MissingOrNullable["PollRequest"] = UNSET
 
 
 class CreateWebhookParams(BaseModel):
@@ -62,15 +60,15 @@ class ExecuteWebhookParams(BaseModel):
     username: Missing[str] = UNSET
     avatar_url: Missing[str] = UNSET
     tts: Missing[bool] = UNSET
-    embeds: Missing[list[Embed]] = UNSET
-    allowed_mentions: Missing[AllowedMention] = UNSET
-    components: Missing[list[DirectComponent]] = UNSET
-    files: Missing[list[File]] = UNSET
-    attachments: Missing[list[AttachmentSend]] = UNSET
+    embeds: Missing[list["Embed"]] = UNSET
+    allowed_mentions: Missing["AllowedMention"] = UNSET
+    components: Missing[list["DirectComponent"]] = UNSET
+    files: Missing[list["File"]] = UNSET
+    attachments: Missing[list["AttachmentSend"]] = UNSET
     flags: Missing[MessageFlag] = UNSET
     thread_name: Missing[str] = UNSET
     applied_tags: Missing[list[Snowflake]] = UNSET
-    poll: Missing[PollRequest] = UNSET
+    poll: Missing["PollRequest"] = UNSET
 
 
 __all__ = ["CreateWebhookParams", "ExecuteWebhookParams", "WebhookMessageEditParams"]

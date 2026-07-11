@@ -1,7 +1,5 @@
 """Canonical lobby.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -38,7 +36,7 @@ class Lobby(BaseModel):
     application_id: Snowflake
     metadata: dict[str, str] | None = Field(...)
     members: list[LobbyMember]
-    linked_channel: Missing[Channel] = UNSET
+    linked_channel: Missing["Channel"] = UNSET
 
 
 __all__ = ["Lobby", "LobbyMember"]

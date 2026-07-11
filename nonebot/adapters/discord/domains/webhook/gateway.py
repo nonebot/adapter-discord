@@ -1,7 +1,5 @@
 """Canonical webhook.gateway models."""
 
-from __future__ import annotations
-
 from .._model_support import BaseModel, Snowflake
 
 

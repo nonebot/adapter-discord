@@ -1,7 +1,5 @@
 """Canonical guild.gateway models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
@@ -69,8 +67,8 @@ class GuildCreate(BaseModel):
     verification_level: Missing[VerificationLevel] = UNSET
     default_message_notifications: Missing[DefaultMessageNotificationLevel] = UNSET
     explicit_content_filter: Missing[ExplicitContentFilterLevel] = UNSET
-    roles: Missing[list[Role]] = UNSET
-    emojis: Missing[list[Emoji]] = UNSET
+    roles: Missing[list["Role"]] = UNSET
+    emojis: Missing[list["Emoji"]] = UNSET
     features: Missing[list[GuildFeature]] = UNSET
     mfa_level: Missing[MFALevel] = UNSET
     application_id: MissingOrNullable[Snowflake] = UNSET
@@ -90,19 +88,21 @@ class GuildCreate(BaseModel):
     max_stage_video_channel_users: Missing[int] = UNSET
     approximate_member_count: Missing[int] = UNSET
     approximate_presence_count: Missing[int] = UNSET
-    welcome_screen: Missing[WelcomeScreen] = UNSET
+    welcome_screen: Missing["WelcomeScreen"] = UNSET
     nsfw_level: Missing[GuildNSFWLevel] = UNSET
-    stickers: Missing[list[Sticker]] = UNSET
+    stickers: Missing[list["Sticker"]] = UNSET
     premium_progress_bar_enabled: Missing[bool] = UNSET
     joined_at: Missing[str] = UNSET
     large: Missing[bool] = UNSET
     member_count: Missing[int] = UNSET
-    voice_states: Missing[list[VoiceState]] = UNSET
+    voice_states: Missing[list["VoiceState"]] = UNSET
     members: Missing[list[GuildMember]] = UNSET
-    channels: Missing[list[Channel]] = UNSET
-    threads: Missing[list[Channel]] = UNSET
-    presences: Missing[list[PresenceUpdate]] = UNSET  # partial presence update objects
-    stage_instances: Missing[list[StageInstance]] = UNSET
+    channels: Missing[list["Channel"]] = UNSET
+    threads: Missing[list["Channel"]] = UNSET
+    presences: Missing[list["PresenceUpdate"]] = (
+        UNSET  # partial presence update objects
+    )
+    stage_instances: Missing[list["StageInstance"]] = UNSET
     guild_scheduled_events: Missing[list[GuildScheduledEvent]] = UNSET
 
 
@@ -161,7 +161,7 @@ class GuildBanAdd(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#guild-ban-add"""
 
     guild_id: Snowflake
-    user: User
+    user: "User"
 
 
 class GuildBanRemove(BaseModel):
@@ -170,7 +170,7 @@ class GuildBanRemove(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#guild-ban-remove"""
 
     guild_id: Snowflake
-    user: User
+    user: "User"
 
 
 class GuildEmojisUpdate(BaseModel):
@@ -179,7 +179,7 @@ class GuildEmojisUpdate(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#guild-emojis-update"""
 
     guild_id: Snowflake
-    emojis: list[Emoji]
+    emojis: list["Emoji"]
 
 
 class GuildStickersUpdate(BaseModel):
@@ -189,7 +189,7 @@ class GuildStickersUpdate(BaseModel):
     """
 
     guild_id: Snowflake
-    stickers: list[Sticker]
+    stickers: list["Sticker"]
 
 
 class GuildIntegrationsUpdate(BaseModel):
@@ -215,7 +215,7 @@ class GuildMemberRemove(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#guild-member-remove"""
 
     guild_id: Snowflake
-    user: User
+    user: "User"
 
 
 class GuildMemberUpdate(BaseModel):
@@ -225,7 +225,7 @@ class GuildMemberUpdate(BaseModel):
 
     guild_id: Snowflake
     roles: list[Snowflake]
-    user: User
+    user: "User"
     nick: MissingOrNullable[str] = UNSET
     avatar: str | None = Field(...)
     joined_at: datetime.datetime | None = Field(...)
@@ -235,7 +235,7 @@ class GuildMemberUpdate(BaseModel):
     pending: Missing[bool] = UNSET
     communication_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
     flags: Missing[GuildMemberFlags] = UNSET
-    avatar_decoration_data: MissingOrNullable[AvatarDecorationData] = UNSET
+    avatar_decoration_data: MissingOrNullable["AvatarDecorationData"] = UNSET
 
 
 class GuildMembersChunk(BaseModel):
@@ -248,7 +248,7 @@ class GuildMembersChunk(BaseModel):
     chunk_index: int
     chunk_count: int
     not_found: Missing[list[Snowflake]] = UNSET
-    presences: Missing[list[PresenceUpdate]] = UNSET
+    presences: Missing[list["PresenceUpdate"]] = UNSET
     nonce: Missing[str] = UNSET
 
 
@@ -258,7 +258,7 @@ class GuildRoleCreate(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#guild-role-create"""
 
     guild_id: Snowflake
-    role: Role
+    role: "Role"
 
 
 class GuildRoleUpdate(BaseModel):
@@ -267,7 +267,7 @@ class GuildRoleUpdate(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#guild-role-update"""
 
     guild_id: Snowflake
-    role: Role
+    role: "Role"
 
 
 class GuildRoleDelete(BaseModel):

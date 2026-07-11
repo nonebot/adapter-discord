@@ -1,7 +1,5 @@
 """Canonical command.read models."""
 
-from __future__ import annotations
-
 from .._model_support import (
     UNSET,
     ApplicationCommandOptionType,
@@ -52,7 +50,7 @@ class ApplicationCommand(BaseModel):
     description_localizations: MissingOrNullable[dict[str, str]] = UNSET
     """Localization dictionary for description field.
     Values follow the same restrictions as description"""
-    options: MissingOrNullable[list[ApplicationCommandOption]] = UNSET
+    options: MissingOrNullable[list["ApplicationCommandOption"]] = UNSET
     """Parameters for the command, max of 25"""
     default_member_permissions: str | None = Field(...)
     """Set of permissions represented as a bit set"""
@@ -112,10 +110,10 @@ class ApplicationCommandOption(BaseModel):
     Values follow the same restrictions as description"""
     required: Missing[bool] = UNSET
     """If the parameter is required or optional--default false"""
-    choices: Missing[list[ApplicationCommandOptionChoice]] = UNSET
+    choices: Missing[list["ApplicationCommandOptionChoice"]] = UNSET
     """Choices for STRING, INTEGER,
     and NUMBER types for the user to pick from, max 25"""
-    options: MissingOrNullable[list[ApplicationCommandOption]] = UNSET
+    options: MissingOrNullable[list["ApplicationCommandOption"]] = UNSET
     """If the option is a subcommand or subcommand group type,
     these nested options will be the parameters"""
     channel_types: Missing[list[ChannelType]] = UNSET
@@ -158,15 +156,7 @@ class SubCommandOption(CommandOptionBase):
     )
     options: (
         list[
-            IntegerOption
-            | StringOption
-            | BooleanOption
-            | UserOption
-            | ChannelOption
-            | RoleOption
-            | MentionableOption
-            | NumberOption
-            | AttachmentOption
+            "IntegerOption | StringOption | BooleanOption | UserOption | ChannelOption | RoleOption | MentionableOption | NumberOption | AttachmentOption"
         ]
         | None
     ) = None
@@ -352,7 +342,7 @@ class GuildApplicationCommandPermissions(BaseModel):
     """ID of the application the command belongs to"""
     guild_id: Snowflake
     """ID of the guild"""
-    permissions: list[ApplicationCommandPermissions]
+    permissions: list["ApplicationCommandPermissions"]
     """Permissions for the command in the guild, max of 100"""
 
 

@@ -1,7 +1,5 @@
 """Canonical gateway.write models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -23,11 +21,11 @@ class Identify(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#identify"""
 
     token: str
-    properties: IdentifyConnectionProperties
+    properties: "IdentifyConnectionProperties"
     compress: Missing[bool] = UNSET
     large_threshold: Missing[int] = UNSET
     shard: Missing[list[int]] = UNSET
-    presence: Missing[PresenceUpdate] = UNSET
+    presence: Missing["PresenceUpdate"] = UNSET
     intents: int
 
 
@@ -83,7 +81,7 @@ class UpdatePresence(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#update-presence"""
 
     since: int | None = Field(...)
-    activities: list[Activity]
+    activities: list["Activity"]
     status: UpdatePresenceStatusType
     afk: bool
 

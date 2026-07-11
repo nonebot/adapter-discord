@@ -1,7 +1,5 @@
 """Canonical voice.gateway models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -106,7 +104,7 @@ class VoiceChannelEffectSend(BaseModel):
     channel_id: Snowflake
     guild_id: Snowflake
     user_id: Snowflake
-    emoji: MissingOrNullable[Emoji] = UNSET
+    emoji: MissingOrNullable["Emoji"] = UNSET
     animation_type: MissingOrNullable[AnimationType] = UNSET
     animation_id: Missing[int] = UNSET
     sound_id: Missing[Snowflake | int] = UNSET

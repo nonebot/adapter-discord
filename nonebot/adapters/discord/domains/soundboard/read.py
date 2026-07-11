@@ -1,7 +1,5 @@
 """Canonical soundboard.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -23,7 +21,7 @@ class SoundboardSound(BaseModel):
     emoji_name: str | None = Field(...)
     guild_id: Missing[Snowflake] = UNSET
     available: bool
-    user: Missing[User] = UNSET
+    user: Missing["User"] = UNSET
 
 
 class _SoundboardSoundsListResponse(BaseModel):

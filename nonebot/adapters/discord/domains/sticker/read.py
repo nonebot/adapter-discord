@@ -1,7 +1,5 @@
 """Canonical sticker.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -34,7 +32,7 @@ class Sticker(BaseModel):
     format_type: StickerFormatType
     available: Missing[bool] = UNSET
     guild_id: Missing[Snowflake] = UNSET
-    user: Missing[User] = UNSET
+    user: Missing["User"] = UNSET
     sort_value: Missing[int] = UNSET
 
 

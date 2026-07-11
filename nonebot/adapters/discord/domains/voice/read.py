@@ -1,7 +1,5 @@
 """Canonical voice.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -41,7 +39,7 @@ class VoiceState(BaseModel):
     guild_id: Missing[Snowflake] = UNSET
     channel_id: Snowflake | None = Field(...)
     user_id: Snowflake
-    member: Missing[GuildMember] = UNSET
+    member: Missing["GuildMember"] = UNSET
     session_id: str
     deaf: bool
     mute: bool

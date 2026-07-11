@@ -1,7 +1,5 @@
 """Canonical channel.write models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -37,14 +35,14 @@ class ModifyChannelParams(BaseModel):
     rate_limit_per_user: MissingOrNullable[int] = UNSET
     bitrate: MissingOrNullable[int] = UNSET
     user_limit: MissingOrNullable[int] = UNSET
-    permission_overwrites: MissingOrNullable[list[PartialOverwrite]] = UNSET
+    permission_overwrites: MissingOrNullable[list["PartialOverwrite"]] = UNSET
     parent_id: MissingOrNullable[Snowflake] = UNSET
     rtc_region: MissingOrNullable[str] = UNSET
     video_quality_mode: MissingOrNullable[VideoQualityMode] = UNSET
     default_auto_archive_duration: MissingOrNullable[int] = UNSET
     flags: Missing[ChannelFlags] = UNSET
-    available_tags: Missing[list[ForumTagRequest]] = UNSET
-    default_reaction_emoji: MissingOrNullable[DefaultReaction] = UNSET
+    available_tags: Missing[list["ForumTagRequest"]] = UNSET
+    default_reaction_emoji: MissingOrNullable["DefaultReaction"] = UNSET
     default_thread_rate_limit_per_user: Missing[int] = UNSET
     default_sort_order: MissingOrNullable[SortOrderTypes] = UNSET
     default_forum_layout: Missing[ForumLayoutTypes] = UNSET

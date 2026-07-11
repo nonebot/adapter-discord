@@ -1,7 +1,5 @@
 """Canonical invite.gateway models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -26,12 +24,12 @@ class InviteCreate(BaseModel):
     code: str
     created_at: datetime.datetime
     guild_id: Missing[Snowflake] = UNSET
-    inviter: Missing[User] = UNSET
+    inviter: Missing["User"] = UNSET
     max_age: int
     max_uses: int
     target_type: Missing[InviteTargetType] = UNSET
-    target_user: Missing[User] = UNSET
-    target_application: Missing[Application] = UNSET  # partial application object
+    target_user: Missing["User"] = UNSET
+    target_application: Missing["Application"] = UNSET  # partial application object
     temporary: bool
     uses: int
 

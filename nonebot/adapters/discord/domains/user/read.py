@@ -1,7 +1,5 @@
 """Canonical user.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -42,7 +40,7 @@ class User(BaseModel):
     flags: Missing[int] = UNSET
     premium_type: Missing[PremiumType] = UNSET
     public_flags: Missing[UserFlags] = UNSET
-    avatar_decoration_data: MissingOrNullable[AvatarDecorationData] = UNSET
+    avatar_decoration_data: MissingOrNullable["AvatarDecorationData"] = UNSET
 
 
 class AvatarDecorationData(BaseModel):
@@ -64,7 +62,7 @@ class Connection(BaseModel):
     name: str
     type: ConnectionServiceType
     revoked: Missing[bool] = UNSET
-    integrations: Missing[list[Integration]] = UNSET  # partial server integrations
+    integrations: Missing[list["Integration"]] = UNSET  # partial server integrations
     verified: bool
     friend_sync: bool
     show_activity: bool

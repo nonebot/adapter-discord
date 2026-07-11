@@ -1,7 +1,5 @@
 """Canonical user.gateway models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -41,7 +39,7 @@ class PresenceUpdateUser(BaseModel):
     flags: Missing[int] = UNSET
     premium_type: Missing[PremiumType] = UNSET
     public_flags: Missing[UserFlags] = UNSET
-    avatar_decoration_data: MissingOrNullable[AvatarDecorationData] = UNSET
+    avatar_decoration_data: MissingOrNullable["AvatarDecorationData"] = UNSET
 
 
 class PresenceUpdate(BaseModel):
@@ -53,8 +51,8 @@ class PresenceUpdate(BaseModel):
     user: PresenceUpdateUser
     guild_id: Snowflake
     status: PresenceStatus
-    activities: list[Activity]
-    client_status: ClientStatus
+    activities: list["Activity"]
+    client_status: "ClientStatus"
 
 
 class UserUpdate(User):

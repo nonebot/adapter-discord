@@ -1,7 +1,5 @@
 """Forward-reference rebuild support for canonical domain models."""
 
-from __future__ import annotations
-
 from collections.abc import Mapping, Sequence
 import inspect
 from types import ModuleType

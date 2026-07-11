@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from enum import IntEnum, IntFlag
 
 from .._enum import StrEnum

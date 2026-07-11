@@ -1,7 +1,5 @@
 """Canonical application.write models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -26,9 +24,9 @@ class EditCurrentApplicationParams(BaseModel):
     custom_install_url: Missing[str] = UNSET
     description: Missing[str] = UNSET
     role_connections_verification_url: Missing[str] = UNSET
-    install_params: Missing[InstallParams] = UNSET
+    install_params: Missing["InstallParams"] = UNSET
     integration_types_config: Missing[
-        dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfiguration]
+        dict[ApplicationIntegrationType, "ApplicationIntegrationTypeConfiguration"]
     ] = UNSET
     flags: Missing[ApplicationFlag] = UNSET
     icon: MissingOrNullable[str] = UNSET

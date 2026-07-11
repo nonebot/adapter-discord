@@ -1,7 +1,5 @@
 """Canonical channel.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -37,7 +35,7 @@ class Channel(BaseModel):
     received over gateway guild dispatches)"""
     position: Missing[int] = UNSET
     """sorting position of the channel"""
-    permission_overwrites: Missing[list[Overwrite]] = UNSET
+    permission_overwrites: Missing[list["Overwrite"]] = UNSET
     """explicit permission overwrites for members and roles"""
     name: MissingOrNullable[str] = UNSET
     """the name of the channel (1-100 characters)"""
@@ -58,7 +56,7 @@ class Channel(BaseModel):
     """amount of seconds a user has to wait before sending another message (0-21600);
     bots, as well as users with the permission manage_messages or
     manage_channel, are unaffected"""
-    recipients: Missing[list[User]] = UNSET
+    recipients: Missing[list["User"]] = UNSET
     """the recipients of the DM"""
     icon: MissingOrNullable[str] = UNSET
     """icon hash of the group DM"""
@@ -85,9 +83,9 @@ class Channel(BaseModel):
     or deleted messages) in a thread."""
     member_count: Missing[int] = UNSET
     """an approximate count of users in a thread, stops counting at 50"""
-    thread_metadata: Missing[ThreadMetadata] = UNSET
+    thread_metadata: Missing["ThreadMetadata"] = UNSET
     """thread-specific fields not needed by other channels"""
-    member: Missing[ThreadMember] = UNSET
+    member: Missing["ThreadMember"] = UNSET
     """thread member object for the current user, if they have joined the thread,
     only included on certain API endpoints"""
     default_auto_archive_duration: Missing[int] = UNSET
@@ -103,12 +101,12 @@ class Channel(BaseModel):
     total_message_sent: Missing[int] = UNSET
     """number of messages ever sent in a thread, it's similar to message_count
     on message creation, but will not decrement the number when a message is deleted"""
-    available_tags: Missing[list[ForumTag]] = UNSET
+    available_tags: Missing[list["ForumTag"]] = UNSET
     """the set of tags that can be used in a GUILD_FORUM or a GUILD_MEDIA channel"""
     applied_tags: Missing[list[Snowflake]] = UNSET
     """the IDs of the set of tags that have been applied to a
     thread in a GUILD_FORUM or a GUILD_MEDIA channel"""
-    default_reaction_emoji: MissingOrNullable[DefaultReaction] = UNSET
+    default_reaction_emoji: MissingOrNullable["DefaultReaction"] = UNSET
     """the emoji to show in the add reaction button on a
     thread in a GUILD_FORUM channel"""
     default_thread_rate_limit_per_user: Missing[int] = UNSET
@@ -189,7 +187,7 @@ class ThreadMember(BaseModel):
     user_id: Missing[Snowflake] = UNSET
     join_timestamp: datetime.datetime
     flags: int
-    member: Missing[GuildMember] = UNSET
+    member: Missing["GuildMember"] = UNSET
 
 
 class DefaultReaction(BaseModel):

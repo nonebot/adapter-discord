@@ -1,7 +1,5 @@
 """Canonical gateway.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
@@ -32,7 +30,7 @@ class GatewayBot(BaseModel):
 
     url: str
     shards: int
-    session_start_limit: SessionStartLimit
+    session_start_limit: "SessionStartLimit"
 
 
 class SessionStartLimit(BaseModel):
@@ -60,12 +58,12 @@ class Ready(BaseModel):
     see https://discord.com/developers/docs/topics/gateway-events#ready"""
 
     v: int
-    user: User
-    guilds: list[UnavailableGuild]
+    user: "User"
+    guilds: list["UnavailableGuild"]
     session_id: str
     resume_gateway_url: str
     shard: Missing[list[int]] = UNSET
-    application: ApplicationReady
+    application: "ApplicationReady"
 
 
 class ClientStatus(BaseModel):
@@ -155,7 +153,7 @@ class ActivityInstance(BaseModel):
     """Activity Instance ID"""
     launch_id: Snowflake
     """Unique identifier for the launch"""
-    location: ActivityLocation
+    location: "ActivityLocation"
     """The Location the instance is runnning in"""
     users: list[Snowflake]
     """The IDs of the Users currently connected to the instance"""

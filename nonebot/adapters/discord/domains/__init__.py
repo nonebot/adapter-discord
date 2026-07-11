@@ -1,7 +1,5 @@
 """Bootstrap canonical Discord model modules without aggregating business names."""
 
-from __future__ import annotations
-
 from importlib import import_module
 
 from . import _model_support

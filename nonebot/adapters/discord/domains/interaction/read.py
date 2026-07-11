@@ -1,7 +1,5 @@
 """Canonical interaction.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -45,9 +43,9 @@ class ApplicationCommandData(BaseModel):
     """the name of the invoked command"""
     type: ApplicationCommandType
     """the type of the invoked command"""
-    resolved: Missing[ResolvedData] = UNSET
+    resolved: Missing["ResolvedData"] = UNSET
     """converted users + roles + channels + attachments"""
-    options: Missing[list[ApplicationCommandInteractionDataOption]] = UNSET
+    options: Missing[list["ApplicationCommandInteractionDataOption"]] = UNSET
     """the params + values from the user"""
     guild_id: Missing[Snowflake] = UNSET
     """the id of the guild the command is registered to"""
@@ -69,7 +67,7 @@ class MessageComponentData(BaseModel):
     """the type of the component"""
     values: Missing[list[str]] = UNSET
     """values the user selected in a select menu component"""
-    resolved: Missing[ResolvedData] = UNSET
+    resolved: Missing["ResolvedData"] = UNSET
     """resolved entities from selected options"""
 
 
@@ -81,7 +79,7 @@ class ModalSubmitData(BaseModel):
 
     custom_id: str
     """the custom_id of the modal"""
-    components: list[Component]
+    components: list["Component"]
     """the values submitted by the user"""
 
 
@@ -104,7 +102,7 @@ class ApplicationCommandInteractionDataOption(BaseModel):
     """Value of application command option type"""
     value: Missing[str | int | float | bool] = UNSET
     """Value of the option resulting from user input"""
-    options: Missing[list[ApplicationCommandInteractionDataOption]] = UNSET
+    options: Missing[list["ApplicationCommandInteractionDataOption"]] = UNSET
     """Present if this option is a group or subcommand"""
     focused: Missing[bool] = UNSET
     """true if this option is the currently focused option for autocomplete"""
@@ -118,7 +116,7 @@ class InteractionResponse(BaseModel):
 
     type: InteractionCallbackType
     """the type of response"""
-    data: Missing[InteractionCallbackData] = UNSET
+    data: Missing["InteractionCallbackData"] = UNSET
     """an optional response message"""
 
 

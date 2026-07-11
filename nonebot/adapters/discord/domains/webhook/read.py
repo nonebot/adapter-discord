@@ -1,7 +1,5 @@
 """Canonical webhook.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -47,7 +45,7 @@ class Webhook(BaseModel):
     type: WebhookType
     guild_id: MissingOrNullable[Snowflake] = UNSET
     channel_id: Snowflake | None = Field(...)
-    user: Missing[User] = UNSET
+    user: Missing["User"] = UNSET
     name: str | None = Field(...)
     avatar: str | None = Field(...)
     token: Missing[str] = UNSET

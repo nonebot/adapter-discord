@@ -1,7 +1,5 @@
 """Canonical guild.write models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -82,8 +80,8 @@ class CreateGuildParams(BaseModel):
     verification_level: VerificationLevel | None = None
     default_message_notifications: DefaultMessageNotificationLevel | None = None
     explicit_content_filter: ExplicitContentFilterLevel | None = None
-    roles: list[Role] | None = None
-    channels: list[Channel] | None = None
+    roles: list["Role"] | None = None
+    channels: list["Channel"] | None = None
     afk_channel_id: Snowflake | None = None
     afk_timeout: int | None = None
     system_channel_id: Snowflake | None = None
@@ -141,14 +139,14 @@ class CreateGuildChannelParams(BaseModel):
     user_limit: int | None = None
     rate_limit_per_user: int | None = None
     position: int | None = None
-    permission_overwrites: list[Overwrite] | None = None
+    permission_overwrites: list["Overwrite"] | None = None
     parent_id: Snowflake | None = None
     nsfw: bool | None = None
     rtc_region: str | None = None
     video_quality_mode: VideoQualityMode | None = None
     default_auto_archive_duration: int | None = None
-    default_reaction_emoji: DefaultReaction | None = None
-    available_tags: list[ForumTagRequest] | None = None
+    default_reaction_emoji: "DefaultReaction | None" = None
+    available_tags: list["ForumTagRequest"] | None = None
     default_sort_order: SortOrderTypes | None = None
     default_forum_layout: ForumLayoutTypes | None = None
     default_thread_rate_limit_per_user: int | None = None
@@ -161,7 +159,7 @@ class ModifyGuildWelcomeScreenParams(BaseModel):
     """
 
     enabled: MissingOrNullable[bool] = UNSET
-    welcome_channels: MissingOrNullable[list[WelcomeScreenChannel]] = UNSET
+    welcome_channels: MissingOrNullable[list["WelcomeScreenChannel"]] = UNSET
     description: MissingOrNullable[str] = UNSET
 
 
@@ -182,7 +180,7 @@ class CreateGuildScheduledEventParams(BaseModel):
     """
 
     channel_id: Snowflake | None = None
-    entity_metadata: GuildScheduledEventEntityMetadata | None = None
+    entity_metadata: "GuildScheduledEventEntityMetadata | None" = None
     name: str
     privacy_level: GuildScheduledEventPrivacyLevel
     scheduled_start_time: datetime.datetime  # ISO8601 timestamp
@@ -190,7 +188,7 @@ class CreateGuildScheduledEventParams(BaseModel):
     description: str | None = None
     entity_type: GuildScheduledEventEntityType
     image: str | None = None
-    recurrence_rule: RecurrenceRule | None = None
+    recurrence_rule: "RecurrenceRule | None" = None
 
 
 class ModifyGuildScheduledEventParams(BaseModel):
@@ -200,7 +198,7 @@ class ModifyGuildScheduledEventParams(BaseModel):
     """
 
     channel_id: MissingOrNullable[Snowflake] = UNSET
-    entity_metadata: MissingOrNullable[GuildScheduledEventEntityMetadata] = UNSET
+    entity_metadata: MissingOrNullable["GuildScheduledEventEntityMetadata"] = UNSET
     name: Missing[str] = UNSET
     privacy_level: Missing[GuildScheduledEventPrivacyLevel] = UNSET
     scheduled_start_time: Missing[datetime.datetime] = UNSET  # ISO8601 timestamp
@@ -209,7 +207,7 @@ class ModifyGuildScheduledEventParams(BaseModel):
     entity_type: Missing[GuildScheduledEventEntityType] = UNSET
     status: Missing[GuildScheduledEventStatus] = UNSET
     image: Missing[str] = UNSET
-    recurrence_rule: MissingOrNullable[RecurrenceRule] = UNSET
+    recurrence_rule: MissingOrNullable["RecurrenceRule"] = UNSET
 
 
 class ModifyGuildRoleParams(BaseModel):
@@ -223,7 +221,7 @@ class ModifyGuildRoleParams(BaseModel):
     name: MissingOrNullable[str] = UNSET
     permissions: MissingOrNullable[str] = UNSET
     color: MissingOrNullable[int] = UNSET
-    colors: Missing[RoleColors] = UNSET
+    colors: Missing["RoleColors"] = UNSET
     hoist: MissingOrNullable[bool] = UNSET
     icon: MissingOrNullable[str] = UNSET
     unicode_emoji: MissingOrNullable[str] = UNSET
@@ -239,7 +237,7 @@ class CreateGuildRoleParams(BaseModel):
     name: Missing[str] = UNSET
     permissions: Missing[str] = UNSET
     color: Missing[int] = UNSET
-    colors: Missing[RoleColors] = UNSET
+    colors: Missing["RoleColors"] = UNSET
     hoist: Missing[bool] = UNSET
     icon: MissingOrNullable[str] = UNSET
     unicode_emoji: MissingOrNullable[str] = UNSET
@@ -282,7 +280,7 @@ class ModifyGuildOnboardingParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
     """
 
-    prompts: Missing[list[OnboardingPrompt]] = UNSET
+    prompts: Missing[list["OnboardingPrompt"]] = UNSET
     """Prompts shown during onboarding and in customize community"""
     default_channel_ids: Missing[list[Snowflake]] = UNSET
     """Channel IDs that members get opted into automatically"""

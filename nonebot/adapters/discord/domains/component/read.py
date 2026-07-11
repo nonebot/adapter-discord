@@ -1,7 +1,5 @@
 """Canonical component.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Literal, TypeAlias
 
 if TYPE_CHECKING:
@@ -36,7 +34,7 @@ class ActionRow(BaseModel):
     """
 
     type: ComponentType = Field(default=ComponentType.ActionRow)
-    components: list[Button | SelectMenu | TextInput]
+    components: list["Button | SelectMenu | TextInput"]
 
 
 class ComponentEmoji(BaseModel):
@@ -112,14 +110,14 @@ class SelectMenu(BaseModel):
     """Type of select menu component"""
     custom_id: str
     """ID for the select menu; max 100 characters"""
-    options: Missing[list[SelectOption]] = UNSET
+    options: Missing[list["SelectOption"]] = UNSET
     """Specified choices in a select menu
     (only required and available for string selects; max 25"""
     channel_types: Missing[list[ChannelType]] = UNSET
     """List of channel types to include in the channel select component"""
     placeholder: Missing[str] = UNSET
     """Placeholder text if nothing is selected; max 150 characters"""
-    default_values: Missing[list[SelectDefaultValue]] = UNSET
+    default_values: Missing[list["SelectDefaultValue"]] = UNSET
     """List of default values for auto-populated select
     menu components; number of default values must be in
     the range defined by min_values and max_values"""
@@ -167,10 +165,10 @@ class SelectMenuResolved(BaseModel):
     see https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-resolved-object
     """
 
-    users: Missing[dict[Snowflake, User]] = UNSET
-    roles: Missing[dict[Snowflake, Role]] = UNSET
-    channels: Missing[dict[Snowflake, Channel]] = UNSET
-    members: Missing[dict[Snowflake, GuildMember]] = UNSET
+    users: Missing[dict[Snowflake, "User"]] = UNSET
+    roles: Missing[dict[Snowflake, "Role"]] = UNSET
+    channels: Missing[dict[Snowflake, "Channel"]] = UNSET
+    members: Missing[dict[Snowflake, "GuildMember"]] = UNSET
 
 
 class TextInput(BaseModel):

@@ -1,7 +1,5 @@
 """Canonical message.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -57,17 +55,17 @@ class ResolvedData(BaseModel):
     see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
     """
 
-    users: Missing[dict[Snowflake, User]] = UNSET
+    users: Missing[dict[Snowflake, "User"]] = UNSET
     """the ids and User objects"""
-    members: Missing[dict[Snowflake, GuildMember]] = UNSET
+    members: Missing[dict[Snowflake, "GuildMember"]] = UNSET
     """the ids and partial Member objects"""
-    roles: Missing[dict[Snowflake, Role]] = UNSET
+    roles: Missing[dict[Snowflake, "Role"]] = UNSET
     """the ids and Role objects"""
-    channels: Missing[dict[Snowflake, Channel]] = UNSET
+    channels: Missing[dict[Snowflake, "Channel"]] = UNSET
     """the ids and partial Channel objects"""
-    messages: Missing[dict[Snowflake, MessageGet]] = UNSET
+    messages: Missing[dict[Snowflake, "MessageGet"]] = UNSET
     """the ids and partial Message objects"""
-    attachments: Missing[dict[Snowflake, Attachment]] = UNSET
+    attachments: Missing[dict[Snowflake, "Attachment"]] = UNSET
     """the ids and attachment objects"""
 
 
@@ -83,9 +81,9 @@ class MessageInteraction(BaseModel):
     """Type of interaction"""
     name: str
     """Name of the application command, including subcommands and subcommand groups"""
-    user: User
+    user: "User"
     """User who invoked the interaction"""
-    member: Missing[GuildMember] = UNSET  # partial member object
+    member: Missing["GuildMember"] = UNSET  # partial member object
     """Member who invoked the interaction in the guild"""
 
 
@@ -101,7 +99,7 @@ class MessageInteractionMetadata(BaseModel):
     """ID of the interaction"""
     type: InteractionType
     """Type of interaction"""
-    user: User
+    user: "User"
     """User who triggered the interaction"""
     authorizing_integration_owners: dict[
         ApplicationIntegrationType, Snowflake | Literal[0]
@@ -113,7 +111,7 @@ class MessageInteractionMetadata(BaseModel):
     interacted_message_id: Missing[Snowflake] = UNSET
     """ID of the message that contained interactive component,
     present only on messages created from component interactions"""
-    triggering_interaction_metadata: Missing[MessageInteractionMetadata] = UNSET
+    triggering_interaction_metadata: Missing["MessageInteractionMetadata"] = UNSET
     """Metadata for the interaction that was used to open the modal,
     present only on modal submit interactions"""
 
@@ -125,40 +123,40 @@ class MessageGet(BaseModel):
 
     id: Snowflake
     channel_id: Snowflake
-    author: User
+    author: "User"
     content: str
     timestamp: datetime.datetime
     edited_timestamp: datetime.datetime | None = Field(...)
     tts: bool
     mention_everyone: bool
-    mentions: list[User]
+    mentions: list["User"]
     mention_roles: list[Snowflake]
-    mention_channels: Missing[list[ChannelMention]] = UNSET
-    attachments: list[Attachment]
-    embeds: list[Embed]
-    reactions: Missing[list[Reaction]] = UNSET
+    mention_channels: Missing[list["ChannelMention"]] = UNSET
+    attachments: list["Attachment"]
+    embeds: list["Embed"]
+    reactions: Missing[list["Reaction"]] = UNSET
     nonce: Missing[int | str] = UNSET
     pinned: bool
     webhook_id: Missing[Snowflake] = UNSET
     type: MessageType
-    activity: Missing[MessageActivity] = UNSET
-    application: Missing[Application] = UNSET
+    activity: Missing["MessageActivity"] = UNSET
+    application: Missing["Application"] = UNSET
     application_id: Missing[Snowflake] = UNSET
-    message_reference: Missing[MessageReference] = UNSET
+    message_reference: Missing["MessageReference"] = UNSET
     flags: Missing[MessageFlag] = UNSET
-    message_snapshots: Missing[list[MessageSnapshot]] = UNSET
-    referenced_message: MissingOrNullable[MessageGet] = UNSET
+    message_snapshots: Missing[list["MessageSnapshot"]] = UNSET
+    referenced_message: MissingOrNullable["MessageGet"] = UNSET
     interaction_metadata: Missing[MessageInteractionMetadata] = UNSET
     interaction: Missing[MessageInteraction] = UNSET
-    thread: Missing[Channel] = UNSET
-    components: Missing[list[DirectComponent]] = UNSET
-    sticker_items: Missing[list[StickerItem]] = UNSET
-    stickers: Missing[list[Sticker]] = UNSET
+    thread: Missing["Channel"] = UNSET
+    components: Missing[list["DirectComponent"]] = UNSET
+    sticker_items: Missing[list["StickerItem"]] = UNSET
+    stickers: Missing[list["Sticker"]] = UNSET
     position: Missing[int] = UNSET
-    role_subscription_data: Missing[RoleSubscriptionData] = UNSET
+    role_subscription_data: Missing["RoleSubscriptionData"] = UNSET
     resolved: Missing[ResolvedData] = UNSET
-    poll: Missing[Poll] = UNSET
-    call: Missing[MessageCall] = UNSET
+    poll: Missing["Poll"] = UNSET
+    call: Missing["MessageCall"] = UNSET
 
 
 class MessageActivity(BaseModel):
@@ -211,7 +209,7 @@ class MessageSnapshot(BaseModel):
     see https://discord.com/developers/docs/resources/message#message-snapshot-object
     """
 
-    message: MessageSnapshotMessage
+    message: "MessageSnapshotMessage"
 
 
 class MessageSnapshotMessage(BaseModel):
@@ -221,16 +219,16 @@ class MessageSnapshotMessage(BaseModel):
 
     type: MessageType
     content: str
-    embeds: list[Embed]
-    attachments: list[Attachment]
+    embeds: list["Embed"]
+    attachments: list["Attachment"]
     timestamp: datetime.datetime
     edited_timestamp: datetime.datetime | None = Field(...)
     flags: Missing[MessageFlag] = UNSET
-    mentions: list[User]
+    mentions: list["User"]
     mention_roles: Missing[list[Snowflake]] = UNSET
-    components: Missing[list[DirectComponent]] = UNSET
-    sticker_items: Missing[list[StickerItem]] = UNSET
-    stickers: Missing[list[Sticker]] = UNSET
+    components: Missing[list["DirectComponent"]] = UNSET
+    sticker_items: Missing[list["StickerItem"]] = UNSET
+    stickers: Missing[list["Sticker"]] = UNSET
 
 
 class Reaction(BaseModel):
@@ -239,10 +237,10 @@ class Reaction(BaseModel):
     see https://discord.com/developers/docs/resources/message#reaction-object"""
 
     count: int
-    count_details: Missing[CountDetails] = UNSET
+    count_details: Missing["CountDetails"] = UNSET
     me: bool
     me_burst: Missing[bool] = UNSET
-    emoji: Emoji
+    emoji: "Emoji"
     burst_colors: Missing[list[str]] = UNSET
 
 
@@ -257,13 +255,13 @@ class Embed(BaseModel):
     url: Missing[str] = UNSET
     timestamp: Missing[datetime.datetime] = UNSET
     color: Missing[int] = UNSET
-    footer: Missing[EmbedFooter] = UNSET
-    image: Missing[EmbedImage] = UNSET
-    thumbnail: Missing[EmbedThumbnail] = UNSET
-    video: Missing[EmbedVideo] = UNSET
-    provider: Missing[EmbedProvider] = UNSET
-    author: Missing[EmbedAuthor] = UNSET
-    fields: Missing[list[EmbedField]] = UNSET
+    footer: Missing["EmbedFooter"] = UNSET
+    image: Missing["EmbedImage"] = UNSET
+    thumbnail: Missing["EmbedThumbnail"] = UNSET
+    video: Missing["EmbedVideo"] = UNSET
+    provider: Missing["EmbedProvider"] = UNSET
+    author: Missing["EmbedAuthor"] = UNSET
+    fields: Missing[list["EmbedField"]] = UNSET
 
 
 class EmbedThumbnail(BaseModel):
@@ -419,17 +417,17 @@ class Activity(BaseModel):
     type: ActivityType
     url: MissingOrNullable[str] = UNSET
     created_at: int
-    timestamps: Missing[ActivityTimestamps] = UNSET
+    timestamps: Missing["ActivityTimestamps"] = UNSET
     application_id: Missing[Snowflake] = UNSET
     details: MissingOrNullable[str] = UNSET
     state: MissingOrNullable[str] = UNSET
-    emoji: MissingOrNullable[ActivityEmoji] = UNSET
-    party: Missing[ActivityParty] = UNSET
-    assets: Missing[ActivityAssets] = UNSET
-    secrets: Missing[ActivitySecrets] = UNSET
+    emoji: MissingOrNullable["ActivityEmoji"] = UNSET
+    party: Missing["ActivityParty"] = UNSET
+    assets: Missing["ActivityAssets"] = UNSET
+    secrets: Missing["ActivitySecrets"] = UNSET
     instance: Missing[bool] = UNSET
     flags: Missing[ActivityFlags] = UNSET
-    buttons: Missing[list[ActivityButtons]] = UNSET
+    buttons: Missing[list["ActivityButtons"]] = UNSET
 
 
 class Poll(BaseModel):
@@ -440,9 +438,9 @@ class Poll(BaseModel):
     see https://discord.com/developers/docs/resources/poll#poll-object
     """
 
-    question: PollMedia
+    question: "PollMedia"
     """The question of the poll. Only `text` is supported."""
-    answers: list[PollAnswer]
+    answers: list["PollAnswer"]
     """Each of the answers available in the poll."""
     expiry: datetime.datetime | None = None
     """The time when the poll ends."""
@@ -450,7 +448,7 @@ class Poll(BaseModel):
     """Whether a user can select multiple answers"""
     layout_type: int
     """The layout type of the poll"""
-    results: Missing[PollResults] = UNSET
+    results: Missing["PollResults"] = UNSET
     """The results of the poll"""
 
 
@@ -461,7 +459,7 @@ class PollAnswer(BaseModel):
     """
 
     answer_id: int
-    poll_media: PollMedia
+    poll_media: "PollMedia"
 
 
 class PollMedia(BaseModel):
@@ -474,7 +472,7 @@ class PollMedia(BaseModel):
     """
 
     text: Missing[str] = UNSET
-    emoji: Missing[Emoji] = UNSET  # partial emoji
+    emoji: Missing["Emoji"] = UNSET  # partial emoji
 
 
 class PollResults(BaseModel):
@@ -484,7 +482,7 @@ class PollResults(BaseModel):
     """
 
     is_finalized: bool
-    answer_counts: list[PollAnswerCount]
+    answer_counts: list["PollAnswerCount"]
 
 
 class PollAnswerCount(BaseModel):
@@ -504,7 +502,7 @@ class AnswerVoters(BaseModel):
     see https://discord.com/developers/docs/resources/poll#get-answer-voters-response-body
     """
 
-    users: list[User]
+    users: list["User"]
     """Users who voted for this answer"""
 
 

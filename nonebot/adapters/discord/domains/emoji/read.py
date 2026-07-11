@@ -1,7 +1,5 @@
 """Canonical emoji.read models."""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -21,7 +19,7 @@ class Emoji(BaseModel):
     """emoji name(can be null only in reaction emoji objects)"""
     roles: Missing[list[Snowflake]] = UNSET
     """roles allowed to use this emoji"""
-    user: Missing[User] = UNSET
+    user: Missing["User"] = UNSET
     """user that created this emoji"""
     require_colons: Missing[bool] = UNSET
     """whether this emoji must be wrapped in colons"""
