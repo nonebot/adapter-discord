@@ -1,7 +1,9 @@
 """Canonical command.write models."""
 
 from typing import TYPE_CHECKING
-from typing_extensions import Required, TypedDict
+from typing_extensions import Required
+
+from .._model_support import OutboundTypedDict
 
 if TYPE_CHECKING:
     from .read import ApplicationCommandPermissions
@@ -15,7 +17,7 @@ from .._model_support import (
 )
 
 
-class ApplicationCommandCreate(TypedDict, total=False):
+class ApplicationCommandCreate(OutboundTypedDict, total=False):
     """Application Command Create
 
     see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
@@ -35,7 +37,7 @@ class ApplicationCommandCreate(TypedDict, total=False):
     nsfw: bool
 
 
-class ApplicationCommandBulkOverwriteParams(TypedDict, total=False):
+class ApplicationCommandBulkOverwriteParams(OutboundTypedDict, total=False):
     """Application Command Bulk Overwrite Params.
 
     see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
@@ -56,7 +58,7 @@ class ApplicationCommandBulkOverwriteParams(TypedDict, total=False):
     contexts: list[InteractionContextType] | None
 
 
-class ApplicationCommandEditParams(TypedDict, total=False):
+class ApplicationCommandEditParams(OutboundTypedDict, total=False):
     """Application Command Edit Params.
 
     see https://discord.com/developers/docs/interactions/application-commands#edit-global-application-command
@@ -75,7 +77,34 @@ class ApplicationCommandEditParams(TypedDict, total=False):
     contexts: list[InteractionContextType]
 
 
-class EditApplicationCommandPermissionsParams(TypedDict, total=False):
+class GuildApplicationCommandCreateParams(OutboundTypedDict, total=False):
+    """Parameters for creating a guild application command."""
+
+    name: Required[str]
+    name_localizations: dict[str, str] | None
+    description: str
+    description_localizations: dict[str, str] | None
+    options: "list[AnyCommandOption]"
+    default_member_permissions: str | None
+    default_permission: bool
+    type: ApplicationCommandType
+    nsfw: bool
+
+
+class GuildApplicationCommandEditParams(OutboundTypedDict, total=False):
+    """Parameters for editing a guild application command."""
+
+    name: str
+    name_localizations: dict[str, str] | None
+    description: str
+    description_localizations: dict[str, str] | None
+    options: "list[AnyCommandOption]"
+    default_member_permissions: str | None
+    default_permission: bool
+    nsfw: bool
+
+
+class EditApplicationCommandPermissionsParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_edit_application_command_permissions``."""
 
     permissions: Required["list[ApplicationCommandPermissions]"]
@@ -86,4 +115,6 @@ __all__ = [
     "ApplicationCommandCreate",
     "ApplicationCommandEditParams",
     "EditApplicationCommandPermissionsParams",
+    "GuildApplicationCommandCreateParams",
+    "GuildApplicationCommandEditParams",
 ]

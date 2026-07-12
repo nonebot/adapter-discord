@@ -1,6 +1,10 @@
-from typing import Annotated
+from typing import Annotated, Any
 
-from nonebot.adapters.discord.api.types import ApplicationCommandType, TriggerType
+from nonebot.adapters.discord.api.types import (
+    ApplicationCommandType,
+    AutoModerationRuleEventType,
+    TriggerType,
+)
 from nonebot.adapters.discord.api.validation import (
     AtMostOne,
     ForbidIfEquals,
@@ -9,6 +13,7 @@ from nonebot.adapters.discord.api.validation import (
     validate,
 )
 from nonebot.adapters.discord.domains.command.endpoints import _build_command_payloads
+from tests.fake.doubles import DummyAdapter, DummyBot
 
 import pytest
 
@@ -148,3 +153,103 @@ def test_bulk_command_materializes_type_and_normalizes_description() -> None:
         match="description is required for CHAT_INPUT commands",
     ):
         _build_command_payloads([{"name": "ping"}])
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("messages", [[1], list(range(101))])
+async def test_bulk_delete_message_preserves_item_count_validation(
+    messages: list[int],
+) -> None:
+    adapter = DummyAdapter()
+    bot = DummyBot(adapter)
+
+    with pytest.raises(ValueError, match="messages must contain 2-100 items"):
+        await adapter._api_bulk_delete_message(  # noqa: SLF001
+            bot,
+            channel_id=1,
+            messages=messages,
+        )
+
+    assert adapter.request_calls == 0
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        (
+            "delete_message_days",
+            8,
+            "delete_message_days must be between 0 and 7",
+        ),
+        (
+            "delete_message_seconds",
+            604801,
+            "delete_message_seconds must be between 0 and 604800",
+        ),
+    ],
+)
+async def test_create_guild_ban_preserves_delete_message_range_validation(
+    field: str,
+    value: int,
+    message: str,
+) -> None:
+    adapter = DummyAdapter()
+    bot = DummyBot(adapter)
+
+    fields: dict[str, Any] = {field: value}
+    with pytest.raises(ValueError, match=message):
+        await adapter._api_create_guild_ban(  # noqa: SLF001
+            bot,
+            guild_id=1,
+            user_id=2,
+            **fields,
+        )
+
+    assert adapter.request_calls == 0
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("field", "values", "message"),
+    [
+        (
+            "exempt_roles",
+            list(range(21)),
+            "exempt_roles must be 20 items or fewer",
+        ),
+        (
+            "exempt_channels",
+            list(range(51)),
+            "exempt_channels must be 50 items or fewer",
+        ),
+    ],
+)
+async def test_auto_moderation_preserves_exemption_count_validation(
+    field: str,
+    values: list[int],
+    message: str,
+) -> None:
+    adapter = DummyAdapter()
+    bot = DummyBot(adapter)
+
+    fields: dict[str, Any] = {field: values}
+    with pytest.raises(ValueError, match=message):
+        await adapter._api_create_auto_moderation_rule(  # noqa: SLF001
+            bot,
+            guild_id=1,
+            name="rule",
+            event_type=AutoModerationRuleEventType.MESSAGE_SEND,
+            trigger_type=TriggerType.SPAM,
+            actions=[],
+            **fields,
+        )
+    with pytest.raises(ValueError, match=message):
+        await adapter._api_modify_auto_moderation_rule(  # noqa: SLF001
+            bot,
+            guild_id=1,
+            rule_id=2,
+            **fields,
+        )
+
+    assert adapter.request_calls == 0

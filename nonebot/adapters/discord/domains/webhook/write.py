@@ -1,14 +1,15 @@
 """Canonical webhook.write models."""
 
 from typing import TYPE_CHECKING
-from typing_extensions import Required, TypedDict
+from typing_extensions import Required
+
+from .._model_support import OutboundTypedDict
 
 if TYPE_CHECKING:
     from ..models import (
         AllowedMention,
         AttachmentSend,
         Component,
-        DirectComponent,
         Embed,
         File,
         PollRequest,
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 from .._model_support import MessageFlag, Snowflake
 
 
-class WebhookMessageEditParams(TypedDict, total=False):
+class WebhookMessageEditParams(OutboundTypedDict, total=False):
     """Edit Webhook Message Parameters.
 
     All parameters are optional and nullable.
@@ -36,7 +37,7 @@ class WebhookMessageEditParams(TypedDict, total=False):
     poll: "PollRequest | None"
 
 
-class CreateWebhookParams(TypedDict, total=False):
+class CreateWebhookParams(OutboundTypedDict, total=False):
     """Create Webhook Params.
 
     see https://discord.com/developers/docs/resources/webhook#create-webhook
@@ -46,27 +47,27 @@ class CreateWebhookParams(TypedDict, total=False):
     avatar: str | None
 
 
-class ExecuteWebhookParams(TypedDict, total=False):
+class ExecuteWebhookParams(OutboundTypedDict, total=False):
     """Execute Webhook Parameters
 
     see https://discord.com/developers/docs/resources/webhook#execute-webhook"""
 
-    content: str
-    username: str
-    avatar_url: str
-    tts: bool
-    embeds: "list[Embed]"
-    allowed_mentions: "AllowedMention"
-    components: "list[DirectComponent]"
-    files: "list[File]"
-    attachments: "list[AttachmentSend]"
-    flags: MessageFlag
-    thread_name: str
-    applied_tags: list[Snowflake]
-    poll: "PollRequest"
+    content: str | None
+    username: str | None
+    avatar_url: str | None
+    tts: bool | None
+    embeds: "list[Embed] | None"
+    allowed_mentions: "AllowedMention | None"
+    components: "list[Component] | None"
+    files: "list[File] | None"
+    attachments: "list[AttachmentSend] | None"
+    flags: int | None
+    thread_name: str | None
+    applied_tags: list[Snowflake] | None
+    poll: "PollRequest | None"
 
 
-class ModifyWebhookParams(TypedDict, total=False):
+class ModifyWebhookParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_modify_webhook``."""
 
     name: str
@@ -74,9 +75,17 @@ class ModifyWebhookParams(TypedDict, total=False):
     channel_id: "SnowflakeType"
 
 
+class ModifyWebhookWithTokenParams(OutboundTypedDict, total=False):
+    """Parameters for ``_api_modify_webhook_with_token``."""
+
+    name: str
+    avatar: "str | None"
+
+
 __all__ = [
     "CreateWebhookParams",
     "ExecuteWebhookParams",
     "ModifyWebhookParams",
+    "ModifyWebhookWithTokenParams",
     "WebhookMessageEditParams",
 ]

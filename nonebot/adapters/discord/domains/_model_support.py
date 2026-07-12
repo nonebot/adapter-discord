@@ -1,11 +1,12 @@
 """Private common imports for canonical Discord domain models."""
 
 import datetime
-from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, cast
+from typing_extensions import TypedDict
 import warnings
 
 from nonebot.compat import PYDANTIC_V2
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 if PYDANTIC_V2 or TYPE_CHECKING:
     GenericModel = BaseModel
@@ -100,6 +101,16 @@ from ..protocol import (
     is_not_unset,
     is_unset,
 )
+
+_OUTBOUND_TYPED_DICT_CONFIG = ConfigDict(extra="forbid") if PYDANTIC_V2 else {}
+
+
+class OutboundTypedDict(TypedDict):
+    """Base for REST request mappings with strict Pydantic v2 extras."""
+
+
+cast("Any", OutboundTypedDict).__pydantic_config__ = _OUTBOUND_TYPED_DICT_CONFIG
+
 
 T = TypeVar("T", str, int, float)
 

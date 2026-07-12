@@ -1,11 +1,11 @@
 """Canonical soundboard.write models."""
 
-from typing_extensions import Required, TypedDict
+from typing_extensions import Required
 
-from .._model_support import Snowflake
+from .._model_support import OutboundTypedDict, Snowflake
 
 
-class SendSoundboardSoundParams(TypedDict, total=False):
+class SendSoundboardSoundParams(OutboundTypedDict, total=False):
     """Send Soundboard Sound Params.
 
     see https://discord.com/developers/docs/resources/soundboard#send-soundboard-sound
@@ -15,7 +15,7 @@ class SendSoundboardSoundParams(TypedDict, total=False):
     source_guild_id: Snowflake
 
 
-class CreateGuildSoundboardSoundParams(TypedDict, total=False):
+class CreateGuildSoundboardSoundParams(OutboundTypedDict, total=False):
     """Create Guild Soundboard Sound Params.
 
     see https://discord.com/developers/docs/resources/soundboard#create-guild-soundboard-sound
@@ -28,7 +28,7 @@ class CreateGuildSoundboardSoundParams(TypedDict, total=False):
     emoji_name: str
 
 
-class ModifyGuildSoundboardSoundParams(TypedDict, total=False):
+class ModifyGuildSoundboardSoundParams(OutboundTypedDict, total=False):
     """Modify Guild Soundboard Sound Params.
 
     see https://discord.com/developers/docs/resources/soundboard#modify-guild-soundboard-sound

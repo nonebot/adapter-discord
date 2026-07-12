@@ -11,9 +11,11 @@ from .write import (
     ApplicationCommandCreate,
     ApplicationCommandEditParams,
     EditApplicationCommandPermissionsParams,
+    GuildApplicationCommandCreateParams,
+    GuildApplicationCommandEditParams,
 )
 from ...api.validation import validate_outbound_value
-from ...protocol import UNSET, SnowflakeType
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BearerAuth,
@@ -99,42 +101,14 @@ class CommandEndpointMixin:
         see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
         """
         fields = validate_outbound_value(ApplicationCommandCreate, fields)
-        name = fields["name"]
-        name_localizations = fields.get("name_localizations")
-        description = fields.get("description")
-        description_localizations = fields.get("description_localizations")
-        options = fields.get("options")
-        default_member_permissions = fields.get("default_member_permissions")
-        dm_permission = fields.get("dm_permission")
-        default_permission = fields.get("default_permission")
-        integration_types = fields.get("integration_types")
-        contexts = fields.get("contexts")
-        command_type = fields.get("type")
-        nsfw = fields.get("nsfw")
-
         description = _normalize_command_description(
-            command_type=command_type,
-            description=description,
+            command_type=fields.get("type"),
+            description=fields.get("description"),
         )
-        data = {
-            "name": name,
-            "name_localizations": name_localizations,
-            "description": description,
-            "description_localizations": description_localizations,
-            "options": options,
-            "default_member_permissions": default_member_permissions,
-            "dm_permission": dm_permission,
-            "default_permission": default_permission,
-            "type": command_type,
-            "nsfw": nsfw,
-            "integration_types": integration_types,
-            "contexts": contexts,
+        payload: dict[str, object] = {
+            key: value for key, value in fields.items() if value is not None
         }
-        data = {key: value for key, value in data.items() if value is not None}
-        payload = validate_outbound_value(
-            ApplicationCommandCreate,
-            {key: value for key, value in data.items() if value is not UNSET},
-        )
+        payload["description"] = description
         call = RestCall(
             method="POST",
             url=self.base_url / f"applications/{application_id}/commands",
@@ -177,41 +151,12 @@ class CommandEndpointMixin:
         see https://discord.com/developers/docs/interactions/application-commands#edit-global-application-command
         """
         fields = validate_outbound_value(ApplicationCommandEditParams, fields)
-        name = fields.get("name", UNSET)
-        name_localizations = fields.get("name_localizations", UNSET)
-        description = fields.get("description", UNSET)
-        description_localizations = fields.get("description_localizations", UNSET)
-        options = fields.get("options", UNSET)
-        default_member_permissions = fields.get("default_member_permissions", UNSET)
-        dm_permission = fields.get("dm_permission", UNSET)
-        default_permission = fields.get("default_permission", UNSET)
-        nsfw = fields.get("nsfw", UNSET)
-        integration_types = fields.get("integration_types", UNSET)
-        contexts = fields.get("contexts", UNSET)
-
-        data = {
-            "name": name,
-            "name_localizations": name_localizations,
-            "description": description,
-            "description_localizations": description_localizations,
-            "options": options,
-            "default_member_permissions": default_member_permissions,
-            "dm_permission": dm_permission,
-            "default_permission": default_permission,
-            "nsfw": nsfw,
-            "integration_types": integration_types,
-            "contexts": contexts,
-        }
-        data = validate_outbound_value(
-            ApplicationCommandEditParams,
-            {key: value for key, value in data.items() if value is not UNSET},
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"applications/{application_id}/commands/{command_id}",
             response=JsonResponse(ApplicationCommand),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -287,43 +232,21 @@ class CommandEndpointMixin:
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
-        **fields: Unpack[ApplicationCommandCreate],
+        **fields: Unpack[GuildApplicationCommandCreateParams],
     ) -> ApplicationCommand:
         """Create guild application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command
         """
-        fields = validate_outbound_value(ApplicationCommandCreate, fields)
-        name = fields["name"]
-        name_localizations = fields.get("name_localizations")
-        description = fields.get("description")
-        description_localizations = fields.get("description_localizations")
-        options = fields.get("options")
-        default_member_permissions = fields.get("default_member_permissions")
-        default_permission = fields.get("default_permission")
-        command_type = fields.get("type")
-        nsfw = fields.get("nsfw")
-
+        fields = validate_outbound_value(GuildApplicationCommandCreateParams, fields)
         description = _normalize_command_description(
-            command_type=command_type,
-            description=description,
+            command_type=fields.get("type"),
+            description=fields.get("description"),
         )
-        data = {
-            "name": name,
-            "name_localizations": name_localizations,
-            "description": description,
-            "description_localizations": description_localizations,
-            "options": options,
-            "default_member_permissions": default_member_permissions,
-            "default_permission": default_permission,
-            "type": command_type,
-            "nsfw": nsfw,
+        payload: dict[str, object] = {
+            key: value for key, value in fields.items() if value is not None
         }
-        data = {key: value for key, value in data.items() if value is not None}
-        payload = validate_outbound_value(
-            ApplicationCommandCreate,
-            {key: value for key, value in data.items() if value is not UNSET},
-        )
+        payload["description"] = description
         call = RestCall(
             method="POST",
             url=self.base_url
@@ -363,43 +286,20 @@ class CommandEndpointMixin:
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
-        **fields: Unpack[ApplicationCommandEditParams],
+        **fields: Unpack[GuildApplicationCommandEditParams],
     ) -> ApplicationCommand:
         """Edit guild application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#edit-guild-application-command
         """
-        fields = validate_outbound_value(ApplicationCommandEditParams, fields)
-        name = fields.get("name", UNSET)
-        name_localizations = fields.get("name_localizations", UNSET)
-        description = fields.get("description", UNSET)
-        description_localizations = fields.get("description_localizations", UNSET)
-        options = fields.get("options", UNSET)
-        default_member_permissions = fields.get("default_member_permissions", UNSET)
-        default_permission = fields.get("default_permission", UNSET)
-        nsfw = fields.get("nsfw", UNSET)
-
-        data = {
-            "name": name,
-            "name_localizations": name_localizations,
-            "description": description,
-            "description_localizations": description_localizations,
-            "options": options,
-            "default_member_permissions": default_member_permissions,
-            "default_permission": default_permission,
-            "nsfw": nsfw,
-        }
-        data = validate_outbound_value(
-            ApplicationCommandEditParams,
-            {key: value for key, value in data.items() if value is not UNSET},
-        )
+        fields = validate_outbound_value(GuildApplicationCommandEditParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url
             / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
             response=JsonResponse(ApplicationCommand),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -508,15 +408,13 @@ class CommandEndpointMixin:
         fields = validate_outbound_value(
             EditApplicationCommandPermissionsParams, fields
         )
-        permissions = fields["permissions"]
-
         call = RestCall(
             method="PUT",
             url=self.base_url
             / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",
             response=JsonResponse(GuildApplicationCommandPermissions),
             auth=BearerAuth(access_token),
-            body=JsonBody({"permissions": permissions}),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 

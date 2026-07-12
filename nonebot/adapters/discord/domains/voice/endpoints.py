@@ -9,7 +9,7 @@ from .write import (
     ModifyUserVoiceStateParams,
 )
 from ...api.validation import validate_outbound_value
-from ...protocol import UNSET, SnowflakeType
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -89,28 +89,12 @@ class VoiceEndpointMixin:
         see https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state
         """
         fields = validate_outbound_value(ModifyCurrentUserVoiceStateParams, fields)
-        channel_id = fields.get("channel_id", UNSET)
-        suppress = fields.get("suppress", UNSET)
-        request_to_speak_timestamp = fields.get("request_to_speak_timestamp", UNSET)
-
-        data = validate_outbound_value(
-            ModifyCurrentUserVoiceStateParams,
-            {
-                key: value
-                for key, value in {
-                    "channel_id": channel_id,
-                    "suppress": suppress,
-                    "request_to_speak_timestamp": request_to_speak_timestamp,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/voice-states/@me",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         await REST_EXCHANGE.execute(self, call)
 
@@ -127,18 +111,12 @@ class VoiceEndpointMixin:
         see https://discord.com/developers/docs/resources/voice#modify-user-voice-state
         """
         fields = validate_outbound_value(ModifyUserVoiceStateParams, fields)
-        channel_id = fields.get("channel_id")
-        suppress = fields.get("suppress")
-
-        data = {"channel_id": channel_id, "suppress": suppress}
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/voice-states/{user_id}",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
         )
         await REST_EXCHANGE.execute(self, call)
 
@@ -154,27 +132,12 @@ class VoiceEndpointMixin:
         see https://discord.com/developers/docs/resources/stage-instance#create-stage-instance
         """
         fields = validate_outbound_value(CreateStageInstanceParams, fields)
-        channel_id = fields["channel_id"]
-        topic = fields["topic"]
-        privacy_level = fields.get("privacy_level")
-        send_start_notification = fields.get("send_start_notification")
-        guild_scheduled_event_id = fields.get("guild_scheduled_event_id")
-
-        data = {
-            "channel_id": channel_id,
-            "topic": topic,
-            "privacy_level": privacy_level,
-            "send_start_notification": send_start_notification,
-            "guild_scheduled_event_id": guild_scheduled_event_id,
-        }
         call = RestCall(
             method="POST",
             url=self.base_url / "stage-instances",
             response=JsonResponse(StageInstance),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -208,18 +171,12 @@ class VoiceEndpointMixin:
         see https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance
         """
         fields = validate_outbound_value(ModifyStageInstanceParams, fields)
-        topic = fields.get("topic")
-        privacy_level = fields.get("privacy_level")
-
-        data = {"topic": topic, "privacy_level": privacy_level}
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"stage-instances/{channel_id}",
             response=JsonResponse(StageInstance),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)

@@ -9,8 +9,8 @@ from typing_extensions import TypedDict
 
 EXPECTED_COUNTS = {
     "top_level_exports": 133,
-    "api_exports": 373,
-    "model_exports": 292,
+    "api_exports": 378,
+    "model_exports": 297,
     "api_client_async_methods": 230,
 }
 

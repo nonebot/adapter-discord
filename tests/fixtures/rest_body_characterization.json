@@ -110,24 +110,7 @@
   "_api_create_guild_channel": {
     "files": null,
     "json": {
-      "available_tags": null,
-      "bitrate": null,
-      "default_auto_archive_duration": null,
-      "default_forum_layout": null,
-      "default_reaction_emoji": null,
-      "default_sort_order": null,
-      "default_thread_rate_limit_per_user": null,
-      "name": "value",
-      "nsfw": null,
-      "parent_id": null,
-      "permission_overwrites": null,
-      "position": null,
-      "rate_limit_per_user": null,
-      "rtc_region": null,
-      "topic": null,
-      "type": null,
-      "user_limit": null,
-      "video_quality_mode": null
+      "name": "value"
     }
   },
   "_api_create_guild_emoji": {

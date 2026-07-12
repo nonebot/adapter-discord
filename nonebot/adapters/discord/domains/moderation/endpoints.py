@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Annotated, Literal, overload
 from typing_extensions import Unpack
 
@@ -15,7 +16,7 @@ from ...api.validation import (
     validate,
     validate_outbound_value,
 )
-from ...protocol import UNSET, SnowflakeType
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -35,6 +36,19 @@ NonSpamTriggerType = Literal[
     TriggerType.MENTION_SPAM,
     TriggerType.MEMBER_PROFILE,
 ]
+
+
+def _validate_auto_moderation_exemptions(
+    *,
+    exempt_roles: Sequence[SnowflakeType] | None,
+    exempt_channels: Sequence[SnowflakeType] | None,
+) -> None:
+    if exempt_roles is not None and len(exempt_roles) > 20:  # noqa: PLR2004
+        msg = "exempt_roles must be 20 items or fewer"
+        raise ValueError(msg)
+    if exempt_channels is not None and len(exempt_channels) > 50:  # noqa: PLR2004
+        msg = "exempt_channels must be 50 items or fewer"
+        raise ValueError(msg)
 
 
 class ModerationEndpointMixin:
@@ -224,41 +238,20 @@ class ModerationEndpointMixin:
         see https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
         """
         fields = validate_outbound_value(CreateAutoModerationRuleParams, fields)
-        name = fields["name"]
-        event_type = fields["event_type"]
-        trigger_type = fields["trigger_type"]
-        trigger_metadata = fields.get("trigger_metadata")
-        actions = fields["actions"]
-        enabled = fields.get("enabled")
         exempt_roles = fields.get("exempt_roles")
         exempt_channels = fields.get("exempt_channels")
-
-        data = {
-            "name": name,
-            "event_type": event_type,
-            "trigger_type": trigger_type,
-            "actions": actions,
-            "trigger_metadata": trigger_metadata,
-            "enabled": enabled,
-            "exempt_roles": exempt_roles,
-            "exempt_channels": exempt_channels,
-        }
-        data = validate_outbound_value(
-            CreateAutoModerationRuleParams,
-            {
-                key: value
-                for key, value in {
-                    key: value for key, value in data.items() if value is not None
-                }.items()
-                if value is not UNSET
-            },
+        _validate_auto_moderation_exemptions(
+            exempt_roles=exempt_roles,
+            exempt_channels=exempt_channels,
         )
+
+        payload = {key: value for key, value in fields.items() if value is not None}
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/auto-moderation/rules",
             response=JsonResponse(AutoModerationRule),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(payload),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -278,39 +271,20 @@ class ModerationEndpointMixin:
         see https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
         """
         fields = validate_outbound_value(ModifyAutoModerationRuleParams, fields)
-        name = fields.get("name")
-        event_type = fields.get("event_type")
-        trigger_metadata = fields.get("trigger_metadata")
-        actions = fields.get("actions")
-        enabled = fields.get("enabled")
         exempt_roles = fields.get("exempt_roles")
         exempt_channels = fields.get("exempt_channels")
-
-        data = {
-            "name": name,
-            "event_type": event_type,
-            "trigger_metadata": trigger_metadata,
-            "actions": actions,
-            "enabled": enabled,
-            "exempt_roles": exempt_roles,
-            "exempt_channels": exempt_channels,
-        }
-        data = validate_outbound_value(
-            ModifyAutoModerationRuleParams,
-            {
-                key: value
-                for key, value in {
-                    key: value for (key, value) in data.items() if value is not None
-                }.items()
-                if value is not UNSET
-            },
+        _validate_auto_moderation_exemptions(
+            exempt_roles=exempt_roles,
+            exempt_channels=exempt_channels,
         )
+
+        payload = {key: value for key, value in fields.items() if value is not None}
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/auto-moderation/rules/{rule_id}",
             response=JsonResponse(AutoModerationRule),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(payload),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)

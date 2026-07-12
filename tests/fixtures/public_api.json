@@ -225,6 +225,7 @@
     "CountDetails",
     "CreateApplicationEmojiParams",
     "CreateAutoModerationRuleParams",
+    "CreateFollowupMessageParams",
     "CreateChannelInviteParams",
     "CreateDMParams",
     "CreateGroupDMParams",
@@ -271,6 +272,8 @@
     "GatewayBot",
     "Guild",
     "GuildApplicationCommandPermissions",
+    "GuildApplicationCommandCreateParams",
+    "GuildApplicationCommandEditParams",
     "GuildAuditLogEntryCreate",
     "GuildBanAdd",
     "GuildBanRemove",
@@ -396,6 +399,7 @@
     "ModifyStageInstanceParams",
     "ModifyUserVoiceStateParams",
     "ModifyWebhookParams",
+    "ModifyWebhookWithTokenParams",
     "MutableGuildFeature",
     "NumberOption",
     "OnboardingMode",
@@ -449,6 +453,7 @@
     "StageInstanceDelete",
     "StageInstanceUpdate",
     "StagePrivacyLevel",
+    "StartThreadInForumChannelParams",
     "Sticker",
     "StickerFormatType",
     "StickerItem",
@@ -580,6 +585,7 @@
     "CountDetails",
     "CreateApplicationEmojiParams",
     "CreateAutoModerationRuleParams",
+    "CreateFollowupMessageParams",
     "CreateChannelInviteParams",
     "CreateDMParams",
     "CreateGroupDMParams",
@@ -621,6 +627,8 @@
     "GatewayBot",
     "Guild",
     "GuildApplicationCommandPermissions",
+    "GuildApplicationCommandCreateParams",
+    "GuildApplicationCommandEditParams",
     "GuildAuditLogEntryCreate",
     "GuildBanAdd",
     "GuildBanRemove",
@@ -720,6 +728,7 @@
     "ModifyStageInstanceParams",
     "ModifyUserVoiceStateParams",
     "ModifyWebhookParams",
+    "ModifyWebhookWithTokenParams",
     "NumberOption",
     "OnboardingPrompt",
     "OnboardingPromptOption",
@@ -760,6 +769,7 @@
     "StageInstanceCreate",
     "StageInstanceDelete",
     "StageInstanceUpdate",
+    "StartThreadInForumChannelParams",
     "Sticker",
     "StickerItem",
     "StickerPack",
@@ -1032,7 +1042,7 @@
           {
             "name": "fields",
             "kind": "var_keyword",
-            "annotation": "Unpack[ApplicationCommandCreate]",
+            "annotation": "Unpack[GuildApplicationCommandCreateParams]",
             "default": null
           }
         ],
@@ -1104,7 +1114,7 @@
           {
             "name": "fields",
             "kind": "var_keyword",
-            "annotation": "Unpack[ApplicationCommandEditParams]",
+            "annotation": "Unpack[GuildApplicationCommandEditParams]",
             "default": null
           }
         ],
@@ -1402,52 +1412,10 @@
             "default": "None"
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Embed]]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[MessageFlag]",
-            "default": "..."
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[AllowedMention]",
-            "default": "..."
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Component]]",
-            "default": "..."
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[File]]",
-            "default": "..."
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[AttachmentSend]]",
-            "default": "..."
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[PollRequest]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[WebhookMessageEditParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -1510,58 +1478,10 @@
             "default": null
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "tts",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "list[Embed] | None",
-            "default": "None"
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "AllowedMention | None",
-            "default": "None"
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "list[DirectComponent] | None",
-            "default": "None"
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "list[File] | None",
-            "default": "None"
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "list[AttachmentSend] | None",
-            "default": "None"
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MessageFlag | None",
-            "default": "None"
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "PollRequest | None",
-            "default": "None"
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateFollowupMessageParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -1648,52 +1568,10 @@
             "default": "None"
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Embed]]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[MessageFlag]",
-            "default": "..."
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[AllowedMention]",
-            "default": "..."
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Component]]",
-            "default": "..."
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[File]]",
-            "default": "..."
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[AttachmentSend]]",
-            "default": "..."
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[PollRequest]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[WebhookMessageEditParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -2548,82 +2426,10 @@
             "default": null
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "nonce",
-            "kind": "keyword_only",
-            "annotation": "int | str | None",
-            "default": "None"
-          },
-          {
-            "name": "enforce_nonce",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "tts",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "list[Embed] | None",
-            "default": "None"
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "AllowedMention | None",
-            "default": "None"
-          },
-          {
-            "name": "message_reference",
-            "kind": "keyword_only",
-            "annotation": "MessageReference | None",
-            "default": "None"
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "list[DirectComponent] | None",
-            "default": "None"
-          },
-          {
-            "name": "sticker_ids",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "list[File] | None",
-            "default": "None"
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "list[AttachmentSend] | None",
-            "default": "None"
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MessageFlag | None",
-            "default": "None"
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "PollRequest | None",
-            "default": "None"
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[MessageSend]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -2926,58 +2732,10 @@
             "default": null
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Embed]]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[MessageFlag]",
-            "default": "..."
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[AllowedMention]",
-            "default": "..."
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Component]]",
-            "default": "..."
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[File]]",
-            "default": "..."
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[AttachmentSend]]",
-            "default": "..."
-          },
-          {
-            "name": "sticker_ids",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[SnowflakeType]]",
-            "default": "..."
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[PollRequest]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[MessageEditParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -3472,82 +3230,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "auto_archive_duration",
-            "kind": "keyword_only",
-            "annotation": "Missing[int]",
-            "default": "..."
-          },
-          {
-            "name": "rate_limit_per_user",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
-            "default": "..."
-          },
-          {
-            "name": "applied_tags",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[SnowflakeType]]",
-            "default": "..."
-          },
-          {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "list[Embed] | None",
-            "default": "None"
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "AllowedMention | None",
-            "default": "None"
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "list[DirectComponent] | None",
-            "default": "None"
-          },
-          {
-            "name": "sticker_ids",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "list[File] | None",
-            "default": "None"
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "list[AttachmentSend] | None",
-            "default": "None"
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MessageFlag | None",
-            "default": "None"
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[StartThreadInForumChannelParams]",
+            "default": null
           }
         ],
         "return_annotation": "Channel",
@@ -4399,16 +4091,10 @@
             "default": null
           },
           {
-            "name": "metadata",
-            "kind": "keyword_only",
-            "annotation": "Missing[dict[str, str]]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "Missing[LobbyMemberFlags]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[AddLobbyMemberParams]",
+            "default": null
           }
         ],
         "return_annotation": "LobbyMember",
@@ -7791,7 +7477,7 @@
           {
             "name": "fields",
             "kind": "var_keyword",
-            "annotation": "Unpack[ModifyWebhookParams]",
+            "annotation": "Unpack[ModifyWebhookWithTokenParams]",
             "default": null
           }
         ],
@@ -7894,82 +7580,10 @@
             "default": "None"
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "username",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "avatar_url",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "tts",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "list[Embed] | None",
-            "default": "None"
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "AllowedMention | None",
-            "default": "None"
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "list[Component] | None",
-            "default": "None"
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "list[File] | None",
-            "default": "None"
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "list[AttachmentSend] | None",
-            "default": "None"
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "thread_name",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "applied_tags",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "PollRequest | None",
-            "default": "None"
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ExecuteWebhookParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -8017,82 +7631,10 @@
             "default": "None"
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "username",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "avatar_url",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "tts",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "list[Embed] | None",
-            "default": "None"
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "AllowedMention | None",
-            "default": "None"
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "list[Component] | None",
-            "default": "None"
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "list[File] | None",
-            "default": "None"
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "list[AttachmentSend] | None",
-            "default": "None"
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "thread_name",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "applied_tags",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "PollRequest | None",
-            "default": "None"
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ExecuteWebhookParams]",
+            "default": null
           }
         ],
         "return_annotation": "None",
@@ -8269,52 +7811,10 @@
             "default": "None"
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Embed]]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[MessageFlag]",
-            "default": "..."
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[AllowedMention]",
-            "default": "..."
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Component]]",
-            "default": "..."
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[File]]",
-            "default": "..."
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[AttachmentSend]]",
-            "default": "..."
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[PollRequest]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[WebhookMessageEditParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -8612,8 +8112,8 @@
   },
   "counts": {
     "top_level_exports": 133,
-    "api_exports": 373,
-    "model_exports": 292,
+    "api_exports": 378,
+    "model_exports": 297,
     "api_client_async_methods": 230
   }
 }

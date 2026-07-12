@@ -96,6 +96,7 @@ if TYPE_CHECKING:
     ModifyAutoModerationRuleParams = (
         _static_domains_models.ModifyAutoModerationRuleParams
     )
+    CreateFollowupMessageParams = _static_domains_models.CreateFollowupMessageParams
     CreateGuildChannelParams = _static_domains_models.CreateGuildChannelParams
     CreateGuildParams = _static_domains_models.CreateGuildParams
     CreateGuildRoleParams = _static_domains_models.CreateGuildRoleParams
@@ -134,6 +135,12 @@ if TYPE_CHECKING:
     Gateway = _static_domains_models.Gateway
     GatewayBot = _static_domains_models.GatewayBot
     Guild = _static_domains_models.Guild
+    GuildApplicationCommandCreateParams = (
+        _static_domains_models.GuildApplicationCommandCreateParams
+    )
+    GuildApplicationCommandEditParams = (
+        _static_domains_models.GuildApplicationCommandEditParams
+    )
     GuildApplicationCommandPermissions = (
         _static_domains_models.GuildApplicationCommandPermissions
     )
@@ -311,6 +318,9 @@ if TYPE_CHECKING:
     StageInstanceDelete = _static_domains_models.StageInstanceDelete
     StageInstanceUpdate = _static_domains_models.StageInstanceUpdate
     StartThreadFromMessageParams = _static_domains_models.StartThreadFromMessageParams
+    StartThreadInForumChannelParams = (
+        _static_domains_models.StartThreadInForumChannelParams
+    )
     StartThreadWithoutMessageParams = (
         _static_domains_models.StartThreadWithoutMessageParams
     )
@@ -480,6 +490,7 @@ if TYPE_CHECKING:
     ModifyStageInstanceParams = _static_domains_models.ModifyStageInstanceParams
     ModifyUserVoiceStateParams = _static_domains_models.ModifyUserVoiceStateParams
     ModifyWebhookParams = _static_domains_models.ModifyWebhookParams
+    ModifyWebhookWithTokenParams = _static_domains_models.ModifyWebhookWithTokenParams
     UpdateUserApplicationRoleConnectionParams = (
         _static_domains_models.UpdateUserApplicationRoleConnectionParams
     )
@@ -560,6 +571,7 @@ __all__ = [  # noqa: RUF022 - preserve the 1.x public API snapshot order.
     "CountDetails",
     "CreateApplicationEmojiParams",
     "CreateAutoModerationRuleParams",
+    "CreateFollowupMessageParams",
     "CreateChannelInviteParams",
     "CreateDMParams",
     "CreateGroupDMParams",
@@ -601,6 +613,8 @@ __all__ = [  # noqa: RUF022 - preserve the 1.x public API snapshot order.
     "GatewayBot",
     "Guild",
     "GuildApplicationCommandPermissions",
+    "GuildApplicationCommandCreateParams",
+    "GuildApplicationCommandEditParams",
     "GuildAuditLogEntryCreate",
     "GuildBanAdd",
     "GuildBanRemove",
@@ -700,6 +714,7 @@ __all__ = [  # noqa: RUF022 - preserve the 1.x public API snapshot order.
     "ModifyStageInstanceParams",
     "ModifyUserVoiceStateParams",
     "ModifyWebhookParams",
+    "ModifyWebhookWithTokenParams",
     "NumberOption",
     "OnboardingPrompt",
     "OnboardingPromptOption",
@@ -740,6 +755,7 @@ __all__ = [  # noqa: RUF022 - preserve the 1.x public API snapshot order.
     "StageInstanceCreate",
     "StageInstanceDelete",
     "StageInstanceUpdate",
+    "StartThreadInForumChannelParams",
     "Sticker",
     "StickerItem",
     "StickerPack",

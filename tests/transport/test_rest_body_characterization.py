@@ -6,7 +6,7 @@ import inspect
 import json
 from pathlib import Path
 import types
-from typing import Annotated, Literal, NoReturn, Union, get_args, get_origin
+from typing import Annotated, Any, Literal, NoReturn, Union, get_args, get_origin
 from typing_extensions import NotRequired, Required, Unpack, is_typeddict
 
 from nonebot.adapters.discord.api.model import File, Snowflake
@@ -247,6 +247,21 @@ async def test_rest_body_presence_values_are_not_dropped() -> None:
 
 
 @pytest.mark.asyncio
+async def test_create_guild_channel_omits_absent_optional_fields() -> None:
+    adapter = DummyAdapter()
+    bot = DummyBot(adapter=adapter)
+    request = await _capture_request(
+        adapter,
+        adapter._api_create_guild_channel(  # noqa: SLF001
+            bot,
+            guild_id=1,
+            name="channel",
+        ),
+    )
+    assert request.json == {"name": "channel"}
+
+
+@pytest.mark.asyncio
 async def test_nullable_patch_distinguishes_omitted_and_explicit_none() -> None:
     adapter = DummyAdapter()
     bot = DummyBot(adapter=adapter)
@@ -265,3 +280,43 @@ async def test_nullable_patch_distinguishes_omitted_and_explicit_none() -> None:
     )
     assert omitted.json == {"embeds": []}
     assert explicit_null.json == {"content": None}
+
+
+@pytest.mark.asyncio
+async def test_guild_command_rejects_global_only_fields() -> None:
+    adapter = DummyAdapter()
+    bot = DummyBot(adapter=adapter)
+    fields: dict[str, Any] = {"contexts": []}
+
+    with pytest.raises(
+        TypeError,
+        match=r"Unknown Discord REST fields at \$: \['contexts'\]",
+    ):
+        await adapter._api_create_guild_application_command(  # noqa: SLF001
+            bot,
+            application_id=1,
+            guild_id=2,
+            name="command",
+            description="description",
+            **fields,
+        )
+
+    assert adapter.request_calls == 0
+
+
+@pytest.mark.asyncio
+async def test_token_webhook_rejects_channel_id() -> None:
+    adapter = DummyAdapter()
+
+    fields: dict[str, Any] = {"channel_id": 2}
+    with pytest.raises(
+        TypeError,
+        match=r"Unknown Discord REST fields at \$: \['channel_id'\]",
+    ):
+        await adapter._api_modify_webhook_with_token(  # noqa: SLF001
+            webhook_id=1,
+            token=str(1),
+            **fields,
+        )
+
+    assert adapter.request_calls == 0

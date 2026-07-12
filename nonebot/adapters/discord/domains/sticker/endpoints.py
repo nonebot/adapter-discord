@@ -7,7 +7,7 @@ from .write import (
 )
 from ..message.read import File
 from ...api.validation import validate_outbound_value
-from ...protocol import UNSET, SnowflakeType
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -155,28 +155,12 @@ class StickerEndpointMixin:
         see https://discord.com/developers/docs/resources/sticker#modify-guild-sticker
         """
         fields = validate_outbound_value(ModifyGuildStickerParams, fields)
-        name = fields.get("name", UNSET)
-        description = fields.get("description", UNSET)
-        tags = fields.get("tags", UNSET)
-
-        data = validate_outbound_value(
-            ModifyGuildStickerParams,
-            {
-                key: value
-                for key, value in {
-                    "name": name,
-                    "description": description,
-                    "tags": tags,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/stickers/{sticker_id}",
             response=JsonResponse(Sticker),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)

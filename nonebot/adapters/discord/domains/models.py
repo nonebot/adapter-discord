@@ -128,6 +128,12 @@ if TYPE_CHECKING:
     ApplicationCommandCreate = _static_command_write.ApplicationCommandCreate
     ApplicationCommandData = _static_interaction_read.ApplicationCommandData
     ApplicationCommandEditParams = _static_command_write.ApplicationCommandEditParams
+    GuildApplicationCommandCreateParams = (
+        _static_command_write.GuildApplicationCommandCreateParams
+    )
+    GuildApplicationCommandEditParams = (
+        _static_command_write.GuildApplicationCommandEditParams
+    )
     ApplicationCommandInteractionDataOption = (
         _static_interaction_read.ApplicationCommandInteractionDataOption
     )
@@ -186,6 +192,7 @@ if TYPE_CHECKING:
     ModifyAutoModerationRuleParams = (
         _static_moderation_write.ModifyAutoModerationRuleParams
     )
+    CreateFollowupMessageParams = _static_interaction_write.CreateFollowupMessageParams
     CreateGuildChannelParams = _static_guild_write.CreateGuildChannelParams
     CreateGuildParams = _static_guild_write.CreateGuildParams
     CreateGuildRoleParams = _static_guild_write.CreateGuildRoleParams
@@ -399,6 +406,9 @@ if TYPE_CHECKING:
     StageInstanceDelete = _static_voice_gateway.StageInstanceDelete
     StageInstanceUpdate = _static_voice_gateway.StageInstanceUpdate
     StartThreadFromMessageParams = _static_channel_write.StartThreadFromMessageParams
+    StartThreadInForumChannelParams = (
+        _static_channel_write.StartThreadInForumChannelParams
+    )
     StartThreadWithoutMessageParams = (
         _static_channel_write.StartThreadWithoutMessageParams
     )
@@ -568,6 +578,7 @@ if TYPE_CHECKING:
     ModifyStageInstanceParams = _static_voice_write.ModifyStageInstanceParams
     ModifyUserVoiceStateParams = _static_voice_write.ModifyUserVoiceStateParams
     ModifyWebhookParams = _static_webhook_write.ModifyWebhookParams
+    ModifyWebhookWithTokenParams = _static_webhook_write.ModifyWebhookWithTokenParams
     UpdateUserApplicationRoleConnectionParams = (
         _static_user_write.UpdateUserApplicationRoleConnectionParams
     )
@@ -729,6 +740,7 @@ __all__ = [
     "CreateAutoModerationRuleParams",
     "CreateChannelInviteParams",
     "CreateDMParams",
+    "CreateFollowupMessageParams",
     "CreateGroupDMParams",
     "CreateGuildBanParams",
     "CreateGuildChannelParams",
@@ -776,6 +788,8 @@ __all__ = [
     "Gateway",
     "GatewayBot",
     "Guild",
+    "GuildApplicationCommandCreateParams",
+    "GuildApplicationCommandEditParams",
     "GuildApplicationCommandPermissions",
     "GuildAuditLogEntryCreate",
     "GuildBanAdd",
@@ -917,6 +931,7 @@ __all__ = [
     "ModifyThreadParams",
     "ModifyUserVoiceStateParams",
     "ModifyWebhookParams",
+    "ModifyWebhookWithTokenParams",
     "MutableGuildFeature",
     "NumberOption",
     "OnboardingMode",
@@ -973,6 +988,7 @@ __all__ = [
     "StageInstanceUpdate",
     "StagePrivacyLevel",
     "StartThreadFromMessageParams",
+    "StartThreadInForumChannelParams",
     "StartThreadWithoutMessageParams",
     "Sticker",
     "StickerFormatType",

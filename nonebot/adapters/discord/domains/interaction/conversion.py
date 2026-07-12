@@ -1,32 +1,16 @@
 """Interaction request conversion built on message-domain compiled parts."""
 
-from typing_extensions import TypedDict
-
 from .write import InteractionCallbackMessage
 from ..message.conversion import OutboundMessageParts
 from ..models import (
     AllowedMention,
     AttachmentSend,
-    DirectComponent,
-    Embed,
+    CreateFollowupMessageParams,
     File,
     MessageFlag,
-    PollRequest,
     WebhookMessageEditParams,
 )
 from ...protocol import UNSET, Missing, MissingOrNullable, is_unset
-
-
-class FollowupMessageParams(TypedDict, total=False):
-    content: str
-    tts: bool
-    embeds: list[Embed]
-    allowed_mentions: AllowedMention
-    components: list[DirectComponent]
-    files: list[File]
-    attachments: list[AttachmentSend]
-    flags: MessageFlag
-    poll: PollRequest
 
 
 def _attachment_lists(
@@ -77,11 +61,11 @@ def to_followup_message(
     tts: Missing[bool] = UNSET,
     allowed_mentions: Missing[AllowedMention] = UNSET,
     flags: Missing[MessageFlag] = UNSET,
-) -> FollowupMessageParams:
+) -> CreateFollowupMessageParams:
     """Build a followup webhook payload from compiled message parts."""
 
     attachments, files = _attachment_lists(parts)
-    request = FollowupMessageParams()
+    request = CreateFollowupMessageParams()
     if not is_unset(parts.content):
         request["content"] = parts.content
     if not is_unset(tts):

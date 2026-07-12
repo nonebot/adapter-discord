@@ -1,7 +1,9 @@
 """Canonical interaction.write models."""
 
 from typing import TYPE_CHECKING
-from typing_extensions import Required, TypedDict
+from typing_extensions import Required
+
+from .._model_support import OutboundTypedDict
 
 if TYPE_CHECKING:
     from ..models import (
@@ -9,6 +11,7 @@ if TYPE_CHECKING:
         ApplicationCommandOptionChoice,
         AttachmentSend,
         Component,
+        DirectComponent,
         Embed,
         File,
         PollRequest,
@@ -17,7 +20,7 @@ if TYPE_CHECKING:
 from .._model_support import MessageFlag
 
 
-class InteractionCallbackMessage(TypedDict, total=False):
+class InteractionCallbackMessage(OutboundTypedDict, total=False):
     """Interaction callback message.
 
     Not all message fields are currently supported.
@@ -47,7 +50,21 @@ class InteractionCallbackMessage(TypedDict, total=False):
     files: "list[File] | None"
 
 
-class InteractionCallbackAutocomplete(TypedDict, total=False):
+class CreateFollowupMessageParams(OutboundTypedDict, total=False):
+    """Parameters for creating an interaction followup message."""
+
+    content: str | None
+    tts: bool | None
+    embeds: "list[Embed] | None"
+    allowed_mentions: "AllowedMention | None"
+    components: "list[DirectComponent] | None"
+    files: "list[File] | None"
+    attachments: "list[AttachmentSend] | None"
+    flags: MessageFlag | None
+    poll: "PollRequest | None"
+
+
+class InteractionCallbackAutocomplete(OutboundTypedDict, total=False):
     """Interaction callback Autocomplete.
 
     see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete
@@ -57,7 +74,7 @@ class InteractionCallbackAutocomplete(TypedDict, total=False):
     """autocomplete choices (max of 25 choices)"""
 
 
-class InteractionCallbackModal(TypedDict, total=False):
+class InteractionCallbackModal(OutboundTypedDict, total=False):
     """Interaction callback modal.
 
     Support for components in modals is currently limited to type 4 (Text Input).
@@ -80,6 +97,7 @@ InteractionCallbackData = (
 )
 
 __all__ = [
+    "CreateFollowupMessageParams",
     "InteractionCallbackAutocomplete",
     "InteractionCallbackData",
     "InteractionCallbackMessage",

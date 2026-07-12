@@ -1,14 +1,13 @@
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
+from typing_extensions import Unpack
 
 from .read import InteractionResponse
-from ..component.read import Component, DirectComponent
-from ..message.read import AllowedMention, Embed, File, MessageGet
-from ..message.types import MessageFlag
-from ..message.write import AttachmentSend, PollRequest
-from ..webhook.write import ExecuteWebhookParams, WebhookMessageEditParams
+from .write import CreateFollowupMessageParams
+from ..message.read import File, MessageGet
+from ..webhook.write import WebhookMessageEditParams
 from ...api.validation import validate_outbound_value
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -102,7 +101,7 @@ class InteractionEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_edit_origin_interaction_response(  # noqa: PLR0913
+    async def _api_edit_origin_interaction_response(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
@@ -110,14 +109,7 @@ class InteractionEndpointMixin:
         interaction_token: str,
         thread_id: SnowflakeType | None = None,
         with_components: bool | None = None,
-        content: MissingOrNullable[str] = UNSET,
-        embeds: MissingOrNullable[list[Embed]] = UNSET,
-        flags: MissingOrNullable[MessageFlag] = UNSET,
-        allowed_mentions: MissingOrNullable[AllowedMention] = UNSET,
-        components: MissingOrNullable[list[Component]] = UNSET,
-        files: Missing[list[File]] = UNSET,
-        attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
-        poll: MissingOrNullable[PollRequest] = UNSET,
+        **fields: Unpack[WebhookMessageEditParams],
     ) -> MessageGet:
         """Edit the original interaction response.
 
@@ -127,26 +119,9 @@ class InteractionEndpointMixin:
         if with_components is not None:
             params["with_components"] = str(with_components).lower()
 
-        data = {
-            "content": content,
-            "embeds": embeds,
-            "flags": flags,
-            "allowed_mentions": allowed_mentions,
-            "components": components,
-            "files": files,
-            "attachments": attachments,
-            "poll": poll,
-        }
-        request_kwargs_payload = dict(
-            validate_outbound_value(
-                WebhookMessageEditParams,
-                {key: value for key, value in data.items() if value is not UNSET},
-            )
-        )
-        request_kwargs_files = request_kwargs_payload.pop("files", None)
-        request_kwargs = PreparedBody(
-            request_kwargs_payload, files=request_kwargs_files or None
-        )
+        fields = validate_outbound_value(WebhookMessageEditParams, fields)
+        request_kwargs_files = fields.pop("files", None)
+        request_kwargs = PreparedBody(fields, files=request_kwargs_files or None)
         call = RestCall(
             method="PATCH",
             url=self.base_url
@@ -182,64 +157,29 @@ class InteractionEndpointMixin:
         )
         await REST_EXCHANGE.execute(self, call)
 
-    async def _api_create_followup_message(  # noqa: PLR0913
+    async def _api_create_followup_message(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         application_id: SnowflakeType,
         interaction_token: str,
-        content: str | None = None,
-        tts: bool | None = None,
-        embeds: list[Embed] | None = None,
-        allowed_mentions: AllowedMention | None = None,
-        components: list[DirectComponent] | None = None,
-        files: list[File] | None = None,
-        attachments: list[AttachmentSend] | None = None,
-        flags: MessageFlag | None = None,
-        poll: PollRequest | None = None,
+        **fields: Unpack[CreateFollowupMessageParams],
     ) -> MessageGet:
         """Create a followup message.
 
         see https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message
         """
+        fields = validate_outbound_value(CreateFollowupMessageParams, fields)
         has_payload = any(
-            [
-                bool(content),
-                bool(embeds),
-                bool(components),
-                bool(files),
-            ]
+            bool(fields.get(key))
+            for key in ("content", "embeds", "components", "files")
         )
         if not has_payload:
             msg = "content/embeds/components/files is required"
             raise ValueError(msg)
-        data = {
-            "content": content,
-            "tts": tts,
-            "embeds": embeds,
-            "allowed_mentions": allowed_mentions,
-            "components": components,
-            "files": files,
-            "attachments": attachments,
-            "flags": flags,
-            "poll": poll,
-        }
-        request_kwargs_payload = dict(
-            validate_outbound_value(
-                ExecuteWebhookParams,
-                {
-                    key: value
-                    for key, value in {
-                        key: value for (key, value) in data.items() if value is not None
-                    }.items()
-                    if value is not UNSET
-                },
-            )
-        )
-        request_kwargs_files = request_kwargs_payload.pop("files", None)
-        request_kwargs = PreparedBody(
-            request_kwargs_payload, files=request_kwargs_files or None
-        )
+        files = fields.pop("files", None)
+        payload = {key: value for key, value in fields.items() if value is not None}
+        request_kwargs = PreparedBody(payload, files=files or None)
 
         call = RestCall(
             method="POST",
@@ -284,14 +224,7 @@ class InteractionEndpointMixin:
         message_id: SnowflakeType,
         thread_id: SnowflakeType | None = None,
         with_components: bool | None = None,
-        content: MissingOrNullable[str] = UNSET,
-        embeds: MissingOrNullable[list[Embed]] = UNSET,
-        flags: MissingOrNullable[MessageFlag] = UNSET,
-        allowed_mentions: MissingOrNullable[AllowedMention] = UNSET,
-        components: MissingOrNullable[list[Component]] = UNSET,
-        files: Missing[list[File]] = UNSET,
-        attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
-        poll: MissingOrNullable[PollRequest] = UNSET,
+        **fields: Unpack[WebhookMessageEditParams],
     ) -> MessageGet:
         """Edit a followup message.
 
@@ -301,26 +234,9 @@ class InteractionEndpointMixin:
         params: dict[str, Any] = {"thread_id": thread_id}
         if with_components is not None:
             params["with_components"] = str(with_components).lower()
-        data = {
-            "content": content,
-            "embeds": embeds,
-            "flags": flags,
-            "allowed_mentions": allowed_mentions,
-            "components": components,
-            "files": files,
-            "attachments": attachments,
-            "poll": poll,
-        }
-        request_kwargs_payload = dict(
-            validate_outbound_value(
-                WebhookMessageEditParams,
-                {key: value for key, value in data.items() if value is not UNSET},
-            )
-        )
-        request_kwargs_files = request_kwargs_payload.pop("files", None)
-        request_kwargs = PreparedBody(
-            request_kwargs_payload, files=request_kwargs_files or None
-        )
+        fields = validate_outbound_value(WebhookMessageEditParams, fields)
+        request_kwargs_files = fields.pop("files", None)
+        request_kwargs = PreparedBody(fields, files=request_kwargs_files or None)
         call = RestCall(
             method="PATCH",
             url=self.base_url

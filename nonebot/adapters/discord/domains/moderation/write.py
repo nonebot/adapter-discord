@@ -1,7 +1,9 @@
 """Canonical moderation.write models."""
 
 from typing import TYPE_CHECKING
-from typing_extensions import Required, TypedDict
+from typing_extensions import Required
+
+from .._model_support import OutboundTypedDict
 
 if TYPE_CHECKING:
     from ..models import AutoModerationAction, TriggerMetadata
@@ -9,7 +11,7 @@ if TYPE_CHECKING:
 from .._model_support import AutoModerationRuleEventType, Snowflake, TriggerType
 
 
-class CreateAutoModerationRuleParams(TypedDict, total=False):
+class CreateAutoModerationRuleParams(OutboundTypedDict, total=False):
     """Create Auto Moderation Rule Params.
 
     see https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
@@ -25,7 +27,7 @@ class CreateAutoModerationRuleParams(TypedDict, total=False):
     exempt_channels: list[Snowflake]
 
 
-class ModifyAutoModerationRuleParams(TypedDict, total=False):
+class ModifyAutoModerationRuleParams(OutboundTypedDict, total=False):
     """Modify Auto Moderation Rule Params.
 
     see https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule

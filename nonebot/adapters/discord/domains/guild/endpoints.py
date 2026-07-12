@@ -70,7 +70,6 @@ from ...transport.exchange import (
     RestCall,
     _bool_query,
 )
-from ...utils import omit_unset
 
 if TYPE_CHECKING:
     from ...api.handle import AdapterProtocol
@@ -90,18 +89,16 @@ class GuildEndpointMixin:
     ) -> Guild:
         """https://discord.com/developers/docs/resources/guild"""
         fields = validate_outbound_value(CreateGuildParams, fields)
-        name = fields["name"]
-        if not name:
+        if not fields["name"]:
             msg = "name is required"
             raise ValueError(msg)
-        data = dict(fields)
 
         call = RestCall(
             method="POST",
             url=self.base_url / "guilds",
             response=JsonResponse(Guild),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -175,61 +172,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#modify-guild
         """
         fields = validate_outbound_value(ModifyGuildParams, fields)
-        name = fields.get("name", UNSET)
-        region = fields.get("region", UNSET)
-        verification_level = fields.get("verification_level", UNSET)
-        default_message_notifications = fields.get(
-            "default_message_notifications", UNSET
-        )
-        explicit_content_filter = fields.get("explicit_content_filter", UNSET)
-        afk_channel_id = fields.get("afk_channel_id", UNSET)
-        afk_timeout = fields.get("afk_timeout", UNSET)
-        icon = fields.get("icon", UNSET)
-        splash = fields.get("splash", UNSET)
-        discovery_splash = fields.get("discovery_splash", UNSET)
-        banner = fields.get("banner", UNSET)
-        system_channel_id = fields.get("system_channel_id", UNSET)
-        system_channel_flags = fields.get("system_channel_flags", UNSET)
-        rules_channel_id = fields.get("rules_channel_id", UNSET)
-        public_updates_channel_id = fields.get("public_updates_channel_id", UNSET)
-        preferred_locale = fields.get("preferred_locale", UNSET)
-        features = fields.get("features", UNSET)
-        description = fields.get("description", UNSET)
-        premium_progress_bar_enabled = fields.get("premium_progress_bar_enabled", UNSET)
-        safety_alerts_channel_id = fields.get("safety_alerts_channel_id", UNSET)
-
-        data = {
-            "name": name,
-            "region": region,
-            "verification_level": verification_level,
-            "default_message_notifications": default_message_notifications,
-            "explicit_content_filter": explicit_content_filter,
-            "afk_channel_id": afk_channel_id,
-            "afk_timeout": afk_timeout,
-            "icon": icon,
-            "splash": splash,
-            "discovery_splash": discovery_splash,
-            "banner": banner,
-            "system_channel_id": system_channel_id,
-            "system_channel_flags": system_channel_flags,
-            "rules_channel_id": rules_channel_id,
-            "public_updates_channel_id": public_updates_channel_id,
-            "preferred_locale": preferred_locale,
-            "features": features,
-            "description": description,
-            "premium_progress_bar_enabled": premium_progress_bar_enabled,
-            "safety_alerts_channel_id": safety_alerts_channel_id,
-        }
-        data = validate_outbound_value(
-            ModifyGuildParams,
-            {key: value for key, value in data.items() if value is not UNSET},
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}",
             response=JsonResponse(Guild),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -246,26 +194,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
         """
         fields = validate_outbound_value(ModifyGuildIncidentActionsParams, fields)
-        invites_disabled_until = fields.get("invites_disabled_until", UNSET)
-        dms_disabled_until = fields.get("dms_disabled_until", UNSET)
-
-        data = validate_outbound_value(
-            ModifyGuildIncidentActionsParams,
-            {
-                key: value
-                for key, value in {
-                    "invites_disabled_until": invites_disabled_until,
-                    "dms_disabled_until": dms_disabled_until,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PUT",
             url=self.base_url / f"guilds/{guild_id}/incident-actions",
             response=JsonResponse(GuildIncidentsData),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -316,60 +250,15 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#create-guild-channel
         """
         fields = validate_outbound_value(CreateGuildChannelParams, fields)
-        name = fields["name"]
-        channel_type = fields.get("type")
-        topic = fields.get("topic")
-        bitrate = fields.get("bitrate")
-        user_limit = fields.get("user_limit")
-        rate_limit_per_user = fields.get("rate_limit_per_user")
-        position = fields.get("position")
-        permission_overwrites = fields.get("permission_overwrites")
-        parent_id = fields.get("parent_id")
-        nsfw = fields.get("nsfw")
-        rtc_region = fields.get("rtc_region")
-        video_quality_mode = fields.get("video_quality_mode")
-        default_auto_archive_duration = fields.get("default_auto_archive_duration")
-        default_reaction_emoji = fields.get("default_reaction_emoji")
-        available_tags = fields.get("available_tags")
-        default_sort_order = fields.get("default_sort_order")
-
-        default_forum_layout = fields.get("default_forum_layout")
-        default_thread_rate_limit_per_user = fields.get(
-            "default_thread_rate_limit_per_user"
-        )
-        if not name:
+        if not fields["name"]:
             msg = "name is required"
             raise ValueError(msg)
-        data = {
-            "name": name,
-            "type": channel_type,
-            "topic": topic,
-            "bitrate": bitrate,
-            "user_limit": user_limit,
-            "rate_limit_per_user": rate_limit_per_user,
-            "position": position,
-            "permission_overwrites": permission_overwrites,
-            "parent_id": parent_id,
-            "nsfw": nsfw,
-            "rtc_region": rtc_region,
-            "video_quality_mode": video_quality_mode,
-            "default_auto_archive_duration": default_auto_archive_duration,
-            "default_reaction_emoji": default_reaction_emoji,
-            "available_tags": available_tags,
-            "default_sort_order": default_sort_order,
-            "default_forum_layout": default_forum_layout,
-            "default_thread_rate_limit_per_user": default_thread_rate_limit_per_user,
-        }
-        data = validate_outbound_value(
-            CreateGuildChannelParams,
-            {key: value for key, value in data.items() if value is not UNSET},
-        )
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/channels",
             response=JsonResponse(Channel),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -405,10 +294,7 @@ class GuildEndpointMixin:
                 )
             channels = [channel]
         payload = [
-            validate_outbound_value(
-                ModifyGuildChannelPositionParams,
-                {key: value for key, value in channel.items() if value is not UNSET},
-            )
+            validate_outbound_value(ModifyGuildChannelPositionParams, channel)
             for channel in channels
         ]
         call = RestCall(
@@ -523,27 +409,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#add-guild-member
         """
         fields = validate_outbound_value(AddGuildMemberParams, fields)
-        access_token = fields["access_token"]
-        nick = fields.get("nick")
-        roles = fields.get("roles")
-        mute = fields.get("mute")
-        deaf = fields.get("deaf")
-
-        data = {
-            "access_token": access_token,
-            "nick": nick,
-            "roles": roles,
-            "mute": mute,
-            "deaf": deaf,
-        }
         call = RestCall(
             method="PUT",
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}",
             response=JsonResponse(GuildMember, allow_empty=True),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
         )
         resp = await REST_EXCHANGE.execute(self, call)
         if resp:
@@ -564,36 +435,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#modify-guild-member
         """
         fields = validate_outbound_value(ModifyGuildMemberParams, fields)
-        nick = fields.get("nick", UNSET)
-        roles = fields.get("roles", UNSET)
-        mute = fields.get("mute", UNSET)
-        deaf = fields.get("deaf", UNSET)
-        channel_id = fields.get("channel_id", UNSET)
-        communication_disabled_until = fields.get("communication_disabled_until", UNSET)
-        flags = fields.get("flags", UNSET)
-
-        data = validate_outbound_value(
-            ModifyGuildMemberParams,
-            {
-                key: value
-                for key, value in {
-                    "nick": nick,
-                    "roles": roles,
-                    "mute": mute,
-                    "deaf": deaf,
-                    "channel_id": channel_id,
-                    "communication_disabled_until": communication_disabled_until,
-                    "flags": flags,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}",
             response=JsonResponse(GuildMember),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -611,30 +458,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#modify-current-member
         """
         fields = validate_outbound_value(ModifyCurrentMemberParams, fields)
-        nick = fields.get("nick", UNSET)
-        banner = fields.get("banner", UNSET)
-        avatar = fields.get("avatar", UNSET)
-        bio = fields.get("bio", UNSET)
-
-        data = validate_outbound_value(
-            ModifyCurrentMemberParams,
-            {
-                key: value
-                for key, value in {
-                    "nick": nick,
-                    "banner": banner,
-                    "avatar": avatar,
-                    "bio": bio,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/members/@me",
             response=JsonResponse(GuildMember),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -652,15 +481,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#modify-current-user-nick
         """
         fields = validate_outbound_value(ModifyCurrentUserNickParams, fields)
-        nick = fields.get("nick", UNSET)
-
-        data = omit_unset({"nick": nick})
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/members/@me/nick",
             response=JsonResponse(GuildMember),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -874,19 +700,22 @@ class GuildEndpointMixin:
         fields = validate_outbound_value(CreateGuildBanParams, fields)
         delete_message_days = fields.get("delete_message_days")
         delete_message_seconds = fields.get("delete_message_seconds")
+        if delete_message_days is not None and not 0 <= delete_message_days <= 7:  # noqa: PLR2004
+            msg = "delete_message_days must be between 0 and 7"
+            raise ValueError(msg)
+        if (
+            delete_message_seconds is not None
+            and not 0 <= delete_message_seconds <= 604800  # noqa: PLR2004
+        ):
+            msg = "delete_message_seconds must be between 0 and 604800"
+            raise ValueError(msg)
 
-        data = {
-            "delete_message_days": delete_message_days,
-            "delete_message_seconds": delete_message_seconds,
-        }
         call = RestCall(
             method="PUT",
             url=self.base_url / f"guilds/{guild_id}/bans/{user_id}",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         await REST_EXCHANGE.execute(self, call)
@@ -926,21 +755,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#bulk-guild-ban
         """
         fields = validate_outbound_value(BulkGuildBanParams, fields)
-        user_ids = fields["user_ids"]
-        delete_message_seconds = fields.get("delete_message_seconds")
-
-        data = {
-            "user_ids": user_ids,
-            "delete_message_seconds": delete_message_seconds,
-        }
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/bulk-ban",
             response=JsonResponse(BulkBan),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -994,38 +814,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#create-guild-role
         """
         fields = validate_outbound_value(CreateGuildRoleParams, fields)
-        name = fields.get("name", UNSET)
-        permissions = fields.get("permissions", UNSET)
-        color = fields.get("color", UNSET)
-        colors = fields.get("colors", UNSET)
-        hoist = fields.get("hoist", UNSET)
-        icon = fields.get("icon", UNSET)
-        unicode_emoji = fields.get("unicode_emoji", UNSET)
-        mentionable = fields.get("mentionable", UNSET)
-
-        data = validate_outbound_value(
-            CreateGuildRoleParams,
-            {
-                key: value
-                for key, value in {
-                    "name": name,
-                    "permissions": permissions,
-                    "color": color,
-                    "colors": colors,
-                    "hoist": hoist,
-                    "icon": icon,
-                    "unicode_emoji": unicode_emoji,
-                    "mentionable": mentionable,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/roles",
             response=JsonResponse(Role),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1054,10 +848,7 @@ class GuildEndpointMixin:
                 role["position"] = position
             roles = [role]
         payload = [
-            validate_outbound_value(
-                ModifyGuildRolePositionParams,
-                {key: value for key, value in role.items() if value is not UNSET},
-            )
+            validate_outbound_value(ModifyGuildRolePositionParams, role)
             for role in roles
         ]
         call = RestCall(
@@ -1084,38 +875,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#modify-guild-role
         """
         fields = validate_outbound_value(ModifyGuildRoleParams, fields)
-        name = fields.get("name", UNSET)
-        permissions = fields.get("permissions", UNSET)
-        color = fields.get("color", UNSET)
-        colors = fields.get("colors", UNSET)
-        hoist = fields.get("hoist", UNSET)
-        icon = fields.get("icon", UNSET)
-        unicode_emoji = fields.get("unicode_emoji", UNSET)
-        mentionable = fields.get("mentionable", UNSET)
-
-        data = validate_outbound_value(
-            ModifyGuildRoleParams,
-            {
-                key: value
-                for key, value in {
-                    "name": name,
-                    "permissions": permissions,
-                    "color": color,
-                    "colors": colors,
-                    "hoist": hoist,
-                    "icon": icon,
-                    "unicode_emoji": unicode_emoji,
-                    "mentionable": mentionable,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/roles/{role_id}",
             response=JsonResponse(Role),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1135,15 +900,12 @@ class GuildEndpointMixin:
     ) -> None:
         """https://discord.com/developers/docs/resources/guild"""
         fields = validate_outbound_value(ModifyGuildMFAParams, fields)
-        level = fields["level"]
-
-        data = {"level": level}
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/mfa",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         await REST_EXCHANGE.execute(self, call)
@@ -1211,23 +973,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#begin-guild-prune
         """
         fields = validate_outbound_value(BeginGuildPruneParams, fields)
-        days = fields.get("days")
-        compute_prune_count = fields.get("compute_prune_count")
-        include_roles = fields.get("include_roles")
-
-        data = {
-            "days": days,
-            "compute_prune_count": compute_prune_count,
-            "include_roles": include_roles,
-        }
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/prune",
             response=JsonResponse(Any),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1331,23 +1082,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#modify-guild-widget
         """
         fields = validate_outbound_value(ModifyGuildWidgetParams, fields)
-        enabled = fields.get("enabled", UNSET)
-        channel_id = fields.get("channel_id", UNSET)
-
-        data = validate_outbound_value(
-            ModifyGuildWidgetParams,
-            {
-                key: value
-                for key, value in {"enabled": enabled, "channel_id": channel_id}.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/widget",
             response=JsonResponse(GuildWidgetSettings),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1436,25 +1176,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
         """
         fields = validate_outbound_value(ModifyGuildWelcomeScreenParams, fields)
-        enabled = fields.get("enabled", UNSET)
-        welcome_channels = fields.get("welcome_channels", UNSET)
-        description = fields.get("description", UNSET)
-
-        data = {
-            "enabled": enabled,
-            "welcome_channels": welcome_channels,
-            "description": description,
-        }
-        data = validate_outbound_value(
-            ModifyGuildWelcomeScreenParams,
-            {key: value for key, value in data.items() if value is not UNSET},
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/welcome-screen",
             response=JsonResponse(WelcomeScreen),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1488,27 +1215,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
         """
         fields = validate_outbound_value(ModifyGuildOnboardingParams, fields)
-        prompts = fields.get("prompts", UNSET)
-        default_channel_ids = fields.get("default_channel_ids", UNSET)
-        enabled = fields.get("enabled", UNSET)
-        mode = fields.get("mode", UNSET)
-
-        data = {
-            "prompts": prompts,
-            "default_channel_ids": default_channel_ids,
-            "enabled": enabled,
-            "mode": mode,
-        }
-        data = validate_outbound_value(
-            ModifyGuildOnboardingParams,
-            {key: value for key, value in data.items() if value is not UNSET},
-        )
         call = RestCall(
             method="PUT",
             url=self.base_url / f"guilds/{guild_id}/onboarding",
             response=JsonResponse(GuildOnboarding),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1550,14 +1262,8 @@ class GuildEndpointMixin:
         fields = validate_outbound_value(CreateGuildScheduledEventParams, fields)
         channel_id = fields.get("channel_id")
         entity_metadata = fields.get("entity_metadata")
-        name = fields["name"]
-        privacy_level = fields["privacy_level"]
-        scheduled_start_time = fields["scheduled_start_time"]
         scheduled_end_time = fields.get("scheduled_end_time")
-        description = fields.get("description")
         entity_type = fields["entity_type"]
-        image = fields.get("image")
-        recurrence_rule = fields.get("recurrence_rule")
         if entity_type == GuildScheduledEventEntityType.EXTERNAL:
             if channel_id is not None:
                 msg = "channel_id must be None for EXTERNAL events"
@@ -1576,32 +1282,13 @@ class GuildEndpointMixin:
             msg = "channel_id is required for non-EXTERNAL events"
             raise ValueError(msg)
 
-        data = {
-            "channel_id": channel_id,
-            "entity_metadata": entity_metadata,
-            "name": name,
-            "privacy_level": privacy_level,
-            "scheduled_start_time": scheduled_start_time,
-            "scheduled_end_time": scheduled_end_time,
-            "description": description,
-            "entity_type": entity_type,
-            "image": image,
-            "recurrence_rule": recurrence_rule,
-        }
-        data = validate_outbound_value(
-            CreateGuildScheduledEventParams,
-            {
-                key: value
-                for key, value in data.items()
-                if value is not UNSET and value is not None
-            },
-        )
+        payload = {key: value for key, value in fields.items() if value is not None}
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/scheduled-events",
             response=JsonResponse(GuildScheduledEvent),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(payload),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1643,41 +1330,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event
         """
         fields = validate_outbound_value(ModifyGuildScheduledEventParams, fields)
-        channel_id = fields.get("channel_id", UNSET)
-        entity_metadata = fields.get("entity_metadata", UNSET)
-        name = fields.get("name", UNSET)
-        privacy_level = fields.get("privacy_level", UNSET)
-        scheduled_start_time = fields.get("scheduled_start_time", UNSET)
-        scheduled_end_time = fields.get("scheduled_end_time", UNSET)
-        description = fields.get("description", UNSET)
-        entity_type = fields.get("entity_type", UNSET)
-        status = fields.get("status", UNSET)
-        image = fields.get("image", UNSET)
-        recurrence_rule = fields.get("recurrence_rule", UNSET)
-
-        data = {
-            "channel_id": channel_id,
-            "entity_metadata": entity_metadata,
-            "name": name,
-            "privacy_level": privacy_level,
-            "scheduled_start_time": scheduled_start_time,
-            "scheduled_end_time": scheduled_end_time,
-            "description": description,
-            "entity_type": entity_type,
-            "status": status,
-            "image": image,
-            "recurrence_rule": recurrence_rule,
-        }
-        data = validate_outbound_value(
-            ModifyGuildScheduledEventParams,
-            {key: value for key, value in data.items() if value is not UNSET},
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/scheduled-events/{event_id}",
             response=JsonResponse(GuildScheduledEvent),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1809,23 +1467,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild-template#create-guild-template
         """
         fields = validate_outbound_value(CreateGuildTemplateParams, fields)
-        name = fields["name"]
-        description = fields.get("description", UNSET)
-
-        data = validate_outbound_value(
-            CreateGuildTemplateParams,
-            {
-                key: value
-                for key, value in {"name": name, "description": description}.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/templates",
             response=JsonResponse(GuildTemplate),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -1862,23 +1509,12 @@ class GuildEndpointMixin:
         see https://discord.com/developers/docs/resources/guild-template#modify-guild-template
         """
         fields = validate_outbound_value(ModifyGuildTemplateParams, fields)
-        name = fields.get("name", UNSET)
-        description = fields.get("description", UNSET)
-
-        data = validate_outbound_value(
-            ModifyGuildTemplateParams,
-            {
-                key: value
-                for key, value in {"name": name, "description": description}.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/templates/{template_code}",
             response=JsonResponse(GuildTemplate),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 

@@ -9,7 +9,7 @@ from .write import (
     ModifyGuildEmojiParams,
 )
 from ...api.validation import validate_outbound_value
-from ...protocol import UNSET, SnowflakeType
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -74,29 +74,18 @@ class EmojiEndpointMixin:
         see https://discord.com/developers/docs/resources/emoji#create-guild-emoji
         """
         fields = validate_outbound_value(CreateGuildEmojiParams, fields)
-        name = fields["name"]
-        image = fields["image"]
-        roles = fields.get("roles")
-
-        if not name:
+        if not fields["name"]:
             msg = "name is required"
             raise ValueError(msg)
-        if not image:
+        if not fields["image"]:
             msg = "image is required"
             raise ValueError(msg)
-        data = {
-            "name": name,
-            "image": image,
-            "roles": roles,
-        }
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/emojis",
             response=JsonResponse(Emoji),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -115,23 +104,12 @@ class EmojiEndpointMixin:
         see https://discord.com/developers/docs/resources/emoji#modify-guild-emoji
         """
         fields = validate_outbound_value(ModifyGuildEmojiParams, fields)
-        name = fields.get("name", UNSET)
-        roles = fields.get("roles", UNSET)
-
-        data = validate_outbound_value(
-            ModifyGuildEmojiParams,
-            {
-                key: value
-                for key, value in {"name": name, "roles": roles}.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/emojis/{emoji_id}",
             response=JsonResponse(Emoji),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -206,22 +184,18 @@ class EmojiEndpointMixin:
         see https://discord.com/developers/docs/resources/emoji#create-application-emoji
         """
         fields = validate_outbound_value(CreateApplicationEmojiParams, fields)
-        name = fields["name"]
-        image = fields["image"]
-
-        if not name:
+        if not fields["name"]:
             msg = "name is required"
             raise ValueError(msg)
-        if not image:
+        if not fields["image"]:
             msg = "image is required"
             raise ValueError(msg)
-        data = {"name": name, "image": image}
         call = RestCall(
             method="POST",
             url=self.base_url / f"applications/{application_id}/emojis",
             response=JsonResponse(Emoji),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -238,14 +212,12 @@ class EmojiEndpointMixin:
         see https://discord.com/developers/docs/resources/emoji#modify-application-emoji
         """
         fields = validate_outbound_value(ModifyApplicationEmojiParams, fields)
-        name = fields["name"]
-
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"applications/{application_id}/emojis/{emoji_id}",
             response=JsonResponse(Emoji),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody({"name": name}),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 

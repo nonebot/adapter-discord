@@ -12,7 +12,7 @@ from .write import (
     SendSoundboardSoundParams,
 )
 from ...api.validation import validate_outbound_value
-from ...protocol import UNSET, SnowflakeType
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -40,26 +40,12 @@ class SoundboardEndpointMixin:
         see https://discord.com/developers/docs/resources/soundboard#send-soundboard-sound
         """
         fields = validate_outbound_value(SendSoundboardSoundParams, fields)
-        sound_id = fields["sound_id"]
-        source_guild_id = fields.get("source_guild_id", UNSET)
-
-        data = validate_outbound_value(
-            SendSoundboardSoundParams,
-            {
-                key: value
-                for key, value in {
-                    "sound_id": sound_id,
-                    "source_guild_id": source_guild_id,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="POST",
             url=self.base_url / f"channels/{channel_id}/send-soundboard-sound",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         await REST_EXCHANGE.execute(self, call)
 
@@ -130,32 +116,12 @@ class SoundboardEndpointMixin:
         see https://discord.com/developers/docs/resources/soundboard#create-guild-soundboard-sound
         """
         fields = validate_outbound_value(CreateGuildSoundboardSoundParams, fields)
-        name = fields["name"]
-        sound = fields["sound"]
-        volume = fields.get("volume", UNSET)
-        emoji_id = fields.get("emoji_id", UNSET)
-        emoji_name = fields.get("emoji_name", UNSET)
-
-        data = validate_outbound_value(
-            CreateGuildSoundboardSoundParams,
-            {
-                key: value
-                for key, value in {
-                    "name": name,
-                    "sound": sound,
-                    "volume": volume,
-                    "emoji_id": emoji_id,
-                    "emoji_name": emoji_name,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/soundboard-sounds",
             response=JsonResponse(SoundboardSound),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -172,30 +138,12 @@ class SoundboardEndpointMixin:
         see https://discord.com/developers/docs/resources/soundboard#modify-guild-soundboard-sound
         """
         fields = validate_outbound_value(ModifyGuildSoundboardSoundParams, fields)
-        name = fields.get("name", UNSET)
-        volume = fields.get("volume", UNSET)
-        emoji_id = fields.get("emoji_id", UNSET)
-        emoji_name = fields.get("emoji_name", UNSET)
-
-        data = validate_outbound_value(
-            ModifyGuildSoundboardSoundParams,
-            {
-                key: value
-                for key, value in {
-                    "name": name,
-                    "volume": volume,
-                    "emoji_id": emoji_id,
-                    "emoji_name": emoji_name,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/soundboard-sounds/{sound_id}",
             response=JsonResponse(SoundboardSound),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 

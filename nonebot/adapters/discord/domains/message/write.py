@@ -1,7 +1,9 @@
 """Canonical message.write models."""
 
 from typing import TYPE_CHECKING
-from typing_extensions import Required, TypedDict
+from typing_extensions import Required
+
+from .._model_support import OutboundTypedDict
 
 if TYPE_CHECKING:
     from ..models import (
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
 from .._model_support import MessageFlag
 
 
-class AttachmentSend(TypedDict, total=False):
+class AttachmentSend(OutboundTypedDict, total=False):
     """Attachment Send
 
     see https://discord.com/developers/docs/resources/channel#attachment-object"""
@@ -28,27 +30,27 @@ class AttachmentSend(TypedDict, total=False):
     description: str | None
 
 
-class MessageSend(TypedDict, total=False):
+class MessageSend(OutboundTypedDict, total=False):
     """Message Send
 
     see https://discord.com/developers/docs/resources/message#create-message"""
 
-    content: str
-    nonce: int | str
-    enforce_nonce: bool
-    tts: bool
-    embeds: "list[Embed]"
-    allowed_mentions: "AllowedMention"
-    message_reference: "MessageReference"
-    components: "list[DirectComponent]"
-    sticker_ids: "list[SnowflakeType]"
-    files: "list[File]"
-    attachments: list[AttachmentSend]
-    flags: MessageFlag
-    poll: "PollRequest"
+    content: str | None
+    nonce: int | str | None
+    enforce_nonce: bool | None
+    tts: bool | None
+    embeds: "list[Embed] | None"
+    allowed_mentions: "AllowedMention | None"
+    message_reference: "MessageReference | None"
+    components: "list[DirectComponent] | None"
+    sticker_ids: "list[SnowflakeType] | None"
+    files: "list[File] | None"
+    attachments: list[AttachmentSend] | None
+    flags: MessageFlag | None
+    poll: "PollRequest | None"
 
 
-class MessageEditParams(TypedDict, total=False):
+class MessageEditParams(OutboundTypedDict, total=False):
     """Edit Message Parameters.
 
     All parameters are optional and nullable.
@@ -67,7 +69,7 @@ class MessageEditParams(TypedDict, total=False):
     poll: "PollRequest | None"
 
 
-class PollRequest(TypedDict, total=False):
+class PollRequest(OutboundTypedDict, total=False):
     """This is the request object used when creating a poll across the
     different endpoints. It is similar but not exactly identical to the
     main poll object. The main difference is that the request has `duration`
@@ -88,7 +90,7 @@ class PollRequest(TypedDict, total=False):
     """The layout type of the poll"""
 
 
-class PollAnswerRequest(TypedDict, total=False):
+class PollAnswerRequest(OutboundTypedDict, total=False):
     """Poll answer request object.
 
     see https://discord.com/developers/docs/resources/poll#poll-create-request-object
@@ -97,7 +99,7 @@ class PollAnswerRequest(TypedDict, total=False):
     poll_media: Required["PollMedia"]
 
 
-class BulkDeleteMessagesParams(TypedDict, total=False):
+class BulkDeleteMessagesParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_bulk_delete_message``."""
 
     messages: Required["list[SnowflakeType]"]

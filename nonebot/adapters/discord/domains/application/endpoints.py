@@ -19,7 +19,7 @@ from ...api.validation import (
     validate,
     validate_outbound_value,
 )
-from ...protocol import UNSET, SnowflakeType
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BearerAuth,
@@ -64,50 +64,12 @@ class ApplicationEndpointMixin:
         see https://discord.com/developers/docs/resources/application#edit-current-application
         """
         fields = validate_outbound_value(EditCurrentApplicationParams, fields)
-        custom_install_url = fields.get("custom_install_url", UNSET)
-        description = fields.get("description", UNSET)
-        role_connections_verification_url = fields.get(
-            "role_connections_verification_url", UNSET
-        )
-        install_params = fields.get("install_params", UNSET)
-        integration_types_config = fields.get("integration_types_config", UNSET)
-        flags = fields.get("flags", UNSET)
-        icon = fields.get("icon", UNSET)
-        cover_image = fields.get("cover_image", UNSET)
-        interactions_endpoint_url = fields.get("interactions_endpoint_url", UNSET)
-        tags = fields.get("tags", UNSET)
-        event_webhooks_url = fields.get("event_webhooks_url", UNSET)
-        event_webhooks_status = fields.get("event_webhooks_status", UNSET)
-        event_webhooks_types = fields.get("event_webhooks_types", UNSET)
-
-        data = validate_outbound_value(
-            EditCurrentApplicationParams,
-            {
-                key: value
-                for key, value in {
-                    "custom_install_url": custom_install_url,
-                    "description": description,
-                    "role_connections_verification_url": role_connections_verification_url,
-                    "install_params": install_params,
-                    "integration_types_config": integration_types_config,
-                    "flags": flags,
-                    "icon": icon,
-                    "cover_image": cover_image,
-                    "interactions_endpoint_url": interactions_endpoint_url,
-                    "tags": tags,
-                    "event_webhooks_url": event_webhooks_url,
-                    "event_webhooks_status": event_webhooks_status,
-                    "event_webhooks_types": event_webhooks_types,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / "applications/@me",
             response=JsonResponse(Application),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -271,24 +233,16 @@ class ApplicationEndpointMixin:
         see https://discord.com/developers/docs/resources/entitlement#create-test-entitlement
         """
         fields = validate_outbound_value(CreateTestEntitlementParams, fields)
-        sku_id = fields["sku_id"]
-        owner_id = fields["owner_id"]
         owner_type = fields["owner_type"]
         if owner_type not in (1, 2):
             msg = "owner_type must be 1 or 2"
             raise ValueError(msg)
-
-        data = {
-            "sku_id": sku_id,
-            "owner_id": owner_id,
-            "owner_type": owner_type,
-        }
         call = RestCall(
             method="POST",
             url=self.base_url / f"applications/{application_id}/entitlements",
             response=JsonResponse(Entitlement),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 

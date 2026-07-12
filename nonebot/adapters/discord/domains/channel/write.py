@@ -1,25 +1,37 @@
 """Canonical channel.write models."""
 
 from typing import TYPE_CHECKING
-from typing_extensions import Required, TypedDict
+from typing_extensions import Required
+
+from .._model_support import OutboundTypedDict
 
 if TYPE_CHECKING:
     from .types import OverwriteType
     from ..invite.types import InviteTargetType
-    from ..models import DefaultReaction, ForumTagRequest, PartialOverwrite
+    from ..models import (
+        AllowedMention,
+        AttachmentSend,
+        DefaultReaction,
+        DirectComponent,
+        Embed,
+        File,
+        ForumTagRequest,
+        PartialOverwrite,
+    )
     from ...protocol import SnowflakeType
 
 from .._model_support import (
     ChannelFlags,
     ChannelType,
     ForumLayoutTypes,
+    MessageFlag,
     Snowflake,
     SortOrderTypes,
     VideoQualityMode,
 )
 
 
-class ModifyChannelParams(TypedDict, total=False):
+class ModifyChannelParams(OutboundTypedDict, total=False):
     """Modify Channel Params
 
     see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
@@ -48,7 +60,7 @@ class ModifyChannelParams(TypedDict, total=False):
     default_forum_layout: ForumLayoutTypes
 
 
-class ModifyThreadParams(TypedDict, total=False):
+class ModifyThreadParams(OutboundTypedDict, total=False):
     """Modify Thread Params.
 
     see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-thread
@@ -64,7 +76,7 @@ class ModifyThreadParams(TypedDict, total=False):
     applied_tags: list[Snowflake]
 
 
-class StartThreadFromMessageParams(TypedDict, total=False):
+class StartThreadFromMessageParams(OutboundTypedDict, total=False):
     """Start Thread From Message Params.
 
     see https://discord.com/developers/docs/resources/channel#start-thread-from-message
@@ -75,7 +87,7 @@ class StartThreadFromMessageParams(TypedDict, total=False):
     rate_limit_per_user: int | None
 
 
-class StartThreadWithoutMessageParams(TypedDict, total=False):
+class StartThreadWithoutMessageParams(OutboundTypedDict, total=False):
     """Start Thread Without Message Params.
 
     see https://discord.com/developers/docs/resources/channel#start-thread-without-message
@@ -88,7 +100,24 @@ class StartThreadWithoutMessageParams(TypedDict, total=False):
     rate_limit_per_user: int | None
 
 
-class ModifyGuildChannelPositionParams(TypedDict, total=False):
+class StartThreadInForumChannelParams(OutboundTypedDict, total=False):
+    """Parameters for starting a thread in a forum or media channel."""
+
+    name: Required[str]
+    auto_archive_duration: int
+    rate_limit_per_user: int | None
+    applied_tags: "list[SnowflakeType]"
+    content: str | None
+    embeds: "list[Embed] | None"
+    allowed_mentions: "AllowedMention | None"
+    components: "list[DirectComponent] | None"
+    sticker_ids: "list[SnowflakeType] | None"
+    files: "list[File] | None"
+    attachments: "list[AttachmentSend] | None"
+    flags: MessageFlag | None
+
+
+class ModifyGuildChannelPositionParams(OutboundTypedDict, total=False):
     """Modify Guild Channel Position Params.
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions
@@ -100,14 +129,14 @@ class ModifyGuildChannelPositionParams(TypedDict, total=False):
     parent_id: Snowflake | None
 
 
-class ModifyDMParams(TypedDict, total=False):
+class ModifyDMParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_modify_DM``."""
 
     name: str
     icon: bytes
 
 
-class EditChannelPermissionsParams(TypedDict, total=False):
+class EditChannelPermissionsParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_edit_channel_permissions``."""
 
     allow: str
@@ -115,7 +144,7 @@ class EditChannelPermissionsParams(TypedDict, total=False):
     type: Required["OverwriteType"]
 
 
-class CreateChannelInviteParams(TypedDict, total=False):
+class CreateChannelInviteParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_create_channel_invite``."""
 
     max_age: int
@@ -128,13 +157,13 @@ class CreateChannelInviteParams(TypedDict, total=False):
     role_ids: "list[SnowflakeType]"
 
 
-class FollowAnnouncementChannelParams(TypedDict, total=False):
+class FollowAnnouncementChannelParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_follow_announcement_channel``."""
 
     webhook_channel_id: Required["SnowflakeType"]
 
 
-class AddGroupDMRecipientParams(TypedDict, total=False):
+class AddGroupDMRecipientParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_group_DM_add_recipient``."""
 
     access_token: Required[str]
@@ -151,5 +180,6 @@ __all__ = [
     "ModifyGuildChannelPositionParams",
     "ModifyThreadParams",
     "StartThreadFromMessageParams",
+    "StartThreadInForumChannelParams",
     "StartThreadWithoutMessageParams",
 ]

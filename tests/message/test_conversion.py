@@ -90,8 +90,12 @@ def test_compile_message_preserves_parts_and_attachment_pairs() -> None:
     send = to_message_send(parts, tts=False)
     assert "attachments" in send
     assert "files" in send
-    assert [attachment.get("id") for attachment in send["attachments"]] == [0, 1]
-    assert [file.content for file in send["files"]] == [b"first", b"second"]
+    attachments = send["attachments"]
+    files = send["files"]
+    assert attachments is not None
+    assert files is not None
+    assert [attachment.get("id") for attachment in attachments] == [0, 1]
+    assert [file.content for file in files] == [b"first", b"second"]
     assert to_message_edit(parts).get("content") == "first second"
 
 
@@ -175,12 +179,16 @@ def test_interaction_converters_preserve_compiled_values() -> None:
     assert "files" in followup
     origin_attachments = origin_edit.get("attachments")
     origin_files = origin_edit.get("files")
+    followup_attachments = followup.get("attachments")
+    followup_files = followup.get("files")
     assert origin_attachments is not None
     assert origin_files is not None
+    assert followup_attachments is not None
+    assert followup_files is not None
     assert callback_attachments[0].get("id") == 0
     assert callback_files[0].content == b"data"
-    assert followup["attachments"][0].get("id") == 0
-    assert followup["files"][0].content == b"data"
+    assert followup_attachments[0].get("id") == 0
+    assert followup_files[0].content == b"data"
     assert origin_attachments[0].get("id") == 0
     assert origin_files[0].content == b"data"
 

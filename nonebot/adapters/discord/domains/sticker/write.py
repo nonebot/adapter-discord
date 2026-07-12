@@ -1,9 +1,9 @@
 """Canonical sticker.write models."""
 
-from typing_extensions import TypedDict
+from .._model_support import OutboundTypedDict
 
 
-class ModifyGuildStickerParams(TypedDict, total=False):
+class ModifyGuildStickerParams(OutboundTypedDict, total=False):
     """Modify Guild Sticker Params.
 
     see https://discord.com/developers/docs/resources/sticker#modify-guild-sticker

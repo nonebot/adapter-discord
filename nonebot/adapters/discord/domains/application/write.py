@@ -1,7 +1,9 @@
 """Canonical application.write models."""
 
 from typing import TYPE_CHECKING, Literal
-from typing_extensions import Required, TypedDict
+from typing_extensions import Required
+
+from .._model_support import OutboundTypedDict
 
 if TYPE_CHECKING:
     from ..models import ApplicationIntegrationTypeConfiguration, InstallParams
@@ -9,7 +11,7 @@ if TYPE_CHECKING:
 from .._model_support import ApplicationFlag, ApplicationIntegrationType
 
 
-class EditCurrentApplicationParams(TypedDict, total=False):
+class EditCurrentApplicationParams(OutboundTypedDict, total=False):
     """Edit Current Application Params.
 
     see https://discord.com/developers/docs/resources/application#edit-current-application
@@ -32,7 +34,7 @@ class EditCurrentApplicationParams(TypedDict, total=False):
     event_webhooks_types: list[str]
 
 
-class CreateTestEntitlementParams(TypedDict, total=False):
+class CreateTestEntitlementParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_create_test_entitlement``."""
 
     sku_id: Required[str]

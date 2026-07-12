@@ -1,7 +1,9 @@
 """Canonical guild.write models."""
 
 from typing import TYPE_CHECKING
-from typing_extensions import Required, TypedDict
+from typing_extensions import Required
+
+from .._model_support import OutboundTypedDict
 
 if TYPE_CHECKING:
     from ..models import (
@@ -38,7 +40,7 @@ from .._model_support import (
 )
 
 
-class ModifyGuildMemberParams(TypedDict, total=False):
+class ModifyGuildMemberParams(OutboundTypedDict, total=False):
     """Modify Guild Member Params.
 
     All parameters are optional and nullable.
@@ -55,7 +57,7 @@ class ModifyGuildMemberParams(TypedDict, total=False):
     flags: GuildMemberFlags | None
 
 
-class ModifyCurrentMemberParams(TypedDict, total=False):
+class ModifyCurrentMemberParams(OutboundTypedDict, total=False):
     """Modify Current Member Params.
 
     see https://discord.com/developers/docs/resources/guild#modify-current-member
@@ -67,7 +69,7 @@ class ModifyCurrentMemberParams(TypedDict, total=False):
     bio: str | None
 
 
-class CreateGuildParams(TypedDict, total=False):
+class CreateGuildParams(OutboundTypedDict, total=False):
     """Create Guild Params
 
     see https://discord.com/developers/docs/resources/guild#create-guild"""
@@ -86,7 +88,7 @@ class CreateGuildParams(TypedDict, total=False):
     system_channel_flags: SystemChannelFlags | None
 
 
-class ModifyGuildParams(TypedDict, total=False):
+class ModifyGuildParams(OutboundTypedDict, total=False):
     """Modify Guild Params
 
     see https://discord.com/developers/docs/resources/guild#modify-guild"""
@@ -113,7 +115,7 @@ class ModifyGuildParams(TypedDict, total=False):
     safety_alerts_channel_id: Snowflake | None
 
 
-class ModifyGuildIncidentActionsParams(TypedDict, total=False):
+class ModifyGuildIncidentActionsParams(OutboundTypedDict, total=False):
     """Modify Guild Incident Actions Params.
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
@@ -123,7 +125,7 @@ class ModifyGuildIncidentActionsParams(TypedDict, total=False):
     dms_disabled_until: datetime.datetime | None
 
 
-class CreateGuildChannelParams(TypedDict, total=False):
+class CreateGuildChannelParams(OutboundTypedDict, total=False):
     """Create Guild Channel Params
 
     see https://discord.com/developers/docs/resources/guild#create-guild-channel"""
@@ -148,7 +150,7 @@ class CreateGuildChannelParams(TypedDict, total=False):
     default_thread_rate_limit_per_user: int | None
 
 
-class ModifyGuildWelcomeScreenParams(TypedDict, total=False):
+class ModifyGuildWelcomeScreenParams(OutboundTypedDict, total=False):
     """Modify Guild Welcome Screen Params
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
@@ -159,7 +161,7 @@ class ModifyGuildWelcomeScreenParams(TypedDict, total=False):
     description: str | None
 
 
-class ModifyGuildWidgetParams(TypedDict, total=False):
+class ModifyGuildWidgetParams(OutboundTypedDict, total=False):
     """Modify Guild Widget Params.
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-widget
@@ -169,7 +171,7 @@ class ModifyGuildWidgetParams(TypedDict, total=False):
     channel_id: Snowflake | None
 
 
-class CreateGuildScheduledEventParams(TypedDict, total=False):
+class CreateGuildScheduledEventParams(OutboundTypedDict, total=False):
     """Create Guild Scheduled Event Params
 
     see https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event-json-params
@@ -187,7 +189,7 @@ class CreateGuildScheduledEventParams(TypedDict, total=False):
     recurrence_rule: "RecurrenceRule | None"
 
 
-class ModifyGuildScheduledEventParams(TypedDict, total=False):
+class ModifyGuildScheduledEventParams(OutboundTypedDict, total=False):
     """Modify Guild Scheduled Event Params
 
     see https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event-json-params
@@ -206,7 +208,7 @@ class ModifyGuildScheduledEventParams(TypedDict, total=False):
     recurrence_rule: "RecurrenceRule | None"
 
 
-class ModifyGuildRoleParams(TypedDict, total=False):
+class ModifyGuildRoleParams(OutboundTypedDict, total=False):
     """Modify Guild Role Params.
 
     All parameters are optional and nullable.
@@ -224,7 +226,7 @@ class ModifyGuildRoleParams(TypedDict, total=False):
     mentionable: bool | None
 
 
-class CreateGuildRoleParams(TypedDict, total=False):
+class CreateGuildRoleParams(OutboundTypedDict, total=False):
     """Create Guild Role Params.
 
     see https://discord.com/developers/docs/resources/guild#create-guild-role
@@ -240,7 +242,7 @@ class CreateGuildRoleParams(TypedDict, total=False):
     mentionable: bool
 
 
-class ModifyGuildRolePositionParams(TypedDict, total=False):
+class ModifyGuildRolePositionParams(OutboundTypedDict, total=False):
     """Modify Guild Role Position Params.
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
@@ -250,7 +252,7 @@ class ModifyGuildRolePositionParams(TypedDict, total=False):
     position: int | None
 
 
-class CreateGuildTemplateParams(TypedDict, total=False):
+class CreateGuildTemplateParams(OutboundTypedDict, total=False):
     """Create Guild Template Params.
 
     see https://discord.com/developers/docs/resources/guild-template#create-guild-template
@@ -260,7 +262,7 @@ class CreateGuildTemplateParams(TypedDict, total=False):
     description: str | None
 
 
-class ModifyGuildTemplateParams(TypedDict, total=False):
+class ModifyGuildTemplateParams(OutboundTypedDict, total=False):
     """Modify Guild Template Params.
 
     see https://discord.com/developers/docs/resources/guild-template#modify-guild-template
@@ -270,7 +272,7 @@ class ModifyGuildTemplateParams(TypedDict, total=False):
     description: str | None
 
 
-class ModifyGuildOnboardingParams(TypedDict, total=False):
+class ModifyGuildOnboardingParams(OutboundTypedDict, total=False):
     """Modify Guild Onboarding Params
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
@@ -286,7 +288,7 @@ class ModifyGuildOnboardingParams(TypedDict, total=False):
     """Current mode of onboarding"""
 
 
-class AddGuildMemberParams(TypedDict, total=False):
+class AddGuildMemberParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_add_guild_member``."""
 
     access_token: Required[str]
@@ -296,33 +298,33 @@ class AddGuildMemberParams(TypedDict, total=False):
     deaf: bool
 
 
-class ModifyCurrentUserNickParams(TypedDict, total=False):
+class ModifyCurrentUserNickParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_modify_current_user_nick``."""
 
     nick: "str | None"
 
 
-class CreateGuildBanParams(TypedDict, total=False):
+class CreateGuildBanParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_create_guild_ban``."""
 
     delete_message_days: int
     delete_message_seconds: int
 
 
-class BulkGuildBanParams(TypedDict, total=False):
+class BulkGuildBanParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_bulk_guild_ban``."""
 
     user_ids: Required["list[SnowflakeType]"]
     delete_message_seconds: int
 
 
-class ModifyGuildMFAParams(TypedDict, total=False):
+class ModifyGuildMFAParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_modify_guild_MFA_level``."""
 
     level: Required[int]
 
 
-class BeginGuildPruneParams(TypedDict, total=False):
+class BeginGuildPruneParams(OutboundTypedDict, total=False):
     """Parameters for ``_api_begin_guild_prune``."""
 
     days: int

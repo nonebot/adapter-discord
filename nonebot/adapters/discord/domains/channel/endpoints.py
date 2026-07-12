@@ -21,23 +21,18 @@ from .write import (
     ModifyDMParams,
     ModifyThreadParams,
     StartThreadFromMessageParams,
+    StartThreadInForumChannelParams,
     StartThreadWithoutMessageParams,
 )
-from ..component.read import DirectComponent
 from ..invite.read import Invite
 from ..invite.types import InviteTargetType
-from ..message.read import AllowedMention, Embed, File, MessageGet
-from ..message.types import MessageFlag
-from ..message.write import (
-    AttachmentSend,
-    MessageSend,
-)
+from ..message.read import File, MessageGet
 from ...api.validation import (
     Range,
     validate,
     validate_outbound_value,
 )
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -135,61 +130,12 @@ class ChannelEndpointMixin:
         see https://discord.com/developers/docs/resources/channel#modify-channel
         """
         fields = validate_outbound_value(ModifyChannelParams, fields)
-        name = fields.get("name", UNSET)
-        channel_type = fields.get("type", UNSET)
-        position = fields.get("position", UNSET)
-        topic = fields.get("topic", UNSET)
-        nsfw = fields.get("nsfw", UNSET)
-        rate_limit_per_user = fields.get("rate_limit_per_user", UNSET)
-        bitrate = fields.get("bitrate", UNSET)
-        user_limit = fields.get("user_limit", UNSET)
-        permission_overwrites = fields.get("permission_overwrites", UNSET)
-        parent_id = fields.get("parent_id", UNSET)
-        rtc_region = fields.get("rtc_region", UNSET)
-        video_quality_mode = fields.get("video_quality_mode", UNSET)
-        default_auto_archive_duration = fields.get(
-            "default_auto_archive_duration", UNSET
-        )
-        flags = fields.get("flags", UNSET)
-        available_tags = fields.get("available_tags", UNSET)
-        default_reaction_emoji = fields.get("default_reaction_emoji", UNSET)
-        default_thread_rate_limit_per_user = fields.get(
-            "default_thread_rate_limit_per_user", UNSET
-        )
-        default_sort_order = fields.get("default_sort_order", UNSET)
-        default_forum_layout = fields.get("default_forum_layout", UNSET)
-
-        data = {
-            "name": name,
-            "type": channel_type,
-            "position": position,
-            "topic": topic,
-            "nsfw": nsfw,
-            "rate_limit_per_user": rate_limit_per_user,
-            "bitrate": bitrate,
-            "user_limit": user_limit,
-            "permission_overwrites": permission_overwrites,
-            "parent_id": parent_id,
-            "rtc_region": rtc_region,
-            "video_quality_mode": video_quality_mode,
-            "default_auto_archive_duration": default_auto_archive_duration,
-            "flags": flags,
-            "available_tags": available_tags,
-            "default_reaction_emoji": default_reaction_emoji,
-            "default_thread_rate_limit_per_user": default_thread_rate_limit_per_user,
-            "default_sort_order": default_sort_order,
-            "default_forum_layout": default_forum_layout,
-        }
-        data = validate_outbound_value(
-            ModifyChannelParams,
-            {key: value for key, value in data.items() if value is not UNSET},
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"channels/{channel_id}",
             response=JsonResponse(Channel),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -207,38 +153,12 @@ class ChannelEndpointMixin:
         see https://discord.com/developers/docs/resources/channel#modify-channel
         """
         fields = validate_outbound_value(ModifyThreadParams, fields)
-        name = fields.get("name", UNSET)
-        archived = fields.get("archived", UNSET)
-        auto_archive_duration = fields.get("auto_archive_duration", UNSET)
-        locked = fields.get("locked", UNSET)
-        invitable = fields.get("invitable", UNSET)
-        rate_limit_per_user = fields.get("rate_limit_per_user", UNSET)
-        flags = fields.get("flags", UNSET)
-        applied_tags = fields.get("applied_tags", UNSET)
-
-        data = validate_outbound_value(
-            ModifyThreadParams,
-            {
-                key: value
-                for key, value in {
-                    "name": name,
-                    "archived": archived,
-                    "auto_archive_duration": auto_archive_duration,
-                    "locked": locked,
-                    "invitable": invitable,
-                    "rate_limit_per_user": rate_limit_per_user,
-                    "flags": flags,
-                    "applied_tags": applied_tags,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"channels/{channel_id}",
             response=JsonResponse(Channel),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -278,23 +198,12 @@ class ChannelEndpointMixin:
         see https://discord.com/developers/docs/resources/channel#edit-channel-permissions
         """
         fields = validate_outbound_value(EditChannelPermissionsParams, fields)
-        allow = fields.get("allow")
-        deny = fields.get("deny")
-        overwrite_type = fields["type"]
-
-        data = {
-            "allow": allow,
-            "deny": deny,
-            "type": overwrite_type,
-        }
         call = RestCall(
             method="PUT",
             url=self.base_url / f"channels/{channel_id}/permissions/{overwrite_id}",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         await REST_EXCHANGE.execute(self, call)
@@ -420,15 +329,12 @@ class ChannelEndpointMixin:
         see https://discord.com/developers/docs/resources/channel#follow-announcement-channel
         """
         fields = validate_outbound_value(FollowAnnouncementChannelParams, fields)
-        webhook_channel_id = fields["webhook_channel_id"]
-
-        data = {"webhook_channel_id": webhook_channel_id}
         call = RestCall(
             method="POST",
             url=self.base_url / f"channels/{channel_id}/followers",
             response=JsonResponse(FollowedChannel),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -522,16 +428,12 @@ class ChannelEndpointMixin:
         see https://discord.com/developers/docs/resources/channel#group-dm-add-recipient
         """
         fields = validate_outbound_value(AddGroupDMRecipientParams, fields)
-        access_token = fields["access_token"]
-        nick = fields["nick"]
-
-        data = {"access_token": access_token, "nick": nick}
         call = RestCall(
             method="PUT",
             url=self.base_url / f"channels/{channel_id}/recipients/{user_id}",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
         )
         await REST_EXCHANGE.execute(self, call)
 
@@ -569,28 +471,12 @@ class ChannelEndpointMixin:
         see https://discord.com/developers/docs/resources/channel#start-thread-from-message
         """
         fields = validate_outbound_value(StartThreadFromMessageParams, fields)
-        name = fields["name"]
-        auto_archive_duration = fields.get("auto_archive_duration", UNSET)
-        rate_limit_per_user = fields.get("rate_limit_per_user", UNSET)
-
-        data = validate_outbound_value(
-            StartThreadFromMessageParams,
-            {
-                key: value
-                for key, value in {
-                    "name": name,
-                    "auto_archive_duration": auto_archive_duration,
-                    "rate_limit_per_user": rate_limit_per_user,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="POST",
             url=self.base_url / f"channels/{channel_id}/messages/{message_id}/threads",
             response=JsonResponse(Channel),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -608,12 +494,8 @@ class ChannelEndpointMixin:
         see https://discord.com/developers/docs/resources/channel#start-thread-without-message
         """
         fields = validate_outbound_value(StartThreadWithoutMessageParams, fields)
-        name = fields["name"]
-        auto_archive_duration = fields.get("auto_archive_duration", UNSET)
-        channel_type = fields.get("type", UNSET)
-        invitable = fields.get("invitable", UNSET)
-        rate_limit_per_user = fields.get("rate_limit_per_user", UNSET)
-        if channel_type is not UNSET and channel_type not in (
+        channel_type = fields.get("type")
+        if channel_type is not None and channel_type not in (
             ChannelType.ANNOUNCEMENT_THREAD,
             ChannelType.PUBLIC_THREAD,
             ChannelType.PRIVATE_THREAD,
@@ -621,91 +503,39 @@ class ChannelEndpointMixin:
             msg = "type must be ANNOUNCEMENT_THREAD, PUBLIC_THREAD or PRIVATE_THREAD"
             raise ValueError(msg)
 
-        data = validate_outbound_value(
-            StartThreadWithoutMessageParams,
-            {
-                key: value
-                for key, value in {
-                    "name": name,
-                    "auto_archive_duration": auto_archive_duration,
-                    "type": channel_type,
-                    "invitable": invitable,
-                    "rate_limit_per_user": rate_limit_per_user,
-                }.items()
-                if value is not UNSET
-            },
-        )
         call = RestCall(
             method="POST",
             url=self.base_url / f"channels/{channel_id}/threads",
             response=JsonResponse(Channel),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_start_thread_in_forum_channel(  # noqa: PLR0913
+    async def _api_start_thread_in_forum_channel(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        name: str,
-        auto_archive_duration: Missing[int] = UNSET,
-        rate_limit_per_user: MissingOrNullable[int] = UNSET,
-        applied_tags: Missing[list[SnowflakeType]] = UNSET,
-        content: str | None = None,
-        embeds: list[Embed] | None = None,
-        allowed_mentions: AllowedMention | None = None,
-        components: list[DirectComponent] | None = None,
-        sticker_ids: list[SnowflakeType] | None = None,
-        files: list[File] | None = None,
-        attachments: list[AttachmentSend] | None = None,
-        flags: MessageFlag | None = None,
         reason: str | None = None,
+        **fields: Unpack[StartThreadInForumChannelParams],
     ) -> Channel:
         """Start thread in forum or media channel.
 
         see https://discord.com/developers/docs/resources/channel#start-thread-in-forum-or-media-channel
         """
-        data = {
-            "name": name,
-            "auto_archive_duration": auto_archive_duration,
-            "rate_limit_per_user": rate_limit_per_user,
-            "applied_tags": applied_tags,
-            "content": content,
-            "embeds": embeds,
-            "allowed_mentions": allowed_mentions,
-            "components": components,
-            "sticker_ids": sticker_ids,
-            "files": files,
-            "attachments": attachments,
-            "flags": flags,
-        }
-        message_payload = dict(
-            validate_outbound_value(
-                MessageSend,
-                {
-                    key: value
-                    for key, value in data.items()
-                    if key
-                    not in {
-                        "name",
-                        "auto_archive_duration",
-                        "rate_limit_per_user",
-                        "applied_tags",
-                    }
-                    and value is not None
-                    and value is not UNSET
-                },
-            )
-        )
-        request_files = message_payload.pop("files", None)
-        payload: dict[str, object] = {"name": name, "message": message_payload}
+        fields = validate_outbound_value(StartThreadInForumChannelParams, fields)
+        name = fields.pop("name")
+        request_files = fields.pop("files", None)
+        payload: dict[str, object] = {"name": name}
         for key in ("auto_archive_duration", "rate_limit_per_user", "applied_tags"):
-            value = data[key]
-            if value is not UNSET and value is not None:
+            value = fields.pop(key, None)
+            if value is not None:
                 payload[key] = value
+        payload["message"] = {
+            key: value for key, value in fields.items() if value is not None
+        }
         params = PreparedBody(
             payload,
             files=request_files or None,
