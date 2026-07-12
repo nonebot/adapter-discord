@@ -1,41 +1,46 @@
 """Canonical application.write models."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
+from typing_extensions import Required, TypedDict
 
 if TYPE_CHECKING:
     from ..models import ApplicationIntegrationTypeConfiguration, InstallParams
 
-from .._model_support import (
-    UNSET,
-    ApplicationFlag,
-    ApplicationIntegrationType,
-    BaseModel,
-    Missing,
-    MissingOrNullable,
-)
+from .._model_support import ApplicationFlag, ApplicationIntegrationType
 
 
-class EditCurrentApplicationParams(BaseModel):
+class EditCurrentApplicationParams(TypedDict, total=False):
     """Edit Current Application Params.
 
     see https://discord.com/developers/docs/resources/application#edit-current-application
     """
 
-    custom_install_url: Missing[str] = UNSET
-    description: Missing[str] = UNSET
-    role_connections_verification_url: Missing[str] = UNSET
-    install_params: Missing["InstallParams"] = UNSET
-    integration_types_config: Missing[
-        dict[ApplicationIntegrationType, "ApplicationIntegrationTypeConfiguration"]
-    ] = UNSET
-    flags: Missing[ApplicationFlag] = UNSET
-    icon: MissingOrNullable[str] = UNSET
-    cover_image: MissingOrNullable[str] = UNSET
-    interactions_endpoint_url: Missing[str] = UNSET
-    tags: Missing[list[str]] = UNSET
-    event_webhooks_url: Missing[str] = UNSET
-    event_webhooks_status: Missing[int] = UNSET
-    event_webhooks_types: Missing[list[str]] = UNSET
+    custom_install_url: str
+    description: str
+    role_connections_verification_url: str
+    install_params: "InstallParams"
+    integration_types_config: (
+        "dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfiguration]"
+    )
+    flags: ApplicationFlag
+    icon: str | None
+    cover_image: str | None
+    interactions_endpoint_url: str
+    tags: list[str]
+    event_webhooks_url: str
+    event_webhooks_status: int
+    event_webhooks_types: list[str]
 
 
-__all__ = ["EditCurrentApplicationParams"]
+class CreateTestEntitlementParams(TypedDict, total=False):
+    """Parameters for ``_api_create_test_entitlement``."""
+
+    sku_id: Required[str]
+    owner_id: Required[str]
+    owner_type: Required["Literal[1, 2]"]
+
+
+__all__ = [
+    "CreateTestEntitlementParams",
+    "EditCurrentApplicationParams",
+]

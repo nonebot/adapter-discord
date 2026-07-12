@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from nonebot.adapters.discord.api.types import TriggerType
+from nonebot.adapters.discord.api.types import ApplicationCommandType, TriggerType
 from nonebot.adapters.discord.api.validation import (
     AtMostOne,
     ForbidIfEquals,
@@ -8,6 +8,7 @@ from nonebot.adapters.discord.api.validation import (
     RequireIfNotEquals,
     validate,
 )
+from nonebot.adapters.discord.domains.command.endpoints import _build_command_payloads
 
 import pytest
 
@@ -123,3 +124,27 @@ async def test_async_wrapper_cross_rules() -> None:
         ValueError, match="around, before and after are mutually exclusive"
     ):
         await func(around=1, before=2)
+
+
+def test_bulk_command_materializes_type_and_normalizes_description() -> None:
+    assert _build_command_payloads([{"name": "ping", "description": "Ping"}]) == [
+        {
+            "name": "ping",
+            "description": "Ping",
+            "type": ApplicationCommandType.CHAT_INPUT,
+        }
+    ]
+    assert _build_command_payloads(
+        [{"name": "user", "type": ApplicationCommandType.USER}]
+    ) == [
+        {
+            "name": "user",
+            "description": "",
+            "type": ApplicationCommandType.USER,
+        }
+    ]
+    with pytest.raises(
+        ValueError,
+        match="description is required for CHAT_INPUT commands",
+    ):
+        _build_command_payloads([{"name": "ping"}])

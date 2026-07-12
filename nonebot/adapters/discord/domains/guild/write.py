@@ -1,6 +1,7 @@
 """Canonical guild.write models."""
 
 from typing import TYPE_CHECKING
+from typing_extensions import Required, TypedDict
 
 if TYPE_CHECKING:
     from ..models import (
@@ -15,10 +16,9 @@ if TYPE_CHECKING:
         RoleColors,
         WelcomeScreenChannel,
     )
+    from ...protocol import SnowflakeType
 
 from .._model_support import (
-    UNSET,
-    BaseModel,
     ChannelType,
     DefaultMessageNotificationLevel,
     ExplicitContentFilterLevel,
@@ -28,8 +28,6 @@ from .._model_support import (
     GuildScheduledEventEntityType,
     GuildScheduledEventPrivacyLevel,
     GuildScheduledEventStatus,
-    Missing,
-    MissingOrNullable,
     OnboardingMode,
     Snowflake,
     SortOrderTypes,
@@ -40,7 +38,7 @@ from .._model_support import (
 )
 
 
-class ModifyGuildMemberParams(BaseModel):
+class ModifyGuildMemberParams(TypedDict, total=False):
     """Modify Guild Member Params.
 
     All parameters are optional and nullable.
@@ -48,169 +46,167 @@ class ModifyGuildMemberParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#modify-guild-member
     """
 
-    nick: MissingOrNullable[str] = UNSET
-    roles: MissingOrNullable[list[Snowflake]] = UNSET
-    mute: MissingOrNullable[bool] = UNSET
-    deaf: MissingOrNullable[bool] = UNSET
-    channel_id: MissingOrNullable[Snowflake] = UNSET
-    communication_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
-    flags: MissingOrNullable[GuildMemberFlags] = UNSET
+    nick: str | None
+    roles: list[Snowflake] | None
+    mute: bool | None
+    deaf: bool | None
+    channel_id: Snowflake | None
+    communication_disabled_until: datetime.datetime | None
+    flags: GuildMemberFlags | None
 
 
-class ModifyCurrentMemberParams(BaseModel):
+class ModifyCurrentMemberParams(TypedDict, total=False):
     """Modify Current Member Params.
 
     see https://discord.com/developers/docs/resources/guild#modify-current-member
     """
 
-    nick: MissingOrNullable[str] = UNSET
-    banner: MissingOrNullable[str] = UNSET
-    avatar: MissingOrNullable[str] = UNSET
-    bio: MissingOrNullable[str] = UNSET
+    nick: str | None
+    banner: str | None
+    avatar: str | None
+    bio: str | None
 
 
-class CreateGuildParams(BaseModel):
+class CreateGuildParams(TypedDict, total=False):
     """Create Guild Params
 
     see https://discord.com/developers/docs/resources/guild#create-guild"""
 
-    name: str
-    region: str | None = None
-    icon: str | None = None
-    verification_level: VerificationLevel | None = None
-    default_message_notifications: DefaultMessageNotificationLevel | None = None
-    explicit_content_filter: ExplicitContentFilterLevel | None = None
-    roles: list["Role"] | None = None
-    channels: list["Channel"] | None = None
-    afk_channel_id: Snowflake | None = None
-    afk_timeout: int | None = None
-    system_channel_id: Snowflake | None = None
-    system_channel_flags: SystemChannelFlags | None = None
+    name: Required[str]
+    region: str | None
+    icon: str | None
+    verification_level: VerificationLevel | None
+    default_message_notifications: DefaultMessageNotificationLevel | None
+    explicit_content_filter: ExplicitContentFilterLevel | None
+    roles: "list[Role] | None"
+    channels: "list[Channel] | None"
+    afk_channel_id: Snowflake | None
+    afk_timeout: int | None
+    system_channel_id: Snowflake | None
+    system_channel_flags: SystemChannelFlags | None
 
 
-class ModifyGuildParams(BaseModel):
+class ModifyGuildParams(TypedDict, total=False):
     """Modify Guild Params
 
     see https://discord.com/developers/docs/resources/guild#modify-guild"""
 
-    name: Missing[str] = UNSET
-    region: MissingOrNullable[str] = UNSET
-    verification_level: MissingOrNullable[VerificationLevel] = UNSET
-    default_message_notifications: MissingOrNullable[
-        DefaultMessageNotificationLevel
-    ] = UNSET
-    explicit_content_filter: MissingOrNullable[ExplicitContentFilterLevel] = UNSET
-    afk_channel_id: MissingOrNullable[Snowflake] = UNSET
-    afk_timeout: Missing[int] = UNSET
-    icon: MissingOrNullable[str] = UNSET
-    splash: MissingOrNullable[str] = UNSET
-    discovery_splash: MissingOrNullable[str] = UNSET
-    banner: MissingOrNullable[str] = UNSET
-    system_channel_id: MissingOrNullable[Snowflake] = UNSET
-    system_channel_flags: Missing[SystemChannelFlags] = UNSET
-    rules_channel_id: MissingOrNullable[Snowflake] = UNSET
-    public_updates_channel_id: MissingOrNullable[Snowflake] = UNSET
-    preferred_locale: MissingOrNullable[str] = UNSET
-    features: Missing[list[GuildFeature]] = UNSET
-    description: MissingOrNullable[str] = UNSET
-    premium_progress_bar_enabled: Missing[bool] = UNSET
-    safety_alerts_channel_id: MissingOrNullable[Snowflake] = UNSET
+    name: str
+    region: str | None
+    verification_level: VerificationLevel | None
+    default_message_notifications: DefaultMessageNotificationLevel | None
+    explicit_content_filter: ExplicitContentFilterLevel | None
+    afk_channel_id: Snowflake | None
+    afk_timeout: int
+    icon: str | None
+    splash: str | None
+    discovery_splash: str | None
+    banner: str | None
+    system_channel_id: Snowflake | None
+    system_channel_flags: SystemChannelFlags
+    rules_channel_id: Snowflake | None
+    public_updates_channel_id: Snowflake | None
+    preferred_locale: str | None
+    features: list[GuildFeature]
+    description: str | None
+    premium_progress_bar_enabled: bool
+    safety_alerts_channel_id: Snowflake | None
 
 
-class ModifyGuildIncidentActionsParams(BaseModel):
+class ModifyGuildIncidentActionsParams(TypedDict, total=False):
     """Modify Guild Incident Actions Params.
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
     """
 
-    invites_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
-    dms_disabled_until: MissingOrNullable[datetime.datetime] = UNSET
+    invites_disabled_until: datetime.datetime | None
+    dms_disabled_until: datetime.datetime | None
 
 
-class CreateGuildChannelParams(BaseModel):
+class CreateGuildChannelParams(TypedDict, total=False):
     """Create Guild Channel Params
 
     see https://discord.com/developers/docs/resources/guild#create-guild-channel"""
 
-    name: str
-    type: ChannelType | None = None
-    topic: str | None = None
-    bitrate: int | None = None
-    user_limit: int | None = None
-    rate_limit_per_user: int | None = None
-    position: int | None = None
-    permission_overwrites: list["Overwrite"] | None = None
-    parent_id: Snowflake | None = None
-    nsfw: bool | None = None
-    rtc_region: str | None = None
-    video_quality_mode: VideoQualityMode | None = None
-    default_auto_archive_duration: int | None = None
-    default_reaction_emoji: "DefaultReaction | None" = None
-    available_tags: list["ForumTagRequest"] | None = None
-    default_sort_order: SortOrderTypes | None = None
-    default_forum_layout: ForumLayoutTypes | None = None
-    default_thread_rate_limit_per_user: int | None = None
+    name: Required[str]
+    type: ChannelType | None
+    topic: str | None
+    bitrate: int | None
+    user_limit: int | None
+    rate_limit_per_user: int | None
+    position: int | None
+    permission_overwrites: "list[Overwrite] | None"
+    parent_id: Snowflake | None
+    nsfw: bool | None
+    rtc_region: str | None
+    video_quality_mode: VideoQualityMode | None
+    default_auto_archive_duration: int | None
+    default_reaction_emoji: "DefaultReaction | None"
+    available_tags: "list[ForumTagRequest] | None"
+    default_sort_order: SortOrderTypes | None
+    default_forum_layout: ForumLayoutTypes | None
+    default_thread_rate_limit_per_user: int | None
 
 
-class ModifyGuildWelcomeScreenParams(BaseModel):
+class ModifyGuildWelcomeScreenParams(TypedDict, total=False):
     """Modify Guild Welcome Screen Params
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
     """
 
-    enabled: MissingOrNullable[bool] = UNSET
-    welcome_channels: MissingOrNullable[list["WelcomeScreenChannel"]] = UNSET
-    description: MissingOrNullable[str] = UNSET
+    enabled: bool | None
+    welcome_channels: "list[WelcomeScreenChannel] | None"
+    description: str | None
 
 
-class ModifyGuildWidgetParams(BaseModel):
+class ModifyGuildWidgetParams(TypedDict, total=False):
     """Modify Guild Widget Params.
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-widget
     """
 
-    enabled: Missing[bool] = UNSET
-    channel_id: MissingOrNullable[Snowflake] = UNSET
+    enabled: bool
+    channel_id: Snowflake | None
 
 
-class CreateGuildScheduledEventParams(BaseModel):
+class CreateGuildScheduledEventParams(TypedDict, total=False):
     """Create Guild Scheduled Event Params
 
     see https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event-json-params
     """
 
-    channel_id: Snowflake | None = None
-    entity_metadata: "GuildScheduledEventEntityMetadata | None" = None
-    name: str
-    privacy_level: GuildScheduledEventPrivacyLevel
-    scheduled_start_time: datetime.datetime  # ISO8601 timestamp
-    scheduled_end_time: datetime.datetime | None = None  # ISO8601 timestamp
-    description: str | None = None
-    entity_type: GuildScheduledEventEntityType
-    image: str | None = None
-    recurrence_rule: "RecurrenceRule | None" = None
+    channel_id: Snowflake | None
+    entity_metadata: "GuildScheduledEventEntityMetadata | None"
+    name: Required[str]
+    privacy_level: Required[GuildScheduledEventPrivacyLevel]
+    scheduled_start_time: Required[datetime.datetime]
+    scheduled_end_time: datetime.datetime | None
+    description: str | None
+    entity_type: Required[GuildScheduledEventEntityType]
+    image: str | None
+    recurrence_rule: "RecurrenceRule | None"
 
 
-class ModifyGuildScheduledEventParams(BaseModel):
+class ModifyGuildScheduledEventParams(TypedDict, total=False):
     """Modify Guild Scheduled Event Params
 
     see https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event-json-params
     """
 
-    channel_id: MissingOrNullable[Snowflake] = UNSET
-    entity_metadata: MissingOrNullable["GuildScheduledEventEntityMetadata"] = UNSET
-    name: Missing[str] = UNSET
-    privacy_level: Missing[GuildScheduledEventPrivacyLevel] = UNSET
-    scheduled_start_time: Missing[datetime.datetime] = UNSET  # ISO8601 timestamp
-    scheduled_end_time: Missing[datetime.datetime] = UNSET  # ISO8601 timestamp
-    description: MissingOrNullable[str] = UNSET
-    entity_type: Missing[GuildScheduledEventEntityType] = UNSET
-    status: Missing[GuildScheduledEventStatus] = UNSET
-    image: Missing[str] = UNSET
-    recurrence_rule: MissingOrNullable["RecurrenceRule"] = UNSET
+    channel_id: Snowflake | None
+    entity_metadata: "GuildScheduledEventEntityMetadata | None"
+    name: str
+    privacy_level: GuildScheduledEventPrivacyLevel
+    scheduled_start_time: datetime.datetime
+    scheduled_end_time: datetime.datetime
+    description: str | None
+    entity_type: GuildScheduledEventEntityType
+    status: GuildScheduledEventStatus
+    image: str
+    recurrence_rule: "RecurrenceRule | None"
 
 
-class ModifyGuildRoleParams(BaseModel):
+class ModifyGuildRoleParams(TypedDict, total=False):
     """Modify Guild Role Params.
 
     All parameters are optional and nullable.
@@ -218,86 +214,136 @@ class ModifyGuildRoleParams(BaseModel):
     see https://discord.com/developers/docs/resources/guild#modify-guild-role
     """
 
-    name: MissingOrNullable[str] = UNSET
-    permissions: MissingOrNullable[str] = UNSET
-    color: MissingOrNullable[int] = UNSET
-    colors: Missing["RoleColors"] = UNSET
-    hoist: MissingOrNullable[bool] = UNSET
-    icon: MissingOrNullable[str] = UNSET
-    unicode_emoji: MissingOrNullable[str] = UNSET
-    mentionable: MissingOrNullable[bool] = UNSET
+    name: str | None
+    permissions: str | None
+    color: int | None
+    colors: "RoleColors"
+    hoist: bool | None
+    icon: str | None
+    unicode_emoji: str | None
+    mentionable: bool | None
 
 
-class CreateGuildRoleParams(BaseModel):
+class CreateGuildRoleParams(TypedDict, total=False):
     """Create Guild Role Params.
 
     see https://discord.com/developers/docs/resources/guild#create-guild-role
     """
 
-    name: Missing[str] = UNSET
-    permissions: Missing[str] = UNSET
-    color: Missing[int] = UNSET
-    colors: Missing["RoleColors"] = UNSET
-    hoist: Missing[bool] = UNSET
-    icon: MissingOrNullable[str] = UNSET
-    unicode_emoji: MissingOrNullable[str] = UNSET
-    mentionable: Missing[bool] = UNSET
+    name: str
+    permissions: str
+    color: int
+    colors: "RoleColors"
+    hoist: bool
+    icon: str | None
+    unicode_emoji: str | None
+    mentionable: bool
 
 
-class ModifyGuildRolePositionParams(BaseModel):
+class ModifyGuildRolePositionParams(TypedDict, total=False):
     """Modify Guild Role Position Params.
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
     """
 
-    id: Snowflake
-    position: MissingOrNullable[int] = UNSET
+    id: Required[Snowflake]
+    position: int | None
 
 
-class CreateGuildTemplateParams(BaseModel):
+class CreateGuildTemplateParams(TypedDict, total=False):
     """Create Guild Template Params.
 
     see https://discord.com/developers/docs/resources/guild-template#create-guild-template
     """
 
-    name: str
-    description: MissingOrNullable[str] = UNSET
+    name: Required[str]
+    description: str | None
 
 
-class ModifyGuildTemplateParams(BaseModel):
+class ModifyGuildTemplateParams(TypedDict, total=False):
     """Modify Guild Template Params.
 
     see https://discord.com/developers/docs/resources/guild-template#modify-guild-template
     """
 
-    name: Missing[str] = UNSET
-    description: MissingOrNullable[str] = UNSET
+    name: str
+    description: str | None
 
 
-class ModifyGuildOnboardingParams(BaseModel):
+class ModifyGuildOnboardingParams(TypedDict, total=False):
     """Modify Guild Onboarding Params
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
     """
 
-    prompts: Missing[list["OnboardingPrompt"]] = UNSET
+    prompts: "list[OnboardingPrompt]"
     """Prompts shown during onboarding and in customize community"""
-    default_channel_ids: Missing[list[Snowflake]] = UNSET
+    default_channel_ids: list[Snowflake]
     """Channel IDs that members get opted into automatically"""
-    enabled: Missing[bool] = UNSET
+    enabled: bool
     """Whether onboarding is enabled in the guild"""
-    mode: Missing[OnboardingMode] = UNSET
+    mode: OnboardingMode
     """Current mode of onboarding"""
 
 
+class AddGuildMemberParams(TypedDict, total=False):
+    """Parameters for ``_api_add_guild_member``."""
+
+    access_token: Required[str]
+    nick: str
+    roles: "list[SnowflakeType]"
+    mute: bool
+    deaf: bool
+
+
+class ModifyCurrentUserNickParams(TypedDict, total=False):
+    """Parameters for ``_api_modify_current_user_nick``."""
+
+    nick: "str | None"
+
+
+class CreateGuildBanParams(TypedDict, total=False):
+    """Parameters for ``_api_create_guild_ban``."""
+
+    delete_message_days: int
+    delete_message_seconds: int
+
+
+class BulkGuildBanParams(TypedDict, total=False):
+    """Parameters for ``_api_bulk_guild_ban``."""
+
+    user_ids: Required["list[SnowflakeType]"]
+    delete_message_seconds: int
+
+
+class ModifyGuildMFAParams(TypedDict, total=False):
+    """Parameters for ``_api_modify_guild_MFA_level``."""
+
+    level: Required[int]
+
+
+class BeginGuildPruneParams(TypedDict, total=False):
+    """Parameters for ``_api_begin_guild_prune``."""
+
+    days: int
+    compute_prune_count: bool
+    include_roles: "list[SnowflakeType]"
+
+
 __all__ = [
+    "AddGuildMemberParams",
+    "BeginGuildPruneParams",
+    "BulkGuildBanParams",
+    "CreateGuildBanParams",
     "CreateGuildChannelParams",
     "CreateGuildParams",
     "CreateGuildRoleParams",
     "CreateGuildScheduledEventParams",
     "CreateGuildTemplateParams",
     "ModifyCurrentMemberParams",
+    "ModifyCurrentUserNickParams",
     "ModifyGuildIncidentActionsParams",
+    "ModifyGuildMFAParams",
     "ModifyGuildMemberParams",
     "ModifyGuildOnboardingParams",
     "ModifyGuildParams",

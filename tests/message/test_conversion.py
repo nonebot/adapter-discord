@@ -24,10 +24,9 @@ from nonebot.adapters.discord.domains.models import (
     Poll,
     PollAnswer,
     PollMedia,
-    PollRequest,
 )
 from nonebot.adapters.discord.message import Message, MessageSegment, parse_message
-from nonebot.adapters.discord.protocol import is_not_unset, is_unset
+from nonebot.adapters.discord.protocol import is_not_unset
 from tests.fake.doubles import DummyBot
 
 import pytest
@@ -72,24 +71,28 @@ def test_compile_message_preserves_parts_and_attachment_pairs() -> None:
     assert is_not_unset(parts.message_reference.message_id)
     assert is_not_unset(parts.sticker_ids)
     assert is_not_unset(parts.attachments)
+    assert is_not_unset(parts.poll)
     assert [embed.title for embed in parts.embeds] == ["first", "second"]
     assert int(parts.message_reference.message_id) == 2
     assert parts.message_reference.fail_if_not_exists is False
     assert [int(sticker_id) for sticker_id in parts.sticker_ids] == [10, 11]
-    assert isinstance(parts.poll, PollRequest)
-    assert [attachment.attachment.id for attachment in parts.attachments] == [0, 1]
+    assert parts.poll["question"].text == "question"
+    assert [attachment.attachment.get("id") for attachment in parts.attachments] == [
+        0,
+        1,
+    ]
     assert [attachment.file.content for attachment in parts.attachments] == [
         b"first",
         b"second",
     ]
-    assert is_unset(message["attachment"][0].data["attachment"].id)
+    assert "id" not in message["attachment"][0].data["attachment"]
 
     send = to_message_send(parts, tts=False)
-    assert is_not_unset(send.attachments)
-    assert is_not_unset(send.files)
-    assert [attachment.id for attachment in send.attachments] == [0, 1]
-    assert [file.content for file in send.files] == [b"first", b"second"]
-    assert to_message_edit(parts).content == "first second"
+    assert "attachments" in send
+    assert "files" in send
+    assert [attachment.get("id") for attachment in send["attachments"]] == [0, 1]
+    assert [file.content for file in send["files"]] == [b"first", b"second"]
+    assert to_message_edit(parts).get("content") == "first second"
 
 
 def test_legacy_kwargs_exactly_render_compiled_parts() -> None:
@@ -164,20 +167,22 @@ def test_interaction_converters_preserve_compiled_values() -> None:
     followup = to_followup_message(parts)
     origin_edit = to_origin_edit(parts)
 
-    assert callback.attachments is not None
-    assert callback.files is not None
-    assert is_not_unset(followup.attachments)
-    assert is_not_unset(followup.files)
-    assert is_not_unset(origin_edit.attachments)
-    assert origin_edit.attachments is not None
-    assert is_not_unset(origin_edit.files)
-    assert origin_edit.files is not None
-    assert callback.attachments[0].id == 0
-    assert callback.files[0].content == b"data"
-    assert followup.attachments[0].id == 0
-    assert followup.files[0].content == b"data"
-    assert origin_edit.attachments[0].id == 0
-    assert origin_edit.files[0].content == b"data"
+    callback_attachments = callback.get("attachments")
+    callback_files = callback.get("files")
+    assert callback_attachments is not None
+    assert callback_files is not None
+    assert "attachments" in followup
+    assert "files" in followup
+    origin_attachments = origin_edit.get("attachments")
+    origin_files = origin_edit.get("files")
+    assert origin_attachments is not None
+    assert origin_files is not None
+    assert callback_attachments[0].get("id") == 0
+    assert callback_files[0].content == b"data"
+    assert followup["attachments"][0].get("id") == 0
+    assert followup["files"][0].content == b"data"
+    assert origin_attachments[0].get("id") == 0
+    assert origin_files[0].content == b"data"
 
 
 @pytest.mark.anyio
@@ -207,7 +212,7 @@ async def test_bot_send_to_passes_typed_compiled_models(
     files = captured["files"]
     assert isinstance(attachments, list)
     assert isinstance(files, list)
-    assert [attachment.id for attachment in attachments] == [0, 1]
+    assert [attachment["id"] for attachment in attachments] == [0, 1]
     assert [file.content for file in files] == [b"first", b"second"]
 
 

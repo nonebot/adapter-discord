@@ -1,13 +1,18 @@
 from typing import TYPE_CHECKING
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import Connection, User
-from .write import ModifyCurrentUserParams
+from .write import (
+    CreateDMParams,
+    CreateGroupDMParams,
+    ModifyCurrentUserParams,
+    UpdateUserApplicationRoleConnectionParams,
+)
 from ..application.read import ApplicationRoleConnection
 from ..channel.read import Channel
 from ..guild.read import CurrentUserGuild, GuildMember
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...api.validation import validate_outbound_value
+from ...protocol import UNSET, SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BearerAuth,
@@ -15,7 +20,6 @@ from ...transport.exchange import (
     EmptyResponse,
     JsonBody,
     JsonResponse,
-    JsonValueBody,
     RestCall,
     _bool_query,
 )
@@ -59,26 +63,35 @@ class UserEndpointMixin:
     async def _api_modify_current_user(
         self: "AdapterProtocol",
         bot: "Bot",
-        *,
-        username: Missing[str] = UNSET,
-        avatar: MissingOrNullable[str] = UNSET,
-        banner: MissingOrNullable[str] = UNSET,
+        **fields: Unpack[ModifyCurrentUserParams],
     ) -> User:
         """Modify current user.
 
         see https://discord.com/developers/docs/resources/user#modify-current-user
         """
+        fields = validate_outbound_value(ModifyCurrentUserParams, fields)
+        username = fields.get("username", UNSET)
+        avatar = fields.get("avatar", UNSET)
+        banner = fields.get("banner", UNSET)
 
-        data = type_validate_python(
+        data = validate_outbound_value(
             ModifyCurrentUserParams,
-            {"username": username, "avatar": avatar, "banner": banner},
+            {
+                key: value
+                for key, value in {
+                    "username": username,
+                    "avatar": avatar,
+                    "banner": banner,
+                }.items()
+                if value is not UNSET
+            },
         )
         call = RestCall(
             method="PATCH",
             url=self.base_url / "users/@me",
             response=JsonResponse(User),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(data),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -149,34 +162,36 @@ class UserEndpointMixin:
     async def _api_create_DM(  # noqa: N802
         self: "AdapterProtocol",
         bot: "Bot",
-        *,
-        recipient_id: SnowflakeType,
+        **fields: Unpack[CreateDMParams],
     ) -> Channel:
         """Create DM.
 
         see https://discord.com/developers/docs/resources/user#create-dm
         """
+        fields = validate_outbound_value(CreateDMParams, fields)
+        recipient_id = fields["recipient_id"]
 
         call = RestCall(
             method="POST",
             url=self.base_url / "users/@me/channels",
             response=JsonResponse(Channel),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody({"recipient_id": recipient_id}),
+            body=JsonBody({"recipient_id": recipient_id}),
         )
         return await REST_EXCHANGE.execute(self, call)
 
     async def _api_create_group_DM(  # noqa: N802
         self: "AdapterProtocol",
         bot: "Bot",
-        *,
-        access_tokens: list[str],
-        nicks: dict[SnowflakeType, str],
+        **fields: Unpack[CreateGroupDMParams],
     ) -> Channel:
         """Create group DM.
 
         see https://discord.com/developers/docs/resources/user#create-group-dm
         """
+        fields = validate_outbound_value(CreateGroupDMParams, fields)
+        access_tokens = fields["access_tokens"]
+        nicks = fields["nicks"]
 
         data = {"access_tokens": access_tokens, "nicks": nicks}
         call = RestCall(
@@ -184,7 +199,7 @@ class UserEndpointMixin:
             url=self.base_url / "users/@me/channels",
             response=JsonResponse(Channel),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(data),
+            body=JsonBody(data),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -231,14 +246,18 @@ class UserEndpointMixin:
         *,
         application_id: SnowflakeType,
         access_token: str,
-        platform_name: str | None = None,
-        platform_username: str | None = None,
-        metadata: dict[str, str] | None = None,
+        **fields: Unpack[UpdateUserApplicationRoleConnectionParams],
     ) -> ApplicationRoleConnection:
         """Update current user application role connection.
 
         see https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection
         """
+        fields = validate_outbound_value(
+            UpdateUserApplicationRoleConnectionParams, fields
+        )
+        platform_name = fields.get("platform_name")
+        platform_username = fields.get("platform_username")
+        metadata = fields.get("metadata")
         data = {
             "platform_name": platform_name,
             "platform_username": platform_username,
@@ -251,7 +270,7 @@ class UserEndpointMixin:
             / f"users/@me/applications/{application_id}/role-connection",
             response=JsonResponse(ApplicationRoleConnection),
             auth=BearerAuth(access_token),
-            body=JsonValueBody(
+            body=JsonBody(
                 {key: value for (key, value) in data.items() if value is not None}
             ),
         )

@@ -1,22 +1,25 @@
-from typing import TYPE_CHECKING, Annotated, Literal
-
-from nonebot.compat import type_validate_python
+from typing import TYPE_CHECKING, Annotated
+from typing_extensions import Unpack
 
 from .read import (
     SKU,
     Application,
-    ApplicationIntegrationTypeConfiguration,
     ApplicationRoleConnectionMetadata,
     AuthorizationResponse,
     Entitlement,
-    InstallParams,
     Subscription,
 )
-from .types import ApplicationFlag, ApplicationIntegrationType
-from .write import EditCurrentApplicationParams
+from .write import (
+    CreateTestEntitlementParams,
+    EditCurrentApplicationParams,
+)
 from ..gateway.read import ActivityInstance
-from ...api.validation import Range, validate
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...api.validation import (
+    Range,
+    validate,
+    validate_outbound_value,
+)
+from ...protocol import UNSET, SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BearerAuth,
@@ -24,7 +27,6 @@ from ...transport.exchange import (
     EmptyResponse,
     JsonBody,
     JsonResponse,
-    JsonValueBody,
     RestCall,
     _bool_query,
 )
@@ -52,47 +54,52 @@ class ApplicationEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_edit_current_application(  # noqa: PLR0913
+    async def _api_edit_current_application(
         self: "AdapterProtocol",
         bot: "Bot",
-        *,
-        custom_install_url: Missing[str] = UNSET,
-        description: Missing[str] = UNSET,
-        role_connections_verification_url: Missing[str] = UNSET,
-        install_params: Missing[InstallParams] = UNSET,
-        integration_types_config: Missing[
-            dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfiguration]
-        ] = UNSET,
-        flags: Missing[ApplicationFlag] = UNSET,
-        icon: MissingOrNullable[str] = UNSET,
-        cover_image: MissingOrNullable[str] = UNSET,
-        interactions_endpoint_url: Missing[str] = UNSET,
-        tags: Missing[list[str]] = UNSET,
-        event_webhooks_url: Missing[str] = UNSET,
-        event_webhooks_status: Missing[int] = UNSET,
-        event_webhooks_types: Missing[list[str]] = UNSET,
+        **fields: Unpack[EditCurrentApplicationParams],
     ) -> Application:
         """Edit current application.
 
         see https://discord.com/developers/docs/resources/application#edit-current-application
         """
+        fields = validate_outbound_value(EditCurrentApplicationParams, fields)
+        custom_install_url = fields.get("custom_install_url", UNSET)
+        description = fields.get("description", UNSET)
+        role_connections_verification_url = fields.get(
+            "role_connections_verification_url", UNSET
+        )
+        install_params = fields.get("install_params", UNSET)
+        integration_types_config = fields.get("integration_types_config", UNSET)
+        flags = fields.get("flags", UNSET)
+        icon = fields.get("icon", UNSET)
+        cover_image = fields.get("cover_image", UNSET)
+        interactions_endpoint_url = fields.get("interactions_endpoint_url", UNSET)
+        tags = fields.get("tags", UNSET)
+        event_webhooks_url = fields.get("event_webhooks_url", UNSET)
+        event_webhooks_status = fields.get("event_webhooks_status", UNSET)
+        event_webhooks_types = fields.get("event_webhooks_types", UNSET)
 
-        data = type_validate_python(
+        data = validate_outbound_value(
             EditCurrentApplicationParams,
             {
-                "custom_install_url": custom_install_url,
-                "description": description,
-                "role_connections_verification_url": role_connections_verification_url,
-                "install_params": install_params,
-                "integration_types_config": integration_types_config,
-                "flags": flags,
-                "icon": icon,
-                "cover_image": cover_image,
-                "interactions_endpoint_url": interactions_endpoint_url,
-                "tags": tags,
-                "event_webhooks_url": event_webhooks_url,
-                "event_webhooks_status": event_webhooks_status,
-                "event_webhooks_types": event_webhooks_types,
+                key: value
+                for key, value in {
+                    "custom_install_url": custom_install_url,
+                    "description": description,
+                    "role_connections_verification_url": role_connections_verification_url,
+                    "install_params": install_params,
+                    "integration_types_config": integration_types_config,
+                    "flags": flags,
+                    "icon": icon,
+                    "cover_image": cover_image,
+                    "interactions_endpoint_url": interactions_endpoint_url,
+                    "tags": tags,
+                    "event_webhooks_url": event_webhooks_url,
+                    "event_webhooks_status": event_webhooks_status,
+                    "event_webhooks_types": event_webhooks_types,
+                }.items()
+                if value is not UNSET
             },
         )
         call = RestCall(
@@ -100,7 +107,7 @@ class ApplicationEndpointMixin:
             url=self.base_url / "applications/@me",
             response=JsonResponse(Application),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(data),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -158,17 +165,17 @@ class ApplicationEndpointMixin:
         see https://discord.com/developers/docs/resources/application-role-connection-metadata#update-application-role-connection-metadata-records
         """
 
-        payload = [
-            type_validate_python(ApplicationRoleConnectionMetadata, record)
-            for record in records
-        ]
+        payload = validate_outbound_value(
+            list[ApplicationRoleConnectionMetadata],
+            records,
+        )
         call = RestCall(
             method="PUT",
             url=self.base_url
             / f"applications/{application_id}/role-connections/metadata",
             response=JsonResponse(list[ApplicationRoleConnectionMetadata]),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(payload),
+            body=JsonBody(payload),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -257,14 +264,16 @@ class ApplicationEndpointMixin:
         bot: "Bot",
         *,
         application_id: SnowflakeType,
-        sku_id: str,
-        owner_id: str,
-        owner_type: Literal[1, 2],
+        **fields: Unpack[CreateTestEntitlementParams],
     ) -> Entitlement:
         """Create test entitlement.
 
         see https://discord.com/developers/docs/resources/entitlement#create-test-entitlement
         """
+        fields = validate_outbound_value(CreateTestEntitlementParams, fields)
+        sku_id = fields["sku_id"]
+        owner_id = fields["owner_id"]
+        owner_type = fields["owner_type"]
         if owner_type not in (1, 2):
             msg = "owner_type must be 1 or 2"
             raise ValueError(msg)
@@ -279,7 +288,7 @@ class ApplicationEndpointMixin:
             url=self.base_url / f"applications/{application_id}/entitlements",
             response=JsonResponse(Entitlement),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(data),
+            body=JsonBody(data),
         )
         return await REST_EXCHANGE.execute(self, call)
 

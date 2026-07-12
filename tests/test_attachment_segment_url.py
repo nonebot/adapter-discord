@@ -104,5 +104,5 @@ def test_parse_message_keeps_file_attachment_upload_behavior() -> None:
     payload = to_legacy_kwargs(compile_message(message))
 
     assert "content" not in payload
-    assert payload["attachments"][0].filename == "a.png"
+    assert payload["attachments"][0]["filename"] == "a.png"
     assert payload["files"][0].filename == "a.png"

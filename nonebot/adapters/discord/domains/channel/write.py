@@ -1,25 +1,25 @@
 """Canonical channel.write models."""
 
 from typing import TYPE_CHECKING
+from typing_extensions import Required, TypedDict
 
 if TYPE_CHECKING:
+    from .types import OverwriteType
+    from ..invite.types import InviteTargetType
     from ..models import DefaultReaction, ForumTagRequest, PartialOverwrite
+    from ...protocol import SnowflakeType
 
 from .._model_support import (
-    UNSET,
-    BaseModel,
     ChannelFlags,
     ChannelType,
     ForumLayoutTypes,
-    Missing,
-    MissingOrNullable,
     Snowflake,
     SortOrderTypes,
     VideoQualityMode,
 )
 
 
-class ModifyChannelParams(BaseModel):
+class ModifyChannelParams(TypedDict, total=False):
     """Modify Channel Params
 
     see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
@@ -27,81 +27,127 @@ class ModifyChannelParams(BaseModel):
 
     # JSON Params (Guild channel)
     # see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
-    name: Missing[str] = UNSET
-    type: Missing[ChannelType] = UNSET
-    position: MissingOrNullable[int] = UNSET
-    topic: MissingOrNullable[str] = UNSET
-    nsfw: MissingOrNullable[bool] = UNSET
-    rate_limit_per_user: MissingOrNullable[int] = UNSET
-    bitrate: MissingOrNullable[int] = UNSET
-    user_limit: MissingOrNullable[int] = UNSET
-    permission_overwrites: MissingOrNullable[list["PartialOverwrite"]] = UNSET
-    parent_id: MissingOrNullable[Snowflake] = UNSET
-    rtc_region: MissingOrNullable[str] = UNSET
-    video_quality_mode: MissingOrNullable[VideoQualityMode] = UNSET
-    default_auto_archive_duration: MissingOrNullable[int] = UNSET
-    flags: Missing[ChannelFlags] = UNSET
-    available_tags: Missing[list["ForumTagRequest"]] = UNSET
-    default_reaction_emoji: MissingOrNullable["DefaultReaction"] = UNSET
-    default_thread_rate_limit_per_user: Missing[int] = UNSET
-    default_sort_order: MissingOrNullable[SortOrderTypes] = UNSET
-    default_forum_layout: Missing[ForumLayoutTypes] = UNSET
+    name: str
+    type: ChannelType
+    position: int | None
+    topic: str | None
+    nsfw: bool | None
+    rate_limit_per_user: int | None
+    bitrate: int | None
+    user_limit: int | None
+    permission_overwrites: "list[PartialOverwrite] | None"
+    parent_id: Snowflake | None
+    rtc_region: str | None
+    video_quality_mode: VideoQualityMode | None
+    default_auto_archive_duration: int | None
+    flags: ChannelFlags
+    available_tags: "list[ForumTagRequest]"
+    default_reaction_emoji: "DefaultReaction | None"
+    default_thread_rate_limit_per_user: int
+    default_sort_order: SortOrderTypes | None
+    default_forum_layout: ForumLayoutTypes
 
 
-class ModifyThreadParams(BaseModel):
+class ModifyThreadParams(TypedDict, total=False):
     """Modify Thread Params.
 
     see https://discord.com/developers/docs/resources/channel#modify-channel-json-params-thread
     """
 
-    name: Missing[str] = UNSET
-    archived: Missing[bool] = UNSET
-    auto_archive_duration: Missing[int] = UNSET
-    locked: Missing[bool] = UNSET
-    invitable: Missing[bool] = UNSET
-    rate_limit_per_user: MissingOrNullable[int] = UNSET
-    flags: Missing[ChannelFlags] = UNSET
-    applied_tags: Missing[list[Snowflake]] = UNSET
+    name: str
+    archived: bool
+    auto_archive_duration: int
+    locked: bool
+    invitable: bool
+    rate_limit_per_user: int | None
+    flags: ChannelFlags
+    applied_tags: list[Snowflake]
 
 
-class StartThreadFromMessageParams(BaseModel):
+class StartThreadFromMessageParams(TypedDict, total=False):
     """Start Thread From Message Params.
 
     see https://discord.com/developers/docs/resources/channel#start-thread-from-message
     """
 
-    name: str
-    auto_archive_duration: Missing[int] = UNSET
-    rate_limit_per_user: MissingOrNullable[int] = UNSET
+    name: Required[str]
+    auto_archive_duration: int
+    rate_limit_per_user: int | None
 
 
-class StartThreadWithoutMessageParams(BaseModel):
+class StartThreadWithoutMessageParams(TypedDict, total=False):
     """Start Thread Without Message Params.
 
     see https://discord.com/developers/docs/resources/channel#start-thread-without-message
     """
 
-    name: str
-    auto_archive_duration: Missing[int] = UNSET
-    type: Missing[ChannelType] = UNSET
-    invitable: Missing[bool] = UNSET
-    rate_limit_per_user: MissingOrNullable[int] = UNSET
+    name: Required[str]
+    auto_archive_duration: int
+    type: ChannelType
+    invitable: bool
+    rate_limit_per_user: int | None
 
 
-class ModifyGuildChannelPositionParams(BaseModel):
+class ModifyGuildChannelPositionParams(TypedDict, total=False):
     """Modify Guild Channel Position Params.
 
     see https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions
     """
 
-    id: Snowflake
-    position: MissingOrNullable[int] = UNSET
-    lock_permissions: MissingOrNullable[bool] = UNSET
-    parent_id: MissingOrNullable[Snowflake] = UNSET
+    id: Required[Snowflake]
+    position: int | None
+    lock_permissions: bool | None
+    parent_id: Snowflake | None
+
+
+class ModifyDMParams(TypedDict, total=False):
+    """Parameters for ``_api_modify_DM``."""
+
+    name: str
+    icon: bytes
+
+
+class EditChannelPermissionsParams(TypedDict, total=False):
+    """Parameters for ``_api_edit_channel_permissions``."""
+
+    allow: str
+    deny: str
+    type: Required["OverwriteType"]
+
+
+class CreateChannelInviteParams(TypedDict, total=False):
+    """Parameters for ``_api_create_channel_invite``."""
+
+    max_age: int
+    max_uses: int
+    temporary: bool
+    unique: bool
+    target_type: "InviteTargetType"
+    target_user_id: "SnowflakeType"
+    target_application_id: "SnowflakeType"
+    role_ids: "list[SnowflakeType]"
+
+
+class FollowAnnouncementChannelParams(TypedDict, total=False):
+    """Parameters for ``_api_follow_announcement_channel``."""
+
+    webhook_channel_id: Required["SnowflakeType"]
+
+
+class AddGroupDMRecipientParams(TypedDict, total=False):
+    """Parameters for ``_api_group_DM_add_recipient``."""
+
+    access_token: Required[str]
+    nick: Required[str]
 
 
 __all__ = [
+    "AddGroupDMRecipientParams",
+    "CreateChannelInviteParams",
+    "EditChannelPermissionsParams",
+    "FollowAnnouncementChannelParams",
     "ModifyChannelParams",
+    "ModifyDMParams",
     "ModifyGuildChannelPositionParams",
     "ModifyThreadParams",
     "StartThreadFromMessageParams",

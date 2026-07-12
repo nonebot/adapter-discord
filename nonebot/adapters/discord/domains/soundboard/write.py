@@ -1,41 +1,43 @@
 """Canonical soundboard.write models."""
 
-from .._model_support import UNSET, BaseModel, Missing, MissingOrNullable, Snowflake
+from typing_extensions import Required, TypedDict
+
+from .._model_support import Snowflake
 
 
-class SendSoundboardSoundParams(BaseModel):
+class SendSoundboardSoundParams(TypedDict, total=False):
     """Send Soundboard Sound Params.
 
     see https://discord.com/developers/docs/resources/soundboard#send-soundboard-sound
     """
 
-    sound_id: Snowflake
-    source_guild_id: Missing[Snowflake] = UNSET
+    sound_id: Required[Snowflake]
+    source_guild_id: Snowflake
 
 
-class CreateGuildSoundboardSoundParams(BaseModel):
+class CreateGuildSoundboardSoundParams(TypedDict, total=False):
     """Create Guild Soundboard Sound Params.
 
     see https://discord.com/developers/docs/resources/soundboard#create-guild-soundboard-sound
     """
 
-    name: str
-    sound: str
-    volume: Missing[float] = UNSET
-    emoji_id: Missing[Snowflake] = UNSET
-    emoji_name: Missing[str] = UNSET
+    name: Required[str]
+    sound: Required[str]
+    volume: float
+    emoji_id: Snowflake
+    emoji_name: str
 
 
-class ModifyGuildSoundboardSoundParams(BaseModel):
+class ModifyGuildSoundboardSoundParams(TypedDict, total=False):
     """Modify Guild Soundboard Sound Params.
 
     see https://discord.com/developers/docs/resources/soundboard#modify-guild-soundboard-sound
     """
 
-    name: Missing[str] = UNSET
-    volume: Missing[float] = UNSET
-    emoji_id: MissingOrNullable[Snowflake] = UNSET
-    emoji_name: MissingOrNullable[str] = UNSET
+    name: str
+    volume: float
+    emoji_id: Snowflake | None
+    emoji_name: str | None
 
 
 __all__ = [

@@ -1,5 +1,4 @@
 from nonebot.adapters.discord.api.model import (
-    InteractionCallbackMessage,
     InteractionResponse,
 )
 from nonebot.adapters.discord.api.types import InteractionCallbackType
@@ -66,8 +65,9 @@ async def test_bot_send_interaction_callback_success_fetches_original(
     response = callback["response"]
     assert isinstance(response, InteractionResponse)
     assert response.type is InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE
-    assert isinstance(response.data, InteractionCallbackMessage)
-    assert response.data.content == "hello"
+    data = response.data
+    assert isinstance(data, dict)
+    assert data.get("content") == "hello"
     assert calls[1][1] == {
         "application_id": event.application_id,
         "interaction_token": event.token,

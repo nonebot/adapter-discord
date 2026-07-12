@@ -12,6 +12,7 @@ if PYDANTIC_V2 or TYPE_CHECKING:
 else:
     from pydantic.generics import GenericModel
 
+
 from ._types import (
     ActivityAssetImage,
     ActivityFlags,

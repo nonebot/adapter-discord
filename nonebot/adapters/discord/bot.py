@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any, Literal, NoReturn, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Literal, NoReturn
 from typing_extensions import override
 import warnings
 
@@ -21,10 +21,13 @@ from .domains.interaction.lifecycle import (
     InteractionResponder,
     current_interaction_responder,
 )
-from .domains.message.conversion import compile_message, to_message_send
+from .domains.message.conversion import (
+    MessageSendOptions,
+    compile_message,
+    to_message_send,
+)
 from .domains.models import (
     AllowedMention,
-    Component,
     File,
     InteractionCallbackType,
     InteractionResponse,
@@ -39,11 +42,9 @@ from .exception import ActionFailed
 from .message import Message, MessageSegment
 from .protocol import (
     UNSET,
-    MissingOrNullable,
     Snowflake,
     SnowflakeType,
     is_not_unset,
-    is_unset,
 )
 from .utils import log
 
@@ -53,11 +54,6 @@ if TYPE_CHECKING:
 
 DISCORD_ATTACHMENT_HOSTS = {"cdn.discordapp.com", "media.discordapp.net"}
 AttachmentFetchOnError = Literal["raise", "skip"]
-T = TypeVar("T")
-
-
-def _none_if_unset(value: MissingOrNullable[T]) -> T | None:
-    return None if is_unset(value) else value
 
 
 async def _check_reply(bot: "Bot", event: MessageEvent) -> None:
@@ -273,7 +269,7 @@ class Bot(BaseBot, ApiClient):
                 continue
 
             attachment.data["file"] = File(
-                filename=attachment.data["attachment"].filename,
+                filename=attachment.data["attachment"]["filename"],
                 content=content,
             )
 
@@ -363,34 +359,14 @@ class Bot(BaseBot, ApiClient):
         message = MessageSegment.text(message) if isinstance(message, str) else message
         message = message if isinstance(message, Message) else Message(message)
         parts = compile_message(message.sendable())
-        request = to_message_send(
-            parts,
-            nonce=nonce if nonce is not None else UNSET,
-            tts=tts,
-            allowed_mentions=(
-                allowed_mentions if allowed_mentions is not None else UNSET
-            ),
-        )
+        options: MessageSendOptions = {"tts": tts}
+        if nonce is not None:
+            options["nonce"] = nonce
+        if allowed_mentions is not None:
+            options["allowed_mentions"] = allowed_mentions
+        request = to_message_send(parts, **options)
 
-        return await self.create_message(
-            channel_id=channel_id,
-            content=_none_if_unset(request.content),
-            nonce=_none_if_unset(request.nonce),
-            enforce_nonce=_none_if_unset(request.enforce_nonce),
-            tts=_none_if_unset(request.tts),
-            embeds=_none_if_unset(request.embeds),
-            allowed_mentions=_none_if_unset(request.allowed_mentions),
-            message_reference=_none_if_unset(request.message_reference),
-            components=_none_if_unset(request.components),
-            sticker_ids=cast(
-                "list[SnowflakeType] | None",
-                _none_if_unset(request.sticker_ids),
-            ),
-            files=_none_if_unset(request.files),
-            attachments=_none_if_unset(request.attachments),
-            flags=_none_if_unset(request.flags),
-            poll=_none_if_unset(request.poll),
-        )
+        return await self.create_message(channel_id=channel_id, **request)
 
     @override
     async def send(
@@ -481,17 +457,7 @@ class Bot(BaseBot, ApiClient):
                 return await self.create_followup_message(
                     application_id=event.application_id,
                     interaction_token=event.token,
-                    content=_none_if_unset(followup.content),
-                    tts=_none_if_unset(followup.tts),
-                    embeds=_none_if_unset(followup.embeds),
-                    allowed_mentions=_none_if_unset(followup.allowed_mentions),
-                    components=cast(
-                        "list[Component] | None",
-                        _none_if_unset(followup.components),
-                    ),
-                    files=_none_if_unset(followup.files),
-                    attachments=_none_if_unset(followup.attachments),
-                    flags=_none_if_unset(followup.flags),
+                    **followup,
                 )
             return await self.get_origin_interaction_response(
                 application_id=event.application_id,
@@ -506,30 +472,10 @@ class Bot(BaseBot, ApiClient):
         if reply_message:
             message += MessageSegment.reference(MessageReference(message_id=event.id))
 
-        request = to_message_send(
-            compile_message(message),
-            nonce=nonce if nonce is not None else UNSET,
-            tts=tts,
-            allowed_mentions=allowed_mentions
-            if allowed_mentions is not None
-            else UNSET,
-        )
-        return await self.create_message(
-            channel_id=event.channel_id,
-            content=_none_if_unset(request.content),
-            nonce=_none_if_unset(request.nonce),
-            enforce_nonce=_none_if_unset(request.enforce_nonce),
-            tts=_none_if_unset(request.tts),
-            embeds=_none_if_unset(request.embeds),
-            allowed_mentions=_none_if_unset(request.allowed_mentions),
-            message_reference=_none_if_unset(request.message_reference),
-            components=_none_if_unset(request.components),
-            sticker_ids=cast(
-                "list[SnowflakeType] | None",
-                _none_if_unset(request.sticker_ids),
-            ),
-            files=_none_if_unset(request.files),
-            attachments=_none_if_unset(request.attachments),
-            flags=_none_if_unset(request.flags),
-            poll=_none_if_unset(request.poll),
-        )
+        options: MessageSendOptions = {"tts": tts}
+        if nonce is not None:
+            options["nonce"] = nonce
+        if allowed_mentions is not None:
+            options["allowed_mentions"] = allowed_mentions
+        request = to_message_send(compile_message(message), **options)
+        return await self.create_message(channel_id=event.channel_id, **request)

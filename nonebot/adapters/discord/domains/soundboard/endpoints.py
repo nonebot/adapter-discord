@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import (
     ListDefaultSoundboardSoundsResponse,
@@ -12,7 +11,8 @@ from .write import (
     ModifyGuildSoundboardSoundParams,
     SendSoundboardSoundParams,
 )
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...api.validation import validate_outbound_value
+from ...protocol import UNSET, SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -33,24 +33,33 @@ class SoundboardEndpointMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        sound_id: SnowflakeType,
-        source_guild_id: Missing[SnowflakeType] = UNSET,
+        **fields: Unpack[SendSoundboardSoundParams],
     ) -> None:
         """Send soundboard sound.
 
         see https://discord.com/developers/docs/resources/soundboard#send-soundboard-sound
         """
+        fields = validate_outbound_value(SendSoundboardSoundParams, fields)
+        sound_id = fields["sound_id"]
+        source_guild_id = fields.get("source_guild_id", UNSET)
 
-        data = type_validate_python(
+        data = validate_outbound_value(
             SendSoundboardSoundParams,
-            {"sound_id": sound_id, "source_guild_id": source_guild_id},
+            {
+                key: value
+                for key, value in {
+                    "sound_id": sound_id,
+                    "source_guild_id": source_guild_id,
+                }.items()
+                if value is not UNSET
+            },
         )
         call = RestCall(
             method="POST",
             url=self.base_url / f"channels/{channel_id}/send-soundboard-sound",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(data),
         )
         await REST_EXCHANGE.execute(self, call)
 
@@ -109,30 +118,36 @@ class SoundboardEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_create_guild_soundboard_sound(  # noqa: PLR0913
+    async def _api_create_guild_soundboard_sound(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: str,
-        sound: str,
-        volume: Missing[float] = UNSET,
-        emoji_id: Missing[SnowflakeType] = UNSET,
-        emoji_name: Missing[str] = UNSET,
+        **fields: Unpack[CreateGuildSoundboardSoundParams],
     ) -> SoundboardSound:
         """Create guild soundboard sound.
 
         see https://discord.com/developers/docs/resources/soundboard#create-guild-soundboard-sound
         """
+        fields = validate_outbound_value(CreateGuildSoundboardSoundParams, fields)
+        name = fields["name"]
+        sound = fields["sound"]
+        volume = fields.get("volume", UNSET)
+        emoji_id = fields.get("emoji_id", UNSET)
+        emoji_name = fields.get("emoji_name", UNSET)
 
-        data = type_validate_python(
+        data = validate_outbound_value(
             CreateGuildSoundboardSoundParams,
             {
-                "name": name,
-                "sound": sound,
-                "volume": volume,
-                "emoji_id": emoji_id,
-                "emoji_name": emoji_name,
+                key: value
+                for key, value in {
+                    "name": name,
+                    "sound": sound,
+                    "volume": volume,
+                    "emoji_id": emoji_id,
+                    "emoji_name": emoji_name,
+                }.items()
+                if value is not UNSET
             },
         )
         call = RestCall(
@@ -140,33 +155,39 @@ class SoundboardEndpointMixin:
             url=self.base_url / f"guilds/{guild_id}/soundboard-sounds",
             response=JsonResponse(SoundboardSound),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(data),
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_modify_guild_soundboard_sound(  # noqa: PLR0913
+    async def _api_modify_guild_soundboard_sound(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         sound_id: SnowflakeType,
-        name: Missing[str] = UNSET,
-        volume: Missing[float] = UNSET,
-        emoji_id: MissingOrNullable[SnowflakeType] = UNSET,
-        emoji_name: MissingOrNullable[str] = UNSET,
+        **fields: Unpack[ModifyGuildSoundboardSoundParams],
     ) -> SoundboardSound:
         """Modify guild soundboard sound.
 
         see https://discord.com/developers/docs/resources/soundboard#modify-guild-soundboard-sound
         """
+        fields = validate_outbound_value(ModifyGuildSoundboardSoundParams, fields)
+        name = fields.get("name", UNSET)
+        volume = fields.get("volume", UNSET)
+        emoji_id = fields.get("emoji_id", UNSET)
+        emoji_name = fields.get("emoji_name", UNSET)
 
-        data = type_validate_python(
+        data = validate_outbound_value(
             ModifyGuildSoundboardSoundParams,
             {
-                "name": name,
-                "volume": volume,
-                "emoji_id": emoji_id,
-                "emoji_name": emoji_name,
+                key: value
+                for key, value in {
+                    "name": name,
+                    "volume": volume,
+                    "emoji_id": emoji_id,
+                    "emoji_name": emoji_name,
+                }.items()
+                if value is not UNSET
             },
         )
         call = RestCall(
@@ -174,7 +195,7 @@ class SoundboardEndpointMixin:
             url=self.base_url / f"guilds/{guild_id}/soundboard-sounds/{sound_id}",
             response=JsonResponse(SoundboardSound),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(data),
         )
         return await REST_EXCHANGE.execute(self, call)
 

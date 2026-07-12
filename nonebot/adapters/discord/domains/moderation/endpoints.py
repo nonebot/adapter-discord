@@ -1,18 +1,21 @@
 from typing import TYPE_CHECKING, Annotated, Literal, overload
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import AuditLog, AutoModerationAction, AutoModerationRule, TriggerMetadata
 from .types import AuditLogEventType, AutoModerationRuleEventType, TriggerType
-from .write import CreateAndModifyAutoModerationRuleParams
+from .write import (
+    CreateAutoModerationRuleParams,
+    ModifyAutoModerationRuleParams,
+)
 from ...api.validation import (
     AtMostOne,
     ForbidIfEquals,
     Range,
     RequireIfNotEquals,
     validate,
+    validate_outbound_value,
 )
-from ...protocol import SnowflakeType
+from ...protocol import UNSET, SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -208,31 +211,27 @@ class ModerationEndpointMixin:
             ),
         )
     )
-    async def _api_create_auto_moderation_rule(  # noqa: PLR0913
+    async def _api_create_auto_moderation_rule(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: str,
-        event_type: AutoModerationRuleEventType,
-        trigger_type: TriggerType,
-        actions: list[AutoModerationAction],
-        trigger_metadata: TriggerMetadata | None = None,
-        enabled: bool | None = None,
-        exempt_roles: Annotated[
-            list[SnowflakeType] | None,
-            Range(message="exempt_roles must be 20 items or fewer", max_length=20),
-        ] = None,
-        exempt_channels: Annotated[
-            list[SnowflakeType] | None,
-            Range(message="exempt_channels must be 50 items or fewer", max_length=50),
-        ] = None,
         reason: str | None = None,
+        **fields: Unpack[CreateAutoModerationRuleParams],
     ) -> AutoModerationRule:
         """Create auto moderation rule.
 
         see https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
         """
+        fields = validate_outbound_value(CreateAutoModerationRuleParams, fields)
+        name = fields["name"]
+        event_type = fields["event_type"]
+        trigger_type = fields["trigger_type"]
+        trigger_metadata = fields.get("trigger_metadata")
+        actions = fields["actions"]
+        enabled = fields.get("enabled")
+        exempt_roles = fields.get("exempt_roles")
+        exempt_channels = fields.get("exempt_channels")
 
         data = {
             "name": name,
@@ -244,43 +243,48 @@ class ModerationEndpointMixin:
             "exempt_roles": exempt_roles,
             "exempt_channels": exempt_channels,
         }
-        data = type_validate_python(CreateAndModifyAutoModerationRuleParams, data)
+        data = validate_outbound_value(
+            CreateAutoModerationRuleParams,
+            {
+                key: value
+                for key, value in {
+                    key: value for key, value in data.items() if value is not None
+                }.items()
+                if value is not UNSET
+            },
+        )
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/auto-moderation/rules",
             response=JsonResponse(AutoModerationRule),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, exclude_none=True, omit_unset_values=True),
+            body=JsonBody(data),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
 
     @validate
-    async def _api_modify_auto_moderation_rule(  # noqa: PLR0913
+    async def _api_modify_auto_moderation_rule(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         rule_id: SnowflakeType,
-        name: str | None = None,
-        event_type: AutoModerationRuleEventType | None = None,
-        trigger_metadata: TriggerMetadata | None = None,
-        actions: list[AutoModerationAction] | None = None,
-        enabled: bool | None = None,
-        exempt_roles: Annotated[
-            list[SnowflakeType] | None,
-            Range(message="exempt_roles must be 20 items or fewer", max_length=20),
-        ] = None,
-        exempt_channels: Annotated[
-            list[SnowflakeType] | None,
-            Range(message="exempt_channels must be 50 items or fewer", max_length=50),
-        ] = None,
         reason: str | None = None,
+        **fields: Unpack[ModifyAutoModerationRuleParams],
     ) -> AutoModerationRule:
         """Modify auto moderation rule.
 
         see https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
         """
+        fields = validate_outbound_value(ModifyAutoModerationRuleParams, fields)
+        name = fields.get("name")
+        event_type = fields.get("event_type")
+        trigger_metadata = fields.get("trigger_metadata")
+        actions = fields.get("actions")
+        enabled = fields.get("enabled")
+        exempt_roles = fields.get("exempt_roles")
+        exempt_channels = fields.get("exempt_channels")
 
         data = {
             "name": name,
@@ -291,16 +295,22 @@ class ModerationEndpointMixin:
             "exempt_roles": exempt_roles,
             "exempt_channels": exempt_channels,
         }
-        data = type_validate_python(
-            CreateAndModifyAutoModerationRuleParams,
-            {key: value for (key, value) in data.items() if value is not None},
+        data = validate_outbound_value(
+            ModifyAutoModerationRuleParams,
+            {
+                key: value
+                for key, value in {
+                    key: value for (key, value) in data.items() if value is not None
+                }.items()
+                if value is not UNSET
+            },
         )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/auto-moderation/rules/{rule_id}",
             response=JsonResponse(AutoModerationRule),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, exclude_none=True, omit_unset_values=True),
+            body=JsonBody(data),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)

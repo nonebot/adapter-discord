@@ -1,6 +1,7 @@
 """Canonical webhook.write models."""
 
 from typing import TYPE_CHECKING
+from typing_extensions import Required, TypedDict
 
 if TYPE_CHECKING:
     from ..models import (
@@ -12,18 +13,12 @@ if TYPE_CHECKING:
         File,
         PollRequest,
     )
+    from ...protocol import SnowflakeType
 
-from .._model_support import (
-    UNSET,
-    BaseModel,
-    MessageFlag,
-    Missing,
-    MissingOrNullable,
-    Snowflake,
-)
+from .._model_support import MessageFlag, Snowflake
 
 
-class WebhookMessageEditParams(BaseModel):
+class WebhookMessageEditParams(TypedDict, total=False):
     """Edit Webhook Message Parameters.
 
     All parameters are optional and nullable.
@@ -31,44 +26,57 @@ class WebhookMessageEditParams(BaseModel):
     see https://discord.com/developers/docs/resources/webhook#edit-webhook-message
     """
 
-    content: MissingOrNullable[str] = UNSET
-    embeds: MissingOrNullable[list["Embed"]] = UNSET
-    flags: MissingOrNullable[MessageFlag] = UNSET
-    allowed_mentions: MissingOrNullable["AllowedMention"] = UNSET
-    components: MissingOrNullable[list["Component"]] = UNSET
-    files: Missing[list["File"]] = UNSET
-    attachments: MissingOrNullable[list["AttachmentSend"]] = UNSET
-    poll: MissingOrNullable["PollRequest"] = UNSET
+    content: str | None
+    embeds: "list[Embed] | None"
+    flags: MessageFlag | None
+    allowed_mentions: "AllowedMention | None"
+    components: "list[Component] | None"
+    files: "list[File]"
+    attachments: "list[AttachmentSend] | None"
+    poll: "PollRequest | None"
 
 
-class CreateWebhookParams(BaseModel):
+class CreateWebhookParams(TypedDict, total=False):
     """Create Webhook Params.
 
     see https://discord.com/developers/docs/resources/webhook#create-webhook
     """
 
-    name: str
-    avatar: MissingOrNullable[str] = UNSET
+    name: Required[str]
+    avatar: str | None
 
 
-class ExecuteWebhookParams(BaseModel):
+class ExecuteWebhookParams(TypedDict, total=False):
     """Execute Webhook Parameters
 
     see https://discord.com/developers/docs/resources/webhook#execute-webhook"""
 
-    content: Missing[str] = UNSET
-    username: Missing[str] = UNSET
-    avatar_url: Missing[str] = UNSET
-    tts: Missing[bool] = UNSET
-    embeds: Missing[list["Embed"]] = UNSET
-    allowed_mentions: Missing["AllowedMention"] = UNSET
-    components: Missing[list["DirectComponent"]] = UNSET
-    files: Missing[list["File"]] = UNSET
-    attachments: Missing[list["AttachmentSend"]] = UNSET
-    flags: Missing[MessageFlag] = UNSET
-    thread_name: Missing[str] = UNSET
-    applied_tags: Missing[list[Snowflake]] = UNSET
-    poll: Missing["PollRequest"] = UNSET
+    content: str
+    username: str
+    avatar_url: str
+    tts: bool
+    embeds: "list[Embed]"
+    allowed_mentions: "AllowedMention"
+    components: "list[DirectComponent]"
+    files: "list[File]"
+    attachments: "list[AttachmentSend]"
+    flags: MessageFlag
+    thread_name: str
+    applied_tags: list[Snowflake]
+    poll: "PollRequest"
 
 
-__all__ = ["CreateWebhookParams", "ExecuteWebhookParams", "WebhookMessageEditParams"]
+class ModifyWebhookParams(TypedDict, total=False):
+    """Parameters for ``_api_modify_webhook``."""
+
+    name: str
+    avatar: "str | None"
+    channel_id: "SnowflakeType"
+
+
+__all__ = [
+    "CreateWebhookParams",
+    "ExecuteWebhookParams",
+    "ModifyWebhookParams",
+    "WebhookMessageEditParams",
+]

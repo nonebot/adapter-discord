@@ -1,17 +1,16 @@
 from typing import TYPE_CHECKING
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import Lobby, LobbyMember
 from .types import LobbyMemberFlags
 from .write import (
     AddLobbyMemberParams,
-    CreateLobbyMemberParams,
     CreateLobbyParams,
     LinkChannelToLobbyParams,
     ModifyLobbyParams,
 )
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...api.validation import validate_outbound_value
+from ...protocol import UNSET, Missing, SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -30,22 +29,27 @@ class LobbyEndpointMixin:
     async def _api_create_lobby(
         self: "AdapterProtocol",
         bot: "Bot",
-        *,
-        metadata: Missing[dict[str, str]] = UNSET,
-        members: Missing[list[CreateLobbyMemberParams]] = UNSET,
-        idle_timeout_seconds: Missing[int] = UNSET,
+        **fields: Unpack[CreateLobbyParams],
     ) -> Lobby:
         """Create lobby.
 
         see https://discord.com/developers/docs/resources/lobby#create-lobby
         """
+        fields = validate_outbound_value(CreateLobbyParams, fields)
+        metadata = fields.get("metadata", UNSET)
+        members = fields.get("members", UNSET)
+        idle_timeout_seconds = fields.get("idle_timeout_seconds", UNSET)
 
-        data = type_validate_python(
+        data = validate_outbound_value(
             CreateLobbyParams,
             {
-                "metadata": metadata,
-                "members": members,
-                "idle_timeout_seconds": idle_timeout_seconds,
+                key: value
+                for key, value in {
+                    "metadata": metadata,
+                    "members": members,
+                    "idle_timeout_seconds": idle_timeout_seconds,
+                }.items()
+                if value is not UNSET
             },
         )
         call = RestCall(
@@ -53,7 +57,7 @@ class LobbyEndpointMixin:
             url=self.base_url / "lobbies",
             response=JsonResponse(Lobby),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(data),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -81,24 +85,33 @@ class LobbyEndpointMixin:
         bot: "Bot",
         *,
         lobby_id: SnowflakeType,
-        metadata: MissingOrNullable[dict[str, str]] = UNSET,
-        idle_timeout_seconds: Missing[int] = UNSET,
+        **fields: Unpack[ModifyLobbyParams],
     ) -> Lobby:
         """Modify lobby.
 
         see https://discord.com/developers/docs/resources/lobby#modify-lobby
         """
+        fields = validate_outbound_value(ModifyLobbyParams, fields)
+        metadata = fields.get("metadata", UNSET)
+        idle_timeout_seconds = fields.get("idle_timeout_seconds", UNSET)
 
-        data = type_validate_python(
+        data = validate_outbound_value(
             ModifyLobbyParams,
-            {"metadata": metadata, "idle_timeout_seconds": idle_timeout_seconds},
+            {
+                key: value
+                for key, value in {
+                    "metadata": metadata,
+                    "idle_timeout_seconds": idle_timeout_seconds,
+                }.items()
+                if value is not UNSET
+            },
         )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"lobbies/{lobby_id}",
             response=JsonResponse(Lobby),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(data),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -135,15 +148,20 @@ class LobbyEndpointMixin:
         see https://discord.com/developers/docs/resources/lobby#add-lobby-member
         """
 
-        data = type_validate_python(
-            AddLobbyMemberParams, {"metadata": metadata, "flags": flags}
+        data = validate_outbound_value(
+            AddLobbyMemberParams,
+            {
+                key: value
+                for key, value in {"metadata": metadata, "flags": flags}.items()
+                if value is not UNSET
+            },
         )
         call = RestCall(
             method="PUT",
             url=self.base_url / f"lobbies/{lobby_id}/members/{user_id}",
             response=JsonResponse(LobbyMember),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(data),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -191,22 +209,29 @@ class LobbyEndpointMixin:
         bot: "Bot",
         *,
         lobby_id: SnowflakeType,
-        channel_id: MissingOrNullable[SnowflakeType] = UNSET,
+        **fields: Unpack[LinkChannelToLobbyParams],
     ) -> Lobby:
         """Link channel to lobby.
 
         see https://discord.com/developers/docs/resources/lobby#link-channel-to-lobby
         """
+        fields = validate_outbound_value(LinkChannelToLobbyParams, fields)
+        channel_id = fields.get("channel_id", UNSET)
 
-        data = type_validate_python(
-            LinkChannelToLobbyParams, {"channel_id": channel_id}
+        data = validate_outbound_value(
+            LinkChannelToLobbyParams,
+            {
+                key: value
+                for key, value in {"channel_id": channel_id}.items()
+                if value is not UNSET
+            },
         )
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"lobbies/{lobby_id}/channel-linking",
             response=JsonResponse(Lobby),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(data),
         )
         return await REST_EXCHANGE.execute(self, call)
 

@@ -1,12 +1,13 @@
+from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
 from .read import InteractionResponse
-from ..component.read import Component
+from ..component.read import Component, DirectComponent
 from ..message.read import AllowedMention, Embed, File, MessageGet
 from ..message.types import MessageFlag
 from ..message.write import AttachmentSend, PollRequest
 from ..webhook.write import ExecuteWebhookParams, WebhookMessageEditParams
-from ...api.utils import parse_data, parse_interaction_response
+from ...api.validation import validate_outbound_value
 from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
@@ -17,6 +18,7 @@ from ...transport.exchange import (
     RestCall,
     _bool_query,
 )
+from ...utils import model_dump
 
 if TYPE_CHECKING:
     from ...api.handle import AdapterProtocol
@@ -37,7 +39,29 @@ class InteractionEndpointMixin:
 
         see https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response
         """
-        params = parse_interaction_response(response)
+        request_files: list[File] | None = None
+        if isinstance(response.data, Mapping):
+            raw_files = response.data.get("files")
+            if isinstance(raw_files, list) and raw_files:
+                request_files = [
+                    file if isinstance(file, File) else File(**file)
+                    for file in raw_files
+                ]
+        payload: dict[str, object] = model_dump(
+            response,
+            exclude_none=True,
+            omit_unset_values=True,
+        )
+        data = payload.get("data")
+        if isinstance(data, Mapping):
+            data_payload = dict(data)
+            data_payload.pop("files", None)
+            payload["data"] = data_payload
+        params = PreparedBody(
+            payload,
+            files=request_files,
+            attachment_owner_path=("data",),
+        )
 
         query = {"with_response": _bool_query(value=with_response)}
         call = RestCall(
@@ -47,7 +71,7 @@ class InteractionEndpointMixin:
             response=JsonResponse(InteractionResponse, allow_empty=True),
             auth=BotAuth(bot.bot_info),
             query=query,
-            body=PreparedBody(params),
+            body=params,
         )
         resp = await REST_EXCHANGE.execute(self, call)
         if resp is None:
@@ -113,7 +137,16 @@ class InteractionEndpointMixin:
             "attachments": attachments,
             "poll": poll,
         }
-        request_kwargs = parse_data(data, WebhookMessageEditParams)
+        request_kwargs_payload = dict(
+            validate_outbound_value(
+                WebhookMessageEditParams,
+                {key: value for key, value in data.items() if value is not UNSET},
+            )
+        )
+        request_kwargs_files = request_kwargs_payload.pop("files", None)
+        request_kwargs = PreparedBody(
+            request_kwargs_payload, files=request_kwargs_files or None
+        )
         call = RestCall(
             method="PATCH",
             url=self.base_url
@@ -121,7 +154,7 @@ class InteractionEndpointMixin:
             response=JsonResponse(MessageGet),
             auth=BotAuth(bot.bot_info),
             query=params,
-            body=PreparedBody(request_kwargs),
+            body=request_kwargs,
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -159,10 +192,11 @@ class InteractionEndpointMixin:
         tts: bool | None = None,
         embeds: list[Embed] | None = None,
         allowed_mentions: AllowedMention | None = None,
-        components: list[Component] | None = None,
+        components: list[DirectComponent] | None = None,
         files: list[File] | None = None,
         attachments: list[AttachmentSend] | None = None,
-        flags: int | None = None,
+        flags: MessageFlag | None = None,
+        poll: PollRequest | None = None,
     ) -> MessageGet:
         """Create a followup message.
 
@@ -188,10 +222,23 @@ class InteractionEndpointMixin:
             "files": files,
             "attachments": attachments,
             "flags": flags,
+            "poll": poll,
         }
-        request_kwargs = parse_data(
-            {key: value for (key, value) in data.items() if value is not None},
-            ExecuteWebhookParams,
+        request_kwargs_payload = dict(
+            validate_outbound_value(
+                ExecuteWebhookParams,
+                {
+                    key: value
+                    for key, value in {
+                        key: value for (key, value) in data.items() if value is not None
+                    }.items()
+                    if value is not UNSET
+                },
+            )
+        )
+        request_kwargs_files = request_kwargs_payload.pop("files", None)
+        request_kwargs = PreparedBody(
+            request_kwargs_payload, files=request_kwargs_files or None
         )
 
         call = RestCall(
@@ -199,7 +246,7 @@ class InteractionEndpointMixin:
             url=self.base_url / f"webhooks/{application_id}/{interaction_token}",
             response=JsonResponse(MessageGet),
             auth=BotAuth(bot.bot_info),
-            body=PreparedBody(request_kwargs),
+            body=request_kwargs,
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -264,7 +311,16 @@ class InteractionEndpointMixin:
             "attachments": attachments,
             "poll": poll,
         }
-        request_kwargs = parse_data(data, WebhookMessageEditParams)
+        request_kwargs_payload = dict(
+            validate_outbound_value(
+                WebhookMessageEditParams,
+                {key: value for key, value in data.items() if value is not UNSET},
+            )
+        )
+        request_kwargs_files = request_kwargs_payload.pop("files", None)
+        request_kwargs = PreparedBody(
+            request_kwargs_payload, files=request_kwargs_files or None
+        )
         call = RestCall(
             method="PATCH",
             url=self.base_url
@@ -272,7 +328,7 @@ class InteractionEndpointMixin:
             response=JsonResponse(MessageGet),
             auth=BotAuth(bot.bot_info),
             query=params,
-            body=PreparedBody(request_kwargs),
+            body=request_kwargs,
         )
         return await REST_EXCHANGE.execute(self, call)
 

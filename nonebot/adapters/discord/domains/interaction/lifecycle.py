@@ -3,7 +3,7 @@
 from asyncio import Lock
 from contextvars import ContextVar
 from enum import Enum
-from typing import Protocol, cast
+from typing import Protocol
 
 from .conversion import to_followup_message, to_interaction_callback, to_origin_edit
 from ...domains.message.conversion import compile_message
@@ -11,6 +11,7 @@ from ...domains.models import (
     AllowedMention,
     AttachmentSend,
     Component,
+    DirectComponent,
     Embed,
     File,
     InteractionCallbackMessage,
@@ -31,7 +32,6 @@ from ...protocol import (
     Missing,
     MissingOrNullable,
     SnowflakeType,
-    is_unset,
 )
 
 INTERACTION_ALREADY_ACKNOWLEDGED = 40060
@@ -88,10 +88,11 @@ class InteractionBot(Protocol):
         tts: bool | None = None,
         embeds: list[Embed] | None = None,
         allowed_mentions: AllowedMention | None = None,
-        components: list[Component] | None = None,
+        components: list[DirectComponent] | None = None,
         files: list[File] | None = None,
         attachments: list[AttachmentSend] | None = None,
-        flags: int | None = None,
+        flags: MessageFlag | None = None,
+        poll: PollRequest | None = None,
     ) -> MessageGet: ...
 
 
@@ -228,16 +229,7 @@ class InteractionResponder:
         result = await self._bot.edit_origin_interaction_response(
             application_id=self._application_id,
             interaction_token=self._interaction_token,
-            content=None if is_unset(request.content) else request.content,
-            embeds=None if is_unset(request.embeds) else request.embeds,
-            flags=None if is_unset(request.flags) else request.flags,
-            allowed_mentions=(
-                None if is_unset(request.allowed_mentions) else request.allowed_mentions
-            ),
-            components=None if is_unset(request.components) else request.components,
-            files=UNSET if is_unset(request.files) else request.files,
-            attachments=None if is_unset(request.attachments) else request.attachments,
-            poll=None if is_unset(request.poll) else request.poll,
+            **request,
         )
         self._state = InteractionState.RESPONDED
         return result
@@ -261,19 +253,7 @@ class InteractionResponder:
         return await self._bot.create_followup_message(
             application_id=self._application_id,
             interaction_token=self._interaction_token,
-            content=None if is_unset(request.content) else request.content,
-            tts=None if is_unset(request.tts) else request.tts,
-            embeds=None if is_unset(request.embeds) else request.embeds,
-            allowed_mentions=(
-                None if is_unset(request.allowed_mentions) else request.allowed_mentions
-            ),
-            components=cast(
-                "list[Component] | None",
-                None if is_unset(request.components) else request.components,
-            ),
-            files=None if is_unset(request.files) else request.files,
-            attachments=None if is_unset(request.attachments) else request.attachments,
-            flags=None if is_unset(request.flags) else int(request.flags),
+            **request,
         )
 
     async def respond(

@@ -27,6 +27,7 @@ from nonebot.permission import Permission
 from nonebot.plugin.on import get_matcher_module, get_matcher_plugin, store_matcher
 from nonebot.rule import Rule
 from nonebot.typing import T_Handler, T_PermissionChecker, T_RuleChecker, T_State
+from pydantic import BaseModel
 
 from .params import OptionParam
 from .response import get_command_response
@@ -38,9 +39,10 @@ from ..domains.interaction.conversion import to_origin_edit
 from ..domains.message.conversion import compile_message
 from ..domains.models import (
     AnyCommandOption,
-    ApplicationCommandCreate,
     ApplicationCommandOptionType,
     ApplicationCommandType,
+    ApplicationIntegrationType,
+    InteractionContextType,
     MessageFlag,
     MessageGet,
 )
@@ -68,7 +70,19 @@ _FOLLOWUP_DEPRECATION = (
 )
 
 
-class ApplicationCommandConfig(ApplicationCommandCreate):
+class ApplicationCommandConfig(BaseModel):
+    name: str
+    name_localizations: dict[str, str] | None = None
+    description: str = ""
+    description_localizations: dict[str, str] | None = None
+    options: Missing[list[AnyCommandOption]] = UNSET
+    default_member_permissions: str | None = None
+    dm_permission: bool | None = None
+    default_permission: Missing[bool] = UNSET
+    integration_types: Missing[list[ApplicationIntegrationType]] = UNSET
+    contexts: Missing[list[InteractionContextType]] = UNSET
+    type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
+    nsfw: Missing[bool] = UNSET
     guild_ids: list[Snowflake] | None = None
 
 
@@ -128,16 +142,7 @@ class ApplicationCommandMatcher(Matcher):
         await bot.edit_origin_interaction_response(
             application_id=event.application_id,
             interaction_token=event.token,
-            content=None if is_unset(request.content) else request.content,
-            embeds=None if is_unset(request.embeds) else request.embeds,
-            flags=None if is_unset(request.flags) else request.flags,
-            allowed_mentions=(
-                None if is_unset(request.allowed_mentions) else request.allowed_mentions
-            ),
-            components=None if is_unset(request.components) else request.components,
-            files=UNSET if is_unset(request.files) else request.files,
-            attachments=None if is_unset(request.attachments) else request.attachments,
-            poll=None if is_unset(request.poll) else request.poll,
+            **request,
         )
 
     @classmethod
@@ -210,16 +215,7 @@ class ApplicationCommandMatcher(Matcher):
             application_id=event.application_id,
             interaction_token=event.token,
             message_id=message_id,
-            content=None if is_unset(request.content) else request.content,
-            embeds=None if is_unset(request.embeds) else request.embeds,
-            flags=None if is_unset(request.flags) else request.flags,
-            allowed_mentions=(
-                None if is_unset(request.allowed_mentions) else request.allowed_mentions
-            ),
-            components=None if is_unset(request.components) else request.components,
-            files=UNSET if is_unset(request.files) else request.files,
-            attachments=None if is_unset(request.attachments) else request.attachments,
-            poll=None if is_unset(request.poll) else request.poll,
+            **request,
         )
 
     @classmethod

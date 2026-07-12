@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Annotated, overload
+from typing_extensions import Unpack
 from urllib.parse import quote
 
 from yarl import URL
@@ -12,18 +13,28 @@ from .read import (
     MessageReference,
 )
 from .types import MessageFlag, MessageReferenceType, ReactionType
-from .write import AttachmentSend, MessageEditParams, MessageSend, PollRequest
+from .write import (
+    AttachmentSend,
+    BulkDeleteMessagesParams,
+    MessageEditParams,
+    MessageSend,
+    PollRequest,
+)
 from ..component.read import Component, DirectComponent
 from ..user.read import User
-from ...api.utils import parse_data
-from ...api.validation import AtMostOne, Range, validate
+from ...api.validation import (
+    AtMostOne,
+    Range,
+    validate,
+    validate_outbound_value,
+)
 from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
     EmptyResponse,
+    JsonBody,
     JsonResponse,
-    JsonValueBody,
     PreparedBody,
     RestCall,
 )
@@ -213,17 +224,27 @@ class MessageEndpointMixin:
             "flags": flags,
             "poll": poll,
         }
-        params = parse_data(
-            {key: value for (key, value) in data.items() if value is not None},
-            MessageSend,
+        params_payload = dict(
+            validate_outbound_value(
+                MessageSend,
+                {
+                    key: value
+                    for key, value in {
+                        key: value for (key, value) in data.items() if value is not None
+                    }.items()
+                    if value is not UNSET
+                },
+            )
         )
+        params_files = params_payload.pop("files", None)
+        params = PreparedBody(params_payload, files=params_files or None)
 
         call = RestCall(
             method="POST",
             url=self.base_url / f"channels/{channel_id}/messages",
             response=JsonResponse(MessageGet),
             auth=BotAuth(bot.bot_info),
-            body=PreparedBody(params),
+            body=params,
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -458,14 +479,21 @@ class MessageEndpointMixin:
             "sticker_ids": sticker_ids,
             "poll": poll,
         }
-        params = parse_data(data, MessageEditParams)
+        params_payload = dict(
+            validate_outbound_value(
+                MessageEditParams,
+                {key: value for key, value in data.items() if value is not UNSET},
+            )
+        )
+        params_files = params_payload.pop("files", None)
+        params = PreparedBody(params_payload, files=params_files or None)
 
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"channels/{channel_id}/messages/{message_id}",
             response=JsonResponse(MessageGet),
             auth=BotAuth(bot.bot_info),
-            body=PreparedBody(params),
+            body=params,
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -497,20 +525,15 @@ class MessageEndpointMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        messages: Annotated[
-            list[SnowflakeType],
-            Range(
-                message="messages must contain 2-100 items",
-                min_length=2,
-                max_length=100,
-            ),
-        ],
         reason: str | None = None,
+        **fields: Unpack[BulkDeleteMessagesParams],
     ) -> None:
         """Bulk delete messages.
 
         see https://discord.com/developers/docs/resources/message#bulk-delete-messages
         """
+        fields = validate_outbound_value(BulkDeleteMessagesParams, fields)
+        messages = fields["messages"]
 
         data = {"messages": messages}
         call = RestCall(
@@ -518,7 +541,7 @@ class MessageEndpointMixin:
             url=self.base_url / f"channels/{channel_id}/messages/bulk-delete",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(data),
+            body=JsonBody(data),
             audit_reason=reason or None,
         )
         await REST_EXCHANGE.execute(self, call)

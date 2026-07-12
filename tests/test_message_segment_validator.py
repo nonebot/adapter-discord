@@ -9,7 +9,6 @@ from nonebot.adapters.discord.api import (
     Poll,
     PollAnswer,
     PollMedia,
-    PollRequest,
 )
 from nonebot.adapters.discord.api.types import is_unset
 from nonebot.adapters.discord.domains.message.conversion import (
@@ -59,7 +58,7 @@ def test_attachment_segment_from_dict() -> None:
         },
     )
     assert seg.type == "attachment"
-    assert seg.data["attachment"].filename == "a.txt"
+    assert seg.data["attachment"]["filename"] == "a.txt"
     assert isinstance(seg.data["file"], File)
 
 
@@ -118,7 +117,7 @@ def test_poll_segment_from_dict() -> None:
         },
     )
     assert seg.type == "poll"
-    assert seg.data["poll"].question.text == "Q"
+    assert seg.data["poll"]["question"].text == "Q"
 
 
 def test_unknown_segment_type_raises() -> None:
@@ -154,6 +153,6 @@ def test_parse_message_integration() -> None:
     assert payload["embeds"][0].title == "t"
     assert int(payload["message_reference"].message_id) == 123
     assert int(payload["components"][0].type) == int(ComponentType.ActionRow)
-    assert payload["attachments"][0].filename == "a.txt"
+    assert payload["attachments"][0]["filename"] == "a.txt"
     assert payload["files"][0].content == b"x"
-    assert isinstance(payload["poll"], PollRequest)
+    assert payload["poll"]["question"].text == "Q"
