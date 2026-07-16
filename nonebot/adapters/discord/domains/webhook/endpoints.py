@@ -1,28 +1,27 @@
 from typing import TYPE_CHECKING, Any, Literal, overload
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import Webhook
-from .write import CreateWebhookParams, ExecuteWebhookParams, WebhookMessageEditParams
-from ..component.read import Component
-from ..message.read import AllowedMention, Embed, File, MessageGet
-from ..message.types import MessageFlag
-from ..message.write import AttachmentSend, PollRequest
-from ...api.utils import parse_data
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from .write import (
+    CreateWebhookParams,
+    ExecuteWebhookParams,
+    ModifyWebhookParams,
+    WebhookMessageEditParams,
+)
+from ..message.read import MessageGet
+from ...api.validation import validate_outbound_value
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
     EmptyResponse,
     JsonBody,
     JsonResponse,
-    JsonValueBody,
     NoAuth,
     PreparedBody,
     RestCall,
     _bool_query,
 )
-from ...utils import omit_unset
 
 if TYPE_CHECKING:
     from ...api.handle import AdapterProtocol
@@ -35,24 +34,20 @@ class WebhookEndpointMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        name: str,
-        avatar: MissingOrNullable[str] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[CreateWebhookParams],
     ) -> Webhook:
         """Create webhook.
 
         see https://discord.com/developers/docs/resources/webhook#create-webhook
         """
-
-        data = type_validate_python(
-            CreateWebhookParams, {"name": name, "avatar": avatar}
-        )
+        fields = validate_outbound_value(CreateWebhookParams, fields)
         call = RestCall(
             method="POST",
             url=self.base_url / f"channels/{channel_id}/webhooks",
             response=JsonResponse(Webhook),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -123,28 +118,25 @@ class WebhookEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_modify_webhook(  # noqa: PLR0913
+    async def _api_modify_webhook(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         webhook_id: SnowflakeType,
-        name: Missing[str] = UNSET,
-        avatar: MissingOrNullable[str] = UNSET,
-        channel_id: Missing[SnowflakeType] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyWebhookParams],
     ) -> Webhook:
         """Modify webhook.
 
         see https://discord.com/developers/docs/resources/webhook#modify-webhook
         """
-
-        data = omit_unset({"name": name, "avatar": avatar, "channel_id": channel_id})
+        fields = validate_outbound_value(ModifyWebhookParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"webhooks/{webhook_id}",
             response=JsonResponse(Webhook),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -154,20 +146,19 @@ class WebhookEndpointMixin:
         *,
         webhook_id: SnowflakeType,
         token: str,
-        name: Missing[str] = UNSET,
-        avatar: MissingOrNullable[str] = UNSET,
+        **fields: Unpack[ModifyWebhookParams],
     ) -> Webhook:
         """Modify webhook with token.
 
         see https://discord.com/developers/docs/resources/webhook#modify-webhook-with-token
         """
-        data = omit_unset({"name": name, "avatar": avatar})
+        fields = validate_outbound_value(ModifyWebhookParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"webhooks/{webhook_id}/{token}",
             response=JsonResponse(Webhook),
             auth=NoAuth(),
-            body=JsonValueBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -220,19 +211,7 @@ class WebhookEndpointMixin:
         wait: Literal[True],
         thread_id: SnowflakeType | None = None,
         with_components: bool | None = None,
-        content: str | None = None,
-        username: str | None = None,
-        avatar_url: str | None = None,
-        tts: bool | None = None,
-        embeds: list[Embed] | None = None,
-        allowed_mentions: AllowedMention | None = None,
-        components: list[Component] | None = None,
-        files: list[File] | None = None,
-        attachments: list[AttachmentSend] | None = None,
-        flags: int | None = None,
-        thread_name: str | None = None,
-        applied_tags: list[SnowflakeType] | None = None,
-        poll: PollRequest | None = None,
+        **fields: Unpack[ExecuteWebhookParams],
     ) -> MessageGet: ...
 
     @overload
@@ -245,19 +224,7 @@ class WebhookEndpointMixin:
         wait: Literal[False] | None = None,
         thread_id: SnowflakeType | None = None,
         with_components: bool | None = None,
-        content: str | None = None,
-        username: str | None = None,
-        avatar_url: str | None = None,
-        tts: bool | None = None,
-        embeds: list[Embed] | None = None,
-        allowed_mentions: AllowedMention | None = None,
-        components: list[Component] | None = None,
-        files: list[File] | None = None,
-        attachments: list[AttachmentSend] | None = None,
-        flags: int | None = None,
-        thread_name: str | None = None,
-        applied_tags: list[SnowflakeType] | None = None,
-        poll: PollRequest | None = None,
+        **fields: Unpack[ExecuteWebhookParams],
     ) -> None: ...
 
     async def _api_execute_webhook(  # noqa: PLR0913
@@ -269,32 +236,16 @@ class WebhookEndpointMixin:
         wait: bool | None = None,
         thread_id: SnowflakeType | None = None,
         with_components: bool | None = None,
-        content: str | None = None,
-        username: str | None = None,
-        avatar_url: str | None = None,
-        tts: bool | None = None,
-        embeds: list[Embed] | None = None,
-        allowed_mentions: AllowedMention | None = None,
-        components: list[Component] | None = None,
-        files: list[File] | None = None,
-        attachments: list[AttachmentSend] | None = None,
-        flags: int | None = None,
-        thread_name: str | None = None,
-        applied_tags: list[SnowflakeType] | None = None,
-        poll: PollRequest | None = None,
+        **fields: Unpack[ExecuteWebhookParams],
     ) -> MessageGet | None:
         """Execute webhook.
 
         see https://discord.com/developers/docs/resources/webhook#execute-webhook
         """
+        fields = validate_outbound_value(ExecuteWebhookParams, fields)
         has_payload = any(
-            [
-                bool(content),
-                bool(embeds),
-                bool(components),
-                bool(files),
-                poll is not None,
-            ]
+            bool(fields.get(key))
+            for key in ("content", "embeds", "components", "files", "poll")
         )
         if not has_payload:
             msg = "content/embeds/components/files/poll is required"
@@ -306,25 +257,9 @@ class WebhookEndpointMixin:
             params["thread_id"] = thread_id
         if with_components is not None:
             params["with_components"] = str(with_components).lower()
-        payload = {
-            "content": content,
-            "username": username,
-            "avatar_url": avatar_url,
-            "tts": tts,
-            "embeds": embeds,
-            "allowed_mentions": allowed_mentions,
-            "components": components,
-            "files": files,
-            "attachments": attachments,
-            "flags": flags,
-            "thread_name": thread_name,
-            "applied_tags": applied_tags,
-            "poll": poll,
-        }
-        request_kwargs = parse_data(
-            {key: value for (key, value) in payload.items() if value is not None},
-            ExecuteWebhookParams,
-        )
+        request_kwargs_files = fields.pop("files", None)
+        payload = {key: value for key, value in fields.items() if value is not None}
+        request_kwargs = PreparedBody(payload, files=request_kwargs_files or None)
 
         call = RestCall(
             method="POST",
@@ -332,7 +267,7 @@ class WebhookEndpointMixin:
             response=JsonResponse(MessageGet, allow_empty=True),
             auth=BotAuth(bot.bot_info),
             query=params,
-            body=PreparedBody(request_kwargs),
+            body=request_kwargs,
         )
         resp = await REST_EXCHANGE.execute(self, call)
         if resp is None:
@@ -361,7 +296,7 @@ class WebhookEndpointMixin:
             response=JsonResponse(MessageGet, allow_empty=True),
             auth=BotAuth(bot.bot_info),
             query=params,
-            body=JsonValueBody(payload),
+            body=JsonBody(payload),
         )
         resp = await REST_EXCHANGE.execute(self, call)
         if resp is None:
@@ -390,7 +325,7 @@ class WebhookEndpointMixin:
             response=JsonResponse(MessageGet, allow_empty=True),
             auth=BotAuth(bot.bot_info),
             query=params,
-            body=JsonValueBody(payload),
+            body=JsonBody(payload),
         )
         resp = await REST_EXCHANGE.execute(self, call)
         if resp is None:
@@ -430,14 +365,7 @@ class WebhookEndpointMixin:
         message_id: SnowflakeType,
         thread_id: SnowflakeType | None = None,
         with_components: bool | None = None,
-        content: MissingOrNullable[str] = UNSET,
-        embeds: MissingOrNullable[list[Embed]] = UNSET,
-        flags: MissingOrNullable[MessageFlag] = UNSET,
-        allowed_mentions: MissingOrNullable[AllowedMention] = UNSET,
-        components: MissingOrNullable[list[Component]] = UNSET,
-        files: Missing[list[File]] = UNSET,
-        attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
-        poll: MissingOrNullable[PollRequest] = UNSET,
+        **fields: Unpack[WebhookMessageEditParams],
     ) -> MessageGet:
         """Edit webhook message.
 
@@ -447,17 +375,9 @@ class WebhookEndpointMixin:
         if with_components is not None:
             params["with_components"] = str(with_components).lower()
 
-        data = {
-            "content": content,
-            "embeds": embeds,
-            "flags": flags,
-            "allowed_mentions": allowed_mentions,
-            "components": components,
-            "files": files,
-            "attachments": attachments,
-            "poll": poll,
-        }
-        request_kwargs = parse_data(data, WebhookMessageEditParams)
+        fields = validate_outbound_value(WebhookMessageEditParams, fields)
+        request_kwargs_files = fields.pop("files", None)
+        request_kwargs = PreparedBody(fields, files=request_kwargs_files or None)
         call = RestCall(
             method="PATCH",
             url=self.base_url
@@ -465,7 +385,7 @@ class WebhookEndpointMixin:
             response=JsonResponse(MessageGet),
             auth=BotAuth(bot.bot_info),
             query=params,
-            body=PreparedBody(request_kwargs),
+            body=request_kwargs,
         )
         return await REST_EXCHANGE.execute(self, call)
 

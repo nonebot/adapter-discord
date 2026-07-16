@@ -1,4 +1,5 @@
-from typing import Any, TypeAlias
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any, TypeAlias
 import zlib
 
 from nonebot.compat import PYDANTIC_V2
@@ -7,7 +8,7 @@ from pydantic import BaseModel
 
 from .protocol import UNSET
 
-if PYDANTIC_V2:
+if TYPE_CHECKING:
     from pydantic.main import IncEx
 else:
     IncEx: TypeAlias = (
@@ -19,6 +20,50 @@ else:
     )
 
 log = logger_wrapper("Discord")
+
+
+def _stable_sort_key(value: object) -> tuple[str, str, str]:
+    value_type = type(value)
+    return (value_type.__module__, value_type.__qualname__, repr(value))
+
+
+def reject_unset_values(value: object, path: str = "$") -> None:  # noqa: C901
+    """Reject outbound values that encode wire absence as a value sentinel."""
+    if value is UNSET:
+        msg = (
+            "REST request mappings must omit absent fields instead of using "
+            f"UNSET at {path}"
+        )
+        raise TypeError(msg)
+    if isinstance(value, BaseModel):
+        field_names = getattr(
+            type(value),
+            "model_fields" if PYDANTIC_V2 else "__fields__",
+        )
+        for field_name in field_names:
+            item = getattr(value, field_name)
+            if item is not UNSET:
+                reject_unset_values(item, f"{path}.{field_name}")
+        return
+    if isinstance(value, Mapping):
+        for key, item in sorted(
+            value.items(), key=lambda pair: _stable_sort_key(pair[0])
+        ):
+            reject_unset_values(key, f"{path}[key={key!r}]")
+            item_path = (
+                f"{path}.{key}"
+                if isinstance(key, str) and key.isidentifier()
+                else f"{path}[{key!r}]"
+            )
+            reject_unset_values(item, item_path)
+        return
+    if isinstance(value, (list, tuple)):
+        for index, item in enumerate(value):
+            reject_unset_values(item, f"{path}[{index}]")
+        return
+    if isinstance(value, (set, frozenset)):
+        for index, item in enumerate(sorted(value, key=_stable_sort_key)):
+            reject_unset_values(item, f"{path}[{index}]")
 
 
 def omit_unset(data: Any) -> Any:  # noqa: ANN401

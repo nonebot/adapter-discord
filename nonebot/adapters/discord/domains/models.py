@@ -180,8 +180,11 @@ if TYPE_CHECKING:
     ComponentEmoji = _static_component_read.ComponentEmoji
     Connection = _static_user_read.Connection
     CountDetails = _static_channel_read.CountDetails
-    CreateAndModifyAutoModerationRuleParams = (
-        _static_moderation_write.CreateAndModifyAutoModerationRuleParams
+    CreateAutoModerationRuleParams = (
+        _static_moderation_write.CreateAutoModerationRuleParams
+    )
+    ModifyAutoModerationRuleParams = (
+        _static_moderation_write.ModifyAutoModerationRuleParams
     )
     CreateGuildChannelParams = _static_guild_write.CreateGuildChannelParams
     CreateGuildParams = _static_guild_write.CreateGuildParams
@@ -538,6 +541,36 @@ if TYPE_CHECKING:
     VideoQualityMode = _static_channel_types.VideoQualityMode
     VisibilityType = _static_user_types.VisibilityType
     WebhookType = _static_webhook_types.WebhookType
+    AddGroupDMRecipientParams = _static_channel_write.AddGroupDMRecipientParams
+    AddGuildMemberParams = _static_guild_write.AddGuildMemberParams
+    BeginGuildPruneParams = _static_guild_write.BeginGuildPruneParams
+    BulkDeleteMessagesParams = _static_message_write.BulkDeleteMessagesParams
+    BulkGuildBanParams = _static_guild_write.BulkGuildBanParams
+    CreateApplicationEmojiParams = _static_emoji_write.CreateApplicationEmojiParams
+    CreateChannelInviteParams = _static_channel_write.CreateChannelInviteParams
+    CreateDMParams = _static_user_write.CreateDMParams
+    CreateGroupDMParams = _static_user_write.CreateGroupDMParams
+    CreateGuildBanParams = _static_guild_write.CreateGuildBanParams
+    CreateGuildEmojiParams = _static_emoji_write.CreateGuildEmojiParams
+    CreateStageInstanceParams = _static_voice_write.CreateStageInstanceParams
+    CreateTestEntitlementParams = _static_application_write.CreateTestEntitlementParams
+    EditApplicationCommandPermissionsParams = (
+        _static_command_write.EditApplicationCommandPermissionsParams
+    )
+    EditChannelPermissionsParams = _static_channel_write.EditChannelPermissionsParams
+    FollowAnnouncementChannelParams = (
+        _static_channel_write.FollowAnnouncementChannelParams
+    )
+    ModifyApplicationEmojiParams = _static_emoji_write.ModifyApplicationEmojiParams
+    ModifyCurrentUserNickParams = _static_guild_write.ModifyCurrentUserNickParams
+    ModifyDMParams = _static_channel_write.ModifyDMParams
+    ModifyGuildMFAParams = _static_guild_write.ModifyGuildMFAParams
+    ModifyStageInstanceParams = _static_voice_write.ModifyStageInstanceParams
+    ModifyUserVoiceStateParams = _static_voice_write.ModifyUserVoiceStateParams
+    ModifyWebhookParams = _static_webhook_write.ModifyWebhookParams
+    UpdateUserApplicationRoleConnectionParams = (
+        _static_user_write.UpdateUserApplicationRoleConnectionParams
+    )
 
 _MODEL_MODULES = tuple(
     import_module(module_name)
@@ -616,6 +649,8 @@ __all__ = [
     "ActivitySecrets",
     "ActivityTimestamps",
     "ActivityType",
+    "AddGroupDMRecipientParams",
+    "AddGuildMemberParams",
     "AddLobbyMemberParams",
     "AllowedMention",
     "AllowedMentionType",
@@ -666,8 +701,11 @@ __all__ = [
     "AvatarDecorationData",
     "Ban",
     "BaseModel",
+    "BeginGuildPruneParams",
     "BooleanOption",
     "BulkBan",
+    "BulkDeleteMessagesParams",
+    "BulkGuildBanParams",
     "Button",
     "ButtonStyle",
     "Channel",
@@ -687,8 +725,14 @@ __all__ = [
     "Connection",
     "ConnectionServiceType",
     "CountDetails",
-    "CreateAndModifyAutoModerationRuleParams",
+    "CreateApplicationEmojiParams",
+    "CreateAutoModerationRuleParams",
+    "CreateChannelInviteParams",
+    "CreateDMParams",
+    "CreateGroupDMParams",
+    "CreateGuildBanParams",
     "CreateGuildChannelParams",
+    "CreateGuildEmojiParams",
     "CreateGuildParams",
     "CreateGuildRoleParams",
     "CreateGuildScheduledEventParams",
@@ -696,11 +740,15 @@ __all__ = [
     "CreateGuildTemplateParams",
     "CreateLobbyMemberParams",
     "CreateLobbyParams",
+    "CreateStageInstanceParams",
+    "CreateTestEntitlementParams",
     "CreateWebhookParams",
     "CurrentUserGuild",
     "DefaultMessageNotificationLevel",
     "DefaultReaction",
     "DirectComponent",
+    "EditApplicationCommandPermissionsParams",
+    "EditChannelPermissionsParams",
     "EditCurrentApplicationParams",
     "Embed",
     "EmbedAuthor",
@@ -720,6 +768,7 @@ __all__ = [
     "ExecuteWebhookParams",
     "ExplicitContentFilterLevel",
     "File",
+    "FollowAnnouncementChannelParams",
     "FollowedChannel",
     "ForumLayoutTypes",
     "ForumTag",
@@ -840,13 +889,18 @@ __all__ = [
     "Missing",
     "MissingOrNullable",
     "ModalSubmitData",
+    "ModifyApplicationEmojiParams",
+    "ModifyAutoModerationRuleParams",
     "ModifyChannelParams",
     "ModifyCurrentMemberParams",
+    "ModifyCurrentUserNickParams",
     "ModifyCurrentUserParams",
     "ModifyCurrentUserVoiceStateParams",
+    "ModifyDMParams",
     "ModifyGuildChannelPositionParams",
     "ModifyGuildEmojiParams",
     "ModifyGuildIncidentActionsParams",
+    "ModifyGuildMFAParams",
     "ModifyGuildMemberParams",
     "ModifyGuildOnboardingParams",
     "ModifyGuildParams",
@@ -859,7 +913,10 @@ __all__ = [
     "ModifyGuildWelcomeScreenParams",
     "ModifyGuildWidgetParams",
     "ModifyLobbyParams",
+    "ModifyStageInstanceParams",
     "ModifyThreadParams",
+    "ModifyUserVoiceStateParams",
+    "ModifyWebhookParams",
     "MutableGuildFeature",
     "NumberOption",
     "OnboardingMode",
@@ -953,6 +1010,7 @@ __all__ = [
     "UnsetType",
     "UpdatePresence",
     "UpdatePresenceStatusType",
+    "UpdateUserApplicationRoleConnectionParams",
     "UpdateVoiceState",
     "User",
     "UserFlags",

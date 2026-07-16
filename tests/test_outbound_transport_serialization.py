@@ -2,6 +2,7 @@ import asyncio
 from collections.abc import Awaitable, Sequence
 from datetime import datetime, timezone
 import json
+from typing import Any
 from typing_extensions import override
 
 from nonebot.adapters.discord.api.model import (
@@ -22,10 +23,23 @@ from nonebot.adapters.discord.api.types import (
 )
 from nonebot.adapters.discord.config import BotInfo
 from nonebot.adapters.discord.exception import DiscordAdapterException
+from nonebot.adapters.discord.protocol import UNSET
+from nonebot.adapters.discord.transport.serialization import normalize_rest_json
 from tests.fake.doubles import DummyAdapter, DummyBot
 
 from nonebot.drivers import URL, Request, Timeout, WebSocket
+from pydantic import BaseModel
 import pytest
+
+
+class ArbitraryPayload(BaseModel):
+    value: Any
+
+
+def test_rest_normalizer_rejects_unset_nested_in_model_any_field() -> None:
+    payload = ArbitraryPayload(value={"nested": UNSET})
+    with pytest.raises(TypeError, match=r"UNSET at \$\.value\.nested"):
+        normalize_rest_json(payload)
 
 
 class CapturedRequestError(DiscordAdapterException):

@@ -1,13 +1,18 @@
 from typing import TYPE_CHECKING
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import Connection, User
-from .write import ModifyCurrentUserParams
+from .write import (
+    CreateDMParams,
+    CreateGroupDMParams,
+    ModifyCurrentUserParams,
+    UpdateUserApplicationRoleConnectionParams,
+)
 from ..application.read import ApplicationRoleConnection
 from ..channel.read import Channel
 from ..guild.read import CurrentUserGuild, GuildMember
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...api.validation import validate_outbound_value
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BearerAuth,
@@ -15,7 +20,6 @@ from ...transport.exchange import (
     EmptyResponse,
     JsonBody,
     JsonResponse,
-    JsonValueBody,
     RestCall,
     _bool_query,
 )
@@ -59,26 +63,19 @@ class UserEndpointMixin:
     async def _api_modify_current_user(
         self: "AdapterProtocol",
         bot: "Bot",
-        *,
-        username: Missing[str] = UNSET,
-        avatar: MissingOrNullable[str] = UNSET,
-        banner: MissingOrNullable[str] = UNSET,
+        **fields: Unpack[ModifyCurrentUserParams],
     ) -> User:
         """Modify current user.
 
         see https://discord.com/developers/docs/resources/user#modify-current-user
         """
-
-        data = type_validate_python(
-            ModifyCurrentUserParams,
-            {"username": username, "avatar": avatar, "banner": banner},
-        )
+        fields = validate_outbound_value(ModifyCurrentUserParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / "users/@me",
             response=JsonResponse(User),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -149,42 +146,38 @@ class UserEndpointMixin:
     async def _api_create_DM(  # noqa: N802
         self: "AdapterProtocol",
         bot: "Bot",
-        *,
-        recipient_id: SnowflakeType,
+        **fields: Unpack[CreateDMParams],
     ) -> Channel:
         """Create DM.
 
         see https://discord.com/developers/docs/resources/user#create-dm
         """
-
+        fields = validate_outbound_value(CreateDMParams, fields)
         call = RestCall(
             method="POST",
             url=self.base_url / "users/@me/channels",
             response=JsonResponse(Channel),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody({"recipient_id": recipient_id}),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
     async def _api_create_group_DM(  # noqa: N802
         self: "AdapterProtocol",
         bot: "Bot",
-        *,
-        access_tokens: list[str],
-        nicks: dict[SnowflakeType, str],
+        **fields: Unpack[CreateGroupDMParams],
     ) -> Channel:
         """Create group DM.
 
         see https://discord.com/developers/docs/resources/user#create-group-dm
         """
-
-        data = {"access_tokens": access_tokens, "nicks": nicks}
+        fields = validate_outbound_value(CreateGroupDMParams, fields)
         call = RestCall(
             method="POST",
             url=self.base_url / "users/@me/channels",
             response=JsonResponse(Channel),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -231,29 +224,22 @@ class UserEndpointMixin:
         *,
         application_id: SnowflakeType,
         access_token: str,
-        platform_name: str | None = None,
-        platform_username: str | None = None,
-        metadata: dict[str, str] | None = None,
+        **fields: Unpack[UpdateUserApplicationRoleConnectionParams],
     ) -> ApplicationRoleConnection:
         """Update current user application role connection.
 
         see https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection
         """
-        data = {
-            "platform_name": platform_name,
-            "platform_username": platform_username,
-            "metadata": metadata,
-        }
-
+        fields = validate_outbound_value(
+            UpdateUserApplicationRoleConnectionParams, fields
+        )
         call = RestCall(
             method="PUT",
             url=self.base_url
             / f"users/@me/applications/{application_id}/role-connection",
             response=JsonResponse(ApplicationRoleConnection),
             auth=BearerAuth(access_token),
-            body=JsonValueBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 

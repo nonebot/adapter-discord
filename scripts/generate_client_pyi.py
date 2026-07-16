@@ -604,10 +604,20 @@ def _public_exports(path: Path) -> set[str]:
 
 
 def _annotation_texts(
-    methods: Iterable[MethodSignature], aliases: dict[str, str]
+    methods: list[MethodSignature], aliases: dict[str, str]
 ) -> list[str]:
+    rendered: list[MethodSignature] = []
+    index = 0
+    while index < len(methods):
+        name = methods[index].public_name
+        grouped: list[MethodSignature] = []
+        while index < len(methods) and methods[index].public_name == name:
+            grouped.append(methods[index])
+            index += 1
+        overloads = [method for method in grouped if method.is_overload]
+        rendered.extend(overloads or grouped[:1])
     texts = [
-        text for method in methods for text in (*method.params, method.returns) if text
+        text for method in rendered for text in (*method.params, method.returns) if text
     ]
     texts.extend(aliases.values())
     return texts
@@ -644,6 +654,7 @@ def _imports_for_annotations(
         "MENTION_SPAM",
         "SPAM",
         "TypeAlias",
+        "Unpack",
     }
     unresolved = used - models - types - local - ignored
     if unresolved:
@@ -658,8 +669,8 @@ def _imports_for_annotations(
     )
 
 
-def _import_sort_key(name: str) -> tuple[int, str]:
-    return (0 if name.isupper() else 1, name)
+def _import_sort_key(name: str) -> tuple[int, str, str]:
+    return (0 if name.isupper() else 1, name.casefold(), name)
 
 
 def _append_import_block(lines: list[str], module: str, names: list[str]) -> None:
@@ -826,6 +837,8 @@ def generate(root: Path) -> str:
     typing = _typing_imports(annotation_texts, methods, aliases)
     if typing:
         lines.append(f"from typing import {', '.join(typing)}")
+    if any("Unpack[" in text for text in annotation_texts):
+        lines.append("from typing_extensions import Unpack")
     if lines[-1] != "":
         lines.append("")
     _append_import_block(lines, "model", model_imports)

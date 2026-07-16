@@ -1,16 +1,18 @@
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Annotated, Literal, overload
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import AuditLog, AutoModerationAction, AutoModerationRule, TriggerMetadata
 from .types import AuditLogEventType, AutoModerationRuleEventType, TriggerType
-from .write import CreateAndModifyAutoModerationRuleParams
+from .write import (
+    CreateAutoModerationRuleParams,
+    ModifyAutoModerationRuleParams,
+)
 from ...api.validation import (
     AtMostOne,
-    ForbidIfEquals,
     Range,
-    RequireIfNotEquals,
     validate,
+    validate_outbound_value,
 )
 from ...protocol import SnowflakeType
 from ...transport.exchange import (
@@ -32,6 +34,19 @@ NonSpamTriggerType = Literal[
     TriggerType.MENTION_SPAM,
     TriggerType.MEMBER_PROFILE,
 ]
+
+
+def _validate_auto_moderation_exemptions(
+    *,
+    exempt_roles: Sequence[SnowflakeType] | None,
+    exempt_channels: Sequence[SnowflakeType] | None,
+) -> None:
+    if exempt_roles is not None and len(exempt_roles) > 20:  # noqa: PLR2004
+        msg = "exempt_roles must be 20 items or fewer"
+        raise ValueError(msg)
+    if exempt_channels is not None and len(exempt_channels) > 50:  # noqa: PLR2004
+        msg = "exempt_channels must be 50 items or fewer"
+        raise ValueError(msg)
 
 
 class ModerationEndpointMixin:
@@ -156,16 +171,15 @@ class ModerationEndpointMixin:
         event_type: AutoModerationRuleEventType,
         trigger_type: Literal[TriggerType.SPAM],
         actions: list[AutoModerationAction],
-        trigger_metadata: None = None,
-        enabled: bool | None = None,
+        enabled: bool = ...,
         exempt_roles: Annotated[
-            list[SnowflakeType] | None,
+            list[SnowflakeType],
             Range(message="exempt_roles must be 20 items or fewer", max_length=20),
-        ] = None,
+        ] = ...,
         exempt_channels: Annotated[
-            list[SnowflakeType] | None,
+            list[SnowflakeType],
             Range(message="exempt_channels must be 50 items or fewer", max_length=50),
-        ] = None,
+        ] = ...,
         reason: str | None = None,
     ) -> AutoModerationRule: ...
 
@@ -180,127 +194,85 @@ class ModerationEndpointMixin:
         trigger_type: NonSpamTriggerType,
         actions: list[AutoModerationAction],
         trigger_metadata: TriggerMetadata,
-        enabled: bool | None = None,
+        enabled: bool = ...,
         exempt_roles: Annotated[
-            list[SnowflakeType] | None,
+            list[SnowflakeType],
             Range(message="exempt_roles must be 20 items or fewer", max_length=20),
-        ] = None,
+        ] = ...,
         exempt_channels: Annotated[
-            list[SnowflakeType] | None,
+            list[SnowflakeType],
             Range(message="exempt_channels must be 50 items or fewer", max_length=50),
-        ] = None,
+        ] = ...,
         reason: str | None = None,
     ) -> AutoModerationRule: ...
 
-    @validate(
-        cross_rules=(
-            ForbidIfEquals(
-                field="trigger_metadata",
-                when_field="trigger_type",
-                equals=TriggerType.SPAM,
-                message="trigger_metadata must be omitted for SPAM rules",
-            ),
-            RequireIfNotEquals(
-                field="trigger_metadata",
-                when_field="trigger_type",
-                equals=TriggerType.SPAM,
-                message="trigger_metadata is required for this trigger_type",
-            ),
-        )
-    )
-    async def _api_create_auto_moderation_rule(  # noqa: PLR0913
+    async def _api_create_auto_moderation_rule(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: str,
-        event_type: AutoModerationRuleEventType,
-        trigger_type: TriggerType,
-        actions: list[AutoModerationAction],
-        trigger_metadata: TriggerMetadata | None = None,
-        enabled: bool | None = None,
-        exempt_roles: Annotated[
-            list[SnowflakeType] | None,
-            Range(message="exempt_roles must be 20 items or fewer", max_length=20),
-        ] = None,
-        exempt_channels: Annotated[
-            list[SnowflakeType] | None,
-            Range(message="exempt_channels must be 50 items or fewer", max_length=50),
-        ] = None,
         reason: str | None = None,
+        **fields: Unpack[CreateAutoModerationRuleParams],
     ) -> AutoModerationRule:
         """Create auto moderation rule.
 
         see https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
         """
+        fields = validate_outbound_value(CreateAutoModerationRuleParams, fields)
+        has_trigger_metadata = "trigger_metadata" in fields
+        if fields["trigger_type"] == TriggerType.SPAM:
+            if has_trigger_metadata:
+                msg = "trigger_metadata must be omitted for SPAM rules"
+                raise ValueError(msg)
+        elif not has_trigger_metadata:
+            msg = "trigger_metadata is required for this trigger_type"
+            raise ValueError(msg)
+        exempt_roles = fields.get("exempt_roles")
+        exempt_channels = fields.get("exempt_channels")
+        _validate_auto_moderation_exemptions(
+            exempt_roles=exempt_roles,
+            exempt_channels=exempt_channels,
+        )
 
-        data = {
-            "name": name,
-            "event_type": event_type,
-            "trigger_type": trigger_type,
-            "actions": actions,
-            "trigger_metadata": trigger_metadata,
-            "enabled": enabled,
-            "exempt_roles": exempt_roles,
-            "exempt_channels": exempt_channels,
-        }
-        data = type_validate_python(CreateAndModifyAutoModerationRuleParams, data)
+        payload = {key: value for key, value in fields.items() if value is not None}
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/auto-moderation/rules",
             response=JsonResponse(AutoModerationRule),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, exclude_none=True, omit_unset_values=True),
+            body=JsonBody(payload),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    @validate
-    async def _api_modify_auto_moderation_rule(  # noqa: PLR0913
+    async def _api_modify_auto_moderation_rule(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         rule_id: SnowflakeType,
-        name: str | None = None,
-        event_type: AutoModerationRuleEventType | None = None,
-        trigger_metadata: TriggerMetadata | None = None,
-        actions: list[AutoModerationAction] | None = None,
-        enabled: bool | None = None,
-        exempt_roles: Annotated[
-            list[SnowflakeType] | None,
-            Range(message="exempt_roles must be 20 items or fewer", max_length=20),
-        ] = None,
-        exempt_channels: Annotated[
-            list[SnowflakeType] | None,
-            Range(message="exempt_channels must be 50 items or fewer", max_length=50),
-        ] = None,
         reason: str | None = None,
+        **fields: Unpack[ModifyAutoModerationRuleParams],
     ) -> AutoModerationRule:
         """Modify auto moderation rule.
 
         see https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
         """
-
-        data = {
-            "name": name,
-            "event_type": event_type,
-            "trigger_metadata": trigger_metadata,
-            "actions": actions,
-            "enabled": enabled,
-            "exempt_roles": exempt_roles,
-            "exempt_channels": exempt_channels,
-        }
-        data = type_validate_python(
-            CreateAndModifyAutoModerationRuleParams,
-            {key: value for (key, value) in data.items() if value is not None},
+        fields = validate_outbound_value(ModifyAutoModerationRuleParams, fields)
+        exempt_roles = fields.get("exempt_roles")
+        exempt_channels = fields.get("exempt_channels")
+        _validate_auto_moderation_exemptions(
+            exempt_roles=exempt_roles,
+            exempt_channels=exempt_channels,
         )
+
+        payload = {key: value for key, value in fields.items() if value is not None}
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/auto-moderation/rules/{rule_id}",
             response=JsonResponse(AutoModerationRule),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, exclude_none=True, omit_unset_values=True),
+            body=JsonBody(payload),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)

@@ -1,13 +1,14 @@
-from dataclasses import dataclass
+from collections.abc import Mapping, Sequence, Set as AbstractSet
+from datetime import date, datetime
 import json
-from typing import Any, TypeAlias, TypedDict
+from typing import Any, TypeAlias
 
 from nonebot.compat import PYDANTIC_V2
 from nonebot.internal.driver import FileTypes
 from pydantic import BaseModel
 
 from ..domains.models import File
-from ..utils import IncEx, model_dump
+from ..utils import IncEx, model_dump, reject_unset_values
 
 if PYDANTIC_V2:
     from pydantic import TypeAdapter
@@ -20,56 +21,9 @@ if PYDANTIC_V2:
 MultipartFormData: TypeAlias = dict[str, FileTypes]
 
 
-class JsonTransportRequest(TypedDict):
-    json: dict[str, Any]
-
-
-class MultipartTransportRequest(TypedDict):
-    files: MultipartFormData
-
-
-EncodedPreparedRequest: TypeAlias = JsonTransportRequest | MultipartTransportRequest
-
-
-@dataclass(frozen=True, slots=True)
-class PreparedRequest:
-    body: BaseModel
-    files: list[File] | None = None
-    attachment_owner_path: tuple[str, ...] = ()
-    include: IncEx | None = None
-    exclude: IncEx | None = None
-    by_alias: bool = False
-    exclude_unset: bool = False
-    exclude_defaults: bool = False
-    exclude_none: bool = False
-    omit_unset_values: bool = False
-
-
-def prepare_request(  # noqa: PLR0913
-    body: BaseModel,
-    *,
-    files: list[File] | None = None,
-    attachment_owner_path: tuple[str, ...] = (),
-    include: IncEx | None = None,
-    exclude: IncEx | None = None,
-    by_alias: bool = False,
-    exclude_unset: bool = False,
-    exclude_defaults: bool = False,
-    exclude_none: bool = False,
-    omit_unset_values: bool = False,
-) -> PreparedRequest:
-    return PreparedRequest(
-        body=body,
-        files=files,
-        attachment_owner_path=attachment_owner_path,
-        include=include,
-        exclude=exclude,
-        by_alias=by_alias,
-        exclude_unset=exclude_unset,
-        exclude_defaults=exclude_defaults,
-        exclude_none=exclude_none,
-        omit_unset_values=omit_unset_values,
-    )
+def _stable_sort_key(value: object) -> tuple[str, str, str]:
+    value_type = type(value)
+    return (value_type.__module__, value_type.__qualname__, repr(value))
 
 
 def encode_json_text(value: object) -> str:
@@ -106,34 +60,33 @@ def encode_model_json_text(  # noqa: PLR0913
     return encode_json_text(payload)
 
 
-def encode_model_json_data(  # noqa: PLR0913
-    model: BaseModel,
-    include: IncEx | None = None,
-    exclude: IncEx | None = None,
-    *,
-    by_alias: bool = False,
-    exclude_unset: bool = False,
-    exclude_defaults: bool = False,
-    exclude_none: bool = False,
-    omit_unset_values: bool = False,
-) -> dict[str, Any]:
-    payload = model_dump(
-        model,
-        include=include,
-        exclude=exclude,
-        by_alias=by_alias,
-        exclude_unset=exclude_unset,
-        exclude_defaults=exclude_defaults,
-        exclude_none=exclude_none,
-        omit_unset_values=omit_unset_values,
-    )
+def _normalize_tree(value: object) -> object:  # noqa: PLR0911
+    if isinstance(value, datetime):
+        encoded = value.isoformat()
+        return encoded[:-6] + "Z" if encoded.endswith("+00:00") else encoded
+    if isinstance(value, date):
+        return value.isoformat()
+    if isinstance(value, BaseModel):
+        dumped = model_dump(value, omit_unset_values=True)
+        reject_unset_values(dumped)
+        return _normalize_tree(dumped)
+    if isinstance(value, Mapping):
+        return {key: _normalize_tree(item) for key, item in value.items()}
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        return [_normalize_tree(item) for item in value]
+    if isinstance(value, AbstractSet):
+        return [_normalize_tree(item) for item in sorted(value, key=_stable_sort_key)]
+    return value
+
+
+def normalize_rest_json(value: object) -> object:
+    """Create a JSON-compatible tree without mutating the caller's value."""
+    reject_unset_values(value)
+    normalized = _normalize_tree(value)
+    reject_unset_values(normalized)
     if PYDANTIC_V2:
-        json_payload = _JSON_ADAPTER.dump_python(payload, mode="json")
-        if not isinstance(json_payload, dict):
-            msg = "transport JSON encoding must produce a mapping"
-            raise TypeError(msg)
-        return json_payload
-    return json.loads(encode_json_text(payload))
+        return _JSON_ADAPTER.dump_python(normalized, mode="json")
+    return json.loads(encode_json_text(normalized))
 
 
 def _resolve_attachment_owner(
@@ -149,9 +102,9 @@ def _resolve_attachment_owner(
     return container
 
 
-def _build_multipart_payload(
+def build_multipart_payload(
     payload: dict[str, Any],
-    files: list[File],
+    files: Sequence[File],
     *,
     attachment_owner_path: tuple[str, ...] = (),
 ) -> MultipartFormData:
@@ -180,25 +133,10 @@ def _build_multipart_payload(
     return multipart
 
 
-def encode_prepared_request(
-    prepared: PreparedRequest,
-) -> EncodedPreparedRequest:
-    payload = encode_model_json_data(
-        prepared.body,
-        include=prepared.include,
-        exclude=prepared.exclude,
-        by_alias=prepared.by_alias,
-        exclude_unset=prepared.exclude_unset,
-        exclude_defaults=prepared.exclude_defaults,
-        exclude_none=prepared.exclude_none,
-        omit_unset_values=prepared.omit_unset_values,
-    )
-    if prepared.files:
-        return {
-            "files": _build_multipart_payload(
-                payload,
-                prepared.files,
-                attachment_owner_path=prepared.attachment_owner_path,
-            )
-        }
-    return {"json": payload}
+__all__ = [
+    "MultipartFormData",
+    "build_multipart_payload",
+    "encode_json_text",
+    "encode_model_json_text",
+    "normalize_rest_json",
+]

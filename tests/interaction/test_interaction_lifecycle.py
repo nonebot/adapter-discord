@@ -11,7 +11,6 @@ from nonebot.adapters.discord.domains.interaction.lifecycle import (
     current_interaction_responder,
 )
 from nonebot.adapters.discord.domains.models import (
-    InteractionCallbackMessage,
     InteractionResponse,
     MessageFlag,
     MessageGet,
@@ -278,8 +277,9 @@ async def test_bot_send_uses_managed_responder_for_all_acknowledged_states(
         await bot.send(event, "initial", flags=initial_flags)
         response = calls[0][1]["response"]
         assert isinstance(response, InteractionResponse)
-        assert isinstance(response.data, InteractionCallbackMessage)
-        assert response.data.flags == initial_flags
+        data = response.data
+        assert isinstance(data, dict)
+        assert data.get("flags") == initial_flags
 
         deferred = InteractionResponder.from_event(bot, event)
         deferred_token = current_interaction_responder.set(deferred)

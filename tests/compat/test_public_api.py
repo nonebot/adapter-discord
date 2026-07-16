@@ -95,8 +95,8 @@ def test_public_api_fixture_matches_current_ast_contract() -> None:
     assert current["counts"] == fixture["counts"]
     assert fixture["counts"] == {
         "top_level_exports": 133,
-        "api_exports": 348,
-        "model_exports": 267,
+        "api_exports": 373,
+        "model_exports": 292,
         "api_client_async_methods": 230,
     }
 

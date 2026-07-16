@@ -1,19 +1,21 @@
-from datetime import datetime
 from typing import TYPE_CHECKING
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import StageInstance, VoiceRegion, VoiceState
-from .types import StagePrivacyLevel
-from .write import ModifyCurrentUserVoiceStateParams
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from .write import (
+    CreateStageInstanceParams,
+    ModifyCurrentUserVoiceStateParams,
+    ModifyStageInstanceParams,
+    ModifyUserVoiceStateParams,
+)
+from ...api.validation import validate_outbound_value
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
     EmptyResponse,
     JsonBody,
     JsonResponse,
-    JsonValueBody,
     RestCall,
 )
 
@@ -80,29 +82,19 @@ class VoiceEndpointMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        channel_id: Missing[SnowflakeType] = UNSET,
-        suppress: Missing[bool] = UNSET,
-        request_to_speak_timestamp: MissingOrNullable[datetime] = UNSET,
+        **fields: Unpack[ModifyCurrentUserVoiceStateParams],
     ) -> None:
         """Modify current user voice state.
 
         see https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state
         """
-
-        data = type_validate_python(
-            ModifyCurrentUserVoiceStateParams,
-            {
-                "channel_id": channel_id,
-                "suppress": suppress,
-                "request_to_speak_timestamp": request_to_speak_timestamp,
-            },
-        )
+        fields = validate_outbound_value(ModifyCurrentUserVoiceStateParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/voice-states/@me",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         await REST_EXCHANGE.execute(self, call)
 
@@ -112,57 +104,40 @@ class VoiceEndpointMixin:
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        channel_id: SnowflakeType | None = None,
-        suppress: bool | None = None,
+        **fields: Unpack[ModifyUserVoiceStateParams],
     ) -> None:
         """Modify user voice state.
 
         see https://discord.com/developers/docs/resources/voice#modify-user-voice-state
         """
-
-        data = {"channel_id": channel_id, "suppress": suppress}
+        fields = validate_outbound_value(ModifyUserVoiceStateParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/voice-states/{user_id}",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
         )
         await REST_EXCHANGE.execute(self, call)
 
-    async def _api_create_stage_instance(  # noqa: PLR0913
+    async def _api_create_stage_instance(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
-        channel_id: SnowflakeType,
-        topic: str,
-        privacy_level: StagePrivacyLevel | None = None,
-        send_start_notification: bool | None = None,
-        guild_scheduled_event_id: SnowflakeType | None = None,
         reason: str | None = None,
+        **fields: Unpack[CreateStageInstanceParams],
     ) -> StageInstance:
         """Create stage instance.
 
         see https://discord.com/developers/docs/resources/stage-instance#create-stage-instance
         """
-
-        data = {
-            "channel_id": channel_id,
-            "topic": topic,
-            "privacy_level": privacy_level,
-            "send_start_notification": send_start_notification,
-            "guild_scheduled_event_id": guild_scheduled_event_id,
-        }
+        fields = validate_outbound_value(CreateStageInstanceParams, fields)
         call = RestCall(
             method="POST",
             url=self.base_url / "stage-instances",
             response=JsonResponse(StageInstance),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -188,24 +163,20 @@ class VoiceEndpointMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        topic: str | None = None,
-        privacy_level: StagePrivacyLevel | None = None,
         reason: str | None = None,
+        **fields: Unpack[ModifyStageInstanceParams],
     ) -> StageInstance:
         """Modify stage instance.
 
         see https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance
         """
-
-        data = {"topic": topic, "privacy_level": privacy_level}
+        fields = validate_outbound_value(ModifyStageInstanceParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"stage-instances/{channel_id}",
             response=JsonResponse(StageInstance),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)

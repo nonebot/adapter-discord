@@ -17,6 +17,7 @@ from nonebot.adapters import (
 
 from nonebot.compat import type_validate_python
 
+from .api.validation import validate_outbound_value
 from .domains.message._attachment_errors import get_unsendable_attachment_message
 from .domains.models import (
     ActionRow,
@@ -29,6 +30,7 @@ from .domains.models import (
     MessageGet,
     MessageReference,
     Poll,
+    PollMedia,
     PollRequest,
     SelectMenu,
     TextInput,
@@ -66,9 +68,10 @@ class MessageSegment(BaseMessageSegment["Message"]):
             _filename = file.filename
             _description = description
             _content = file.content
-        elif isinstance(file, AttachmentSend):
-            _filename = file.filename
-            _description = file.description
+        elif isinstance(file, dict):
+            attachment = validate_outbound_value(AttachmentSend, file)
+            _filename = attachment.get("filename", "")
+            _description = attachment.get("description")
             _content = content
         else:
             msg = "file must be str, File or AttachmentSend"
@@ -405,7 +408,7 @@ class AttachmentSegment(MessageSegment):
 
     @override
     def __str__(self) -> str:
-        return f"<Attachment:{self.data['attachment'].filename}>"
+        return f"<Attachment:{self.data['attachment']['filename']}>"
 
     @classmethod
     @override
@@ -414,10 +417,11 @@ class AttachmentSegment(MessageSegment):
         if "attachment" not in instance.data:
             msg = f"Expected dict with 'attachment' in 'data' for AttachmentSegment, got {value}"
             raise ValueError(msg)
-        if not isinstance(attachment := instance.data["attachment"], AttachmentSend):
-            instance.data["attachment"] = type_validate_python(
-                AttachmentSend, attachment
-            )
+        attachment = instance.data["attachment"]
+        instance.data["attachment"] = validate_outbound_value(
+            AttachmentSend,
+            attachment,
+        )
         if (file := instance.data.get("file")) is not None and not isinstance(
             file, File
         ):
@@ -470,7 +474,9 @@ class PollSegment(MessageSegment):
 
     @override
     def __str__(self) -> str:
-        return f"<Poll:{self.data['poll'].question.text}>"
+        poll = self.data["poll"]
+        question = poll.question if isinstance(poll, Poll) else poll["question"]
+        return f"<Poll:{question.text}>"
 
     @classmethod
     @override
@@ -479,7 +485,8 @@ class PollSegment(MessageSegment):
         if "poll" not in instance.data:
             msg = f"Expected dict with 'poll' in 'data' for PollSegment, got {value}"
             raise ValueError(msg)
-        if not isinstance(poll := instance.data["poll"], (Poll, PollRequest)):
+        poll = instance.data["poll"]
+        if not isinstance(poll, Poll):
             if not isinstance(poll, dict):
                 msg = f"Expected dict for PollData, got {type(poll)}"
                 raise TypeError(msg)
@@ -490,7 +497,27 @@ class PollSegment(MessageSegment):
             ):
                 instance.data["poll"] = type_validate_python(Poll, poll)
             else:
-                instance.data["poll"] = type_validate_python(PollRequest, poll)
+                normalized = dict(poll)
+                question = normalized.get("question")
+                if isinstance(question, dict):
+                    normalized["question"] = type_validate_python(PollMedia, question)
+                answers = normalized.get("answers")
+                if isinstance(answers, list):
+                    normalized_answers = []
+                    for answer in answers:
+                        normalized_answer = dict(answer)
+                        poll_media = normalized_answer.get("poll_media")
+                        if isinstance(poll_media, dict):
+                            normalized_answer["poll_media"] = type_validate_python(
+                                PollMedia,
+                                poll_media,
+                            )
+                        normalized_answers.append(normalized_answer)
+                    normalized["answers"] = normalized_answers
+                instance.data["poll"] = validate_outbound_value(
+                    PollRequest,
+                    normalized,
+                )
         return instance
 
 

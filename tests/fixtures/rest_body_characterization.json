@@ -1,0 +1,506 @@
+{
+  "_api_add_guild_member": {
+    "files": null,
+    "json": {
+      "access_token": "value"
+    }
+  },
+  "_api_add_lobby_member": {
+    "files": null,
+    "json": {}
+  },
+  "_api_begin_guild_prune": {
+    "files": null,
+    "json": {}
+  },
+  "_api_bulk_delete_message": {
+    "files": null,
+    "json": {
+      "messages": [
+        1,
+        2
+      ]
+    }
+  },
+  "_api_bulk_guild_ban": {
+    "files": null,
+    "json": {
+      "user_ids": [
+        1
+      ]
+    }
+  },
+  "_api_bulk_overwrite_global_application_commands": {
+    "files": null,
+    "json": []
+  },
+  "_api_bulk_overwrite_guild_application_commands": {
+    "files": null,
+    "json": []
+  },
+  "_api_create_DM": {
+    "files": null,
+    "json": {
+      "recipient_id": 1
+    }
+  },
+  "_api_create_application_emoji": {
+    "files": null,
+    "json": {
+      "image": "value",
+      "name": "value"
+    }
+  },
+  "_api_create_auto_moderation_rule": {
+    "files": null,
+    "json": {
+      "actions": [
+        {
+          "type": 1
+        }
+      ],
+      "event_type": 1,
+      "name": "value",
+      "trigger_type": 3
+    }
+  },
+  "_api_create_channel_invite": {
+    "files": null,
+    "json": {}
+  },
+  "_api_create_followup_message": {
+    "files": null,
+    "json": {
+      "content": "value"
+    }
+  },
+  "_api_create_global_application_command": {
+    "files": null,
+    "json": {
+      "description": "value",
+      "name": "value"
+    }
+  },
+  "_api_create_group_DM": {
+    "files": null,
+    "json": {
+      "access_tokens": [
+        "value"
+      ],
+      "nicks": {}
+    }
+  },
+  "_api_create_guild": {
+    "files": null,
+    "json": {
+      "name": "value"
+    }
+  },
+  "_api_create_guild_application_command": {
+    "files": null,
+    "json": {
+      "description": "value",
+      "name": "value"
+    }
+  },
+  "_api_create_guild_ban": {
+    "files": null,
+    "json": {}
+  },
+  "_api_create_guild_channel": {
+    "files": null,
+    "json": {
+      "available_tags": null,
+      "bitrate": null,
+      "default_auto_archive_duration": null,
+      "default_forum_layout": null,
+      "default_reaction_emoji": null,
+      "default_sort_order": null,
+      "default_thread_rate_limit_per_user": null,
+      "name": "value",
+      "nsfw": null,
+      "parent_id": null,
+      "permission_overwrites": null,
+      "position": null,
+      "rate_limit_per_user": null,
+      "rtc_region": null,
+      "topic": null,
+      "type": null,
+      "user_limit": null,
+      "video_quality_mode": null
+    }
+  },
+  "_api_create_guild_emoji": {
+    "files": null,
+    "json": {
+      "image": "value",
+      "name": "value"
+    }
+  },
+  "_api_create_guild_from_guild_template": {
+    "files": null,
+    "json": {
+      "name": "value"
+    }
+  },
+  "_api_create_guild_role": {
+    "files": null,
+    "json": {}
+  },
+  "_api_create_guild_schedule_event": {
+    "files": null,
+    "json": {
+      "channel_id": 1,
+      "entity_type": 1,
+      "name": "value",
+      "privacy_level": 2,
+      "scheduled_start_time": "2026-01-01T00:00:00Z"
+    }
+  },
+  "_api_create_guild_soundboard_sound": {
+    "files": null,
+    "json": {
+      "name": "value",
+      "sound": "value"
+    }
+  },
+  "_api_create_guild_sticker": {
+    "files": [
+      {
+        "content": "value",
+        "content_type": null,
+        "filename": null,
+        "key": "name"
+      },
+      {
+        "content": "value",
+        "content_type": null,
+        "filename": null,
+        "key": "description"
+      },
+      {
+        "content": "value",
+        "content_type": null,
+        "filename": null,
+        "key": "tags"
+      },
+      {
+        "content": {
+          "bytes": "eA=="
+        },
+        "content_type": null,
+        "filename": "file.txt",
+        "key": "file"
+      }
+    ],
+    "json": null
+  },
+  "_api_create_guild_template": {
+    "files": null,
+    "json": {
+      "name": "value"
+    }
+  },
+  "_api_create_interaction_response": {
+    "files": null,
+    "json": {
+      "type": 1
+    }
+  },
+  "_api_create_lobby": {
+    "files": null,
+    "json": {}
+  },
+  "_api_create_message": {
+    "files": null,
+    "json": {
+      "content": "value"
+    }
+  },
+  "_api_create_stage_instance": {
+    "files": null,
+    "json": {
+      "channel_id": 1,
+      "topic": "value"
+    }
+  },
+  "_api_create_test_entitlement": {
+    "files": null,
+    "json": {
+      "owner_id": "value",
+      "owner_type": 1,
+      "sku_id": "value"
+    }
+  },
+  "_api_create_webhook": {
+    "files": null,
+    "json": {
+      "name": "value"
+    }
+  },
+  "_api_edit_application_command_permissions": {
+    "files": null,
+    "json": {
+      "permissions": [
+        {
+          "id": 1,
+          "permission": false,
+          "type": 1
+        }
+      ]
+    }
+  },
+  "_api_edit_channel_permissions": {
+    "files": null,
+    "json": {
+      "type": 0
+    }
+  },
+  "_api_edit_current_application": {
+    "files": null,
+    "json": {}
+  },
+  "_api_edit_followup_message": {
+    "files": null,
+    "json": {
+      "content": "value"
+    }
+  },
+  "_api_edit_global_application_command": {
+    "files": null,
+    "json": {}
+  },
+  "_api_edit_guild_application_command": {
+    "files": null,
+    "json": {}
+  },
+  "_api_edit_message": {
+    "files": null,
+    "json": {
+      "content": "value"
+    }
+  },
+  "_api_edit_origin_interaction_response": {
+    "files": null,
+    "json": {
+      "content": "value"
+    }
+  },
+  "_api_edit_webhook_message": {
+    "files": null,
+    "json": {
+      "content": "value"
+    }
+  },
+  "_api_execute_github_compatible_webhook": {
+    "files": null,
+    "json": {}
+  },
+  "_api_execute_slack_compatible_webhook": {
+    "files": null,
+    "json": {}
+  },
+  "_api_execute_webhook": {
+    "files": null,
+    "json": {
+      "content": "value"
+    }
+  },
+  "_api_follow_announcement_channel": {
+    "files": null,
+    "json": {
+      "webhook_channel_id": 1
+    }
+  },
+  "_api_group_DM_add_recipient": {
+    "files": null,
+    "json": {
+      "access_token": "value",
+      "nick": "value"
+    }
+  },
+  "_api_link_channel_to_lobby": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_DM": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_application_emoji": {
+    "files": null,
+    "json": {
+      "name": "value"
+    }
+  },
+  "_api_modify_auto_moderation_rule": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_channel": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_current_member": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_current_user": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_current_user_nick": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_current_user_voice_state": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild_MFA_level": {
+    "files": null,
+    "json": {
+      "level": 1
+    }
+  },
+  "_api_modify_guild_channel_positions": {
+    "files": null,
+    "json": [
+      {
+        "id": 1,
+        "lock_permissions": false,
+        "parent_id": null,
+        "position": 1
+      }
+    ]
+  },
+  "_api_modify_guild_emoji": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild_incident_actions": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild_member": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild_onboarding": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild_role": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild_role_positions": {
+    "files": null,
+    "json": [
+      {
+        "id": 1,
+        "position": 1
+      }
+    ]
+  },
+  "_api_modify_guild_scheduled_event": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild_soundboard_sound": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild_sticker": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild_template": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild_welcome_screen": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_guild_widget": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_lobby": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_stage_instance": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_thread": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_user_voice_state": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_webhook": {
+    "files": null,
+    "json": {}
+  },
+  "_api_modify_webhook_with_token": {
+    "files": null,
+    "json": {}
+  },
+  "_api_send_soundboard_sound": {
+    "files": null,
+    "json": {
+      "sound_id": 1
+    }
+  },
+  "_api_start_thread_from_message": {
+    "files": null,
+    "json": {
+      "name": "value"
+    }
+  },
+  "_api_start_thread_in_forum_channel": {
+    "files": null,
+    "json": {
+      "message": {
+        "content": "value"
+      },
+      "name": "value"
+    }
+  },
+  "_api_start_thread_without_message": {
+    "files": null,
+    "json": {
+      "name": "value"
+    }
+  },
+  "_api_update_application_role_connection_metadata_records": {
+    "files": null,
+    "json": []
+  },
+  "_api_update_invite_target_users": {
+    "files": [
+      {
+        "content": {
+          "bytes": "eA=="
+        },
+        "content_type": null,
+        "filename": "file.txt",
+        "key": "target_users_file"
+      }
+    ],
+    "json": null
+  },
+  "_api_update_user_application_role_connection": {
+    "files": null,
+    "json": {}
+  }
+}

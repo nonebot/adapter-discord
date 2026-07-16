@@ -10,7 +10,6 @@ from nonebot.adapters.discord.transport.exchange import (
     EmptyResponse,
     JsonBody,
     JsonResponse,
-    JsonValueBody,
     MultipartBody,
     NoAuth,
     RestCall,
@@ -114,7 +113,7 @@ async def test_exchange_serializes_top_level_list_and_custom_multipart() -> None
             url=adapter.base_url / "bulk",
             response=JsonResponse(Any),
             auth=NoAuth(),
-            body=JsonValueBody([NullableBody(value=1), NullableBody(value=2)]),
+            body=JsonBody([NullableBody(value=1), NullableBody(value=2)]),
         ),
     )
     assert list_request.json == [{"value": 1}, {"value": 2}]

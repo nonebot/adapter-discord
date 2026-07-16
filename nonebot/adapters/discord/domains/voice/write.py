@@ -1,24 +1,50 @@
 """Canonical voice.write models."""
 
-from .._model_support import (
-    UNSET,
-    BaseModel,
-    Missing,
-    MissingOrNullable,
-    Snowflake,
-    datetime,
-)
+from typing_extensions import Required
+
+from .types import StagePrivacyLevel
+from .._model_support import OutboundTypedDict, Snowflake, datetime
+from ...protocol import SnowflakeType
 
 
-class ModifyCurrentUserVoiceStateParams(BaseModel):
+class ModifyCurrentUserVoiceStateParams(OutboundTypedDict, total=False):
     """Modify Current User Voice State Params.
 
     see https://discord.com/developers/docs/resources/voice#modify-current-user-voice-state
     """
 
-    channel_id: Missing[Snowflake] = UNSET
-    suppress: Missing[bool] = UNSET
-    request_to_speak_timestamp: MissingOrNullable[datetime.datetime] = UNSET
+    channel_id: Snowflake
+    suppress: bool
+    request_to_speak_timestamp: datetime.datetime | None
 
 
-__all__ = ["ModifyCurrentUserVoiceStateParams"]
+class ModifyUserVoiceStateParams(OutboundTypedDict, total=False):
+    """Parameters for ``_api_modify_user_voice_state``."""
+
+    channel_id: "SnowflakeType"
+    suppress: bool
+
+
+class CreateStageInstanceParams(OutboundTypedDict, total=False):
+    """Parameters for ``_api_create_stage_instance``."""
+
+    channel_id: Required["SnowflakeType"]
+    topic: Required[str]
+    privacy_level: "StagePrivacyLevel"
+    send_start_notification: bool
+    guild_scheduled_event_id: "SnowflakeType"
+
+
+class ModifyStageInstanceParams(OutboundTypedDict, total=False):
+    """Parameters for ``_api_modify_stage_instance``."""
+
+    topic: str
+    privacy_level: "StagePrivacyLevel"
+
+
+__all__ = [
+    "CreateStageInstanceParams",
+    "ModifyCurrentUserVoiceStateParams",
+    "ModifyStageInstanceParams",
+    "ModifyUserVoiceStateParams",
+]
