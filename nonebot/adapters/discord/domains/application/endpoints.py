@@ -1,22 +1,25 @@
-from typing import TYPE_CHECKING, Annotated, Literal
-
-from nonebot.compat import type_validate_python
+from typing import TYPE_CHECKING, Annotated
+from typing_extensions import Unpack
 
 from .read import (
     SKU,
     Application,
-    ApplicationIntegrationTypeConfiguration,
     ApplicationRoleConnectionMetadata,
     AuthorizationResponse,
     Entitlement,
-    InstallParams,
     Subscription,
 )
-from .types import ApplicationFlag, ApplicationIntegrationType
-from .write import EditCurrentApplicationParams
+from .write import (
+    CreateTestEntitlementParams,
+    EditCurrentApplicationParams,
+)
 from ..gateway.read import ActivityInstance
-from ...api.validation import Range, validate
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...api.validation import (
+    Range,
+    validate,
+    validate_outbound_value,
+)
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BearerAuth,
@@ -24,7 +27,6 @@ from ...transport.exchange import (
     EmptyResponse,
     JsonBody,
     JsonResponse,
-    JsonValueBody,
     RestCall,
     _bool_query,
 )
@@ -52,55 +54,22 @@ class ApplicationEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_edit_current_application(  # noqa: PLR0913
+    async def _api_edit_current_application(
         self: "AdapterProtocol",
         bot: "Bot",
-        *,
-        custom_install_url: Missing[str] = UNSET,
-        description: Missing[str] = UNSET,
-        role_connections_verification_url: Missing[str] = UNSET,
-        install_params: Missing[InstallParams] = UNSET,
-        integration_types_config: Missing[
-            dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfiguration]
-        ] = UNSET,
-        flags: Missing[ApplicationFlag] = UNSET,
-        icon: MissingOrNullable[str] = UNSET,
-        cover_image: MissingOrNullable[str] = UNSET,
-        interactions_endpoint_url: Missing[str] = UNSET,
-        tags: Missing[list[str]] = UNSET,
-        event_webhooks_url: Missing[str] = UNSET,
-        event_webhooks_status: Missing[int] = UNSET,
-        event_webhooks_types: Missing[list[str]] = UNSET,
+        **fields: Unpack[EditCurrentApplicationParams],
     ) -> Application:
         """Edit current application.
 
         see https://discord.com/developers/docs/resources/application#edit-current-application
         """
-
-        data = type_validate_python(
-            EditCurrentApplicationParams,
-            {
-                "custom_install_url": custom_install_url,
-                "description": description,
-                "role_connections_verification_url": role_connections_verification_url,
-                "install_params": install_params,
-                "integration_types_config": integration_types_config,
-                "flags": flags,
-                "icon": icon,
-                "cover_image": cover_image,
-                "interactions_endpoint_url": interactions_endpoint_url,
-                "tags": tags,
-                "event_webhooks_url": event_webhooks_url,
-                "event_webhooks_status": event_webhooks_status,
-                "event_webhooks_types": event_webhooks_types,
-            },
-        )
+        fields = validate_outbound_value(EditCurrentApplicationParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / "applications/@me",
             response=JsonResponse(Application),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -142,7 +111,6 @@ class ApplicationEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    @validate
     async def _api_update_application_role_connection_metadata_records(
         self: "AdapterProtocol",
         bot: "Bot",
@@ -158,17 +126,21 @@ class ApplicationEndpointMixin:
         see https://discord.com/developers/docs/resources/application-role-connection-metadata#update-application-role-connection-metadata-records
         """
 
-        payload = [
-            type_validate_python(ApplicationRoleConnectionMetadata, record)
-            for record in records
-        ]
+        if len(records) > 5:  # noqa: PLR2004
+            msg = "metadata records must be 0-5 items"
+            raise ValueError(msg)
+
+        payload = validate_outbound_value(
+            list[ApplicationRoleConnectionMetadata],
+            records,
+        )
         call = RestCall(
             method="PUT",
             url=self.base_url
             / f"applications/{application_id}/role-connections/metadata",
             response=JsonResponse(list[ApplicationRoleConnectionMetadata]),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(payload),
+            body=JsonBody(payload),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -257,29 +229,23 @@ class ApplicationEndpointMixin:
         bot: "Bot",
         *,
         application_id: SnowflakeType,
-        sku_id: str,
-        owner_id: str,
-        owner_type: Literal[1, 2],
+        **fields: Unpack[CreateTestEntitlementParams],
     ) -> Entitlement:
         """Create test entitlement.
 
         see https://discord.com/developers/docs/resources/entitlement#create-test-entitlement
         """
+        fields = validate_outbound_value(CreateTestEntitlementParams, fields)
+        owner_type = fields["owner_type"]
         if owner_type not in (1, 2):
             msg = "owner_type must be 1 or 2"
             raise ValueError(msg)
-
-        data = {
-            "sku_id": sku_id,
-            "owner_id": owner_id,
-            "owner_type": owner_type,
-        }
         call = RestCall(
             method="POST",
             url=self.base_url / f"applications/{application_id}/entitlements",
             response=JsonResponse(Entitlement),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 

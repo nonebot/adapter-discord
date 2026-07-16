@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import (
     ListDefaultSoundboardSoundsResponse,
@@ -12,7 +11,8 @@ from .write import (
     ModifyGuildSoundboardSoundParams,
     SendSoundboardSoundParams,
 )
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...api.validation import validate_outbound_value
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -33,24 +33,19 @@ class SoundboardEndpointMixin:
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        sound_id: SnowflakeType,
-        source_guild_id: Missing[SnowflakeType] = UNSET,
+        **fields: Unpack[SendSoundboardSoundParams],
     ) -> None:
         """Send soundboard sound.
 
         see https://discord.com/developers/docs/resources/soundboard#send-soundboard-sound
         """
-
-        data = type_validate_python(
-            SendSoundboardSoundParams,
-            {"sound_id": sound_id, "source_guild_id": source_guild_id},
-        )
+        fields = validate_outbound_value(SendSoundboardSoundParams, fields)
         call = RestCall(
             method="POST",
             url=self.base_url / f"channels/{channel_id}/send-soundboard-sound",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         await REST_EXCHANGE.execute(self, call)
 
@@ -109,72 +104,46 @@ class SoundboardEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_create_guild_soundboard_sound(  # noqa: PLR0913
+    async def _api_create_guild_soundboard_sound(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: str,
-        sound: str,
-        volume: Missing[float] = UNSET,
-        emoji_id: Missing[SnowflakeType] = UNSET,
-        emoji_name: Missing[str] = UNSET,
+        **fields: Unpack[CreateGuildSoundboardSoundParams],
     ) -> SoundboardSound:
         """Create guild soundboard sound.
 
         see https://discord.com/developers/docs/resources/soundboard#create-guild-soundboard-sound
         """
-
-        data = type_validate_python(
-            CreateGuildSoundboardSoundParams,
-            {
-                "name": name,
-                "sound": sound,
-                "volume": volume,
-                "emoji_id": emoji_id,
-                "emoji_name": emoji_name,
-            },
-        )
+        fields = validate_outbound_value(CreateGuildSoundboardSoundParams, fields)
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/soundboard-sounds",
             response=JsonResponse(SoundboardSound),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_modify_guild_soundboard_sound(  # noqa: PLR0913
+    async def _api_modify_guild_soundboard_sound(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         sound_id: SnowflakeType,
-        name: Missing[str] = UNSET,
-        volume: Missing[float] = UNSET,
-        emoji_id: MissingOrNullable[SnowflakeType] = UNSET,
-        emoji_name: MissingOrNullable[str] = UNSET,
+        **fields: Unpack[ModifyGuildSoundboardSoundParams],
     ) -> SoundboardSound:
         """Modify guild soundboard sound.
 
         see https://discord.com/developers/docs/resources/soundboard#modify-guild-soundboard-sound
         """
-
-        data = type_validate_python(
-            ModifyGuildSoundboardSoundParams,
-            {
-                "name": name,
-                "volume": volume,
-                "emoji_id": emoji_id,
-                "emoji_name": emoji_name,
-            },
-        )
+        fields = validate_outbound_value(ModifyGuildSoundboardSoundParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/soundboard-sounds/{sound_id}",
             response=JsonResponse(SoundboardSound),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 

@@ -30,7 +30,7 @@ async def test_fetch_attachments_materializes_remote_attachment_to_file() -> Non
 
     assert message["attachment"][0].data["file"] is None
     assert payload["content"] == "foo"
-    assert payload["attachments"][0].filename == "a.png"
+    assert payload["attachments"][0]["filename"] == "a.png"
     assert payload["files"][0].filename == "a.png"
     assert payload["files"][0].content == b"image"
     assert adapter.request_calls == 1
@@ -60,7 +60,7 @@ async def test_fetch_attachments_supports_custom_allowed_hosts() -> None:
     fetched = await bot.fetch_attachments(message, allowed_hosts={"example.com"})
     payload = to_legacy_kwargs(compile_message(fetched))
 
-    assert payload["attachments"][0].filename == "a.png"
+    assert payload["attachments"][0]["filename"] == "a.png"
     assert payload["files"][0].content == b"image"
     assert adapter.request_calls == 1
 

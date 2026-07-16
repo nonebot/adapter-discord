@@ -90,8 +90,11 @@ if TYPE_CHECKING:
     ComponentEmoji = _static_domains_models.ComponentEmoji
     Connection = _static_domains_models.Connection
     CountDetails = _static_domains_models.CountDetails
-    CreateAndModifyAutoModerationRuleParams = (
-        _static_domains_models.CreateAndModifyAutoModerationRuleParams
+    CreateAutoModerationRuleParams = (
+        _static_domains_models.CreateAutoModerationRuleParams
+    )
+    ModifyAutoModerationRuleParams = (
+        _static_domains_models.ModifyAutoModerationRuleParams
     )
     CreateGuildChannelParams = _static_domains_models.CreateGuildChannelParams
     CreateGuildParams = _static_domains_models.CreateGuildParams
@@ -450,14 +453,43 @@ if TYPE_CHECKING:
     VideoQualityMode = _static_domains_models.VideoQualityMode
     VisibilityType = _static_domains_models.VisibilityType
     WebhookType = _static_domains_models.WebhookType
+    AddGroupDMRecipientParams = _static_domains_models.AddGroupDMRecipientParams
+    AddGuildMemberParams = _static_domains_models.AddGuildMemberParams
+    BeginGuildPruneParams = _static_domains_models.BeginGuildPruneParams
+    BulkDeleteMessagesParams = _static_domains_models.BulkDeleteMessagesParams
+    BulkGuildBanParams = _static_domains_models.BulkGuildBanParams
+    CreateApplicationEmojiParams = _static_domains_models.CreateApplicationEmojiParams
+    CreateChannelInviteParams = _static_domains_models.CreateChannelInviteParams
+    CreateDMParams = _static_domains_models.CreateDMParams
+    CreateGroupDMParams = _static_domains_models.CreateGroupDMParams
+    CreateGuildBanParams = _static_domains_models.CreateGuildBanParams
+    CreateGuildEmojiParams = _static_domains_models.CreateGuildEmojiParams
+    CreateStageInstanceParams = _static_domains_models.CreateStageInstanceParams
+    CreateTestEntitlementParams = _static_domains_models.CreateTestEntitlementParams
+    EditApplicationCommandPermissionsParams = (
+        _static_domains_models.EditApplicationCommandPermissionsParams
+    )
+    EditChannelPermissionsParams = _static_domains_models.EditChannelPermissionsParams
+    FollowAnnouncementChannelParams = (
+        _static_domains_models.FollowAnnouncementChannelParams
+    )
+    ModifyApplicationEmojiParams = _static_domains_models.ModifyApplicationEmojiParams
+    ModifyCurrentUserNickParams = _static_domains_models.ModifyCurrentUserNickParams
+    ModifyDMParams = _static_domains_models.ModifyDMParams
+    ModifyGuildMFAParams = _static_domains_models.ModifyGuildMFAParams
+    ModifyStageInstanceParams = _static_domains_models.ModifyStageInstanceParams
+    ModifyUserVoiceStateParams = _static_domains_models.ModifyUserVoiceStateParams
+    ModifyWebhookParams = _static_domains_models.ModifyWebhookParams
+    UpdateUserApplicationRoleConnectionParams = (
+        _static_domains_models.UpdateUserApplicationRoleConnectionParams
+    )
 
 _MODEL_MODULES: tuple[ModuleType, ...] = tuple(
     import_module(module_name) for module_name in DOMAIN_MODEL_MODULES
 )
 _CANONICAL_MODULES: tuple[ModuleType, ...] = (_model_support, *_MODEL_MODULES)
 
-__all__ = [
-    "SKU",
+__all__ = [  # noqa: RUF022 - preserve the 1.x public API snapshot order.
     "ActionRow",
     "Activity",
     "ActivityAssets",
@@ -468,6 +500,8 @@ __all__ = [
     "ActivityParty",
     "ActivitySecrets",
     "ActivityTimestamps",
+    "AddGroupDMRecipientParams",
+    "AddGuildMemberParams",
     "AddLobbyMemberParams",
     "AllowedMention",
     "AnswerVoters",
@@ -505,8 +539,11 @@ __all__ = [
     "AvatarDecorationData",
     "Ban",
     "BaseModel",
+    "BeginGuildPruneParams",
     "BooleanOption",
     "BulkBan",
+    "BulkDeleteMessagesParams",
+    "BulkGuildBanParams",
     "Button",
     "Channel",
     "ChannelCreate",
@@ -521,16 +558,26 @@ __all__ = [
     "ComponentEmoji",
     "Connection",
     "CountDetails",
-    "CreateAndModifyAutoModerationRuleParams",
+    "CreateApplicationEmojiParams",
+    "CreateAutoModerationRuleParams",
+    "CreateChannelInviteParams",
+    "CreateDMParams",
+    "CreateGroupDMParams",
+    "CreateGuildBanParams",
     "CreateGuildChannelParams",
+    "CreateGuildEmojiParams",
     "CreateGuildParams",
     "CreateGuildScheduledEventParams",
     "CreateGuildSoundboardSoundParams",
     "CreateLobbyMemberParams",
     "CreateLobbyParams",
+    "CreateStageInstanceParams",
+    "CreateTestEntitlementParams",
     "CurrentUserGuild",
     "DefaultReaction",
     "DirectComponent",
+    "EditApplicationCommandPermissionsParams",
+    "EditChannelPermissionsParams",
     "Embed",
     "EmbedAuthor",
     "EmbedField",
@@ -546,6 +593,7 @@ __all__ = [
     "EntitlementUpdate",
     "ExecuteWebhookParams",
     "File",
+    "FollowAnnouncementChannelParams",
     "FollowedChannel",
     "ForumTag",
     "ForumTagRequest",
@@ -636,14 +684,22 @@ __all__ = [
     "MessageSnapshot",
     "MessageSnapshotMessage",
     "ModalSubmitData",
+    "ModifyApplicationEmojiParams",
+    "ModifyAutoModerationRuleParams",
     "ModifyChannelParams",
+    "ModifyCurrentUserNickParams",
+    "ModifyDMParams",
     "ModifyGuildIncidentActionsParams",
+    "ModifyGuildMFAParams",
     "ModifyGuildOnboardingParams",
     "ModifyGuildParams",
     "ModifyGuildScheduledEventParams",
     "ModifyGuildSoundboardSoundParams",
     "ModifyGuildWelcomeScreenParams",
     "ModifyLobbyParams",
+    "ModifyStageInstanceParams",
+    "ModifyUserVoiceStateParams",
+    "ModifyWebhookParams",
     "NumberOption",
     "OnboardingPrompt",
     "OnboardingPromptOption",
@@ -670,6 +726,7 @@ __all__ = [
     "RoleOption",
     "RoleSubscriptionData",
     "RoleTags",
+    "SKU",
     "SelectDefaultValue",
     "SelectMenu",
     "SelectMenuResolved",
@@ -709,6 +766,7 @@ __all__ = [
     "TriggerMetadata",
     "UnavailableGuild",
     "UpdatePresence",
+    "UpdateUserApplicationRoleConnectionParams",
     "UpdateVoiceState",
     "User",
     "UserOption",

@@ -1,12 +1,12 @@
 """Interaction request conversion built on message-domain compiled parts."""
 
+from .write import InteractionCallbackMessage
 from ..message.conversion import OutboundMessageParts
 from ..models import (
     AllowedMention,
     AttachmentSend,
     ExecuteWebhookParams,
     File,
-    InteractionCallbackMessage,
     MessageFlag,
     WebhookMessageEditParams,
 )
@@ -32,19 +32,27 @@ def to_interaction_callback(
     flags: MessageFlag | None,
 ) -> InteractionCallbackMessage:
     """Build initial interaction callback data without owning its lifecycle."""
-
     attachments, files = _attachment_lists(parts)
-    return InteractionCallbackMessage(
-        tts=tts,
-        content=None if is_unset(parts.content) else parts.content,
-        embeds=None if is_unset(parts.embeds) else list(parts.embeds),
-        allowed_mentions=allowed_mentions,
-        flags=flags,
-        components=None if is_unset(parts.components) else list(parts.components),
-        attachments=None if is_unset(attachments) else attachments,
-        poll=None if is_unset(parts.poll) else parts.poll,
-        files=None if is_unset(files) else files,
-    )
+    request = InteractionCallbackMessage()
+    if tts is not None:
+        request["tts"] = tts
+    if not is_unset(parts.content):
+        request["content"] = parts.content
+    if not is_unset(parts.embeds):
+        request["embeds"] = list(parts.embeds)
+    if allowed_mentions is not None:
+        request["allowed_mentions"] = allowed_mentions
+    if flags is not None:
+        request["flags"] = flags
+    if not is_unset(parts.components):
+        request["components"] = list(parts.components)
+    if not is_unset(attachments):
+        request["attachments"] = attachments
+    if not is_unset(parts.poll):
+        request["poll"] = parts.poll
+    if not is_unset(files):
+        request["files"] = files
+    return request
 
 
 def to_followup_message(
@@ -57,19 +65,26 @@ def to_followup_message(
     """Build a followup webhook payload from compiled message parts."""
 
     attachments, files = _attachment_lists(parts)
-    return ExecuteWebhookParams(
-        content=parts.content,
-        tts=tts,
-        embeds=list(parts.embeds) if not is_unset(parts.embeds) else UNSET,
-        allowed_mentions=allowed_mentions,
-        components=(
-            list(parts.components) if not is_unset(parts.components) else UNSET
-        ),
-        files=files,
-        attachments=attachments,
-        flags=flags,
-        poll=parts.poll,
-    )
+    request = ExecuteWebhookParams()
+    if not is_unset(parts.content):
+        request["content"] = parts.content
+    if not is_unset(tts):
+        request["tts"] = tts
+    if not is_unset(parts.embeds):
+        request["embeds"] = list(parts.embeds)
+    if not is_unset(allowed_mentions):
+        request["allowed_mentions"] = allowed_mentions
+    if not is_unset(parts.components):
+        request["components"] = list(parts.components)
+    if not is_unset(files):
+        request["files"] = files
+    if not is_unset(attachments):
+        request["attachments"] = attachments
+    if not is_unset(flags):
+        request["flags"] = flags
+    if not is_unset(parts.poll):
+        request["poll"] = parts.poll
+    return request
 
 
 def to_origin_edit(
@@ -81,18 +96,24 @@ def to_origin_edit(
     """Build an original/followup webhook edit payload from compiled parts."""
 
     attachments, files = _attachment_lists(parts)
-    return WebhookMessageEditParams(
-        content=parts.content,
-        embeds=list(parts.embeds) if not is_unset(parts.embeds) else UNSET,
-        flags=flags,
-        allowed_mentions=allowed_mentions,
-        components=(
-            list(parts.components) if not is_unset(parts.components) else UNSET
-        ),
-        files=files,
-        attachments=attachments,
-        poll=parts.poll,
-    )
+    request = WebhookMessageEditParams()
+    if not is_unset(parts.content):
+        request["content"] = parts.content
+    if not is_unset(parts.embeds):
+        request["embeds"] = list(parts.embeds)
+    if not is_unset(flags):
+        request["flags"] = flags
+    if not is_unset(allowed_mentions):
+        request["allowed_mentions"] = allowed_mentions
+    if not is_unset(parts.components):
+        request["components"] = list(parts.components)
+    if not is_unset(files):
+        request["files"] = files
+    if not is_unset(attachments):
+        request["attachments"] = attachments
+    if not is_unset(parts.poll):
+        request["poll"] = parts.poll
+    return request
 
 
 __all__ = [

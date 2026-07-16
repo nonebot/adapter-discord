@@ -1,6 +1,9 @@
 """Canonical message.write models."""
 
 from typing import TYPE_CHECKING
+from typing_extensions import Required
+
+from .._model_support import OutboundTypedDict
 
 if TYPE_CHECKING:
     from ..models import (
@@ -12,48 +15,42 @@ if TYPE_CHECKING:
         MessageReference,
         PollMedia,
     )
+    from ...protocol import SnowflakeType
 
-from .._model_support import (
-    UNSET,
-    BaseModel,
-    MessageFlag,
-    Missing,
-    MissingOrNullable,
-    Snowflake,
-)
+from .._model_support import MessageFlag, Snowflake
 
 
-class AttachmentSend(BaseModel):
+class AttachmentSend(OutboundTypedDict, total=False):
     """Attachment Send
 
     see https://discord.com/developers/docs/resources/channel#attachment-object"""
 
-    id: Missing[int] = UNSET
-    filename: Missing[str] = UNSET
-    description: MissingOrNullable[str] = UNSET
+    id: int
+    filename: str
+    description: str | None
 
 
-class MessageSend(BaseModel):
+class MessageSend(OutboundTypedDict, total=False):
     """Message Send
 
     see https://discord.com/developers/docs/resources/message#create-message"""
 
-    content: Missing[str] = UNSET
-    nonce: Missing[int | str] = UNSET
-    enforce_nonce: Missing[bool] = UNSET
-    tts: Missing[bool] = UNSET
-    embeds: Missing[list["Embed"]] = UNSET
-    allowed_mentions: Missing["AllowedMention"] = UNSET
-    message_reference: Missing["MessageReference"] = UNSET
-    components: Missing[list["DirectComponent"]] = UNSET
-    sticker_ids: Missing[list[Snowflake]] = UNSET
-    files: Missing[list["File"]] = UNSET
-    attachments: Missing[list[AttachmentSend]] = UNSET
-    flags: Missing[MessageFlag] = UNSET
-    poll: Missing["PollRequest"] = UNSET
+    content: str
+    nonce: int | str
+    enforce_nonce: bool
+    tts: bool
+    embeds: "list[Embed]"
+    allowed_mentions: "AllowedMention"
+    message_reference: "MessageReference"
+    components: "list[DirectComponent]"
+    sticker_ids: "list[Snowflake]"
+    files: "list[File]"
+    attachments: list[AttachmentSend]
+    flags: MessageFlag
+    poll: "PollRequest"
 
 
-class MessageEditParams(BaseModel):
+class MessageEditParams(OutboundTypedDict, total=False):
     """Edit Message Parameters.
 
     All parameters are optional and nullable.
@@ -61,18 +58,18 @@ class MessageEditParams(BaseModel):
     see https://discord.com/developers/docs/resources/message#edit-message
     """
 
-    content: MissingOrNullable[str] = UNSET
-    embeds: MissingOrNullable[list["Embed"]] = UNSET
-    flags: MissingOrNullable[MessageFlag] = UNSET
-    allowed_mentions: MissingOrNullable["AllowedMention"] = UNSET
-    components: MissingOrNullable[list["Component"]] = UNSET
-    files: Missing[list["File"]] = UNSET
-    attachments: MissingOrNullable[list[AttachmentSend]] = UNSET
-    sticker_ids: Missing[list[Snowflake]] = UNSET
-    poll: MissingOrNullable["PollRequest"] = UNSET
+    content: str | None
+    embeds: "list[Embed] | None"
+    flags: MessageFlag | None
+    allowed_mentions: "AllowedMention | None"
+    components: "list[Component] | None"
+    files: "list[File]"
+    attachments: list[AttachmentSend] | None
+    sticker_ids: "list[SnowflakeType]"
+    poll: "PollRequest | None"
 
 
-class PollRequest(BaseModel):
+class PollRequest(OutboundTypedDict, total=False):
     """This is the request object used when creating a poll across the
     different endpoints. It is similar but not exactly identical to the
     main poll object. The main difference is that the request has `duration`
@@ -81,29 +78,36 @@ class PollRequest(BaseModel):
     see https://discord.com/developers/docs/resources/poll#poll-create-request-object
     """
 
-    question: "PollMedia"
+    question: Required["PollMedia"]
     """The question of the poll. Only `text` is supported."""
-    answers: list["PollAnswerRequest"]
+    answers: Required["list[PollAnswerRequest]"]
     """Each of the answers available in the poll, up to 10"""
-    duration: Missing[int] = UNSET
+    duration: int
     """Number of hours the poll should be open for, up to 32 days. Defaults to 24"""
-    allow_multiselect: Missing[bool] = UNSET
+    allow_multiselect: bool
     """Whether a user can select multiple answers. Defaults to false"""
-    layout_type: Missing[int] = UNSET
+    layout_type: int
     """The layout type of the poll"""
 
 
-class PollAnswerRequest(BaseModel):
+class PollAnswerRequest(OutboundTypedDict, total=False):
     """Poll answer request object.
 
     see https://discord.com/developers/docs/resources/poll#poll-create-request-object
     """
 
-    poll_media: "PollMedia"
+    poll_media: Required["PollMedia"]
+
+
+class BulkDeleteMessagesParams(OutboundTypedDict, total=False):
+    """Parameters for ``_api_bulk_delete_message``."""
+
+    messages: Required["list[SnowflakeType]"]
 
 
 __all__ = [
     "AttachmentSend",
+    "BulkDeleteMessagesParams",
     "MessageEditParams",
     "MessageSend",
     "PollAnswerRequest",

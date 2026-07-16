@@ -1,11 +1,13 @@
 from typing import TYPE_CHECKING
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import Sticker, StickerPack, StickerPacksResponse
-from .write import ModifyGuildStickerParams
+from .write import (
+    ModifyGuildStickerParams,
+)
 from ..message.read import File
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...api.validation import validate_outbound_value
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -139,32 +141,26 @@ class StickerEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_modify_guild_sticker(  # noqa: PLR0913
+    async def _api_modify_guild_sticker(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         sticker_id: SnowflakeType,
-        name: Missing[str] = UNSET,
-        description: MissingOrNullable[str] = UNSET,
-        tags: Missing[str] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyGuildStickerParams],
     ) -> Sticker:
         """Modify guild sticker.
 
         see https://discord.com/developers/docs/resources/sticker#modify-guild-sticker
         """
-
-        data = type_validate_python(
-            ModifyGuildStickerParams,
-            {"name": name, "description": description, "tags": tags},
-        )
+        fields = validate_outbound_value(ModifyGuildStickerParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/stickers/{sticker_id}",
             response=JsonResponse(Sticker),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)

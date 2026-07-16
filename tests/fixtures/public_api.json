@@ -135,8 +135,6 @@
     "InteractionStateError"
   ],
   "api_exports": [
-    "SKU",
-    "UNSET",
     "ActionRow",
     "Activity",
     "ActivityAssetImage",
@@ -150,6 +148,8 @@
     "ActivitySecrets",
     "ActivityTimestamps",
     "ActivityType",
+    "AddGroupDMRecipientParams",
+    "AddGuildMemberParams",
     "AddLobbyMemberParams",
     "AllowedMention",
     "AllowedMentionType",
@@ -199,8 +199,11 @@
     "AvatarDecorationData",
     "Ban",
     "BaseModel",
+    "BeginGuildPruneParams",
     "BooleanOption",
     "BulkBan",
+    "BulkDeleteMessagesParams",
+    "BulkGuildBanParams",
     "Button",
     "ButtonStyle",
     "Channel",
@@ -220,17 +223,27 @@
     "Connection",
     "ConnectionServiceType",
     "CountDetails",
-    "CreateAndModifyAutoModerationRuleParams",
+    "CreateApplicationEmojiParams",
+    "CreateAutoModerationRuleParams",
+    "CreateChannelInviteParams",
+    "CreateDMParams",
+    "CreateGroupDMParams",
+    "CreateGuildBanParams",
     "CreateGuildChannelParams",
+    "CreateGuildEmojiParams",
     "CreateGuildParams",
     "CreateGuildScheduledEventParams",
     "CreateGuildSoundboardSoundParams",
     "CreateLobbyMemberParams",
     "CreateLobbyParams",
+    "CreateStageInstanceParams",
+    "CreateTestEntitlementParams",
     "CurrentUserGuild",
     "DefaultMessageNotificationLevel",
     "DefaultReaction",
     "DirectComponent",
+    "EditApplicationCommandPermissionsParams",
+    "EditChannelPermissionsParams",
     "Embed",
     "EmbedAuthor",
     "EmbedField",
@@ -249,6 +262,7 @@
     "ExecuteWebhookParams",
     "ExplicitContentFilterLevel",
     "File",
+    "FollowAnnouncementChannelParams",
     "FollowedChannel",
     "ForumLayoutTypes",
     "ForumTag",
@@ -366,14 +380,22 @@
     "Missing",
     "MissingOrNullable",
     "ModalSubmitData",
+    "ModifyApplicationEmojiParams",
+    "ModifyAutoModerationRuleParams",
     "ModifyChannelParams",
+    "ModifyCurrentUserNickParams",
+    "ModifyDMParams",
     "ModifyGuildIncidentActionsParams",
+    "ModifyGuildMFAParams",
     "ModifyGuildOnboardingParams",
     "ModifyGuildParams",
     "ModifyGuildScheduledEventParams",
     "ModifyGuildSoundboardSoundParams",
     "ModifyGuildWelcomeScreenParams",
     "ModifyLobbyParams",
+    "ModifyStageInstanceParams",
+    "ModifyUserVoiceStateParams",
+    "ModifyWebhookParams",
     "MutableGuildFeature",
     "NumberOption",
     "OnboardingMode",
@@ -409,6 +431,7 @@
     "RoleOption",
     "RoleSubscriptionData",
     "RoleTags",
+    "SKU",
     "SKUFlag",
     "SKUType",
     "SelectDefaultValue",
@@ -458,9 +481,11 @@
     "TimeStampStyle",
     "TriggerMetadata",
     "TriggerType",
+    "UNSET",
     "UnavailableGuild",
     "UpdatePresence",
     "UpdatePresenceStatusType",
+    "UpdateUserApplicationRoleConnectionParams",
     "UpdateVoiceState",
     "User",
     "UserFlags",
@@ -485,7 +510,6 @@
     "is_unset"
   ],
   "model_exports": [
-    "SKU",
     "ActionRow",
     "Activity",
     "ActivityAssets",
@@ -496,6 +520,8 @@
     "ActivityParty",
     "ActivitySecrets",
     "ActivityTimestamps",
+    "AddGroupDMRecipientParams",
+    "AddGuildMemberParams",
     "AddLobbyMemberParams",
     "AllowedMention",
     "AnswerVoters",
@@ -533,8 +559,11 @@
     "AvatarDecorationData",
     "Ban",
     "BaseModel",
+    "BeginGuildPruneParams",
     "BooleanOption",
     "BulkBan",
+    "BulkDeleteMessagesParams",
+    "BulkGuildBanParams",
     "Button",
     "Channel",
     "ChannelCreate",
@@ -549,16 +578,26 @@
     "ComponentEmoji",
     "Connection",
     "CountDetails",
-    "CreateAndModifyAutoModerationRuleParams",
+    "CreateApplicationEmojiParams",
+    "CreateAutoModerationRuleParams",
+    "CreateChannelInviteParams",
+    "CreateDMParams",
+    "CreateGroupDMParams",
+    "CreateGuildBanParams",
     "CreateGuildChannelParams",
+    "CreateGuildEmojiParams",
     "CreateGuildParams",
     "CreateGuildScheduledEventParams",
     "CreateGuildSoundboardSoundParams",
     "CreateLobbyMemberParams",
     "CreateLobbyParams",
+    "CreateStageInstanceParams",
+    "CreateTestEntitlementParams",
     "CurrentUserGuild",
     "DefaultReaction",
     "DirectComponent",
+    "EditApplicationCommandPermissionsParams",
+    "EditChannelPermissionsParams",
     "Embed",
     "EmbedAuthor",
     "EmbedField",
@@ -574,6 +613,7 @@
     "EntitlementUpdate",
     "ExecuteWebhookParams",
     "File",
+    "FollowAnnouncementChannelParams",
     "FollowedChannel",
     "ForumTag",
     "ForumTagRequest",
@@ -664,14 +704,22 @@
     "MessageSnapshot",
     "MessageSnapshotMessage",
     "ModalSubmitData",
+    "ModifyApplicationEmojiParams",
+    "ModifyAutoModerationRuleParams",
     "ModifyChannelParams",
+    "ModifyCurrentUserNickParams",
+    "ModifyDMParams",
     "ModifyGuildIncidentActionsParams",
+    "ModifyGuildMFAParams",
     "ModifyGuildOnboardingParams",
     "ModifyGuildParams",
     "ModifyGuildScheduledEventParams",
     "ModifyGuildSoundboardSoundParams",
     "ModifyGuildWelcomeScreenParams",
     "ModifyLobbyParams",
+    "ModifyStageInstanceParams",
+    "ModifyUserVoiceStateParams",
+    "ModifyWebhookParams",
     "NumberOption",
     "OnboardingPrompt",
     "OnboardingPromptOption",
@@ -698,6 +746,7 @@
     "RoleOption",
     "RoleSubscriptionData",
     "RoleTags",
+    "SKU",
     "SelectDefaultValue",
     "SelectMenu",
     "SelectMenuResolved",
@@ -737,6 +786,7 @@
     "TriggerMetadata",
     "UnavailableGuild",
     "UpdatePresence",
+    "UpdateUserApplicationRoleConnectionParams",
     "UpdateVoiceState",
     "User",
     "UserOption",
@@ -800,76 +850,10 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ApplicationCommandCreate]",
             "default": null
-          },
-          {
-            "name": "name_localizations",
-            "kind": "keyword_only",
-            "annotation": "dict[str, str] | None",
-            "default": "None"
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "description_localizations",
-            "kind": "keyword_only",
-            "annotation": "dict[str, str] | None",
-            "default": "None"
-          },
-          {
-            "name": "options",
-            "kind": "keyword_only",
-            "annotation": "list[ApplicationCommandOption] | None",
-            "default": "None"
-          },
-          {
-            "name": "default_member_permissions",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "dm_permission",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "default_permission",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "type",
-            "kind": "keyword_only",
-            "annotation": "ApplicationCommandType | None",
-            "default": "None"
-          },
-          {
-            "name": "nsfw",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "integration_types",
-            "kind": "keyword_only",
-            "annotation": "list[ApplicationIntegrationType] | None",
-            "default": "None"
-          },
-          {
-            "name": "contexts",
-            "kind": "keyword_only",
-            "annotation": "list[InteractionContextType] | None",
-            "default": "None"
           }
         ],
         "return_annotation": "ApplicationCommand",
@@ -926,70 +910,10 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "name_localizations",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[dict[str, str]]",
-            "default": "..."
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "description_localizations",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[dict[str, str]]",
-            "default": "..."
-          },
-          {
-            "name": "options",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[ApplicationCommandOption]]",
-            "default": "..."
-          },
-          {
-            "name": "default_member_permissions",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "dm_permission",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
-            "name": "default_permission",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[bool]",
-            "default": "..."
-          },
-          {
-            "name": "nsfw",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
-            "name": "integration_types",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[ApplicationIntegrationType]]",
-            "default": "..."
-          },
-          {
-            "name": "contexts",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[InteractionContextType]]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ApplicationCommandEditParams]",
+            "default": null
           }
         ],
         "return_annotation": "ApplicationCommand",
@@ -1106,58 +1030,10 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ApplicationCommandCreate]",
             "default": null
-          },
-          {
-            "name": "name_localizations",
-            "kind": "keyword_only",
-            "annotation": "dict[str, str] | None",
-            "default": "None"
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "description_localizations",
-            "kind": "keyword_only",
-            "annotation": "dict[str, str] | None",
-            "default": "None"
-          },
-          {
-            "name": "options",
-            "kind": "keyword_only",
-            "annotation": "list[ApplicationCommandOption] | None",
-            "default": "None"
-          },
-          {
-            "name": "default_member_permissions",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "default_permission",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "type",
-            "kind": "keyword_only",
-            "annotation": "ApplicationCommandType | None",
-            "default": "None"
-          },
-          {
-            "name": "nsfw",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
           }
         ],
         "return_annotation": "ApplicationCommand",
@@ -1226,52 +1102,10 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "name_localizations",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[dict[str, str]]",
-            "default": "..."
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "description_localizations",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[dict[str, str]]",
-            "default": "..."
-          },
-          {
-            "name": "options",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[ApplicationCommandOption]]",
-            "default": "..."
-          },
-          {
-            "name": "default_member_permissions",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "default_permission",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[bool]",
-            "default": "..."
-          },
-          {
-            "name": "nsfw",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ApplicationCommandEditParams]",
+            "default": null
           }
         ],
         "return_annotation": "ApplicationCommand",
@@ -1451,9 +1285,9 @@
             "default": null
           },
           {
-            "name": "permissions",
-            "kind": "keyword_only",
-            "annotation": "list[ApplicationCommandPermissions]",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[EditApplicationCommandPermissionsParams]",
             "default": null
           }
         ],
@@ -1568,52 +1402,10 @@
             "default": "None"
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Embed]]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[MessageFlag]",
-            "default": "..."
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[AllowedMention]",
-            "default": "..."
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Component]]",
-            "default": "..."
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[File]]",
-            "default": "..."
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[AttachmentSend]]",
-            "default": "..."
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[PollRequest]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[WebhookMessageEditParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -1676,52 +1468,10 @@
             "default": null
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "tts",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "list[Embed] | None",
-            "default": "None"
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "AllowedMention | None",
-            "default": "None"
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "list[Component] | None",
-            "default": "None"
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "list[File] | None",
-            "default": "None"
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "list[AttachmentSend] | None",
-            "default": "None"
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ExecuteWebhookParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -1808,52 +1558,10 @@
             "default": "None"
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Embed]]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[MessageFlag]",
-            "default": "..."
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[AllowedMention]",
-            "default": "..."
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Component]]",
-            "default": "..."
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[File]]",
-            "default": "..."
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[AttachmentSend]]",
-            "default": "..."
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[PollRequest]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[WebhookMessageEditParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -1925,82 +1633,10 @@
             "default": null
           },
           {
-            "name": "custom_install_url",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "role_connections_verification_url",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "install_params",
-            "kind": "keyword_only",
-            "annotation": "Missing[InstallParams]",
-            "default": "..."
-          },
-          {
-            "name": "integration_types_config",
-            "kind": "keyword_only",
-            "annotation": "Missing[\n            dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfiguration]\n        ]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "Missing[ApplicationFlag]",
-            "default": "..."
-          },
-          {
-            "name": "icon",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "cover_image",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "interactions_endpoint_url",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "tags",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[str]]",
-            "default": "..."
-          },
-          {
-            "name": "event_webhooks_url",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "event_webhooks_status",
-            "kind": "keyword_only",
-            "annotation": "Missing[int]",
-            "default": "..."
-          },
-          {
-            "name": "event_webhooks_types",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[str]]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[EditCurrentApplicationParams]",
+            "default": null
           }
         ],
         "return_annotation": "Application",
@@ -2273,28 +1909,22 @@
             "default": null
           },
           {
-            "name": "trigger_metadata",
-            "kind": "keyword_only",
-            "annotation": "None",
-            "default": "None"
-          },
-          {
             "name": "enabled",
             "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
+            "annotation": "bool",
+            "default": "..."
           },
           {
             "name": "exempt_roles",
             "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
+            "annotation": "list[SnowflakeType]",
+            "default": "..."
           },
           {
             "name": "exempt_channels",
             "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
+            "annotation": "list[SnowflakeType]",
+            "default": "..."
           },
           {
             "name": "reason",
@@ -2356,20 +1986,20 @@
           {
             "name": "enabled",
             "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
+            "annotation": "bool",
+            "default": "..."
           },
           {
             "name": "exempt_roles",
             "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
+            "annotation": "list[SnowflakeType]",
+            "default": "..."
           },
           {
             "name": "exempt_channels",
             "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
+            "annotation": "list[SnowflakeType]",
+            "default": "..."
           },
           {
             "name": "reason",
@@ -2405,52 +2035,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "event_type",
-            "kind": "keyword_only",
-            "annotation": "AutoModerationRuleEventType | None",
-            "default": "None"
-          },
-          {
-            "name": "trigger_metadata",
-            "kind": "keyword_only",
-            "annotation": "TriggerMetadata | None",
-            "default": "None"
-          },
-          {
-            "name": "actions",
-            "kind": "keyword_only",
-            "annotation": "list[AutoModerationAction] | None",
-            "default": "None"
-          },
-          {
-            "name": "enabled",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "exempt_roles",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
-            "name": "exempt_channels",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyAutoModerationRuleParams]",
+            "default": null
           }
         ],
         "return_annotation": "AutoModerationRule",
@@ -2528,22 +2122,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "icon",
-            "kind": "keyword_only",
-            "annotation": "bytes | None",
-            "default": "None"
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyDMParams]",
+            "default": null
           }
         ],
         "return_annotation": "Channel",
@@ -2567,124 +2155,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "type",
-            "kind": "keyword_only",
-            "annotation": "Missing[ChannelType]",
-            "default": "..."
-          },
-          {
-            "name": "position",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
-            "default": "..."
-          },
-          {
-            "name": "topic",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "nsfw",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[bool]",
-            "default": "..."
-          },
-          {
-            "name": "rate_limit_per_user",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
-            "default": "..."
-          },
-          {
-            "name": "bitrate",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
-            "default": "..."
-          },
-          {
-            "name": "user_limit",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
-            "default": "..."
-          },
-          {
-            "name": "permission_overwrites",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[PartialOverwrite]]",
-            "default": "..."
-          },
-          {
-            "name": "parent_id",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[SnowflakeType]",
-            "default": "..."
-          },
-          {
-            "name": "rtc_region",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "video_quality_mode",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[VideoQualityMode]",
-            "default": "..."
-          },
-          {
-            "name": "default_auto_archive_duration",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "Missing[ChannelFlags]",
-            "default": "..."
-          },
-          {
-            "name": "available_tags",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[ForumTagRequest]]",
-            "default": "..."
-          },
-          {
-            "name": "default_reaction_emoji",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[DefaultReaction]",
-            "default": "..."
-          },
-          {
-            "name": "default_thread_rate_limit_per_user",
-            "kind": "keyword_only",
-            "annotation": "Missing[int]",
-            "default": "..."
-          },
-          {
-            "name": "default_sort_order",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[SortOrderTypes]",
-            "default": "..."
-          },
-          {
-            "name": "default_forum_layout",
-            "kind": "keyword_only",
-            "annotation": "Missing[ForumLayoutTypes]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyChannelParams]",
+            "default": null
           }
         ],
         "return_annotation": "Channel",
@@ -2708,58 +2188,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "archived",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
-            "name": "auto_archive_duration",
-            "kind": "keyword_only",
-            "annotation": "Missing[int]",
-            "default": "..."
-          },
-          {
-            "name": "locked",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
-            "name": "invitable",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
-            "name": "rate_limit_per_user",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "Missing[ChannelFlags]",
-            "default": "..."
-          },
-          {
-            "name": "applied_tags",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[SnowflakeType]]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyThreadParams]",
+            "default": null
           }
         ],
         "return_annotation": "Channel",
@@ -2972,82 +2410,10 @@
             "default": null
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "nonce",
-            "kind": "keyword_only",
-            "annotation": "int | str | None",
-            "default": "None"
-          },
-          {
-            "name": "enforce_nonce",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "tts",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "list[Embed] | None",
-            "default": "None"
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "AllowedMention | None",
-            "default": "None"
-          },
-          {
-            "name": "message_reference",
-            "kind": "keyword_only",
-            "annotation": "MessageReference | None",
-            "default": "None"
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "list[DirectComponent] | None",
-            "default": "None"
-          },
-          {
-            "name": "sticker_ids",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "list[File] | None",
-            "default": "None"
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "list[AttachmentSend] | None",
-            "default": "None"
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MessageFlag | None",
-            "default": "None"
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "PollRequest | None",
-            "default": "None"
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[MessageSend]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -3350,58 +2716,10 @@
             "default": null
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Embed]]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[MessageFlag]",
-            "default": "..."
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[AllowedMention]",
-            "default": "..."
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Component]]",
-            "default": "..."
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[File]]",
-            "default": "..."
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[AttachmentSend]]",
-            "default": "..."
-          },
-          {
-            "name": "sticker_ids",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[SnowflakeType]]",
-            "default": "..."
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[PollRequest]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[MessageEditParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -3458,16 +2776,16 @@
             "default": null
           },
           {
-            "name": "messages",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType]",
-            "default": null
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[BulkDeleteMessagesParams]",
+            "default": null
           }
         ],
         "return_annotation": "None",
@@ -3497,28 +2815,16 @@
             "default": null
           },
           {
-            "name": "allow",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "deny",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "type",
-            "kind": "keyword_only",
-            "annotation": "OverwriteType",
-            "default": null
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[EditChannelPermissionsParams]",
+            "default": null
           }
         ],
         "return_annotation": "None",
@@ -3563,57 +2869,9 @@
             "default": null
           },
           {
-            "name": "max_age",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "max_uses",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "temporary",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "unique",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "target_type",
-            "kind": "keyword_only",
-            "annotation": "InviteTargetType | None",
-            "default": "None"
-          },
-          {
-            "name": "target_user_id",
-            "kind": "keyword_only",
-            "annotation": "SnowflakeType | None",
-            "default": "None"
-          },
-          {
-            "name": "target_application_id",
-            "kind": "keyword_only",
-            "annotation": "SnowflakeType | None",
-            "default": "None"
-          },
-          {
             "name": "target_users_file",
             "kind": "keyword_only",
             "annotation": "File | None",
-            "default": "None"
-          },
-          {
-            "name": "role_ids",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
             "default": "None"
           },
           {
@@ -3621,6 +2879,12 @@
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateChannelInviteParams]",
+            "default": null
           }
         ],
         "return_annotation": "Invite",
@@ -3677,16 +2941,16 @@
             "default": null
           },
           {
-            "name": "webhook_channel_id",
-            "kind": "keyword_only",
-            "annotation": "SnowflakeType",
-            "default": null
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[FollowAnnouncementChannelParams]",
+            "default": null
           }
         ],
         "return_annotation": "FollowedChannel",
@@ -3824,15 +3088,9 @@
             "default": null
           },
           {
-            "name": "access_token",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "nick",
-            "kind": "keyword_only",
-            "annotation": "str",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[AddGroupDMRecipientParams]",
             "default": null
           }
         ],
@@ -3890,28 +3148,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "auto_archive_duration",
-            "kind": "keyword_only",
-            "annotation": "Missing[int]",
-            "default": "..."
-          },
-          {
-            "name": "rate_limit_per_user",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[StartThreadFromMessageParams]",
+            "default": null
           }
         ],
         "return_annotation": "Channel",
@@ -3935,40 +3181,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "auto_archive_duration",
-            "kind": "keyword_only",
-            "annotation": "Missing[int]",
-            "default": "..."
-          },
-          {
-            "name": "type",
-            "kind": "keyword_only",
-            "annotation": "Missing[ChannelType]",
-            "default": "..."
-          },
-          {
-            "name": "invitable",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
-            "name": "rate_limit_per_user",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[StartThreadWithoutMessageParams]",
+            "default": null
           }
         ],
         "return_annotation": "Channel",
@@ -4000,67 +3222,19 @@
           {
             "name": "auto_archive_duration",
             "kind": "keyword_only",
-            "annotation": "Missing[int]",
-            "default": "..."
+            "annotation": "int | None",
+            "default": "None"
           },
           {
             "name": "rate_limit_per_user",
             "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
-            "default": "..."
+            "annotation": "int | None",
+            "default": "None"
           },
           {
             "name": "applied_tags",
             "kind": "keyword_only",
-            "annotation": "Missing[list[SnowflakeType]]",
-            "default": "..."
-          },
-          {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "list[Embed] | None",
-            "default": "None"
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "AllowedMention | None",
-            "default": "None"
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "list[DirectComponent] | None",
-            "default": "None"
-          },
-          {
-            "name": "sticker_ids",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "list[File] | None",
-            "default": "None"
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "list[AttachmentSend] | None",
-            "default": "None"
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MessageFlag | None",
+            "annotation": "list[Snowflake] | None",
             "default": "None"
           },
           {
@@ -4068,6 +3242,12 @@
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[MessageSend]",
+            "default": null
           }
         ],
         "return_annotation": "Channel",
@@ -4406,28 +3586,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "image",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "roles",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateGuildEmojiParams]",
+            "default": null
           }
         ],
         "return_annotation": "Emoji",
@@ -4457,22 +3625,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "roles",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[SnowflakeType]]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildEmojiParams]",
+            "default": null
           }
         ],
         "return_annotation": "Emoji",
@@ -4577,15 +3739,9 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "image",
-            "kind": "keyword_only",
-            "annotation": "str",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateApplicationEmojiParams]",
             "default": null
           }
         ],
@@ -4616,9 +3772,9 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyApplicationEmojiParams]",
             "default": null
           }
         ],
@@ -4670,16 +3826,10 @@
             "default": null
           },
           {
-            "name": "sound_id",
-            "kind": "keyword_only",
-            "annotation": "SnowflakeType",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[SendSoundboardSoundParams]",
             "default": null
-          },
-          {
-            "name": "source_guild_id",
-            "kind": "keyword_only",
-            "annotation": "Missing[SnowflakeType]",
-            "default": "..."
           }
         ],
         "return_annotation": "None",
@@ -4766,34 +3916,10 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateGuildSoundboardSoundParams]",
             "default": null
-          },
-          {
-            "name": "sound",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "volume",
-            "kind": "keyword_only",
-            "annotation": "Missing[float]",
-            "default": "..."
-          },
-          {
-            "name": "emoji_id",
-            "kind": "keyword_only",
-            "annotation": "Missing[SnowflakeType]",
-            "default": "..."
-          },
-          {
-            "name": "emoji_name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
           }
         ],
         "return_annotation": "SoundboardSound",
@@ -4823,28 +3949,10 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "volume",
-            "kind": "keyword_only",
-            "annotation": "Missing[float]",
-            "default": "..."
-          },
-          {
-            "name": "emoji_id",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[SnowflakeType]",
-            "default": "..."
-          },
-          {
-            "name": "emoji_name",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildSoundboardSoundParams]",
+            "default": null
           }
         ],
         "return_annotation": "SoundboardSound",
@@ -4889,22 +3997,10 @@
             "default": null
           },
           {
-            "name": "metadata",
-            "kind": "keyword_only",
-            "annotation": "Missing[dict[str, str]]",
-            "default": "..."
-          },
-          {
-            "name": "members",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[CreateLobbyMemberParams]]",
-            "default": "..."
-          },
-          {
-            "name": "idle_timeout_seconds",
-            "kind": "keyword_only",
-            "annotation": "Missing[int]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateLobbyParams]",
+            "default": null
           }
         ],
         "return_annotation": "Lobby",
@@ -4949,16 +4045,10 @@
             "default": null
           },
           {
-            "name": "metadata",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[dict[str, str]]",
-            "default": "..."
-          },
-          {
-            "name": "idle_timeout_seconds",
-            "kind": "keyword_only",
-            "annotation": "Missing[int]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyLobbyParams]",
+            "default": null
           }
         ],
         "return_annotation": "Lobby",
@@ -5009,16 +4099,10 @@
             "default": null
           },
           {
-            "name": "metadata",
-            "kind": "keyword_only",
-            "annotation": "Missing[dict[str, str]]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "Missing[LobbyMemberFlags]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[AddLobbyMemberParams]",
+            "default": null
           }
         ],
         "return_annotation": "LobbyMember",
@@ -5090,10 +4174,10 @@
             "default": null
           },
           {
-            "name": "channel_id",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[SnowflakeType]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[LinkChannelToLobbyParams]",
+            "default": null
           }
         ],
         "return_annotation": "Lobby",
@@ -5240,21 +4324,9 @@
             "default": null
           },
           {
-            "name": "sku_id",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "owner_id",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "owner_type",
-            "kind": "keyword_only",
-            "annotation": "Literal[1, 2]",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateTestEntitlementParams]",
             "default": null
           }
         ],
@@ -5300,76 +4372,10 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateGuildParams]",
             "default": null
-          },
-          {
-            "name": "region",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "icon",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "verification_level",
-            "kind": "keyword_only",
-            "annotation": "VerificationLevel | None",
-            "default": "None"
-          },
-          {
-            "name": "default_message_notifications",
-            "kind": "keyword_only",
-            "annotation": "DefaultMessageNotificationLevel | None",
-            "default": "None"
-          },
-          {
-            "name": "explicit_content_filter",
-            "kind": "keyword_only",
-            "annotation": "ExplicitContentFilterLevel | None",
-            "default": "None"
-          },
-          {
-            "name": "roles",
-            "kind": "keyword_only",
-            "annotation": "list[Role] | None",
-            "default": "None"
-          },
-          {
-            "name": "channels",
-            "kind": "keyword_only",
-            "annotation": "list[Channel] | None",
-            "default": "None"
-          },
-          {
-            "name": "afk_channel_id",
-            "kind": "keyword_only",
-            "annotation": "Snowflake | None",
-            "default": "None"
-          },
-          {
-            "name": "afk_timeout",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "system_channel_id",
-            "kind": "keyword_only",
-            "annotation": "Snowflake | None",
-            "default": "None"
-          },
-          {
-            "name": "system_channel_flags",
-            "kind": "keyword_only",
-            "annotation": "SystemChannelFlags | None",
-            "default": "None"
           }
         ],
         "return_annotation": "Guild",
@@ -5462,130 +4468,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "region",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "verification_level",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[VerificationLevel]",
-            "default": "..."
-          },
-          {
-            "name": "default_message_notifications",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[\n            DefaultMessageNotificationLevel\n        ]",
-            "default": "..."
-          },
-          {
-            "name": "explicit_content_filter",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[ExplicitContentFilterLevel]",
-            "default": "..."
-          },
-          {
-            "name": "afk_channel_id",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[Snowflake]",
-            "default": "..."
-          },
-          {
-            "name": "afk_timeout",
-            "kind": "keyword_only",
-            "annotation": "Missing[int]",
-            "default": "..."
-          },
-          {
-            "name": "icon",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "splash",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "discovery_splash",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "banner",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "system_channel_id",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[Snowflake]",
-            "default": "..."
-          },
-          {
-            "name": "system_channel_flags",
-            "kind": "keyword_only",
-            "annotation": "Missing[SystemChannelFlags]",
-            "default": "..."
-          },
-          {
-            "name": "rules_channel_id",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[Snowflake]",
-            "default": "..."
-          },
-          {
-            "name": "public_updates_channel_id",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[Snowflake]",
-            "default": "..."
-          },
-          {
-            "name": "preferred_locale",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "features",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[GuildFeature]]",
-            "default": "..."
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "premium_progress_bar_enabled",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
-            "name": "safety_alerts_channel_id",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[Snowflake]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildParams]",
+            "default": null
           }
         ],
         "return_annotation": "Guild",
@@ -5609,16 +4501,10 @@
             "default": null
           },
           {
-            "name": "invites_disabled_until",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[datetime]",
-            "default": "..."
-          },
-          {
-            "name": "dms_disabled_until",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[datetime]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildIncidentActionsParams]",
+            "default": null
           }
         ],
         "return_annotation": "GuildIncidentsData",
@@ -5684,106 +4570,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "type",
-            "kind": "keyword_only",
-            "annotation": "ChannelType | None",
-            "default": "None"
-          },
-          {
-            "name": "topic",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "bitrate",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "user_limit",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "rate_limit_per_user",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "position",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "permission_overwrites",
-            "kind": "keyword_only",
-            "annotation": "list[Overwrite] | None",
-            "default": "None"
-          },
-          {
-            "name": "parent_id",
-            "kind": "keyword_only",
-            "annotation": "Snowflake | None",
-            "default": "None"
-          },
-          {
-            "name": "nsfw",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "rtc_region",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "video_quality_mode",
-            "kind": "keyword_only",
-            "annotation": "VideoQualityMode | None",
-            "default": "None"
-          },
-          {
-            "name": "default_auto_archive_duration",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "default_reaction_emoji",
-            "kind": "keyword_only",
-            "annotation": "DefaultReaction | None",
-            "default": "None"
-          },
-          {
-            "name": "available_tags",
-            "kind": "keyword_only",
-            "annotation": "list[ForumTagRequest] | None",
-            "default": "None"
-          },
-          {
-            "name": "default_sort_order",
-            "kind": "keyword_only",
-            "annotation": "SortOrderTypes | None",
-            "default": "None"
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateGuildChannelParams]",
+            "default": null
           }
         ],
         "return_annotation": "Channel",
@@ -5821,19 +4617,19 @@
           {
             "name": "position",
             "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
+            "annotation": "int | None | UnsetType",
             "default": "..."
           },
           {
             "name": "lock_permissions",
             "kind": "keyword_only",
-            "annotation": "MissingOrNullable[bool]",
+            "annotation": "bool | UnsetType",
             "default": "..."
           },
           {
             "name": "parent_id",
             "kind": "keyword_only",
-            "annotation": "MissingOrNullable[SnowflakeType]",
+            "annotation": "SnowflakeType | None | UnsetType",
             "default": "..."
           }
         ],
@@ -5978,34 +4774,10 @@
             "default": null
           },
           {
-            "name": "access_token",
-            "kind": "keyword_only",
-            "annotation": "str",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[AddGuildMemberParams]",
             "default": null
-          },
-          {
-            "name": "nick",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "roles",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
-            "name": "mute",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "deaf",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
           }
         ],
         "return_annotation": "GuildMember | None",
@@ -6035,52 +4807,16 @@
             "default": null
           },
           {
-            "name": "nick",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "roles",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[SnowflakeType]]",
-            "default": "..."
-          },
-          {
-            "name": "mute",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[bool]",
-            "default": "..."
-          },
-          {
-            "name": "deaf",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[bool]",
-            "default": "..."
-          },
-          {
-            "name": "channel_id",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[SnowflakeType]",
-            "default": "..."
-          },
-          {
-            "name": "communication_disabled_until",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[datetime]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[GuildMemberFlags]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildMemberParams]",
+            "default": null
           }
         ],
         "return_annotation": "GuildMember",
@@ -6104,34 +4840,16 @@
             "default": null
           },
           {
-            "name": "nick",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "banner",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "avatar",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "bio",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyCurrentMemberParams]",
+            "default": null
           }
         ],
         "return_annotation": "GuildMember",
@@ -6155,16 +4873,16 @@
             "default": null
           },
           {
-            "name": "nick",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyCurrentUserNickParams]",
+            "default": null
           }
         ],
         "return_annotation": "GuildMember",
@@ -6412,14 +5130,8 @@
           {
             "name": "delete_message_days",
             "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "delete_message_seconds",
-            "kind": "keyword_only",
-            "annotation": "None",
-            "default": "None"
+            "annotation": "int",
+            "default": "..."
           },
           {
             "name": "reason",
@@ -6455,16 +5167,10 @@
             "default": null
           },
           {
-            "name": "delete_message_days",
-            "kind": "keyword_only",
-            "annotation": "None",
-            "default": "None"
-          },
-          {
             "name": "delete_message_seconds",
             "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
+            "annotation": "int",
+            "default": "..."
           },
           {
             "name": "reason",
@@ -6527,22 +5233,16 @@
             "default": null
           },
           {
-            "name": "user_ids",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType]",
-            "default": null
-          },
-          {
-            "name": "delete_message_seconds",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[BulkGuildBanParams]",
+            "default": null
           }
         ],
         "return_annotation": "BulkBan",
@@ -6614,58 +5314,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "permissions",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "color",
-            "kind": "keyword_only",
-            "annotation": "Missing[int]",
-            "default": "..."
-          },
-          {
-            "name": "colors",
-            "kind": "keyword_only",
-            "annotation": "Missing[RoleColors]",
-            "default": "..."
-          },
-          {
-            "name": "hoist",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
-            "name": "icon",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "unicode_emoji",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "mentionable",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateGuildRoleParams]",
+            "default": null
           }
         ],
         "return_annotation": "Role",
@@ -6703,7 +5361,7 @@
           {
             "name": "position",
             "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
+            "annotation": "int | None | UnsetType",
             "default": "..."
           },
           {
@@ -6740,58 +5398,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "permissions",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "color",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[int]",
-            "default": "..."
-          },
-          {
-            "name": "colors",
-            "kind": "keyword_only",
-            "annotation": "Missing[RoleColors]",
-            "default": "..."
-          },
-          {
-            "name": "hoist",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[bool]",
-            "default": "..."
-          },
-          {
-            "name": "icon",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "unicode_emoji",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "mentionable",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[bool]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildRoleParams]",
+            "default": null
           }
         ],
         "return_annotation": "Role",
@@ -6815,16 +5431,16 @@
             "default": null
           },
           {
-            "name": "level",
-            "kind": "keyword_only",
-            "annotation": "int",
-            "default": null
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildMFAParams]",
+            "default": null
           }
         ],
         "return_annotation": "None",
@@ -6914,28 +5530,16 @@
             "default": null
           },
           {
-            "name": "days",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "compute_prune_count",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "include_roles",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[BeginGuildPruneParams]",
+            "default": null
           }
         ],
         "return_annotation": "dict[Literal[\"pruned\"], int]",
@@ -7076,22 +5680,16 @@
             "default": null
           },
           {
-            "name": "enabled",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
-            "name": "channel_id",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[SnowflakeType]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildWidgetParams]",
+            "default": null
           }
         ],
         "return_annotation": "GuildWidgetSettings",
@@ -7205,28 +5803,16 @@
             "default": null
           },
           {
-            "name": "enabled",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[bool]",
-            "default": "..."
-          },
-          {
-            "name": "welcome_channels",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[WelcomeScreenChannel]]",
-            "default": "..."
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildWelcomeScreenParams]",
+            "default": null
           }
         ],
         "return_annotation": "WelcomeScreen",
@@ -7271,34 +5857,16 @@
             "default": null
           },
           {
-            "name": "prompts",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[OnboardingPrompt]]",
-            "default": "..."
-          },
-          {
-            "name": "default_channel_ids",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[Snowflake]]",
-            "default": "..."
-          },
-          {
-            "name": "enabled",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
-            "name": "mode",
-            "kind": "keyword_only",
-            "annotation": "Missing[OnboardingMode]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildOnboardingParams]",
+            "default": null
           }
         ],
         "return_annotation": "GuildOnboarding",
@@ -7385,22 +5953,10 @@
             "default": null
           },
           {
-            "name": "channel_id",
-            "kind": "keyword_only",
-            "annotation": "Missing[SnowflakeType]",
-            "default": "..."
-          },
-          {
-            "name": "suppress",
-            "kind": "keyword_only",
-            "annotation": "Missing[bool]",
-            "default": "..."
-          },
-          {
-            "name": "request_to_speak_timestamp",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[datetime]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyCurrentUserVoiceStateParams]",
+            "default": null
           }
         ],
         "return_annotation": "None",
@@ -7430,16 +5986,10 @@
             "default": null
           },
           {
-            "name": "channel_id",
-            "kind": "keyword_only",
-            "annotation": "SnowflakeType | None",
-            "default": "None"
-          },
-          {
-            "name": "suppress",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyUserVoiceStateParams]",
+            "default": null
           }
         ],
         "return_annotation": "None",
@@ -7490,70 +6040,16 @@
             "default": null
           },
           {
-            "name": "channel_id",
-            "kind": "keyword_only",
-            "annotation": "Snowflake | None",
-            "default": "None"
-          },
-          {
-            "name": "entity_metadata",
-            "kind": "keyword_only",
-            "annotation": "GuildScheduledEventEntityMetadata | None",
-            "default": "None"
-          },
-          {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "privacy_level",
-            "kind": "keyword_only",
-            "annotation": "GuildScheduledEventPrivacyLevel",
-            "default": null
-          },
-          {
-            "name": "scheduled_start_time",
-            "kind": "keyword_only",
-            "annotation": "datetime",
-            "default": null
-          },
-          {
-            "name": "scheduled_end_time",
-            "kind": "keyword_only",
-            "annotation": "datetime | None",
-            "default": "None"
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "entity_type",
-            "kind": "keyword_only",
-            "annotation": "GuildScheduledEventEntityType",
-            "default": null
-          },
-          {
-            "name": "image",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "recurrence_rule",
-            "kind": "keyword_only",
-            "annotation": "RecurrenceRule | None",
-            "default": "None"
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateGuildScheduledEventParams]",
+            "default": null
           }
         ],
         "return_annotation": "GuildScheduledEvent",
@@ -7616,76 +6112,16 @@
             "default": null
           },
           {
-            "name": "channel_id",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[Snowflake]",
-            "default": "..."
-          },
-          {
-            "name": "entity_metadata",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[GuildScheduledEventEntityMetadata]",
-            "default": "..."
-          },
-          {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "privacy_level",
-            "kind": "keyword_only",
-            "annotation": "Missing[GuildScheduledEventPrivacyLevel]",
-            "default": "..."
-          },
-          {
-            "name": "scheduled_start_time",
-            "kind": "keyword_only",
-            "annotation": "Missing[datetime]",
-            "default": "..."
-          },
-          {
-            "name": "scheduled_end_time",
-            "kind": "keyword_only",
-            "annotation": "Missing[datetime]",
-            "default": "..."
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "entity_type",
-            "kind": "keyword_only",
-            "annotation": "Missing[GuildScheduledEventEntityType]",
-            "default": "..."
-          },
-          {
-            "name": "status",
-            "kind": "keyword_only",
-            "annotation": "Missing[GuildScheduledEventStatus]",
-            "default": "..."
-          },
-          {
-            "name": "image",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "recurrence_rule",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[RecurrenceRule]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildScheduledEventParams]",
+            "default": null
           }
         ],
         "return_annotation": "GuildScheduledEvent",
@@ -7862,16 +6298,10 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateGuildTemplateParams]",
             "default": null
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
           }
         ],
         "return_annotation": "GuildTemplate",
@@ -7928,16 +6358,10 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildTemplateParams]",
+            "default": null
           }
         ],
         "return_annotation": "GuildTemplate",
@@ -8210,40 +6634,16 @@
             "default": null
           },
           {
-            "name": "channel_id",
-            "kind": "keyword_only",
-            "annotation": "SnowflakeType",
-            "default": null
-          },
-          {
-            "name": "topic",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "privacy_level",
-            "kind": "keyword_only",
-            "annotation": "StagePrivacyLevel | None",
-            "default": "None"
-          },
-          {
-            "name": "send_start_notification",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "guild_scheduled_event_id",
-            "kind": "keyword_only",
-            "annotation": "SnowflakeType | None",
-            "default": "None"
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateStageInstanceParams]",
+            "default": null
           }
         ],
         "return_annotation": "StageInstance",
@@ -8288,22 +6688,16 @@
             "default": null
           },
           {
-            "name": "topic",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "privacy_level",
-            "kind": "keyword_only",
-            "annotation": "StagePrivacyLevel | None",
-            "default": "None"
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyStageInstanceParams]",
+            "default": null
           }
         ],
         "return_annotation": "StageInstance",
@@ -8516,28 +6910,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "description",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "tags",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyGuildStickerParams]",
+            "default": null
           }
         ],
         "return_annotation": "Sticker",
@@ -8696,22 +7078,10 @@
             "default": null
           },
           {
-            "name": "username",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "avatar",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "banner",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyCurrentUserParams]",
+            "default": null
           }
         ],
         "return_annotation": "User",
@@ -8810,9 +7180,9 @@
             "default": null
           },
           {
-            "name": "recipient_id",
-            "kind": "keyword_only",
-            "annotation": "SnowflakeType",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateDMParams]",
             "default": null
           }
         ],
@@ -8831,15 +7201,9 @@
             "default": null
           },
           {
-            "name": "access_tokens",
-            "kind": "keyword_only",
-            "annotation": "list[str]",
-            "default": null
-          },
-          {
-            "name": "nicks",
-            "kind": "keyword_only",
-            "annotation": "dict[SnowflakeType, str]",
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateGroupDMParams]",
             "default": null
           }
         ],
@@ -8918,22 +7282,10 @@
             "default": null
           },
           {
-            "name": "platform_name",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "platform_username",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "metadata",
-            "kind": "keyword_only",
-            "annotation": "dict[str, str] | None",
-            "default": "None"
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[UpdateUserApplicationRoleConnectionParams]",
+            "default": null
           }
         ],
         "return_annotation": "ApplicationRoleConnection",
@@ -8957,22 +7309,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "str",
-            "default": null
-          },
-          {
-            "name": "avatar",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[CreateWebhookParams]",
+            "default": null
           }
         ],
         "return_annotation": "Webhook",
@@ -9086,28 +7432,16 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "avatar",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "channel_id",
-            "kind": "keyword_only",
-            "annotation": "Missing[SnowflakeType]",
-            "default": "..."
-          },
-          {
             "name": "reason",
             "kind": "keyword_only",
             "annotation": "str | None",
             "default": "None"
+          },
+          {
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyWebhookParams]",
+            "default": null
           }
         ],
         "return_annotation": "Webhook",
@@ -9137,16 +7471,10 @@
             "default": null
           },
           {
-            "name": "name",
-            "kind": "keyword_only",
-            "annotation": "Missing[str]",
-            "default": "..."
-          },
-          {
-            "name": "avatar",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ModifyWebhookParams]",
+            "default": null
           }
         ],
         "return_annotation": "Webhook",
@@ -9248,82 +7576,10 @@
             "default": "None"
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "username",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "avatar_url",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "tts",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "list[Embed] | None",
-            "default": "None"
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "AllowedMention | None",
-            "default": "None"
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "list[Component] | None",
-            "default": "None"
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "list[File] | None",
-            "default": "None"
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "list[AttachmentSend] | None",
-            "default": "None"
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "thread_name",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "applied_tags",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "PollRequest | None",
-            "default": "None"
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ExecuteWebhookParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -9371,82 +7627,10 @@
             "default": "None"
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "username",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "avatar_url",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "tts",
-            "kind": "keyword_only",
-            "annotation": "bool | None",
-            "default": "None"
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "list[Embed] | None",
-            "default": "None"
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "AllowedMention | None",
-            "default": "None"
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "list[Component] | None",
-            "default": "None"
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "list[File] | None",
-            "default": "None"
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "list[AttachmentSend] | None",
-            "default": "None"
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "int | None",
-            "default": "None"
-          },
-          {
-            "name": "thread_name",
-            "kind": "keyword_only",
-            "annotation": "str | None",
-            "default": "None"
-          },
-          {
-            "name": "applied_tags",
-            "kind": "keyword_only",
-            "annotation": "list[SnowflakeType] | None",
-            "default": "None"
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "PollRequest | None",
-            "default": "None"
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[ExecuteWebhookParams]",
+            "default": null
           }
         ],
         "return_annotation": "None",
@@ -9623,52 +7807,10 @@
             "default": "None"
           },
           {
-            "name": "content",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[str]",
-            "default": "..."
-          },
-          {
-            "name": "embeds",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Embed]]",
-            "default": "..."
-          },
-          {
-            "name": "flags",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[MessageFlag]",
-            "default": "..."
-          },
-          {
-            "name": "allowed_mentions",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[AllowedMention]",
-            "default": "..."
-          },
-          {
-            "name": "components",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[Component]]",
-            "default": "..."
-          },
-          {
-            "name": "files",
-            "kind": "keyword_only",
-            "annotation": "Missing[list[File]]",
-            "default": "..."
-          },
-          {
-            "name": "attachments",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[list[AttachmentSend]]",
-            "default": "..."
-          },
-          {
-            "name": "poll",
-            "kind": "keyword_only",
-            "annotation": "MissingOrNullable[PollRequest]",
-            "default": "..."
+            "name": "fields",
+            "kind": "var_keyword",
+            "annotation": "Unpack[WebhookMessageEditParams]",
+            "default": null
           }
         ],
         "return_annotation": "MessageGet",
@@ -9966,8 +8108,8 @@
   },
   "counts": {
     "top_level_exports": 133,
-    "api_exports": 348,
-    "model_exports": 267,
+    "api_exports": 373,
+    "model_exports": 292,
     "api_client_async_methods": 230
   }
 }

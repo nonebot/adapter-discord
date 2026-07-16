@@ -1,29 +1,33 @@
 from typing import TYPE_CHECKING, Annotated, overload
+from typing_extensions import Unpack
 from urllib.parse import quote
 
 from yarl import URL
 
 from .read import (
-    AllowedMention,
     AnswerVoters,
-    Embed,
-    File,
     MessageGet,
-    MessageReference,
 )
-from .types import MessageFlag, MessageReferenceType, ReactionType
-from .write import AttachmentSend, MessageEditParams, MessageSend, PollRequest
-from ..component.read import Component, DirectComponent
+from .types import MessageReferenceType, ReactionType
+from .write import (
+    BulkDeleteMessagesParams,
+    MessageEditParams,
+    MessageSend,
+)
 from ..user.read import User
-from ...api.utils import parse_data
-from ...api.validation import AtMostOne, Range, validate
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...api.validation import (
+    AtMostOne,
+    Range,
+    validate,
+    validate_outbound_value,
+)
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
     EmptyResponse,
+    JsonBody,
     JsonResponse,
-    JsonValueBody,
     PreparedBody,
     RestCall,
 )
@@ -159,71 +163,46 @@ class MessageEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_create_message(  # noqa: PLR0913
+    async def _api_create_message(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        content: str | None = None,
-        nonce: int | str | None = None,
-        enforce_nonce: bool | None = None,
-        tts: bool | None = None,
-        embeds: list[Embed] | None = None,
-        allowed_mentions: AllowedMention | None = None,
-        message_reference: MessageReference | None = None,
-        components: list[DirectComponent] | None = None,
-        sticker_ids: list[SnowflakeType] | None = None,
-        files: list[File] | None = None,
-        attachments: list[AttachmentSend] | None = None,
-        flags: MessageFlag | None = None,
-        poll: PollRequest | None = None,
+        **fields: Unpack[MessageSend],
     ) -> MessageGet:
         """Create a message.
 
         see https://discord.com/developers/docs/resources/message#create-message
         """
+        fields = validate_outbound_value(MessageSend, fields)
         has_payload = any(
-            [
-                bool(content),
-                bool(embeds),
-                bool(sticker_ids),
-                bool(components),
-                bool(files),
-                poll is not None,
-            ]
+            bool(fields.get(key))
+            for key in (
+                "content",
+                "embeds",
+                "sticker_ids",
+                "components",
+                "files",
+                "poll",
+            )
         )
+        message_reference = fields.get("message_reference")
         if not has_payload and (
             message_reference is None
             or message_reference.type != MessageReferenceType.FORWARD
         ):
             msg = "content/embeds/sticker_ids/components/files/poll is required"
             raise ValueError(msg)
-        data = {
-            "content": content,
-            "nonce": nonce,
-            "enforce_nonce": enforce_nonce,
-            "tts": tts,
-            "embeds": embeds,
-            "allowed_mentions": allowed_mentions,
-            "message_reference": message_reference,
-            "components": components,
-            "sticker_ids": sticker_ids,
-            "files": files,
-            "attachments": attachments,
-            "flags": flags,
-            "poll": poll,
-        }
-        params = parse_data(
-            {key: value for (key, value) in data.items() if value is not None},
-            MessageSend,
-        )
+        params_files = fields.pop("files", None)
+        payload = {key: value for key, value in fields.items() if value is not None}
+        params = PreparedBody(payload, files=params_files or None)
 
         call = RestCall(
             method="POST",
             url=self.base_url / f"channels/{channel_id}/messages",
             response=JsonResponse(MessageGet),
             auth=BotAuth(bot.bot_info),
-            body=PreparedBody(params),
+            body=params,
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -427,45 +406,28 @@ class MessageEndpointMixin:
         )
         await REST_EXCHANGE.execute(self, call)
 
-    async def _api_edit_message(  # noqa: PLR0913
+    async def _api_edit_message(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
         message_id: SnowflakeType,
-        content: MissingOrNullable[str] = UNSET,
-        embeds: MissingOrNullable[list[Embed]] = UNSET,
-        flags: MissingOrNullable[MessageFlag] = UNSET,
-        allowed_mentions: MissingOrNullable[AllowedMention] = UNSET,
-        components: MissingOrNullable[list[Component]] = UNSET,
-        files: Missing[list[File]] = UNSET,
-        attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
-        sticker_ids: Missing[list[SnowflakeType]] = UNSET,
-        poll: MissingOrNullable[PollRequest] = UNSET,
+        **fields: Unpack[MessageEditParams],
     ) -> MessageGet:
         """Edit a message.
 
         see https://discord.com/developers/docs/resources/message#edit-message
         """
-        data = {
-            "content": content,
-            "embeds": embeds,
-            "flags": flags,
-            "allowed_mentions": allowed_mentions,
-            "components": components,
-            "files": files,
-            "attachments": attachments,
-            "sticker_ids": sticker_ids,
-            "poll": poll,
-        }
-        params = parse_data(data, MessageEditParams)
+        fields = validate_outbound_value(MessageEditParams, fields)
+        params_files = fields.pop("files", None)
+        params = PreparedBody(fields, files=params_files or None)
 
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"channels/{channel_id}/messages/{message_id}",
             response=JsonResponse(MessageGet),
             auth=BotAuth(bot.bot_info),
-            body=PreparedBody(params),
+            body=params,
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -491,34 +453,30 @@ class MessageEndpointMixin:
         )
         await REST_EXCHANGE.execute(self, call)
 
-    @validate
     async def _api_bulk_delete_message(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         channel_id: SnowflakeType,
-        messages: Annotated[
-            list[SnowflakeType],
-            Range(
-                message="messages must contain 2-100 items",
-                min_length=2,
-                max_length=100,
-            ),
-        ],
         reason: str | None = None,
+        **fields: Unpack[BulkDeleteMessagesParams],
     ) -> None:
         """Bulk delete messages.
 
         see https://discord.com/developers/docs/resources/message#bulk-delete-messages
         """
+        fields = validate_outbound_value(BulkDeleteMessagesParams, fields)
+        messages = fields["messages"]
+        if not 2 <= len(messages) <= 100:  # noqa: PLR2004
+            msg = "messages must contain 2-100 items"
+            raise ValueError(msg)
 
-        data = {"messages": messages}
         call = RestCall(
             method="POST",
             url=self.base_url / f"channels/{channel_id}/messages/bulk-delete",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         await REST_EXCHANGE.execute(self, call)

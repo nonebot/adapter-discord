@@ -1,6 +1,9 @@
 """Canonical interaction.write models."""
 
 from typing import TYPE_CHECKING
+from typing_extensions import Required
+
+from .._model_support import OutboundTypedDict
 
 if TYPE_CHECKING:
     from ..models import (
@@ -13,10 +16,10 @@ if TYPE_CHECKING:
         PollRequest,
     )
 
-from .._model_support import BaseModel, MessageFlag
+from .._model_support import MessageFlag
 
 
-class InteractionCallbackMessage(BaseModel):
+class InteractionCallbackMessage(OutboundTypedDict, total=False):
     """Interaction callback message.
 
     Not all message fields are currently supported.
@@ -24,39 +27,39 @@ class InteractionCallbackMessage(BaseModel):
     see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages
     """
 
-    tts: bool | None = None
+    tts: bool
     """is the response TTS"""
-    content: str | None = None
+    content: str
     """message content"""
-    embeds: list["Embed"] | None = None
+    embeds: "list[Embed]"
     """supports up to 10 embeds"""
-    allowed_mentions: "AllowedMention | None" = None
+    allowed_mentions: "AllowedMention"
     """allowed mentions object"""
-    flags: MessageFlag | None = None
+    flags: MessageFlag
     """message flags combined as a bitfield
     (only SUPPRESS_EMBEDS and EPHEMERAL can be set)"""
-    components: list["Component"] | None = None
+    components: "list[Component]"
     """message components"""
-    attachments: list["AttachmentSend"] | None = None
+    attachments: "list[AttachmentSend]"
     """attachment objects with filename and description.
     See Uploading Files for details."""
-    poll: "PollRequest | None" = None
+    poll: "PollRequest"
     """Details about the poll"""
 
-    files: list["File"] | None = None
+    files: "list[File]"
 
 
-class InteractionCallbackAutocomplete(BaseModel):
+class InteractionCallbackAutocomplete(OutboundTypedDict, total=False):
     """Interaction callback Autocomplete.
 
     see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete
     """
 
-    choices: list["ApplicationCommandOptionChoice"]
+    choices: Required["list[ApplicationCommandOptionChoice]"]
     """autocomplete choices (max of 25 choices)"""
 
 
-class InteractionCallbackModal(BaseModel):
+class InteractionCallbackModal(OutboundTypedDict, total=False):
     """Interaction callback modal.
 
     Support for components in modals is currently limited to type 4 (Text Input).
@@ -64,11 +67,11 @@ class InteractionCallbackModal(BaseModel):
     see https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal
     """
 
-    custom_id: str
+    custom_id: Required[str]
     """a developer-defined identifier for the modal, max 100 characters"""
-    title: str
+    title: Required[str]
     """the title of the popup modal, max 45 characters"""
-    components: list["Component"]
+    components: Required["list[Component]"]
     """between 1 and 5 (inclusive) components that make up the modal"""
 
 

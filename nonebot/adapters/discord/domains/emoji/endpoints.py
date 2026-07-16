@@ -1,17 +1,21 @@
 from typing import TYPE_CHECKING
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import ApplicationEmojis, Emoji
-from .write import ModifyGuildEmojiParams
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from .write import (
+    CreateApplicationEmojiParams,
+    CreateGuildEmojiParams,
+    ModifyApplicationEmojiParams,
+    ModifyGuildEmojiParams,
+)
+from ...api.validation import validate_outbound_value
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
     EmptyResponse,
     JsonBody,
     JsonResponse,
-    JsonValueBody,
     RestCall,
 )
 
@@ -57,68 +61,55 @@ class EmojiEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_create_guild_emoji(  # noqa: PLR0913
+    async def _api_create_guild_emoji(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: str,
-        image: str,
-        roles: list[SnowflakeType] | None = None,
         reason: str | None = None,
+        **fields: Unpack[CreateGuildEmojiParams],
     ) -> Emoji:
         """Create guild emoji.
 
         see https://discord.com/developers/docs/resources/emoji#create-guild-emoji
         """
-
-        if not name:
+        fields = validate_outbound_value(CreateGuildEmojiParams, fields)
+        if not fields["name"]:
             msg = "name is required"
             raise ValueError(msg)
-        if not image:
+        if not fields["image"]:
             msg = "image is required"
             raise ValueError(msg)
-        data = {
-            "name": name,
-            "image": image,
-            "roles": roles,
-        }
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/emojis",
             response=JsonResponse(Emoji),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_modify_guild_emoji(  # noqa: PLR0913
+    async def _api_modify_guild_emoji(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         emoji_id: SnowflakeType,
-        name: Missing[str] = UNSET,
-        roles: MissingOrNullable[list[SnowflakeType]] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyGuildEmojiParams],
     ) -> Emoji:
         """Modify guild emoji.
 
         see https://discord.com/developers/docs/resources/emoji#modify-guild-emoji
         """
-
-        data = type_validate_python(
-            ModifyGuildEmojiParams, {"name": name, "roles": roles}
-        )
+        fields = validate_outbound_value(ModifyGuildEmojiParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/emojis/{emoji_id}",
             response=JsonResponse(Emoji),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -186,27 +177,25 @@ class EmojiEndpointMixin:
         bot: "Bot",
         *,
         application_id: SnowflakeType,
-        name: str,
-        image: str,
+        **fields: Unpack[CreateApplicationEmojiParams],
     ) -> Emoji:
         """Create application emoji.
 
         see https://discord.com/developers/docs/resources/emoji#create-application-emoji
         """
-
-        if not name:
+        fields = validate_outbound_value(CreateApplicationEmojiParams, fields)
+        if not fields["name"]:
             msg = "name is required"
             raise ValueError(msg)
-        if not image:
+        if not fields["image"]:
             msg = "image is required"
             raise ValueError(msg)
-        data = {"name": name, "image": image}
         call = RestCall(
             method="POST",
             url=self.base_url / f"applications/{application_id}/emojis",
             response=JsonResponse(Emoji),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(data),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -216,19 +205,19 @@ class EmojiEndpointMixin:
         *,
         application_id: SnowflakeType,
         emoji_id: SnowflakeType,
-        name: str,
+        **fields: Unpack[ModifyApplicationEmojiParams],
     ) -> Emoji:
         """Modify application emoji.
 
         see https://discord.com/developers/docs/resources/emoji#modify-application-emoji
         """
-
+        fields = validate_outbound_value(ModifyApplicationEmojiParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"applications/{application_id}/emojis/{emoji_id}",
             response=JsonResponse(Emoji),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody({"name": name}),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 

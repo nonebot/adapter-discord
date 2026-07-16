@@ -1,8 +1,5 @@
-from datetime import datetime
 from typing import TYPE_CHECKING, Annotated, Any, Literal, overload
-from typing_extensions import deprecated
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack, deprecated
 
 from .read import (
     Ban,
@@ -12,7 +9,6 @@ from .read import (
     GuildOnboarding,
     GuildPreview,
     GuildScheduledEvent,
-    GuildScheduledEventEntityMetadata,
     GuildScheduledEventUser,
     GuildTemplate,
     GuildVanityURL,
@@ -20,34 +16,27 @@ from .read import (
     GuildWidgetSettings,
     Integration,
     ListActiveGuildThreadsResponse,
-    OnboardingPrompt,
-    RecurrenceRule,
     Role,
-    RoleColors,
     WelcomeScreen,
-    WelcomeScreenChannel,
 )
 from .types import (
-    DefaultMessageNotificationLevel,
-    ExplicitContentFilterLevel,
-    GuildFeature,
-    GuildMemberFlags,
     GuildScheduledEventEntityType,
-    GuildScheduledEventPrivacyLevel,
-    GuildScheduledEventStatus,
-    OnboardingMode,
-    SystemChannelFlags,
-    VerificationLevel,
 )
 from .write import (
+    AddGuildMemberParams,
+    BeginGuildPruneParams,
+    BulkGuildBanParams,
+    CreateGuildBanParams,
     CreateGuildChannelParams,
     CreateGuildParams,
     CreateGuildRoleParams,
     CreateGuildScheduledEventParams,
     CreateGuildTemplateParams,
     ModifyCurrentMemberParams,
+    ModifyCurrentUserNickParams,
     ModifyGuildIncidentActionsParams,
     ModifyGuildMemberParams,
+    ModifyGuildMFAParams,
     ModifyGuildOnboardingParams,
     ModifyGuildParams,
     ModifyGuildRoleParams,
@@ -57,14 +46,20 @@ from .write import (
     ModifyGuildWelcomeScreenParams,
     ModifyGuildWidgetParams,
 )
-from ..channel.read import Channel, DefaultReaction, ForumTagRequest, Overwrite
-from ..channel.types import ChannelType, SortOrderTypes, VideoQualityMode
-from ..channel.write import ModifyGuildChannelPositionParams
+from ..channel.read import Channel
+from ..channel.write import (
+    ModifyGuildChannelPositionParams,
+)
 from ..invite.read import Invite
 from ..moderation.read import BulkBan
 from ..voice.read import VoiceRegion
-from ...api.validation import AtMostOne, Range, validate
-from ...protocol import UNSET, Missing, MissingOrNullable, Snowflake, SnowflakeType
+from ...api.validation import (
+    AtMostOne,
+    Range,
+    validate,
+    validate_outbound_value,
+)
+from ...protocol import UNSET, Snowflake, SnowflakeType, UnsetType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BotAuth,
@@ -72,11 +67,9 @@ from ...transport.exchange import (
     EmptyResponse,
     JsonBody,
     JsonResponse,
-    JsonValueBody,
     RestCall,
     _bool_query,
 )
-from ...utils import omit_unset
 
 if TYPE_CHECKING:
     from ...api.handle import AdapterProtocol
@@ -89,49 +82,23 @@ class GuildEndpointMixin:
         "the endpoint from official bot-facing docs in 2025 "
         "(discord-api-docs #7715/#7720/#7722)."
     )
-    async def _api_create_guild(  # noqa: PLR0913
+    async def _api_create_guild(
         self: "AdapterProtocol",
         bot: "Bot",
-        *,
-        name: str,
-        region: str | None = None,
-        icon: str | None = None,
-        verification_level: VerificationLevel | None = None,
-        default_message_notifications: DefaultMessageNotificationLevel | None = None,
-        explicit_content_filter: ExplicitContentFilterLevel | None = None,
-        roles: list[Role] | None = None,
-        channels: list[Channel] | None = None,
-        afk_channel_id: Snowflake | None = None,
-        afk_timeout: int | None = None,
-        system_channel_id: Snowflake | None = None,
-        system_channel_flags: SystemChannelFlags | None = None,
+        **fields: Unpack[CreateGuildParams],
     ) -> Guild:
         """https://discord.com/developers/docs/resources/guild"""
-        if not name:
+        fields = validate_outbound_value(CreateGuildParams, fields)
+        if not fields["name"]:
             msg = "name is required"
             raise ValueError(msg)
-        data = {
-            "name": name,
-            "region": region,
-            "icon": icon,
-            "verification_level": verification_level,
-            "default_message_notifications": default_message_notifications,
-            "explicit_content_filter": explicit_content_filter,
-            "roles": roles,
-            "channels": channels,
-            "afk_channel_id": afk_channel_id,
-            "afk_timeout": afk_timeout,
-            "system_channel_id": system_channel_id,
-            "system_channel_flags": system_channel_flags,
-        }
-        data = type_validate_python(CreateGuildParams, data)
 
         call = RestCall(
             method="POST",
             url=self.base_url / "guilds",
             response=JsonResponse(Guild),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -192,69 +159,25 @@ class GuildEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_modify_guild(  # noqa: PLR0913
+    async def _api_modify_guild(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: Missing[str] = UNSET,
-        region: MissingOrNullable[str] = UNSET,
-        verification_level: MissingOrNullable[VerificationLevel] = UNSET,
-        default_message_notifications: MissingOrNullable[
-            DefaultMessageNotificationLevel
-        ] = UNSET,
-        explicit_content_filter: MissingOrNullable[ExplicitContentFilterLevel] = UNSET,
-        afk_channel_id: MissingOrNullable[Snowflake] = UNSET,
-        afk_timeout: Missing[int] = UNSET,
-        icon: MissingOrNullable[str] = UNSET,
-        splash: MissingOrNullable[str] = UNSET,
-        discovery_splash: MissingOrNullable[str] = UNSET,
-        banner: MissingOrNullable[str] = UNSET,
-        system_channel_id: MissingOrNullable[Snowflake] = UNSET,
-        system_channel_flags: Missing[SystemChannelFlags] = UNSET,
-        rules_channel_id: MissingOrNullable[Snowflake] = UNSET,
-        public_updates_channel_id: MissingOrNullable[Snowflake] = UNSET,
-        preferred_locale: MissingOrNullable[str] = UNSET,
-        features: Missing[list[GuildFeature]] = UNSET,
-        description: MissingOrNullable[str] = UNSET,
-        premium_progress_bar_enabled: Missing[bool] = UNSET,
-        safety_alerts_channel_id: MissingOrNullable[Snowflake] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyGuildParams],
     ) -> Guild:
         """Modify guild.
 
         see https://discord.com/developers/docs/resources/guild#modify-guild
         """
-
-        data = {
-            "name": name,
-            "region": region,
-            "verification_level": verification_level,
-            "default_message_notifications": default_message_notifications,
-            "explicit_content_filter": explicit_content_filter,
-            "afk_channel_id": afk_channel_id,
-            "afk_timeout": afk_timeout,
-            "icon": icon,
-            "splash": splash,
-            "discovery_splash": discovery_splash,
-            "banner": banner,
-            "system_channel_id": system_channel_id,
-            "system_channel_flags": system_channel_flags,
-            "rules_channel_id": rules_channel_id,
-            "public_updates_channel_id": public_updates_channel_id,
-            "preferred_locale": preferred_locale,
-            "features": features,
-            "description": description,
-            "premium_progress_bar_enabled": premium_progress_bar_enabled,
-            "safety_alerts_channel_id": safety_alerts_channel_id,
-        }
-        data = type_validate_python(ModifyGuildParams, data)
+        fields = validate_outbound_value(ModifyGuildParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}",
             response=JsonResponse(Guild),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -264,27 +187,19 @@ class GuildEndpointMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        invites_disabled_until: MissingOrNullable[datetime] = UNSET,
-        dms_disabled_until: MissingOrNullable[datetime] = UNSET,
+        **fields: Unpack[ModifyGuildIncidentActionsParams],
     ) -> GuildIncidentsData:
         """Modify guild incident actions.
 
         see https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
         """
-
-        data = type_validate_python(
-            ModifyGuildIncidentActionsParams,
-            {
-                "invites_disabled_until": invites_disabled_until,
-                "dms_disabled_until": dms_disabled_until,
-            },
-        )
+        fields = validate_outbound_value(ModifyGuildIncidentActionsParams, fields)
         call = RestCall(
             method="PUT",
             url=self.base_url / f"guilds/{guild_id}/incident-actions",
             response=JsonResponse(GuildIncidentsData),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -322,62 +237,49 @@ class GuildEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_create_guild_channel(  # noqa: PLR0913
+    async def _api_create_guild_channel(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: str,
-        type: ChannelType | None = None,  # noqa: A002
-        topic: str | None = None,
-        bitrate: int | None = None,
-        user_limit: int | None = None,
-        rate_limit_per_user: int | None = None,
-        position: int | None = None,
-        permission_overwrites: list[Overwrite] | None = None,
-        parent_id: Snowflake | None = None,
-        nsfw: bool | None = None,
-        rtc_region: str | None = None,
-        video_quality_mode: VideoQualityMode | None = None,
-        default_auto_archive_duration: int | None = None,
-        default_reaction_emoji: DefaultReaction | None = None,
-        available_tags: list[ForumTagRequest] | None = None,
-        default_sort_order: SortOrderTypes | None = None,
         reason: str | None = None,
+        **fields: Unpack[CreateGuildChannelParams],
     ) -> Channel:
         """Create guild channel.
 
         see https://discord.com/developers/docs/resources/guild#create-guild-channel
         """
-
-        if not name:
+        fields = validate_outbound_value(CreateGuildChannelParams, fields)
+        if not fields["name"]:
             msg = "name is required"
             raise ValueError(msg)
-        data = {
-            "name": name,
-            "type": type,
-            "topic": topic,
-            "bitrate": bitrate,
-            "user_limit": user_limit,
-            "rate_limit_per_user": rate_limit_per_user,
-            "position": position,
-            "permission_overwrites": permission_overwrites,
-            "parent_id": parent_id,
-            "nsfw": nsfw,
-            "rtc_region": rtc_region,
-            "video_quality_mode": video_quality_mode,
-            "default_auto_archive_duration": default_auto_archive_duration,
-            "default_reaction_emoji": default_reaction_emoji,
-            "available_tags": available_tags,
-            "default_sort_order": default_sort_order,
-        }
-        data = type_validate_python(CreateGuildChannelParams, data)
+        payload: dict[str, object] = dict(fields)
+        for key in (
+            "type",
+            "topic",
+            "bitrate",
+            "user_limit",
+            "rate_limit_per_user",
+            "position",
+            "permission_overwrites",
+            "parent_id",
+            "nsfw",
+            "rtc_region",
+            "video_quality_mode",
+            "default_auto_archive_duration",
+            "default_reaction_emoji",
+            "available_tags",
+            "default_sort_order",
+            "default_forum_layout",
+            "default_thread_rate_limit_per_user",
+        ):
+            payload.setdefault(key, None)
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/channels",
             response=JsonResponse(Channel),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(payload),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -389,9 +291,9 @@ class GuildEndpointMixin:
         guild_id: SnowflakeType,
         channels: list[ModifyGuildChannelPositionParams] | None = None,
         id: SnowflakeType | None = None,  # noqa: A002
-        position: MissingOrNullable[int] = UNSET,
-        lock_permissions: MissingOrNullable[bool] = UNSET,
-        parent_id: MissingOrNullable[SnowflakeType] = UNSET,
+        position: int | None | UnsetType = UNSET,
+        lock_permissions: bool | UnsetType = UNSET,
+        parent_id: SnowflakeType | None | UnsetType = UNSET,
     ) -> None:
         """Modify guild channel positions.
 
@@ -402,18 +304,18 @@ class GuildEndpointMixin:
             if id is None:
                 msg = "channels or id must be provided"
                 raise ValueError(msg)
-            channel = type_validate_python(
-                ModifyGuildChannelPositionParams,
-                {
-                    "id": id,
-                    "position": position,
-                    "lock_permissions": lock_permissions,
-                    "parent_id": parent_id,
-                },
-            )
+            channel = ModifyGuildChannelPositionParams(id=Snowflake(id))
+            if position is not UNSET:
+                channel["position"] = position
+            if lock_permissions is not UNSET:
+                channel["lock_permissions"] = lock_permissions
+            if parent_id is not UNSET:
+                channel["parent_id"] = (
+                    None if parent_id is None else Snowflake(parent_id)
+                )
             channels = [channel]
         payload = [
-            type_validate_python(ModifyGuildChannelPositionParams, channel)
+            validate_outbound_value(ModifyGuildChannelPositionParams, channel)
             for channel in channels
         ]
         call = RestCall(
@@ -421,7 +323,7 @@ class GuildEndpointMixin:
             url=self.base_url / f"guilds/{guild_id}/channels",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(payload),
+            body=JsonBody(payload),
         )
         await REST_EXCHANGE.execute(self, call)
 
@@ -515,112 +417,74 @@ class GuildEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_add_guild_member(  # noqa: PLR0913
+    async def _api_add_guild_member(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        access_token: str,
-        nick: str | None = None,
-        roles: list[SnowflakeType] | None = None,
-        mute: bool | None = None,
-        deaf: bool | None = None,
+        **fields: Unpack[AddGuildMemberParams],
     ) -> GuildMember | None:
         """Add guild member.
 
         see https://discord.com/developers/docs/resources/guild#add-guild-member
         """
-
-        data = {
-            "access_token": access_token,
-            "nick": nick,
-            "roles": roles,
-            "mute": mute,
-            "deaf": deaf,
-        }
+        fields = validate_outbound_value(AddGuildMemberParams, fields)
         call = RestCall(
             method="PUT",
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}",
             response=JsonResponse(GuildMember, allow_empty=True),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
         )
         resp = await REST_EXCHANGE.execute(self, call)
         if resp:
             return resp
         return None
 
-    async def _api_modify_guild_member(  # noqa: PLR0913
+    async def _api_modify_guild_member(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        nick: MissingOrNullable[str] = UNSET,
-        roles: MissingOrNullable[list[SnowflakeType]] = UNSET,
-        mute: MissingOrNullable[bool] = UNSET,
-        deaf: MissingOrNullable[bool] = UNSET,
-        channel_id: MissingOrNullable[SnowflakeType] = UNSET,
-        communication_disabled_until: MissingOrNullable[datetime] = UNSET,
-        flags: MissingOrNullable[GuildMemberFlags] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyGuildMemberParams],
     ) -> GuildMember:
         """Modify guild member.
 
         see https://discord.com/developers/docs/resources/guild#modify-guild-member
         """
-
-        data = type_validate_python(
-            ModifyGuildMemberParams,
-            {
-                "nick": nick,
-                "roles": roles,
-                "mute": mute,
-                "deaf": deaf,
-                "channel_id": channel_id,
-                "communication_disabled_until": communication_disabled_until,
-                "flags": flags,
-            },
-        )
+        fields = validate_outbound_value(ModifyGuildMemberParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/members/{user_id}",
             response=JsonResponse(GuildMember),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_modify_current_member(  # noqa: PLR0913
+    async def _api_modify_current_member(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        nick: MissingOrNullable[str] = UNSET,
-        banner: MissingOrNullable[str] = UNSET,
-        avatar: MissingOrNullable[str] = UNSET,
-        bio: MissingOrNullable[str] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyCurrentMemberParams],
     ) -> GuildMember:
         """Modify current member.
 
         see https://discord.com/developers/docs/resources/guild#modify-current-member
         """
-
-        data = type_validate_python(
-            ModifyCurrentMemberParams,
-            {"nick": nick, "banner": banner, "avatar": avatar, "bio": bio},
-        )
+        fields = validate_outbound_value(ModifyCurrentMemberParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/members/@me",
             response=JsonResponse(GuildMember),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -630,21 +494,20 @@ class GuildEndpointMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        nick: MissingOrNullable[str] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyCurrentUserNickParams],
     ) -> GuildMember:
         """Deprecated in favor of Modify Current Member.
 
         see https://discord.com/developers/docs/resources/guild#modify-current-user-nick
         """
-
-        data = omit_unset({"nick": nick})
+        fields = validate_outbound_value(ModifyCurrentUserNickParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/members/@me/nick",
             response=JsonResponse(GuildMember),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -808,10 +671,9 @@ class GuildEndpointMixin:
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
         delete_message_days: Annotated[
-            int | None,
+            int,
             Range(message="delete_message_days must be between 0 and 7", ge=0, le=7),
-        ] = None,
-        delete_message_seconds: None = None,
+        ] = ...,
         reason: str | None = None,
     ) -> None: ...
 
@@ -822,63 +684,52 @@ class GuildEndpointMixin:
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        delete_message_days: None = None,
         delete_message_seconds: Annotated[
-            int | None,
+            int,
             Range(
                 message="delete_message_seconds must be between 0 and 604800",
                 ge=0,
                 le=604800,
             ),
-        ] = None,
+        ] = ...,
         reason: str | None = None,
     ) -> None: ...
 
-    @validate(
-        cross_rules=(
-            AtMostOne(
-                fields=("delete_message_days", "delete_message_seconds"),
-                message="delete_message_days and delete_message_seconds cannot both be set",
-            ),
-        )
-    )
-    async def _api_create_guild_ban(  # noqa: PLR0913
+    async def _api_create_guild_ban(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         user_id: SnowflakeType,
-        delete_message_days: Annotated[
-            int | None,
-            Range(message="delete_message_days must be between 0 and 7", ge=0, le=7),
-        ] = None,
-        delete_message_seconds: Annotated[
-            int | None,
-            Range(
-                message="delete_message_seconds must be between 0 and 604800",
-                ge=0,
-                le=604800,
-            ),
-        ] = None,
         reason: str | None = None,
+        **fields: Unpack[CreateGuildBanParams],
     ) -> None:
         """Create guild ban.
 
         see https://discord.com/developers/docs/resources/guild#create-guild-ban
         """
+        fields = validate_outbound_value(CreateGuildBanParams, fields)
+        delete_message_days = fields.get("delete_message_days")
+        delete_message_seconds = fields.get("delete_message_seconds")
+        if "delete_message_days" in fields and "delete_message_seconds" in fields:
+            msg = "delete_message_days and delete_message_seconds cannot both be set"
+            raise ValueError(msg)
+        if delete_message_days is not None and not 0 <= delete_message_days <= 7:  # noqa: PLR2004
+            msg = "delete_message_days must be between 0 and 7"
+            raise ValueError(msg)
+        if (
+            delete_message_seconds is not None
+            and not 0 <= delete_message_seconds <= 604800  # noqa: PLR2004
+        ):
+            msg = "delete_message_seconds must be between 0 and 604800"
+            raise ValueError(msg)
 
-        data = {
-            "delete_message_days": delete_message_days,
-            "delete_message_seconds": delete_message_seconds,
-        }
         call = RestCall(
             method="PUT",
             url=self.base_url / f"guilds/{guild_id}/bans/{user_id}",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         await REST_EXCHANGE.execute(self, call)
@@ -910,27 +761,20 @@ class GuildEndpointMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        user_ids: list[SnowflakeType],
-        delete_message_seconds: int | None = None,
         reason: str | None = None,
+        **fields: Unpack[BulkGuildBanParams],
     ) -> BulkBan:
         """Bulk guild ban.
 
         see https://discord.com/developers/docs/resources/guild#bulk-guild-ban
         """
-
-        data = {
-            "user_ids": user_ids,
-            "delete_message_seconds": delete_message_seconds,
-        }
+        fields = validate_outbound_value(BulkGuildBanParams, fields)
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/bulk-ban",
             response=JsonResponse(BulkBan),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -971,45 +815,25 @@ class GuildEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_create_guild_role(  # noqa: PLR0913
+    async def _api_create_guild_role(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: Missing[str] = UNSET,
-        permissions: Missing[str] = UNSET,
-        color: Missing[int] = UNSET,
-        colors: Missing[RoleColors] = UNSET,
-        hoist: Missing[bool] = UNSET,
-        icon: MissingOrNullable[str] = UNSET,
-        unicode_emoji: MissingOrNullable[str] = UNSET,
-        mentionable: Missing[bool] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[CreateGuildRoleParams],
     ) -> Role:
         """Create guild role.
 
         see https://discord.com/developers/docs/resources/guild#create-guild-role
         """
-
-        data = type_validate_python(
-            CreateGuildRoleParams,
-            {
-                "name": name,
-                "permissions": permissions,
-                "color": color,
-                "colors": colors,
-                "hoist": hoist,
-                "icon": icon,
-                "unicode_emoji": unicode_emoji,
-                "mentionable": mentionable,
-            },
-        )
+        fields = validate_outbound_value(CreateGuildRoleParams, fields)
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/roles",
             response=JsonResponse(Role),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1021,7 +845,7 @@ class GuildEndpointMixin:
         guild_id: SnowflakeType,
         roles: list[ModifyGuildRolePositionParams] | None = None,
         id: SnowflakeType | None = None,  # noqa: A002
-        position: MissingOrNullable[int] = UNSET,
+        position: int | None | UnsetType = UNSET,
         reason: str | None = None,
     ) -> list[Role]:
         """Modify guild role positions.
@@ -1033,63 +857,44 @@ class GuildEndpointMixin:
             if id is None:
                 msg = "roles or id must be provided"
                 raise ValueError(msg)
-            role = type_validate_python(
-                ModifyGuildRolePositionParams, {"id": id, "position": position}
-            )
+            role = ModifyGuildRolePositionParams(id=Snowflake(id))
+            if position is not UNSET:
+                role["position"] = position
             roles = [role]
         payload = [
-            type_validate_python(ModifyGuildRolePositionParams, role) for role in roles
+            validate_outbound_value(ModifyGuildRolePositionParams, role)
+            for role in roles
         ]
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/roles",
             response=JsonResponse(list[Role]),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(payload),
+            body=JsonBody(payload),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_modify_guild_role(  # noqa: PLR0913
+    async def _api_modify_guild_role(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         role_id: SnowflakeType,
-        name: MissingOrNullable[str] = UNSET,
-        permissions: MissingOrNullable[str] = UNSET,
-        color: MissingOrNullable[int] = UNSET,
-        colors: Missing[RoleColors] = UNSET,
-        hoist: MissingOrNullable[bool] = UNSET,
-        icon: MissingOrNullable[str] = UNSET,
-        unicode_emoji: MissingOrNullable[str] = UNSET,
-        mentionable: MissingOrNullable[bool] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyGuildRoleParams],
     ) -> Role:
         """Modify guild role.
 
         see https://discord.com/developers/docs/resources/guild#modify-guild-role
         """
-
-        data = type_validate_python(
-            ModifyGuildRoleParams,
-            {
-                "name": name,
-                "permissions": permissions,
-                "color": color,
-                "colors": colors,
-                "hoist": hoist,
-                "icon": icon,
-                "unicode_emoji": unicode_emoji,
-                "mentionable": mentionable,
-            },
-        )
+        fields = validate_outbound_value(ModifyGuildRoleParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/roles/{role_id}",
             response=JsonResponse(Role),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1104,18 +909,17 @@ class GuildEndpointMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        level: int,
         reason: str | None = None,
+        **fields: Unpack[ModifyGuildMFAParams],
     ) -> None:
         """https://discord.com/developers/docs/resources/guild"""
-
-        data = {"level": level}
+        fields = validate_outbound_value(ModifyGuildMFAParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/mfa",
             response=EmptyResponse(),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(data),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         await REST_EXCHANGE.execute(self, call)
@@ -1170,34 +974,25 @@ class GuildEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_begin_guild_prune(  # noqa: PLR0913
+    async def _api_begin_guild_prune(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        days: int | None = None,
-        compute_prune_count: bool | None = None,
-        include_roles: list[SnowflakeType] | None = None,
         reason: str | None = None,
+        **fields: Unpack[BeginGuildPruneParams],
     ) -> dict[Literal["pruned"], int]:
         """Begin guild prune.
 
         see https://discord.com/developers/docs/resources/guild#begin-guild-prune
         """
-
-        data = {
-            "days": days,
-            "compute_prune_count": compute_prune_count,
-            "include_roles": include_roles,
-        }
+        fields = validate_outbound_value(BeginGuildPruneParams, fields)
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/prune",
             response=JsonResponse(Any),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(
-                {key: value for (key, value) in data.items() if value is not None}
-            ),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1293,24 +1088,20 @@ class GuildEndpointMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        enabled: Missing[bool] = UNSET,
-        channel_id: MissingOrNullable[SnowflakeType] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyGuildWidgetParams],
     ) -> GuildWidgetSettings:
         """Modify guild widget.
 
         see https://discord.com/developers/docs/resources/guild#modify-guild-widget
         """
-
-        data = type_validate_python(
-            ModifyGuildWidgetParams, {"enabled": enabled, "channel_id": channel_id}
-        )
+        fields = validate_outbound_value(ModifyGuildWidgetParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/widget",
             response=JsonResponse(GuildWidgetSettings),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1386,33 +1177,25 @@ class GuildEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_modify_guild_welcome_screen(  # noqa: PLR0913
+    async def _api_modify_guild_welcome_screen(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        enabled: MissingOrNullable[bool] = UNSET,
-        welcome_channels: MissingOrNullable[list[WelcomeScreenChannel]] = UNSET,
-        description: MissingOrNullable[str] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyGuildWelcomeScreenParams],
     ) -> WelcomeScreen:
         """Modify guild welcome screen.
 
         see https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
         """
-
-        data = {
-            "enabled": enabled,
-            "welcome_channels": welcome_channels,
-            "description": description,
-        }
-        data = type_validate_python(ModifyGuildWelcomeScreenParams, data)
+        fields = validate_outbound_value(ModifyGuildWelcomeScreenParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/welcome-screen",
             response=JsonResponse(WelcomeScreen),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1433,35 +1216,25 @@ class GuildEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_modify_guild_onboarding(  # noqa: PLR0913
+    async def _api_modify_guild_onboarding(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        prompts: Missing[list[OnboardingPrompt]] = UNSET,
-        default_channel_ids: Missing[list[Snowflake]] = UNSET,
-        enabled: Missing[bool] = UNSET,
-        mode: Missing[OnboardingMode] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyGuildOnboardingParams],
     ) -> GuildOnboarding:
         """Modify guild onboarding.
 
         see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
         """
-
-        data = {
-            "prompts": prompts,
-            "default_channel_ids": default_channel_ids,
-            "enabled": enabled,
-            "mode": mode,
-        }
-        data = type_validate_python(ModifyGuildOnboardingParams, data)
+        fields = validate_outbound_value(ModifyGuildOnboardingParams, fields)
         call = RestCall(
             method="PUT",
             url=self.base_url / f"guilds/{guild_id}/onboarding",
             response=JsonResponse(GuildOnboarding),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1488,27 +1261,23 @@ class GuildEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_create_guild_schedule_event(  # noqa: PLR0913
+    async def _api_create_guild_schedule_event(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        channel_id: Snowflake | None = None,
-        entity_metadata: GuildScheduledEventEntityMetadata | None = None,
-        name: str,
-        privacy_level: GuildScheduledEventPrivacyLevel,
-        scheduled_start_time: datetime,
-        scheduled_end_time: datetime | None = None,
-        description: str | None = None,
-        entity_type: GuildScheduledEventEntityType,
-        image: str | None = None,
-        recurrence_rule: RecurrenceRule | None = None,
         reason: str | None = None,
+        **fields: Unpack[CreateGuildScheduledEventParams],
     ) -> GuildScheduledEvent:
         """Create guild scheduled event.
 
         see https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event
         """
+        fields = validate_outbound_value(CreateGuildScheduledEventParams, fields)
+        channel_id = fields.get("channel_id")
+        entity_metadata = fields.get("entity_metadata")
+        scheduled_end_time = fields.get("scheduled_end_time")
+        entity_type = fields["entity_type"]
         if entity_type == GuildScheduledEventEntityType.EXTERNAL:
             if channel_id is not None:
                 msg = "channel_id must be None for EXTERNAL events"
@@ -1527,25 +1296,13 @@ class GuildEndpointMixin:
             msg = "channel_id is required for non-EXTERNAL events"
             raise ValueError(msg)
 
-        data = {
-            "channel_id": channel_id,
-            "entity_metadata": entity_metadata,
-            "name": name,
-            "privacy_level": privacy_level,
-            "scheduled_start_time": scheduled_start_time,
-            "scheduled_end_time": scheduled_end_time,
-            "description": description,
-            "entity_type": entity_type,
-            "image": image,
-            "recurrence_rule": recurrence_rule,
-        }
-        data = type_validate_python(CreateGuildScheduledEventParams, data)
+        payload = {key: value for key, value in fields.items() if value is not None}
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/scheduled-events",
             response=JsonResponse(GuildScheduledEvent),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, exclude_none=True, omit_unset_values=True),
+            body=JsonBody(payload),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1573,50 +1330,26 @@ class GuildEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_modify_guild_scheduled_event(  # noqa: PLR0913
+    async def _api_modify_guild_scheduled_event(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
         event_id: SnowflakeType,
-        channel_id: MissingOrNullable[Snowflake] = UNSET,
-        entity_metadata: MissingOrNullable[GuildScheduledEventEntityMetadata] = UNSET,
-        name: Missing[str] = UNSET,
-        privacy_level: Missing[GuildScheduledEventPrivacyLevel] = UNSET,
-        scheduled_start_time: Missing[datetime] = UNSET,
-        scheduled_end_time: Missing[datetime] = UNSET,
-        description: MissingOrNullable[str] = UNSET,
-        entity_type: Missing[GuildScheduledEventEntityType] = UNSET,
-        status: Missing[GuildScheduledEventStatus] = UNSET,
-        image: Missing[str] = UNSET,
-        recurrence_rule: MissingOrNullable[RecurrenceRule] = UNSET,
         reason: str | None = None,
+        **fields: Unpack[ModifyGuildScheduledEventParams],
     ) -> GuildScheduledEvent:
         """Modify guild scheduled event.
 
         see https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event
         """
-
-        data = {
-            "channel_id": channel_id,
-            "entity_metadata": entity_metadata,
-            "name": name,
-            "privacy_level": privacy_level,
-            "scheduled_start_time": scheduled_start_time,
-            "scheduled_end_time": scheduled_end_time,
-            "description": description,
-            "entity_type": entity_type,
-            "status": status,
-            "image": image,
-            "recurrence_rule": recurrence_rule,
-        }
-        data = type_validate_python(ModifyGuildScheduledEventParams, data)
+        fields = validate_outbound_value(ModifyGuildScheduledEventParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/scheduled-events/{event_id}",
             response=JsonResponse(GuildScheduledEvent),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
             audit_reason=reason or None,
         )
         return await REST_EXCHANGE.execute(self, call)
@@ -1714,7 +1447,7 @@ class GuildEndpointMixin:
             url=self.base_url / f"guilds/templates/{template_code}",
             response=JsonResponse(Guild),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(
+            body=JsonBody(
                 {key: value for (key, value) in data.items() if value is not None}
             ),
         )
@@ -1741,23 +1474,19 @@ class GuildEndpointMixin:
         bot: "Bot",
         *,
         guild_id: SnowflakeType,
-        name: str,
-        description: MissingOrNullable[str] = UNSET,
+        **fields: Unpack[CreateGuildTemplateParams],
     ) -> GuildTemplate:
         """Create guild template.
 
         see https://discord.com/developers/docs/resources/guild-template#create-guild-template
         """
-
-        data = type_validate_python(
-            CreateGuildTemplateParams, {"name": name, "description": description}
-        )
+        fields = validate_outbound_value(CreateGuildTemplateParams, fields)
         call = RestCall(
             method="POST",
             url=self.base_url / f"guilds/{guild_id}/templates",
             response=JsonResponse(GuildTemplate),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -1787,23 +1516,19 @@ class GuildEndpointMixin:
         *,
         guild_id: SnowflakeType,
         template_code: str,
-        name: Missing[str] = UNSET,
-        description: MissingOrNullable[str] = UNSET,
+        **fields: Unpack[ModifyGuildTemplateParams],
     ) -> GuildTemplate:
         """Modify guild template.
 
         see https://discord.com/developers/docs/resources/guild-template#modify-guild-template
         """
-
-        data = type_validate_python(
-            ModifyGuildTemplateParams, {"name": name, "description": description}
-        )
+        fields = validate_outbound_value(ModifyGuildTemplateParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"guilds/{guild_id}/templates/{template_code}",
             response=JsonResponse(GuildTemplate),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 

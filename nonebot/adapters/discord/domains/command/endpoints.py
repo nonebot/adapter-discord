@@ -1,11 +1,8 @@
 from typing import TYPE_CHECKING
-
-from nonebot.compat import type_validate_python
+from typing_extensions import Unpack
 
 from .read import (
     ApplicationCommand,
-    ApplicationCommandOption,
-    ApplicationCommandPermissions,
     GuildApplicationCommandPermissions,
 )
 from .types import ApplicationCommandType
@@ -13,10 +10,10 @@ from .write import (
     ApplicationCommandBulkOverwriteParams,
     ApplicationCommandCreate,
     ApplicationCommandEditParams,
+    EditApplicationCommandPermissionsParams,
 )
-from ..application.types import ApplicationIntegrationType
-from ..interaction.types import InteractionContextType
-from ...protocol import UNSET, Missing, MissingOrNullable, SnowflakeType
+from ...api.validation import validate_outbound_value
+from ...protocol import SnowflakeType
 from ...transport.exchange import (
     REST_EXCHANGE,
     BearerAuth,
@@ -24,7 +21,6 @@ from ...transport.exchange import (
     EmptyResponse,
     JsonBody,
     JsonResponse,
-    JsonValueBody,
     RestCall,
     _bool_query,
 )
@@ -56,14 +52,15 @@ def _build_command_payloads(
 ) -> list[ApplicationCommandBulkOverwriteParams]:
     payloads: list[ApplicationCommandBulkOverwriteParams] = []
     for command in commands:
-        command_model = type_validate_python(
-            ApplicationCommandBulkOverwriteParams, command
+        payload = ApplicationCommandBulkOverwriteParams(
+            **validate_outbound_value(ApplicationCommandBulkOverwriteParams, command)
         )
-        description = _normalize_command_description(
-            command_type=command_model.type,
-            description=command_model.description,
+        payload.setdefault("type", ApplicationCommandType.CHAT_INPUT)
+        payload["description"] = _normalize_command_description(
+            command_type=payload.get("type", ApplicationCommandType.CHAT_INPUT),
+            description=payload.get("description"),
         )
-        payloads.append(command_model.copy(update={"description": description}))
+        payloads.append(payload)
     return payloads
 
 
@@ -90,55 +87,32 @@ class CommandEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_create_global_application_command(  # noqa: PLR0913
+    async def _api_create_global_application_command(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         application_id: SnowflakeType,
-        name: str,
-        name_localizations: dict[str, str] | None = None,
-        description: str | None = None,
-        description_localizations: dict[str, str] | None = None,
-        options: list[ApplicationCommandOption] | None = None,
-        default_member_permissions: str | None = None,
-        dm_permission: bool | None = None,
-        default_permission: bool | None = None,
-        type: ApplicationCommandType | None = None,  # noqa: A002
-        nsfw: bool | None = None,
-        integration_types: list[ApplicationIntegrationType] | None = None,
-        contexts: list[InteractionContextType] | None = None,
+        **fields: Unpack[ApplicationCommandCreate],
     ) -> ApplicationCommand:
         """Create global application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
         """
-
+        fields = validate_outbound_value(ApplicationCommandCreate, fields)
         description = _normalize_command_description(
-            command_type=type,
-            description=description,
+            command_type=fields.get("type"),
+            description=fields.get("description"),
         )
-        data = {
-            "name": name,
-            "name_localizations": name_localizations,
-            "description": description,
-            "description_localizations": description_localizations,
-            "options": options,
-            "default_member_permissions": default_member_permissions,
-            "dm_permission": dm_permission,
-            "default_permission": default_permission,
-            "type": type,
-            "nsfw": nsfw,
-            "integration_types": integration_types,
-            "contexts": contexts,
+        payload: dict[str, object] = {
+            key: value for key, value in fields.items() if value is not None
         }
-        data = {key: value for key, value in data.items() if value is not None}
-        payload = type_validate_python(ApplicationCommandCreate, data)
+        payload["description"] = description
         call = RestCall(
             method="POST",
             url=self.base_url / f"applications/{application_id}/commands",
             response=JsonResponse(ApplicationCommand),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(payload, omit_unset_values=True, exclude_none=True),
+            body=JsonBody(payload),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -162,49 +136,25 @@ class CommandEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_edit_global_application_command(  # noqa: PLR0913
+    async def _api_edit_global_application_command(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         application_id: SnowflakeType,
         command_id: SnowflakeType,
-        name: Missing[str] = UNSET,
-        name_localizations: MissingOrNullable[dict[str, str]] = UNSET,
-        description: Missing[str] = UNSET,
-        description_localizations: MissingOrNullable[dict[str, str]] = UNSET,
-        options: Missing[list[ApplicationCommandOption]] = UNSET,
-        default_member_permissions: MissingOrNullable[str] = UNSET,
-        dm_permission: Missing[bool] = UNSET,
-        default_permission: MissingOrNullable[bool] = UNSET,
-        nsfw: Missing[bool] = UNSET,
-        integration_types: Missing[list[ApplicationIntegrationType]] = UNSET,
-        contexts: MissingOrNullable[list[InteractionContextType]] = UNSET,
+        **fields: Unpack[ApplicationCommandEditParams],
     ) -> ApplicationCommand:
         """Edit global application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#edit-global-application-command
         """
-
-        data = {
-            "name": name,
-            "name_localizations": name_localizations,
-            "description": description,
-            "description_localizations": description_localizations,
-            "options": options,
-            "default_member_permissions": default_member_permissions,
-            "dm_permission": dm_permission,
-            "default_permission": default_permission,
-            "nsfw": nsfw,
-            "integration_types": integration_types,
-            "contexts": contexts,
-        }
-        data = type_validate_python(ApplicationCommandEditParams, data)
+        fields = validate_outbound_value(ApplicationCommandEditParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url / f"applications/{application_id}/commands/{command_id}",
             response=JsonResponse(ApplicationCommand),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -246,7 +196,7 @@ class CommandEndpointMixin:
             url=self.base_url / f"applications/{application_id}/commands",
             response=JsonResponse(list[ApplicationCommand]),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(payload),
+            body=JsonBody(payload),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -274,51 +224,34 @@ class CommandEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_create_guild_application_command(  # noqa: PLR0913
+    async def _api_create_guild_application_command(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
-        name: str,
-        name_localizations: dict[str, str] | None = None,
-        description: str | None = None,
-        description_localizations: dict[str, str] | None = None,
-        options: list[ApplicationCommandOption] | None = None,
-        default_member_permissions: str | None = None,
-        default_permission: bool | None = None,
-        type: ApplicationCommandType | None = None,  # noqa: A002
-        nsfw: bool | None = None,
+        **fields: Unpack[ApplicationCommandCreate],
     ) -> ApplicationCommand:
         """Create guild application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command
         """
-
+        fields = validate_outbound_value(ApplicationCommandCreate, fields)
         description = _normalize_command_description(
-            command_type=type,
-            description=description,
+            command_type=fields.get("type"),
+            description=fields.get("description"),
         )
-        data = {
-            "name": name,
-            "name_localizations": name_localizations,
-            "description": description,
-            "description_localizations": description_localizations,
-            "options": options,
-            "default_member_permissions": default_member_permissions,
-            "default_permission": default_permission,
-            "type": type,
-            "nsfw": nsfw,
+        payload: dict[str, object] = {
+            key: value for key, value in fields.items() if value is not None
         }
-        data = {key: value for key, value in data.items() if value is not None}
-        payload = type_validate_python(ApplicationCommandCreate, data)
+        payload["description"] = description
         call = RestCall(
             method="POST",
             url=self.base_url
             / f"applications/{application_id}/guilds/{guild_id}/commands",
             response=JsonResponse(ApplicationCommand),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(payload, omit_unset_values=True, exclude_none=True),
+            body=JsonBody(payload),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -344,45 +277,27 @@ class CommandEndpointMixin:
         )
         return await REST_EXCHANGE.execute(self, call)
 
-    async def _api_edit_guild_application_command(  # noqa: PLR0913
+    async def _api_edit_guild_application_command(
         self: "AdapterProtocol",
         bot: "Bot",
         *,
         application_id: SnowflakeType,
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
-        name: Missing[str] = UNSET,
-        name_localizations: MissingOrNullable[dict[str, str]] = UNSET,
-        description: Missing[str] = UNSET,
-        description_localizations: MissingOrNullable[dict[str, str]] = UNSET,
-        options: Missing[list[ApplicationCommandOption]] = UNSET,
-        default_member_permissions: MissingOrNullable[str] = UNSET,
-        default_permission: MissingOrNullable[bool] = UNSET,
-        nsfw: Missing[bool] = UNSET,
+        **fields: Unpack[ApplicationCommandEditParams],
     ) -> ApplicationCommand:
         """Edit guild application command.
 
         see https://discord.com/developers/docs/interactions/application-commands#edit-guild-application-command
         """
-
-        data = {
-            "name": name,
-            "name_localizations": name_localizations,
-            "description": description,
-            "description_localizations": description_localizations,
-            "options": options,
-            "default_member_permissions": default_member_permissions,
-            "default_permission": default_permission,
-            "nsfw": nsfw,
-        }
-        data = type_validate_python(ApplicationCommandEditParams, data)
+        fields = validate_outbound_value(ApplicationCommandEditParams, fields)
         call = RestCall(
             method="PATCH",
             url=self.base_url
             / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}",
             response=JsonResponse(ApplicationCommand),
             auth=BotAuth(bot.bot_info),
-            body=JsonBody(data, omit_unset_values=True),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -428,7 +343,7 @@ class CommandEndpointMixin:
             / f"applications/{application_id}/guilds/{guild_id}/commands",
             response=JsonResponse(list[ApplicationCommand]),
             auth=BotAuth(bot.bot_info),
-            body=JsonValueBody(payload),
+            body=JsonBody(payload),
         )
         return await REST_EXCHANGE.execute(self, call)
 
@@ -482,20 +397,22 @@ class CommandEndpointMixin:
         guild_id: SnowflakeType,
         command_id: SnowflakeType,
         access_token: str,
-        permissions: list[ApplicationCommandPermissions],
+        **fields: Unpack[EditApplicationCommandPermissionsParams],
     ) -> GuildApplicationCommandPermissions:
         """Edit application command permissions.
 
         see https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions
         """
-
+        fields = validate_outbound_value(
+            EditApplicationCommandPermissionsParams, fields
+        )
         call = RestCall(
             method="PUT",
             url=self.base_url
             / f"applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions",
             response=JsonResponse(GuildApplicationCommandPermissions),
             auth=BearerAuth(access_token),
-            body=JsonValueBody({"permissions": permissions}),
+            body=JsonBody(fields),
         )
         return await REST_EXCHANGE.execute(self, call)
 

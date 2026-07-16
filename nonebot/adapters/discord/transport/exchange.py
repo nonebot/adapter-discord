@@ -1,4 +1,4 @@
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from http import HTTPStatus
 import json
@@ -8,16 +8,14 @@ from nonebot.compat import type_validate_python
 from nonebot.drivers import Request, Response
 from nonebot.internal.driver import FileTypes, QueryVariable
 from nonebot.utils import escape_tag
-from pydantic import BaseModel
 from yarl import URL
 
 from .serialization import (
-    PreparedRequest,
-    encode_json_text,
-    encode_model_json_data,
-    encode_prepared_request,
+    build_multipart_payload,
+    normalize_rest_json,
 )
 from ..config import BotInfo, Config
+from ..domains.models import File
 from ..exception import (
     ActionFailed,
     DiscordAdapterException,
@@ -25,8 +23,7 @@ from ..exception import (
     RateLimitException,
     UnauthorizedException,
 )
-from ..protocol import UNSET, UnsetType
-from ..utils import IncEx, decompress_data, log
+from ..utils import decompress_data, log, reject_unset_values
 
 ResponseT = TypeVar("ResponseT")
 
@@ -51,24 +48,14 @@ RestAuth: TypeAlias = BotAuth | BearerAuth | NoAuth
 
 @dataclass(frozen=True, slots=True)
 class JsonBody:
-    model: BaseModel
-    include: IncEx | None = None
-    exclude: IncEx | None = None
-    by_alias: bool = False
-    exclude_unset: bool = False
-    exclude_defaults: bool = False
-    exclude_none: bool = False
-    omit_unset_values: bool = False
-
-
-@dataclass(frozen=True, slots=True)
-class JsonValueBody:
     value: object
 
 
 @dataclass(frozen=True, slots=True)
 class PreparedBody:
-    request: PreparedRequest
+    payload: Mapping[str, object]
+    files: Sequence[File] | None = None
+    attachment_owner_path: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -76,9 +63,7 @@ class MultipartBody:
     files: Mapping[str, FileTypes]
 
 
-RestBody: TypeAlias = (
-    JsonBody | JsonValueBody | PreparedBody | MultipartBody | UnsetType
-)
+RestBody: TypeAlias = JsonBody | PreparedBody | MultipartBody
 
 
 @dataclass(frozen=True, slots=True)
@@ -107,7 +92,7 @@ class RestCall(Generic[ResponseT]):
     response: ResponseSpec[ResponseT]
     auth: RestAuth
     query: Mapping[str, QueryVariable | None] = field(default_factory=dict)
-    body: RestBody = UNSET
+    body: RestBody | None = None
     audit_reason: str | None = None
     headers: Mapping[str, str] = field(default_factory=dict)
 
@@ -150,28 +135,30 @@ def _encode_body(
     request_json: object | None = None
     request_files: dict[str, FileTypes] | None = None
     if isinstance(call.body, JsonBody):
-        request_json = encode_model_json_data(
-            call.body.model,
-            include=call.body.include,
-            exclude=call.body.exclude,
-            by_alias=call.body.by_alias,
-            exclude_unset=call.body.exclude_unset,
-            exclude_defaults=call.body.exclude_defaults,
-            exclude_none=call.body.exclude_none,
-            omit_unset_values=call.body.omit_unset_values,
-        )
-    elif isinstance(call.body, JsonValueBody):
-        request_json = json.loads(encode_json_text(call.body.value))
+        if call.body.value is None:
+            msg = "JsonBody(None) is ambiguous; use body=None for no body"
+            raise TypeError(msg)
+        request_json = normalize_rest_json(call.body.value)
     elif isinstance(call.body, PreparedBody):
-        prepared = encode_prepared_request(call.body.request)
-        request_json = prepared.get("json")
-        request_files = prepared.get("files")
+        normalized = normalize_rest_json(call.body.payload)
+        if not isinstance(normalized, dict):
+            msg = "PreparedBody payload must normalize to a mapping"
+            raise TypeError(msg)
+        if call.body.files:
+            request_files = build_multipart_payload(
+                normalized,
+                call.body.files,
+                attachment_owner_path=call.body.attachment_owner_path,
+            )
+        else:
+            request_json = normalized
     elif isinstance(call.body, MultipartBody):
+        reject_unset_values(call.body.files)
         request_files = dict(call.body.files)
     return request_json, request_files
 
 
-def _prepare_request(transport: RestTransport, call: RestCall[ResponseT]) -> Request:
+def _build_request(transport: RestTransport, call: RestCall[ResponseT]) -> Request:
     request_json, request_files = _encode_body(call)
     return Request(
         headers=_request_headers(transport, call),
@@ -220,7 +207,7 @@ class RestExchange:
         transport: RestTransport,
         call: RestCall[ResponseT],
     ) -> ResponseT:
-        request = _prepare_request(transport, call)
+        request = _build_request(transport, call)
         try:
             data = await transport.request(request)
             log(

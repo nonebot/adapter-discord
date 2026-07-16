@@ -3,22 +3,20 @@
 from asyncio import Lock
 from contextvars import ContextVar
 from enum import Enum
-from typing import Protocol, cast
+from typing import Protocol
+from typing_extensions import Unpack
 
 from .conversion import to_followup_message, to_interaction_callback, to_origin_edit
 from ...domains.message.conversion import compile_message
 from ...domains.models import (
     AllowedMention,
-    AttachmentSend,
-    Component,
-    Embed,
-    File,
+    ExecuteWebhookParams,
     InteractionCallbackMessage,
     InteractionCallbackType,
     InteractionResponse,
     MessageFlag,
     MessageGet,
-    PollRequest,
+    WebhookMessageEditParams,
 )
 from ...event import InteractionCreateEvent
 from ...exception import (
@@ -26,13 +24,7 @@ from ...exception import (
     NetworkError,
 )
 from ...message import Message, MessageSegment
-from ...protocol import (
-    UNSET,
-    Missing,
-    MissingOrNullable,
-    SnowflakeType,
-    is_unset,
-)
+from ...protocol import UNSET, SnowflakeType
 
 INTERACTION_ALREADY_ACKNOWLEDGED = 40060
 
@@ -62,36 +54,22 @@ class InteractionBot(Protocol):
         thread_id: SnowflakeType | None = None,
     ) -> MessageGet: ...
 
-    async def edit_origin_interaction_response(  # noqa: PLR0913
+    async def edit_origin_interaction_response(
         self,
         *,
         application_id: SnowflakeType,
         interaction_token: str,
         thread_id: SnowflakeType | None = None,
         with_components: bool | None = None,
-        content: MissingOrNullable[str] = UNSET,
-        embeds: MissingOrNullable[list[Embed]] = UNSET,
-        flags: MissingOrNullable[MessageFlag] = UNSET,
-        allowed_mentions: MissingOrNullable[AllowedMention] = UNSET,
-        components: MissingOrNullable[list[Component]] = UNSET,
-        files: Missing[list[File]] = UNSET,
-        attachments: MissingOrNullable[list[AttachmentSend]] = UNSET,
-        poll: MissingOrNullable[PollRequest] = UNSET,
+        **fields: Unpack[WebhookMessageEditParams],
     ) -> MessageGet: ...
 
-    async def create_followup_message(  # noqa: PLR0913
+    async def create_followup_message(
         self,
         *,
         application_id: SnowflakeType,
         interaction_token: str,
-        content: str | None = None,
-        tts: bool | None = None,
-        embeds: list[Embed] | None = None,
-        allowed_mentions: AllowedMention | None = None,
-        components: list[Component] | None = None,
-        files: list[File] | None = None,
-        attachments: list[AttachmentSend] | None = None,
-        flags: int | None = None,
+        **fields: Unpack[ExecuteWebhookParams],
     ) -> MessageGet: ...
 
 
@@ -228,16 +206,7 @@ class InteractionResponder:
         result = await self._bot.edit_origin_interaction_response(
             application_id=self._application_id,
             interaction_token=self._interaction_token,
-            content=None if is_unset(request.content) else request.content,
-            embeds=None if is_unset(request.embeds) else request.embeds,
-            flags=None if is_unset(request.flags) else request.flags,
-            allowed_mentions=(
-                None if is_unset(request.allowed_mentions) else request.allowed_mentions
-            ),
-            components=None if is_unset(request.components) else request.components,
-            files=UNSET if is_unset(request.files) else request.files,
-            attachments=None if is_unset(request.attachments) else request.attachments,
-            poll=None if is_unset(request.poll) else request.poll,
+            **request,
         )
         self._state = InteractionState.RESPONDED
         return result
@@ -261,19 +230,7 @@ class InteractionResponder:
         return await self._bot.create_followup_message(
             application_id=self._application_id,
             interaction_token=self._interaction_token,
-            content=None if is_unset(request.content) else request.content,
-            tts=None if is_unset(request.tts) else request.tts,
-            embeds=None if is_unset(request.embeds) else request.embeds,
-            allowed_mentions=(
-                None if is_unset(request.allowed_mentions) else request.allowed_mentions
-            ),
-            components=cast(
-                "list[Component] | None",
-                None if is_unset(request.components) else request.components,
-            ),
-            files=None if is_unset(request.files) else request.files,
-            attachments=None if is_unset(request.attachments) else request.attachments,
-            flags=None if is_unset(request.flags) else int(request.flags),
+            **request,
         )
 
     async def respond(
