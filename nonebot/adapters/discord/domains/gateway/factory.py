@@ -38,7 +38,7 @@ class EventFactory:
     def from_dispatch(self, dispatch: Dispatch) -> "Event":
         binding = self.bindings.get(dispatch.type)
         if binding is not None:
-            return binding.parser(cast("dict[str, object]", dispatch.data))
+            return binding.parser(dispatch.data)
 
         if self._unknown_event_parser is None:
             msg = "Gateway event registry has not been initialized"

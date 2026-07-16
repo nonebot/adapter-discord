@@ -35,7 +35,7 @@ class Payload(BaseModel):
 
 class Dispatch(Payload):
     opcode: Literal[Opcode.DISPATCH] = Field(Opcode.DISPATCH, alias="op")
-    data: dict = Field(alias="d")
+    data: dict[str, object] = Field(alias="d")
     sequence: int = Field(alias="s")
     type: str = Field(alias="t")
 
