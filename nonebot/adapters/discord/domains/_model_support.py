@@ -1,18 +1,11 @@
 """Private common imports for canonical Discord domain models."""
 
 import datetime
-from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar, cast
+from typing import Any, Generic, Literal, TypeVar
 from typing_extensions import TypedDict
 import warnings
 
-from nonebot.compat import PYDANTIC_V2
-from pydantic import BaseModel, ConfigDict, Field
-
-if PYDANTIC_V2 or TYPE_CHECKING:
-    GenericModel = BaseModel
-else:
-    from pydantic.generics import GenericModel
-
+from pydantic import BaseModel, ConfigDict, Field, with_config
 
 from ._types import (
     ActivityAssetImage,
@@ -102,22 +95,15 @@ from ..protocol import (
     is_unset,
 )
 
-_OUTBOUND_TYPED_DICT_CONFIG = ConfigDict(extra="forbid") if PYDANTIC_V2 else {}
 
-
+@with_config(ConfigDict(extra="forbid"))
 class OutboundTypedDict(TypedDict):
-    """Base for REST request mappings with strict Pydantic v2 extras."""
-
-
-cast("Any", OutboundTypedDict).__pydantic_config__ = _OUTBOUND_TYPED_DICT_CONFIG
+    """Base for REST request mappings with strict Pydantic extras."""
 
 
 T = TypeVar("T", str, int, float)
 
 __all__ = [
-    "PYDANTIC_V2",
-    "TYPE_CHECKING",
-    "UNSET",
     "UNSET",
     "ActivityAssetImage",
     "ActivityFlags",
@@ -148,7 +134,6 @@ __all__ = [
     "Field",
     "ForumLayoutTypes",
     "Generic",
-    "GenericModel",
     "GuildFeature",
     "GuildMemberFlags",
     "GuildNSFWLevel",
@@ -174,8 +159,6 @@ __all__ = [
     "MessageReferenceType",
     "MessageType",
     "Missing",
-    "Missing",
-    "MissingOrNullable",
     "MissingOrNullable",
     "MutableGuildFeature",
     "OnboardingMode",

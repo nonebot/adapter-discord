@@ -37,6 +37,7 @@ from nonebot.internal.matcher import (
     current_event,
     current_matcher,
 )
+from pydantic import BaseModel
 import pytest
 
 ROOT = Path(__file__).parents[2]
@@ -133,11 +134,8 @@ def _assert_version_gate(
     assert not legacy_fallback_present
 
 
-def _model_field_names(model: type[object]) -> set[str]:
-    fields = getattr(model, "model_fields", None)
-    if fields is None:
-        fields = vars(model)["__fields__"]
-    return set(fields)
+def _model_field_names(model: type[BaseModel]) -> set[str]:
+    return set(model.model_fields)
 
 
 def _assert_raw_public_contract(fixture: PublicApiSnapshot) -> None:

@@ -7,7 +7,6 @@ import warnings
 
 from nonebot.adapters import Event as BaseEvent
 
-from nonebot.compat import PYDANTIC_V2
 from nonebot.utils import escape_tag
 from pydantic import BaseModel, Field
 
@@ -1203,16 +1202,7 @@ _model_types_namespace = vars(_model_module)
 
 for _, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass):
     if issubclass(obj, BaseModel) and obj.__module__ == __name__:
-        if PYDANTIC_V2:
-            obj.model_rebuild(_types_namespace=_model_types_namespace)
-        else:
-            obj.update_forward_refs(
-                **{
-                    k: v
-                    for k, v in _model_types_namespace.items()
-                    if isinstance(v, type)
-                }
-            )
+        obj.model_rebuild(_types_namespace=_model_types_namespace)
 
 initialize_event_registry(sys.modules[__name__])
 event_classes = {name: binding.event_type for name, binding in EVENT_BINDINGS.items()}

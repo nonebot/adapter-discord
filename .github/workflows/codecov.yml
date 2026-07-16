@@ -54,8 +54,8 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 
-  pydantic-v1-compat:
-    name: Pydantic v1 compatibility
+  pydantic-minimum:
+    name: Pydantic 2.12 minimum
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -73,15 +73,8 @@ jobs:
       - name: Install Dependencies
         run: uv sync --group test
 
-      - name: Install Pydantic v1
-        run: uv pip install --reinstall 'pydantic<2'
+      - name: Install minimum Pydantic
+        run: uv pip install 'pydantic==2.12.0'
 
-      - name: Run Pydantic v1 compatibility tests
-        run: |
-          uv run pytest -q \
-            tests/test_api_nullability.py \
-            tests/test_event_forward_ref_rebuild.py \
-            tests/transport \
-            tests/message \
-            tests/gateway \
-            tests/interaction
+      - name: Run tests with minimum Pydantic
+        run: uv run pytest -q

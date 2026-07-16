@@ -1,19 +1,15 @@
 from collections.abc import Callable, Mapping, Set as AbstractSet
 from dataclasses import dataclass
-from functools import cache, lru_cache, wraps
+from functools import cache, wraps
 import inspect
 import types
 from typing import Annotated, Any, TypeVar, Union, get_args, get_origin
 from typing_extensions import NotRequired, Required, is_typeddict
-import warnings
 
-from nonebot.compat import PYDANTIC_V2, type_validate_python
-from pydantic import BaseModel, ValidationError
+from nonebot.compat import type_validate_python
+from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from ..utils import reject_unset_values
-
-if PYDANTIC_V2:
-    from pydantic import TypeAdapter
 
 _PAIR_ARGUMENT_COUNT = 2
 T = TypeVar("T")
@@ -315,24 +311,11 @@ def _outbound_adapter(annotation: object) -> Any:  # noqa: ANN401
     return TypeAdapter(annotation)
 
 
-@lru_cache(maxsize=1)
-def _warn_pydantic_v1_outbound_validation() -> None:
-    warnings.warn(
-        "Strict Discord REST outbound value validation is disabled under "
-        "Pydantic v1; upgrade to Pydantic v2 to enable it.",
-        RuntimeWarning,
-        stacklevel=3,
-    )
-
-
 def validate_outbound_value(annotation: object, value: T) -> T:
     """Validate outbound structure without replacing the caller's value."""
     reject_unset_values(value)
     _validate_outbound_structure(annotation, value, "$")
-    if PYDANTIC_V2:
-        _outbound_adapter(annotation).validate_python(value, strict=True)
-    else:
-        _warn_pydantic_v1_outbound_validation()
+    _outbound_adapter(annotation).validate_python(value, strict=True)
     return value
 
 

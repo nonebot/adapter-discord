@@ -20,6 +20,7 @@ from nonebot.adapters.discord.commands.matcher import ApplicationCommandMatcher
 import nonebot.adapters.discord.message as message_module
 from scripts.snapshot_public_api import PublicApiSnapshot, build_snapshot
 
+from pydantic import BaseModel
 import pytest
 
 ROOT = Path(__file__).parents[2]
@@ -61,11 +62,8 @@ def _major_version() -> int:
     return int(match.group(1))
 
 
-def _model_field_names(model: type[object]) -> set[str]:
-    fields = getattr(model, "model_fields", None)
-    if fields is None:
-        fields = vars(model)["__fields__"]
-    return set(fields)
+def _model_field_names(model: type[BaseModel]) -> set[str]:
+    return set(model.model_fields)
 
 
 def _assert_runtime_callable(

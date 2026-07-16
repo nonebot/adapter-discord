@@ -8,11 +8,7 @@ from typing_extensions import Unpack, is_typeddict
 from nonebot.adapters.discord.domains import bootstrap
 from tests.fake.doubles import DummyAdapter
 
-from nonebot.compat import PYDANTIC_V2
-
-if PYDANTIC_V2:
-    from pydantic import TypeAdapter, ValidationError
-
+from pydantic import TypeAdapter, ValidationError
 import pytest
 
 WRITE_DOMAINS = (
@@ -78,8 +74,7 @@ def test_all_rest_write_exports_are_resolved_typed_dicts() -> None:
             assert all(
                 not isinstance(value, str) for value in model.__annotations__.values()
             )
-            if PYDANTIC_V2:
-                TypeAdapter(model)
+            TypeAdapter(model)
 
 
 @pytest.mark.parametrize("name", TYPED_BODY_ENDPOINTS)
@@ -92,7 +87,6 @@ def test_rest_body_endpoints_expose_typed_dict_unpack(name: str) -> None:
     assert get_origin(fields.annotation) is Unpack
 
 
-@pytest.mark.skipif(not PYDANTIC_V2, reason="Pydantic v2 TypedDict config")
 def test_all_rest_write_typed_dicts_forbid_extra_fields() -> None:
     bootstrap()
     for domain in WRITE_DOMAINS:

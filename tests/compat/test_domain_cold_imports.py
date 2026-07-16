@@ -34,10 +34,7 @@ def _assert_cold_import_contract(target: str, module: ModuleType) -> None:
         assert module.MessageGet is message_module.MessageGet
         assert module.Snowflake is protocol_module.Snowflake
     elif target == "nonebot.adapters.discord.event":
-        fields = (
-            getattr(module.GuildMessageCreateEvent, "model_fields", None)
-            or module.GuildMessageCreateEvent.__fields__
-        )
+        fields = module.GuildMessageCreateEvent.model_fields
         assert "id" in fields
         assert module.GuildMessageCreateEvent.__mro__[2] is module.MessageEvent
     else:

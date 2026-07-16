@@ -1,22 +1,14 @@
 from collections.abc import Mapping, Sequence, Set as AbstractSet
 from datetime import date, datetime
-import json
 from typing import Any, TypeAlias
 
-from nonebot.compat import PYDANTIC_V2
 from nonebot.internal.driver import FileTypes
-from pydantic import BaseModel
+from pydantic import BaseModel, TypeAdapter
 
 from ..domains.models import File
 from ..utils import IncEx, model_dump, reject_unset_values
 
-if PYDANTIC_V2:
-    from pydantic import TypeAdapter
-else:
-    from pydantic.json import pydantic_encoder
-
-if PYDANTIC_V2:
-    _JSON_ADAPTER = TypeAdapter(Any)
+_JSON_ADAPTER = TypeAdapter(Any)
 
 MultipartFormData: TypeAlias = dict[str, FileTypes]
 
@@ -27,13 +19,7 @@ def _stable_sort_key(value: object) -> tuple[str, str, str]:
 
 
 def encode_json_text(value: object) -> str:
-    if PYDANTIC_V2:
-        return _JSON_ADAPTER.dump_json(value).decode()
-    return json.dumps(
-        value,
-        default=pydantic_encoder,
-        separators=(",", ":"),
-    )
+    return _JSON_ADAPTER.dump_json(value).decode()
 
 
 def encode_model_json_text(  # noqa: PLR0913
@@ -84,9 +70,7 @@ def normalize_rest_json(value: object) -> object:
     reject_unset_values(value)
     normalized = _normalize_tree(value)
     reject_unset_values(normalized)
-    if PYDANTIC_V2:
-        return _JSON_ADAPTER.dump_python(normalized, mode="json")
-    return json.loads(encode_json_text(normalized))
+    return _JSON_ADAPTER.dump_python(normalized, mode="json")
 
 
 def _resolve_attachment_owner(
