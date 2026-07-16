@@ -3,17 +3,16 @@ from typing import Any
 from nonebot.compat import type_validate_python
 from pydantic import BaseModel
 
-from .model import (
+from ..domains.models import (
     ExecuteWebhookParams,
     File,
     InteractionCallbackMessage,
     InteractionResponse,
     MessageEditParams,
     MessageSend,
-    Snowflake,
     WebhookMessageEditParams,
 )
-from .types import UNSET, Missing, MissingOrNullable
+from ..protocol import UNSET, Missing, MissingOrNullable, Snowflake
 from ..serialization import PreparedRequest, prepare_request
 
 

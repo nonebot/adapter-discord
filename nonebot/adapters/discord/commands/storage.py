@@ -1,8 +1,9 @@
 from collections import defaultdict
 from typing import TYPE_CHECKING, Literal
 
-from ..api import ApplicationCommandBulkOverwriteParams, Snowflake
 from ..bot import Bot
+from ..domains.models import ApplicationCommandBulkOverwriteParams
+from ..protocol import Snowflake
 from ..utils import model_dump
 
 if TYPE_CHECKING:

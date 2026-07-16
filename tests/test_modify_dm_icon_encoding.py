@@ -1,9 +1,9 @@
 import base64
 
-import nonebot.adapters.discord.api.handle as handle_module
+import nonebot.adapters.discord.transport.exchange as exchange_module
 from tests.fake.doubles import DummyAdapter, DummyBot
 
-from nonebot.drivers import Request
+from nonebot.drivers import Request, Response
 import pytest
 
 
@@ -15,22 +15,16 @@ async def test_modify_dm_icon_bytes_are_encoded_to_data_uri(
 ) -> None:
     captured: dict[str, object] = {}
 
-    async def fake_request(
-        _adapter: object,
-        request_obj: Request,
-        *,
-        parse_json: bool = True,
-    ) -> dict[str, object]:
-        del _adapter, parse_json
+    async def fake_request(request_obj: Request) -> Response:
         captured["json"] = request_obj.json
-        return {}
+        return Response(200, content=b"{}")
 
     def fake_type_validate_python(_type: object, value: object) -> object:
         return value
 
-    monkeypatch.setattr(handle_module, "_request", fake_request)
+    monkeypatch.setattr(dummy_adapter, "request", fake_request)
     monkeypatch.setattr(
-        handle_module, "type_validate_python", fake_type_validate_python
+        exchange_module, "type_validate_python", fake_type_validate_python
     )
 
     icon = b"\x89PNG\r\n\x1a\n\x00test"

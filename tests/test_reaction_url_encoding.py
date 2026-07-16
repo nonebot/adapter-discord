@@ -1,9 +1,8 @@
 from collections.abc import Awaitable, Callable
 
-import nonebot.adapters.discord.api.handle as handle_module
 from tests.fake.doubles import DummyAdapter, DummyBot
 
-from nonebot.drivers import Request
+from nonebot.drivers import Request, Response
 import pytest
 
 MethodCaller = Callable[[DummyAdapter, DummyBot, str, int | None], Awaitable[None]]
@@ -110,17 +109,11 @@ async def test_reaction_endpoints_encode_emoji_once(
     caller, suffix, emoji, emoji_id, encoded_emoji = case
     captured: list[str] = []
 
-    async def fake_request(
-        _adapter: object,
-        request_obj: Request,
-        *,
-        parse_json: bool = True,
-    ) -> list[object]:
-        del _adapter, parse_json
+    async def fake_request(request_obj: Request) -> Response:
         captured.append(str(request_obj.url))
-        return []
+        return Response(200, content=b"[]")
 
-    monkeypatch.setattr(handle_module, "_request", fake_request)
+    monkeypatch.setattr(dummy_adapter_list_response, "request", fake_request)
 
     await caller(dummy_adapter_list_response, dummy_bot, emoji, emoji_id)
 

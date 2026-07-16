@@ -2,7 +2,6 @@ from datetime import datetime
 from enum import Enum
 import inspect
 import sys
-from types import UnionType
 from typing_extensions import override
 import warnings
 
@@ -12,8 +11,39 @@ from nonebot.compat import PYDANTIC_V2
 from nonebot.utils import escape_tag
 from pydantic import BaseModel, Field
 
-from .api import model as _model_module
-from .api.model import (
+from .api.models import (
+    ApplicationCommandAutoCompleteInteractionCreatePayload,
+    ApplicationCommandInteractionCreatePayload,
+    DirectMessageCreatePayload,
+    DirectMessageDeleteBulkPayload,
+    DirectMessageDeletePayload,
+    DirectMessagePollVoteAddPayload,
+    DirectMessagePollVoteRemovePayload,
+    DirectMessageReactionAddPayload,
+    DirectMessageReactionRemoveAllPayload,
+    DirectMessageReactionRemoveEmojiPayload,
+    DirectMessageReactionRemovePayload,
+    DirectMessageUpdatePayload,
+    DirectTypingStartPayload,
+    GuildMessageCreatePayload,
+    GuildMessageDeleteBulkPayload,
+    GuildMessageDeletePayload,
+    GuildMessagePollVoteAddPayload,
+    GuildMessagePollVoteRemovePayload,
+    GuildMessageReactionAddPayload,
+    GuildMessageReactionRemoveAllPayload,
+    GuildMessageReactionRemoveEmojiPayload,
+    GuildMessageReactionRemovePayload,
+    GuildMessageUpdatePayload,
+    GuildTypingStartPayload,
+    InteractionCreateBasePayload,
+    MessageComponentInteractionCreatePayload,
+    ModalSubmitInteractionCreatePayload,
+    PingInteractionCreatePayload,
+)
+from .domains import models as _model_module
+from .domains.gateway.factory import EVENT_BINDINGS, initialize_event_registry
+from .domains.models import (
     ApplicationCommandPermissions,
     AutoModerationActionExecution,
     AutoModerationRuleCreate,
@@ -55,7 +85,6 @@ from .api.model import (
     MessageGet,
     PresenceUpdate,
     Ready,
-    Snowflake,
     StageInstanceCreate,
     StageInstanceDelete,
     StageInstanceUpdate,
@@ -76,38 +105,8 @@ from .api.model import (
     VoiceStateUpdate,
     WebhooksUpdate,
 )
-from .api.models import (
-    ApplicationCommandAutoCompleteInteractionCreatePayload,
-    ApplicationCommandInteractionCreatePayload,
-    DirectMessageCreatePayload,
-    DirectMessageDeleteBulkPayload,
-    DirectMessageDeletePayload,
-    DirectMessagePollVoteAddPayload,
-    DirectMessagePollVoteRemovePayload,
-    DirectMessageReactionAddPayload,
-    DirectMessageReactionRemoveAllPayload,
-    DirectMessageReactionRemoveEmojiPayload,
-    DirectMessageReactionRemovePayload,
-    DirectMessageUpdatePayload,
-    DirectTypingStartPayload,
-    GuildMessageCreatePayload,
-    GuildMessageDeleteBulkPayload,
-    GuildMessageDeletePayload,
-    GuildMessagePollVoteAddPayload,
-    GuildMessagePollVoteRemovePayload,
-    GuildMessageReactionAddPayload,
-    GuildMessageReactionRemoveAllPayload,
-    GuildMessageReactionRemoveEmojiPayload,
-    GuildMessageReactionRemovePayload,
-    GuildMessageUpdatePayload,
-    GuildTypingStartPayload,
-    InteractionCreateBasePayload,
-    MessageComponentInteractionCreatePayload,
-    ModalSubmitInteractionCreatePayload,
-    PingInteractionCreatePayload,
-)
-from .api.types import UNSET, Missing, is_unset
 from .message import Message
+from .protocol import UNSET, Missing, Snowflake, is_unset
 from .utils import log, model_dump
 
 
@@ -1200,116 +1199,6 @@ class DirectMessagePollVoteRemoveEvent(
 ): ...
 
 
-event_classes: dict[str, type[Event] | UnionType] = {
-    EventType.HELLO.value: HelloEvent,
-    EventType.READY.value: ReadyEvent,
-    EventType.RESUMED.value: ResumedEvent,
-    EventType.RECONNECT.value: ReconnectEvent,
-    EventType.INVALID_SESSION.value: InvalidSessionEvent,
-    EventType.APPLICATION_COMMAND_PERMISSIONS_UPDATE.value: (
-        ApplicationCommandPermissionsUpdateEvent
-    ),
-    EventType.AUTO_MODERATION_RULE_CREATE.value: AutoModerationRuleCreateEvent,
-    EventType.AUTO_MODERATION_RULE_UPDATE.value: AutoModerationRuleUpdateEvent,
-    EventType.AUTO_MODERATION_RULE_DELETE.value: AutoModerationRuleDeleteEvent,
-    EventType.AUTO_MODERATION_ACTION_EXECUTION.value: (
-        AutoModerationActionExecutionEvent
-    ),
-    EventType.CHANNEL_CREATE.value: ChannelCreateEvent,
-    EventType.CHANNEL_UPDATE.value: ChannelUpdateEvent,
-    EventType.CHANNEL_DELETE.value: ChannelDeleteEvent,
-    EventType.CHANNEL_PINS_UPDATE.value: ChannelPinsUpdateEvent,
-    EventType.THREAD_CREATE.value: ThreadCreateEvent,
-    EventType.THREAD_UPDATE.value: ThreadUpdateEvent,
-    EventType.THREAD_DELETE.value: ThreadDeleteEvent,
-    EventType.THREAD_LIST_SYNC.value: ThreadListSyncEvent,
-    EventType.THREAD_MEMBER_UPDATE.value: ThreadMemberUpdateEvent,
-    EventType.THREAD_MEMBERS_UPDATE.value: ThreadMembersUpdateEvent,
-    EventType.ENTITLEMENT_CREATE.value: EntitlementCreateEvent,
-    EventType.ENTITLEMENT_UPDATE.value: EntitlementUpdateEvent,
-    EventType.ENTITLEMENT_DELETE.value: EntitlementDeleteEvent,
-    EventType.GUILD_CREATE.value: GuildCreateEvent | GuildCreateCompatEvent,
-    EventType.GUILD_UPDATE.value: GuildUpdateEvent,
-    EventType.GUILD_DELETE.value: GuildDeleteEvent,
-    EventType.GUILD_AUDIT_LOG_ENTRY_CREATE.value: GuildAuditLogEntryCreateEvent,
-    EventType.GUILD_BAN_ADD.value: GuildBanAddEvent,
-    EventType.GUILD_BAN_REMOVE.value: GuildBanRemoveEvent,
-    EventType.GUILD_EMOJIS_UPDATE.value: GuildEmojisUpdateEvent,
-    EventType.GUILD_STICKERS_UPDATE.value: GuildStickersUpdateEvent,
-    EventType.GUILD_INTEGRATIONS_UPDATE.value: GuildIntegrationsUpdateEvent,
-    EventType.GUILD_MEMBER_ADD.value: GuildMemberAddEvent,
-    EventType.GUILD_MEMBER_REMOVE.value: GuildMemberRemoveEvent,
-    EventType.GUILD_MEMBER_UPDATE.value: GuildMemberUpdateEvent,
-    EventType.GUILD_MEMBERS_CHUNK.value: GuildMembersChunkEvent,
-    EventType.GUILD_ROLE_CREATE.value: GuildRoleCreateEvent,
-    EventType.GUILD_ROLE_UPDATE.value: GuildRoleUpdateEvent,
-    EventType.GUILD_ROLE_DELETE.value: GuildRoleDeleteEvent,
-    EventType.GUILD_SCHEDULED_EVENT_CREATE.value: GuildScheduledEventCreateEvent,
-    EventType.GUILD_SCHEDULED_EVENT_UPDATE.value: GuildScheduledEventUpdateEvent,
-    EventType.GUILD_SCHEDULED_EVENT_DELETE.value: GuildScheduledEventDeleteEvent,
-    EventType.GUILD_SCHEDULED_EVENT_USER_ADD.value: GuildScheduledEventUserAddEvent,
-    EventType.GUILD_SCHEDULED_EVENT_USER_REMOVE.value: (
-        GuildScheduledEventUserRemoveEvent
-    ),
-    EventType.INTEGRATION_CREATE.value: IntegrationCreateEvent,
-    EventType.INTEGRATION_UPDATE.value: IntegrationUpdateEvent,
-    EventType.INTEGRATION_DELETE.value: IntegrationDeleteEvent,
-    EventType.INTERACTION_CREATE.value: (
-        PingInteractionEvent
-        | ApplicationCommandInteractionEvent
-        | ApplicationCommandAutoCompleteInteractionEvent
-        | MessageComponentInteractionEvent
-        | ModalSubmitInteractionEvent
-    ),
-    EventType.INVITE_CREATE.value: InviteCreateEvent,
-    EventType.INVITE_DELETE.value: InviteDeleteEvent,
-    EventType.MESSAGE_CREATE.value: (
-        GuildMessageCreateEvent | DirectMessageCreateEvent
-    ),
-    EventType.MESSAGE_UPDATE.value: (
-        GuildMessageUpdateEvent | DirectMessageUpdateEvent
-    ),
-    EventType.MESSAGE_DELETE.value: (
-        GuildMessageDeleteEvent | DirectMessageDeleteEvent
-    ),
-    EventType.MESSAGE_DELETE_BULK.value: (
-        GuildMessageDeleteBulkEvent | DirectMessageDeleteBulkEvent
-    ),
-    EventType.MESSAGE_REACTION_ADD.value: (
-        GuildMessageReactionAddEvent | DirectMessageReactionAddEvent
-    ),
-    EventType.MESSAGE_REACTION_REMOVE.value: (
-        GuildMessageReactionRemoveEvent | DirectMessageReactionRemoveEvent
-    ),
-    EventType.MESSAGE_REACTION_REMOVE_ALL.value: (
-        GuildMessageReactionRemoveAllEvent | DirectMessageReactionRemoveAllEvent
-    ),
-    EventType.MESSAGE_REACTION_REMOVE_EMOJI.value: (
-        GuildMessageReactionRemoveEmojiEvent | DirectMessageReactionRemoveEmojiEvent
-    ),
-    EventType.PRESENCE_UPDATE.value: PresenceUpdateEvent,
-    EventType.STAGE_INSTANCE_CREATE.value: StageInstanceCreateEvent,
-    EventType.STAGE_INSTANCE_UPDATE.value: StageInstanceUpdateEvent,
-    EventType.STAGE_INSTANCE_DELETE.value: StageInstanceDeleteEvent,
-    EventType.SUBSCRIPTION_CREATE.value: SubscriptionCreateEvent,
-    EventType.SUBSCRIPTION_UPDATE.value: SubscriptionUpdateEvent,
-    EventType.SUBSCRIPTION_DELETE.value: SubscriptionDeleteEvent,
-    EventType.TYPING_START.value: GuildTypingStartEvent | DirectTypingStartEvent,
-    EventType.USER_UPDATE.value: UserUpdateEvent,
-    EventType.VOICE_CHANNEL_STATUS_UPDATE.value: VoiceChannelStatusUpdateEvent,
-    EventType.VOICE_CHANNEL_START_TIME_UPDATE.value: VoiceChannelStartTimeUpdateEvent,
-    EventType.VOICE_CHANNEL_EFFECT_SEND.value: VoiceChannelEffectSendEvent,
-    EventType.VOICE_STATE_UPDATE.value: VoiceStateUpdateEvent,
-    EventType.VOICE_SERVER_UPDATE.value: VoiceServerUpdateEvent,
-    EventType.WEBHOOKS_UPDATE.value: WebhooksUpdateEvent,
-    EventType.MESSAGE_POLL_VOTE_ADD.value: (
-        GuildMessagePollVoteAddEvent | DirectMessagePollVoteAddEvent
-    ),
-    EventType.MESSAGE_POLL_VOTE_REMOVE.value: (
-        GuildMessagePollVoteRemoveEvent | DirectMessagePollVoteRemoveEvent
-    ),
-}
-
 _model_types_namespace = vars(_model_module)
 
 for _, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass):
@@ -1324,6 +1213,9 @@ for _, obj in inspect.getmembers(sys.modules[__name__], inspect.isclass):
                     if isinstance(v, type)
                 }
             )
+
+initialize_event_registry(sys.modules[__name__])
+event_classes = {name: binding.event_type for name, binding in EVENT_BINDINGS.items()}
 
 __all__ = [
     "ApplicationCommandAutoCompleteInteractionEvent",

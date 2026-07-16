@@ -1,5 +1,9 @@
 from nonebot.adapters.discord.api.model import MessageGet
-from nonebot.adapters.discord.message import Message, MessageSegment, parse_message
+from nonebot.adapters.discord.domains.message.conversion import (
+    compile_message,
+    to_legacy_kwargs,
+)
+from nonebot.adapters.discord.message import Message, MessageSegment
 
 from nonebot.compat import type_validate_python
 import pytest
@@ -84,7 +88,7 @@ def test_parse_message_raises_for_non_sendable_attachment() -> None:
     )
 
     with pytest.raises(ValueError, match=r"bot\.fetch_attachments\(message\)"):
-        parse_message(message)
+        compile_message(message)
 
 
 def test_parse_message_keeps_file_attachment_upload_behavior() -> None:
@@ -97,7 +101,7 @@ def test_parse_message_keeps_file_attachment_upload_behavior() -> None:
         )
     )
 
-    payload = parse_message(message)
+    payload = to_legacy_kwargs(compile_message(message))
 
     assert "content" not in payload
     assert payload["attachments"][0].filename == "a.png"

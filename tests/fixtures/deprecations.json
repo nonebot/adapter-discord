@@ -1,0 +1,30 @@
+{
+  "removal_target": "2.0.0",
+  "callables": [
+    {
+      "fully_qualified_name": "nonebot.adapters.discord.message.parse_message",
+      "removal_target": "2.0.0",
+      "warning": "parse_message() is deprecated and will be removed in 2.0; pass Message to Bot.send/Bot.send_to or construct the raw request model explicitly"
+    },
+    {
+      "fully_qualified_name": "nonebot.adapters.discord.commands.matcher.ApplicationCommandMatcher.send_deferred_response",
+      "removal_target": "2.0.0",
+      "warning": "ApplicationCommandMatcher.send_deferred_response() is deprecated and will be removed in 2.0; inject CommandResponse and call response.defer()"
+    },
+    {
+      "fully_qualified_name": "nonebot.adapters.discord.commands.matcher.ApplicationCommandMatcher.send_response",
+      "removal_target": "2.0.0",
+      "warning": "ApplicationCommandMatcher.send_response() is deprecated and will be removed in 2.0; inject CommandResponse and call response.respond()"
+    },
+    {
+      "fully_qualified_name": "nonebot.adapters.discord.commands.matcher.ApplicationCommandMatcher.send_followup_msg",
+      "removal_target": "2.0.0",
+      "warning": "ApplicationCommandMatcher.send_followup_msg() is deprecated and will be removed in 2.0; inject CommandResponse and call response.followup()"
+    }
+  ],
+  "legacy_fallback": {
+    "behavior": "nonebot.adapters.discord.bot.Bot.send automatically creates a followup after an unmanaged interaction callback raises ActionFailed",
+    "removal_target": "2.0.0",
+    "warning": "Automatic interaction followup after ActionFailed is deprecated and will be removed in 2.0; use CommandResponse or InteractionResponder to manage response state explicitly"
+  }
+}

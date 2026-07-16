@@ -6,11 +6,16 @@ from .commands import (
     CommandMessage,
     CommandOption,
     CommandOptionType,
+    CommandResponse,
     CommandUser,
     on_message_command,
     on_slash_command,
     on_user_command,
     sync_application_command,
+)
+from .domains.interaction.lifecycle import (
+    InteractionResponder,
+    InteractionStateError,
 )
 from .event import (
     ApplicationCommandAutoCompleteInteractionEvent,
@@ -135,7 +140,7 @@ from .message import (
 )
 from .utils import log as log
 
-__all__ = [
+__all__ = [  # noqa: RUF022 - 1.x fixture requires the additions below at the tail.
     "UNSET",
     "Adapter",
     "ApplicationCommandAutoCompleteInteractionEvent",
@@ -266,4 +271,7 @@ __all__ = [
     "on_slash_command",
     "on_user_command",
     "sync_application_command",
+    "CommandResponse",
+    "InteractionResponder",
+    "InteractionStateError",
 ]

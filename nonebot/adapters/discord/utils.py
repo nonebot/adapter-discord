@@ -5,7 +5,7 @@ from nonebot.compat import PYDANTIC_V2
 from nonebot.utils import logger_wrapper
 from pydantic import BaseModel
 
-from .api.types import UNSET
+from .protocol import UNSET
 
 if PYDANTIC_V2:
     from pydantic.main import IncEx

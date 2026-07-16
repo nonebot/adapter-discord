@@ -2,12 +2,13 @@ from collections.abc import Iterable
 from copy import deepcopy
 from dataclasses import dataclass
 import datetime
+from importlib import import_module
 import re
 from typing import (
     Any,
     overload,
 )
-from typing_extensions import Self, override
+from typing_extensions import Self, deprecated, override
 
 from nonebot.adapters import (
     Message as BaseMessage,
@@ -16,8 +17,8 @@ from nonebot.adapters import (
 
 from nonebot.compat import type_validate_python
 
-from .api import (
-    UNSET,
+from .domains.message._attachment_errors import get_unsendable_attachment_message
+from .domains.models import (
     ActionRow,
     AttachmentSend,
     Button,
@@ -28,15 +29,12 @@ from .api import (
     MessageGet,
     MessageReference,
     Poll,
-    PollAnswerRequest,
     PollRequest,
     SelectMenu,
-    Snowflake,
-    SnowflakeType,
     TextInput,
     TimeStampStyle,
 )
-from .api.types import is_not_unset
+from .protocol import UNSET, Snowflake, SnowflakeType, is_not_unset
 from .utils import unescape
 
 
@@ -174,7 +172,7 @@ class MessageSegment(BaseMessageSegment["Message"]):
 
     @staticmethod
     def reference(
-        reference: SnowflakeType | MessageReference,
+        reference: SnowflakeType | MessageReference | None,
         channel_id: SnowflakeType | None = None,
         guild_id: SnowflakeType | None = None,
         fail_if_not_exists: bool | None = None,  # noqa: FBT001
@@ -183,10 +181,12 @@ class MessageSegment(BaseMessageSegment["Message"]):
             _reference = reference
         else:
             _reference = MessageReference(
-                message_id=Snowflake(reference) if reference else UNSET,
-                channel_id=Snowflake(channel_id) if channel_id else UNSET,
-                guild_id=Snowflake(guild_id) if guild_id else UNSET,
-                fail_if_not_exists=fail_if_not_exists or UNSET,
+                message_id=Snowflake(reference) if reference is not None else UNSET,
+                channel_id=Snowflake(channel_id) if channel_id is not None else UNSET,
+                guild_id=Snowflake(guild_id) if guild_id is not None else UNSET,
+                fail_if_not_exists=(
+                    fail_if_not_exists if fail_if_not_exists is not None else UNSET
+                ),
             )
 
         return ReferenceSegment("reference", {"reference": _reference})
@@ -638,52 +638,22 @@ class Message(BaseMessage[MessageSegment]):
         if attachments_segment is not None:
             for index, attachment in enumerate(attachments_segment):
                 if attachment.data["file"] is None:
-                    raise ValueError(_get_unsendable_attachment_msg(index, attachment))
+                    raise ValueError(
+                        get_unsendable_attachment_message(index, attachment)
+                    )
         return new
 
 
+@deprecated(
+    "parse_message() is deprecated and will be removed in 2.0; pass Message to "
+    "Bot.send/Bot.send_to or construct the raw request model explicitly",
+    stacklevel=2,
+)
 def parse_message(message: Message | MessageSegment | str) -> dict[str, Any]:
-    message = MessageSegment.text(message) if isinstance(message, str) else message
-    message = message if isinstance(message, Message) else Message(message)
+    """Compile a message through the 1.x compatibility payload shape."""
 
-    content = message.extract_content() or None
-    if embeds := (message["embed"] or None):
-        embeds = [embed.data["embed"] for embed in embeds]
-    if reference := (message["reference"] or None):
-        reference = reference[-1].data["reference"]
-    if components := (message["component"] or None):
-        components = [component.data["component"] for component in components]
-    if sticker_ids := (message["sticker"] or None):
-        sticker_ids = [sticker.data["id"] for sticker in sticker_ids]
-    if poll := (message["poll"] or None):
-        poll = poll[-1].data["poll"]
-        if isinstance(poll, Poll):
-            poll = PollRequest(
-                question=poll.question,
-                answers=[
-                    PollAnswerRequest(poll_media=answer.poll_media)
-                    for answer in poll.answers
-                ],
-                allow_multiselect=poll.allow_multiselect,
-                layout_type=poll.layout_type,
-            )
-
-    attachments, files = extract_attachments(message)
-
-    return {
-        k: v
-        for k, v in {
-            "content": content,
-            "embeds": embeds,
-            "message_reference": reference,
-            "components": components,
-            "sticker_ids": sticker_ids,
-            "poll": poll,
-            "files": files,
-            "attachments": attachments,
-        }.items()
-        if v is not None
-    }
+    conversion = import_module("nonebot.adapters.discord.domains.message.conversion")
+    return conversion.to_legacy_kwargs(conversion.compile_message(message))
 
 
 def extract_attachments(
@@ -698,24 +668,10 @@ def extract_attachments(
     for index, attachment in enumerate(attachments_segment):
         file = attachment.data["file"]
         if file is None:
-            raise ValueError(_get_unsendable_attachment_msg(index, attachment))
+            raise ValueError(get_unsendable_attachment_message(index, attachment))
         attachments_list.append(attachment.data["attachment"])
         files_list.append(file)
 
     attachments = attachments_list or None
     files = files_list or None
     return attachments, files
-
-
-def _get_unsendable_attachment_msg(index: int, attachment: MessageSegment) -> str:
-    if attachment.data.get("url") or attachment.data.get("proxy_url"):
-        return (
-            f"Attachment segment at index {index} is not sendable because file "
-            "content is missing; call "
-            "`await bot.fetch_attachments(message)` first"
-        )
-    return (
-        f"Attachment segment at index {index} is not sendable because file "
-        "content is missing; provide `content=` in "
-        "MessageSegment.attachment(...)"
-    )

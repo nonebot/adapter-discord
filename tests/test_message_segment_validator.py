@@ -12,7 +12,11 @@ from nonebot.adapters.discord.api import (
     PollRequest,
 )
 from nonebot.adapters.discord.api.types import is_unset
-from nonebot.adapters.discord.message import Message, MessageSegment, parse_message
+from nonebot.adapters.discord.domains.message.conversion import (
+    compile_message,
+    to_legacy_kwargs,
+)
+from nonebot.adapters.discord.message import Message, MessageSegment
 
 from nonebot.compat import type_validate_python
 import pytest
@@ -145,7 +149,7 @@ def test_parse_message_integration() -> None:
     )
     msg.append(MessageSegment.poll(poll))
 
-    payload = parse_message(msg)
+    payload = to_legacy_kwargs(compile_message(msg))
     assert payload["content"] == "hi"
     assert payload["embeds"][0].title == "t"
     assert int(payload["message_reference"].message_id) == 123

@@ -5,16 +5,15 @@ from typing_extensions import override
 from nonebot.dependencies import Param
 from nonebot.params import Depends
 
-from ..api import (
+from ..domains.models import (
+    ApplicationCommandInteractionDataOption,
     ApplicationCommandOptionType,
     ApplicationCommandType,
     MessageGet,
-    Snowflake,
     User,
 )
-from ..api.model import ApplicationCommandInteractionDataOption
-from ..api.types import Missing, is_not_unset, is_unset
 from ..event import ApplicationCommandInteractionEvent
+from ..protocol import Missing, Snowflake, is_not_unset, is_unset
 
 T = TypeVar("T")
 
