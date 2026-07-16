@@ -10,7 +10,6 @@ from .._model_support import (
     ChannelType,
     Field,
     Generic,
-    GenericModel,
     InteractionContextType,
     Missing,
     MissingOrNullable,
@@ -134,7 +133,7 @@ class ApplicationCommandOption(BaseModel):
     this STRING, INTEGER, or NUMBER type option"""
 
 
-class OptionChoice(GenericModel, Generic[T]):
+class OptionChoice(BaseModel, Generic[T]):
     """Application Command Option Choice
 
     see https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure

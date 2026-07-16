@@ -2,7 +2,6 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any, TypeAlias
 import zlib
 
-from nonebot.compat import PYDANTIC_V2
 from nonebot.utils import logger_wrapper
 from pydantic import BaseModel
 
@@ -36,10 +35,7 @@ def reject_unset_values(value: object, path: str = "$") -> None:  # noqa: C901
         )
         raise TypeError(msg)
     if isinstance(value, BaseModel):
-        field_names = getattr(
-            type(value),
-            "model_fields" if PYDANTIC_V2 else "__fields__",
-        )
+        field_names = type(value).model_fields
         for field_name in field_names:
             item = getattr(value, field_name)
             if item is not UNSET:
@@ -78,7 +74,6 @@ def omit_unset(data: Any) -> Any:  # noqa: ANN401
     return data
 
 
-# TODO)): Switch back to nonebot.compat.model_dump. Wait for the next release.
 def model_dump(  # noqa: PLR0913
     model: BaseModel,
     include: IncEx | None = None,
@@ -92,24 +87,14 @@ def model_dump(  # noqa: PLR0913
 ) -> dict[str, Any]:
     """Dump a model to Python data; transport JSON encoding lives elsewhere."""
 
-    if PYDANTIC_V2:
-        data = model.model_dump(
-            include=include,
-            exclude=exclude,
-            by_alias=by_alias,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
-        )
-    else:
-        data = model.dict(
-            include=include,
-            exclude=exclude,
-            by_alias=by_alias,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
-        )
+    data = model.model_dump(
+        include=include,
+        exclude=exclude,
+        by_alias=by_alias,
+        exclude_unset=exclude_unset,
+        exclude_defaults=exclude_defaults,
+        exclude_none=exclude_none,
+    )
     if omit_unset_values:
         data = omit_unset(data)
     return data

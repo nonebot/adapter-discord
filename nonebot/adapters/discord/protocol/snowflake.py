@@ -2,11 +2,8 @@ import datetime
 from typing import Any, TypeAlias, final
 from typing_extensions import Self
 
-from nonebot.compat import PYDANTIC_V2
-
-if PYDANTIC_V2:
-    from pydantic import GetCoreSchemaHandler
-    from pydantic_core import CoreSchema, core_schema
+from pydantic import GetCoreSchemaHandler
+from pydantic_core import CoreSchema, core_schema
 
 
 @final
@@ -20,39 +17,22 @@ class Snowflake(int):
 
     __slots__ = ()
 
-    if PYDANTIC_V2:
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls,
+        source: Any,  # noqa: ANN401
+        handler: GetCoreSchemaHandler,
+    ) -> CoreSchema:
+        return core_schema.no_info_plain_validator_function(cls.validate)
 
-        @classmethod
-        def __get_pydantic_core_schema__(
-            cls,
-            source: Any,  # noqa: ANN401
-            handler: GetCoreSchemaHandler,
-        ) -> CoreSchema:
-            return core_schema.with_info_plain_validator_function(cls.validate)
-
-        @classmethod
-        def validate(cls, value: Any, _) -> Self:  # noqa: ANN001, ANN401
-            if isinstance(value, str) and value.isdigit():
-                value = int(value)
-            if not isinstance(value, int):
-                msg = f"{value!r} is not int or str of int"
-                raise TypeError(msg)
-            return cls(value)
-
-    else:
-
-        @classmethod
-        def __get_validators__(cls):  # noqa: ANN206
-            yield cls.validate
-
-        @classmethod
-        def validate(cls, value: Any):  # noqa: ANN206, ANN401
-            if isinstance(value, str) and value.isdigit():
-                value = int(value)
-            if not isinstance(value, int):
-                msg = f"{value!r} is not int or str of int"
-                raise TypeError(msg)
-            return cls(value)
+    @classmethod
+    def validate(cls, value: Any) -> Self:  # noqa: ANN401
+        if isinstance(value, str) and value.isdigit():
+            value = int(value)
+        if not isinstance(value, int):
+            msg = f"{value!r} is not int or str of int"
+            raise TypeError(msg)
+        return cls(value)
 
     @property
     def timestamp(self) -> int:

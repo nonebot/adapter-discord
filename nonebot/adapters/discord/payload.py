@@ -1,8 +1,7 @@
 from enum import IntEnum
 from typing import Annotated, Literal, TypeAlias
 
-from nonebot.compat import PYDANTIC_V2, ConfigDict
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from .domains.models import (
     Hello as HelloData,
@@ -23,14 +22,11 @@ class Opcode(IntEnum):
 
 
 class Payload(BaseModel):
-    if PYDANTIC_V2:
-        model_config = ConfigDict(extra="allow", populate_by_name=True)
-
-    else:
-
-        class Config(ConfigDict):
-            extra = "allow"
-            allow_population_by_field_name = True
+    model_config = ConfigDict(
+        extra="allow",
+        validate_by_alias=True,
+        validate_by_name=True,
+    )
 
 
 class Dispatch(Payload):

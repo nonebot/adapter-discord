@@ -74,19 +74,10 @@ def _sample(  # noqa: C901, PLR0911, PLR0912
         return Snowflake(1)
     if isinstance(annotation, type) and issubclass(annotation, BaseModel):
         values: dict[str, object] = {}
-        fields = getattr(annotation, "model_fields", None) or annotation.__fields__
+        fields = annotation.model_fields
         for name, field in fields.items():
-            is_required = getattr(field, "is_required", None)
-            required = (
-                is_required()
-                if callable(is_required)
-                else bool(getattr(field, "required", False))
-            )
-            if required:
-                field_annotation = getattr(field, "annotation", None)
-                if field_annotation is None:
-                    field_annotation = object.__getattribute__(field, "outer_type_")
-                values[name] = _sample(field_annotation, depth=depth + 1)
+            if field.is_required():
+                values[name] = _sample(field.annotation, depth=depth + 1)
         return annotation(**values)
     return 1
 

@@ -11,7 +11,6 @@ from nonebot.adapters.discord.domains.message.write import MessageSend
 from nonebot.adapters.discord.domains.webhook.write import ExecuteWebhookParams
 from nonebot.adapters.discord.utils import reject_unset_values
 
-from nonebot.compat import PYDANTIC_V2
 from pydantic import ValidationError
 import pytest
 
@@ -55,11 +54,8 @@ def test_validate_outbound_value_returns_original_mapping() -> None:
 
 def test_validate_outbound_value_rejects_strict_bool_as_int() -> None:
     value = {"nested": {"required": True}}
-    if PYDANTIC_V2:
-        with pytest.raises(ValidationError):
-            validate_outbound_value(Payload, value)
-    else:
-        assert validate_outbound_value(Payload, value) is value
+    with pytest.raises(ValidationError):
+        validate_outbound_value(Payload, value)
 
 
 @pytest.mark.parametrize(
@@ -86,7 +82,6 @@ def test_reject_unset_values_reports_deterministic_path(
         reject_unset_values(value)
 
 
-@pytest.mark.skipif(not PYDANTIC_V2, reason="strict TypedDict validation needs v2")
 @pytest.mark.parametrize(
     ("annotation", "value"),
     [

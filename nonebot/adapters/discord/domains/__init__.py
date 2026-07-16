@@ -12,7 +12,6 @@ _FORWARD_REFERENCE_NAMESPACE = {
         "Any",
         "BaseModel",
         "Generic",
-        "GenericModel",
         "Literal",
         "T",
         "TypeVar",

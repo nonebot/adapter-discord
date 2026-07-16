@@ -6,7 +6,6 @@ from types import ModuleType
 from typing import get_type_hints
 from typing_extensions import is_typeddict
 
-from nonebot.compat import PYDANTIC_V2
 from pydantic import BaseModel
 
 from .. import protocol
@@ -82,10 +81,7 @@ def rebuild_domain_models(  # noqa: C901
         )
 
     for model in canonical_models:
-        if PYDANTIC_V2:
-            model.model_rebuild(force=True, _types_namespace=namespace)
-        else:
-            model.update_forward_refs(**namespace)
+        model.model_rebuild(force=True, _types_namespace=namespace)
     return namespace
 
 
