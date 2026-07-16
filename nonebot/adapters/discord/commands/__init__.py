@@ -10,4 +10,5 @@ from .params import (
     CommandOptionType as CommandOptionType,
     CommandUser as CommandUser,
 )
+from .response import CommandResponse as CommandResponse
 from .storage import sync_application_command as sync_application_command

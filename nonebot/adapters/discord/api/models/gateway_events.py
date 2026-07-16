@@ -29,22 +29,19 @@ from ..model import (
     Reaction,
     ResolvedData,
     RoleSubscriptionData,
-    Snowflake,
     Sticker,
     StickerItem,
     User,
 )
 from ..types import (
-    UNSET,
     ApplicationIntegrationType,
     InteractionContextType,
     InteractionType,
     MessageFlag,
     MessageType,
-    Missing,
-    MissingOrNullable,
     ReactionType,
 )
+from ...protocol import UNSET, Missing, MissingOrNullable, Snowflake
 
 
 class InteractionCreateBasePayload(BaseModel):

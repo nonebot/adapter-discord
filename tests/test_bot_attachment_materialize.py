@@ -1,4 +1,8 @@
-from nonebot.adapters.discord.message import Message, MessageSegment, parse_message
+from nonebot.adapters.discord.domains.message.conversion import (
+    compile_message,
+    to_legacy_kwargs,
+)
+from nonebot.adapters.discord.message import Message, MessageSegment
 from tests.fake.doubles import DummyAdapter, DummyBot
 
 import pytest
@@ -22,7 +26,7 @@ async def test_fetch_attachments_materializes_remote_attachment_to_file() -> Non
     )
 
     fetched = await bot.fetch_attachments(message)
-    payload = parse_message(fetched)
+    payload = to_legacy_kwargs(compile_message(fetched))
 
     assert message["attachment"][0].data["file"] is None
     assert payload["content"] == "foo"
@@ -54,7 +58,7 @@ async def test_fetch_attachments_supports_custom_allowed_hosts() -> None:
     message.append(MessageSegment.attachment("a.png", url="https://example.com/a.png"))
 
     fetched = await bot.fetch_attachments(message, allowed_hosts={"example.com"})
-    payload = parse_message(fetched)
+    payload = to_legacy_kwargs(compile_message(fetched))
 
     assert payload["attachments"][0].filename == "a.png"
     assert payload["files"][0].content == b"image"

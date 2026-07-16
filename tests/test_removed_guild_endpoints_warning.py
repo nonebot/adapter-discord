@@ -1,34 +1,23 @@
 from collections.abc import Awaitable, Callable
 
-import nonebot.adapters.discord.api.handle as handle_module
+import nonebot.adapters.discord.transport.exchange as exchange_module
 from tests.fake.doubles import DummyAdapter, DummyBot
 
+from nonebot.drivers import Request, Response
 import pytest
 
 
 @pytest.fixture
 def patch_api_runtime(monkeypatch: pytest.MonkeyPatch) -> None:
-    async def fake_request(
-        _adapter: object,
-        _request_obj: object,
-        *,
-        parse_json: bool = True,
-    ) -> dict[str, object]:
-        del parse_json
-        return {}
+    async def fake_request(_adapter: object, _request: Request) -> Response:
+        return Response(200, content=b"{}")
 
     def fake_type_validate_python(_type: object, value: object) -> object:
         return value
 
-    def fake_encode_model_json_data(value: object, **_kwargs: object) -> object:
-        return value
-
-    monkeypatch.setattr(handle_module, "_request", fake_request)
+    monkeypatch.setattr(DummyAdapter, "request", fake_request)
     monkeypatch.setattr(
-        handle_module, "type_validate_python", fake_type_validate_python
-    )
-    monkeypatch.setattr(
-        handle_module, "encode_model_json_data", fake_encode_model_json_data
+        exchange_module, "type_validate_python", fake_type_validate_python
     )
 
 

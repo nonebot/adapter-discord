@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from .api import Snowflake
+from .protocol import Snowflake
 
 
 class Intents(BaseModel):
