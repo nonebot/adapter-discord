@@ -19,6 +19,7 @@ from nonebot.adapters.discord.api.model import (
 )
 from nonebot.adapters.discord.api.types import UNSET
 from nonebot.adapters.discord.api.utils import parse_data, parse_forum_thread_message
+from nonebot.adapters.discord.event import GuildCreateEvent
 from nonebot.adapters.discord.serialization import (
     PreparedRequest,
     encode_prepared_request,
@@ -137,6 +138,25 @@ def test_parse_data_keeps_action_row_type_for_components() -> None:
     )
     assert "content" not in payload
     assert int(payload["components"][0]["type"]) == int(ComponentType.ActionRow)
+
+
+def test_guild_create_channel_application_id_is_nullable() -> None:
+    event = type_validate_python(
+        GuildCreateEvent,
+        {
+            "id": "1",
+            "channels": [
+                {
+                    "id": "10",
+                    "type": 2,
+                    "application_id": None,
+                }
+            ],
+        },
+    )
+
+    assert isinstance(event.channels, list)
+    assert event.channels[0].application_id is None
 
 
 def test_component_emoji_allows_missing_partial_fields() -> None:
