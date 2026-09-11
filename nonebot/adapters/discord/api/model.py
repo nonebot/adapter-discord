@@ -1431,8 +1431,9 @@ class Channel(BaseModel):
     """icon hash of the group DM"""
     owner_id: Missing[Snowflake] = UNSET
     """id of the creator of the group DM or thread"""
-    application_id: Missing[Snowflake] = UNSET
-    """application id of the group DM creator if it is bot-created"""
+    application_id: MissingOrNullable[Snowflake] = UNSET
+    """application id associated with the channel.
+    for group DMs, this is the application that created the group"""
     managed: Missing[bool] = UNSET
     """for group DM channels: whether the channel is managed
     by an application via the gdm.join OAuth2 scope"""
