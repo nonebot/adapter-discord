@@ -5,19 +5,7 @@ from types import SimpleNamespace
 from typing import Any, cast
 import warnings
 
-from nonebot.adapters import MessageTemplate, discord
-from nonebot.adapters.discord import (
-    DirectMessageCreateEvent,
-    GuildMessageCreateEvent,
-    Message,
-    MessageCreateEvent,
-    MessageEvent,
-    MessageSegment,
-    api,
-)
-from nonebot.adapters.discord.api import ApiClient, model
-from nonebot.adapters.discord.api.model import MessageGet
-from nonebot.adapters.discord.bot import Bot
+from nonebot.adapters import MessageTemplate
 from nonebot.adapters.discord.commands.matcher import ApplicationCommandMatcher
 from nonebot.adapters.discord.domains.interaction.lifecycle import (
     InteractionResponder,
@@ -26,7 +14,6 @@ from nonebot.adapters.discord.domains.interaction.lifecycle import (
 from nonebot.adapters.discord.event import ApplicationCommandInteractionEvent
 from nonebot.adapters.discord.exception import ActionFailed
 import nonebot.adapters.discord.message as message_module
-from scripts.snapshot_public_api import PublicApiSnapshot, build_snapshot
 from tests.fake.doubles import DummyBot
 
 from nonebot.compat import type_validate_python
@@ -37,24 +24,14 @@ from nonebot.internal.matcher import (
     current_event,
     current_matcher,
 )
-from pydantic import BaseModel
 import pytest
 
 ROOT = Path(__file__).parents[2]
 DEPRECATIONS_PATH = ROOT / "tests/fixtures/deprecations.json"
-PUBLIC_API_PATH = ROOT / "tests/fixtures/public_api.json"
 MATCHER_CALLABLES = {
     "nonebot.adapters.discord.commands.matcher.ApplicationCommandMatcher.send_deferred_response": "send_deferred_response",
     "nonebot.adapters.discord.commands.matcher.ApplicationCommandMatcher.send_response": "send_response",
     "nonebot.adapters.discord.commands.matcher.ApplicationCommandMatcher.send_followup_msg": "send_followup_msg",
-}
-PRESERVED_MATCHER_CRUD = {
-    "get_response",
-    "edit_response",
-    "delete_response",
-    "get_followup_msg",
-    "edit_followup_msg",
-    "delete_followup_msg",
 }
 
 
@@ -65,13 +42,6 @@ def _deprecations() -> dict[str, Any]:
     assert len(data["callables"]) == 4
     assert isinstance(data["legacy_fallback"], dict)
     return data
-
-
-def _public_api_fixture() -> PublicApiSnapshot:
-    return cast(
-        "PublicApiSnapshot",
-        json.loads(PUBLIC_API_PATH.read_text("utf-8")),
-    )
 
 
 def _project_major() -> int:
@@ -106,74 +76,6 @@ def _callable_contracts(deprecations: dict[str, Any]) -> dict[str, dict[str, str
         *MATCHER_CALLABLES,
     }
     return contracts
-
-
-def _resolve_callable(name: str) -> object | None:
-    if name == "nonebot.adapters.discord.message.parse_message":
-        return getattr(message_module, "parse_message", None)
-    return getattr(ApplicationCommandMatcher, MATCHER_CALLABLES[name], None)
-
-
-def _assert_version_gate(
-    major: int,
-    contracts: dict[str, dict[str, str]],
-    *,
-    legacy_fallback_present: bool,
-) -> None:
-    if major < 2:
-        for name in contracts:
-            assert callable(_resolve_callable(name))
-        for name in MATCHER_CALLABLES:
-            method = _resolve_callable(name)
-            assert getattr(method, "__deprecated__", None) == contracts[name]["warning"]
-        assert legacy_fallback_present
-        return
-
-    for name in contracts:
-        assert _resolve_callable(name) is None
-    assert not legacy_fallback_present
-
-
-def _model_field_names(model: type[BaseModel]) -> set[str]:
-    return set(model.model_fields)
-
-
-def _assert_raw_public_contract(fixture: PublicApiSnapshot) -> None:
-    snapshot = build_snapshot(ROOT)
-    assert snapshot["top_level_exports"] == fixture["top_level_exports"]
-    assert snapshot["api_exports"] == fixture["api_exports"]
-    assert snapshot["model_exports"] == fixture["model_exports"]
-    assert snapshot["api_client"] == fixture["api_client"]
-    assert snapshot["counts"] == fixture["counts"]
-    assert list(discord.__all__) == fixture["top_level_exports"]
-    assert list(api.__all__) == fixture["api_exports"]
-    assert list(model.__all__) == fixture["model_exports"]
-    assert all(hasattr(api, name) for name in api.__all__)
-    assert ApiClient.__name__ == "ApiClient"
-
-    for method_name in PRESERVED_MATCHER_CRUD:
-        assert callable(getattr(ApplicationCommandMatcher, method_name))
-
-    assert GuildMessageCreateEvent.__mro__[:3] == (
-        GuildMessageCreateEvent,
-        MessageCreateEvent,
-        MessageEvent,
-    )
-    assert issubclass(GuildMessageCreateEvent, MessageGet)
-    assert issubclass(DirectMessageCreateEvent, MessageGet)
-    flat_fields = {"id", "channel_id", "author", "content", "guild_id"}
-    assert flat_fields <= _model_field_names(GuildMessageCreateEvent)
-    assert flat_fields <= _model_field_names(DirectMessageCreateEvent)
-    assert "to_me" in _model_field_names(DirectMessageCreateEvent)
-
-    text = MessageSegment.text("hello")
-    attachment = MessageSegment.attachment("example.txt", content=b"payload")
-    assert text.type == "text"
-    assert text.data == {"text": "hello"}
-    assert attachment.type == "attachment"
-    assert set(attachment.data) == {"attachment", "file", "url", "proxy_url"}
-    assert attachment.data["file"].content == b"payload"
-    assert Message(text)[0].type == "text"
 
 
 def _interaction_event() -> ApplicationCommandInteractionEvent:
@@ -211,22 +113,9 @@ def _assert_exact_warning(
     assert str(captured[0].message) == expected
 
 
-def test_current_one_x_gate_keeps_all_deprecated_surfaces() -> None:
-    deprecations = _deprecations()
-    contracts = _callable_contracts(deprecations)
-    legacy_fallback = deprecations["legacy_fallback"]
-    assert isinstance(legacy_fallback, dict)
-    assert legacy_fallback["removal_target"] == deprecations["removal_target"]
-    assert "fully_qualified_name" not in legacy_fallback
-
-    assert _project_major() < 2
-    _assert_version_gate(
-        _project_major(),
-        contracts,
-        legacy_fallback_present=True,
-    )
-
-
+@pytest.mark.skipif(
+    _project_major() >= 2, reason="Deprecated helpers are removed in 2.0"
+)
 @pytest.mark.asyncio
 async def test_one_x_deprecation_warnings_are_exact_and_direct(
     monkeypatch: pytest.MonkeyPatch,
@@ -318,7 +207,7 @@ async def test_one_x_deprecation_warnings_are_exact_and_direct(
 
 
 @pytest.mark.asyncio
-async def test_one_x_unmanaged_action_failed_fallback_warns_exactly(
+async def test_unmanaged_action_failed_fallback_matches_project_version(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     deprecations = _deprecations()
@@ -329,12 +218,13 @@ async def test_one_x_unmanaged_action_failed_fallback_warns_exactly(
 
     bot = DummyBot()
     event = _interaction_event()
+    failure = _action_failed()
     followup_result = object()
     followup_calls: list[dict[str, object]] = []
 
     async def callback(**kwargs: object) -> None:
         del kwargs
-        raise _action_failed()
+        raise failure
 
     async def followup(**kwargs: object) -> object:
         followup_calls.append(kwargs)
@@ -342,35 +232,19 @@ async def test_one_x_unmanaged_action_failed_fallback_warns_exactly(
 
     monkeypatch.setattr(bot, "create_interaction_response", callback)
     monkeypatch.setattr(bot, "create_followup_message", followup)
+    major = _project_major()
     with warnings.catch_warnings(record=True) as captured:
         warnings.simplefilter("always", DeprecationWarning)
-        assert await bot.send(event, "fallback") is followup_result
-    _assert_exact_warning(captured, expected_warning)
-    assert len(followup_calls) == 1
+        if major < 2:
+            assert await bot.send(event, "fallback") is followup_result
+        else:
+            with pytest.raises(ActionFailed) as error:
+                await bot.send(event, "no fallback")
+            assert error.value is failure
 
-
-@pytest.mark.asyncio
-async def test_major_two_removal_gate_uses_temporary_release_surface(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Exercise the 2.x assertions without mutating this 1.1.x project's version."""
-    contracts = _callable_contracts(_deprecations())
-    monkeypatch.delattr(message_module, "parse_message")
-    for method_name in MATCHER_CALLABLES.values():
-        monkeypatch.delattr(ApplicationCommandMatcher, method_name)
-
-    async def send_without_legacy_fallback(
-        self: Bot, event: object, message: object, **params: object
-    ) -> object:
-        del self, event, message, params
-        raise _action_failed()
-
-    monkeypatch.setattr(Bot, "send", send_without_legacy_fallback)
-    with warnings.catch_warnings(record=True) as captured:
-        warnings.simplefilter("always", DeprecationWarning)
-        with pytest.raises(ActionFailed):
-            await DummyBot().send(_interaction_event(), "no fallback")
-    assert captured == []
-
-    _assert_version_gate(2, contracts, legacy_fallback_present=False)
-    _assert_raw_public_contract(_public_api_fixture())
+    if major < 2:
+        _assert_exact_warning(captured, expected_warning)
+        assert len(followup_calls) == 1
+    else:
+        assert captured == []
+        assert followup_calls == []

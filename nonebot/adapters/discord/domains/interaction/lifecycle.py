@@ -153,7 +153,6 @@ class InteractionResponder:
         tts: bool,
         allowed_mentions: AllowedMention | None,
     ) -> MessageGet:
-        self._state = InteractionState.ACKNOWLEDGING
         response = InteractionResponse(
             type=InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
             data=to_interaction_callback(
@@ -163,6 +162,7 @@ class InteractionResponder:
                 flags=flags,
             ),
         )
+        self._state = InteractionState.ACKNOWLEDGING
         try:
             await self._bot.create_interaction_response(
                 interaction_id=self._interaction_id,
@@ -254,7 +254,6 @@ class InteractionResponder:
             if self._state is not InteractionState.NEW:
                 raise _interaction_state_error(_ALREADY_ACKNOWLEDGED_MESSAGE)
 
-            self._state = InteractionState.ACKNOWLEDGING
             response = InteractionResponse(
                 type=InteractionCallbackType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
                 data=(
@@ -263,6 +262,7 @@ class InteractionResponder:
                     else UNSET
                 ),
             )
+            self._state = InteractionState.ACKNOWLEDGING
             try:
                 await self._bot.create_interaction_response(
                     interaction_id=self._interaction_id,

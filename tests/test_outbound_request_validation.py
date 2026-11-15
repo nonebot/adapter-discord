@@ -1,5 +1,5 @@
 import re
-from typing import Annotated
+from typing import Annotated, cast
 from typing_extensions import NotRequired, Required, TypedDict
 
 from nonebot.adapters.discord.api.types import UNSET
@@ -8,8 +8,11 @@ from nonebot.adapters.discord.domains.interaction.write import (
     InteractionCallbackMessage,
 )
 from nonebot.adapters.discord.domains.message.write import MessageSend
+from nonebot.adapters.discord.domains.models import File, MessageReference
 from nonebot.adapters.discord.domains.webhook.write import ExecuteWebhookParams
+from nonebot.adapters.discord.protocol import Snowflake
 from nonebot.adapters.discord.utils import reject_unset_values
+from tests.fake.doubles import DummyAdapter, DummyBot
 
 from pydantic import ValidationError
 import pytest
@@ -26,30 +29,58 @@ class Payload(TypedDict, total=False):
 
 
 @pytest.mark.parametrize(
-    ("value", "message"),
+    ("value", "location", "error_type"),
     [
-        ({}, "Missing required Discord REST fields at $: ['nested']"),
-        (
-            {"nested": {}},
-            "Missing required Discord REST fields at $.nested: ['required']",
-        ),
+        ({}, ("nested",), "missing"),
+        ({"nested": {}}, ("nested", "required"), "missing"),
         (
             {"nested": {"required": 1, "extra": 2}},
-            "Unknown Discord REST fields at $.nested: ['extra']",
+            ("nested", "extra"),
+            "extra_forbidden",
         ),
     ],
 )
 def test_validate_outbound_value_rejects_invalid_typed_dict_structure(
     value: object,
-    message: str,
+    location: tuple[str, ...],
+    error_type: str,
 ) -> None:
-    with pytest.raises(TypeError, match=f"^{re.escape(message)}$"):
+    with pytest.raises(ValidationError) as error:
         validate_outbound_value(Payload, value)
+
+    assert [(item["loc"], item["type"]) for item in error.value.errors()] == [
+        (location, error_type)
+    ]
 
 
 def test_validate_outbound_value_returns_original_mapping() -> None:
-    value: Payload = {"nested": {"required": 1}, "values": [2]}
-    assert validate_outbound_value(Payload, value) is value
+    file = File(filename="message.txt", content=b"content")
+    reference = MessageReference(message_id=Snowflake(1))
+    value: MessageSend = {"files": [file], "message_reference": reference}
+    assert validate_outbound_value(MessageSend, value) is value
+    assert value["files"][0] is file
+    assert value["message_reference"] is reference
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {"files": [{"filename": "message.txt", "content": b"content"}]},
+        {"message_reference": {"message_id": 1}},
+    ],
+)
+async def test_message_endpoint_requires_model_instances(
+    fields: dict[str, object],
+) -> None:
+    adapter = DummyAdapter()
+    bot = DummyBot(adapter)
+    request = cast("MessageSend", {"content": "message", **fields})
+
+    with pytest.raises(TypeError, match="Expected Discord model"):
+        await adapter._api_create_message(bot, channel_id=1, **request)  # noqa: SLF001
+
+    assert adapter.request_calls == 0
 
 
 def test_validate_outbound_value_rejects_strict_bool_as_int() -> None:

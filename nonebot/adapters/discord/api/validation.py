@@ -192,11 +192,12 @@ def _stable_key(value: object) -> tuple[str, str, str]:
     return (value_type.__module__, value_type.__qualname__, repr(value))
 
 
-def _validate_outbound_structure(  # noqa: C901, PLR0911, PLR0912
+def _validate_model_instances(  # noqa: C901, PLR0911, PLR0912
     annotation: object,
     value: object,
     path: str,
 ) -> None:
+    """Keep model-valued fields as instances for endpoint attribute access."""
     annotation = _unwrap_outbound_annotation(annotation)
     origin = get_origin(annotation)
     args = get_args(annotation)
@@ -226,7 +227,7 @@ def _validate_outbound_structure(  # noqa: C901, PLR0911, PLR0912
             if not matches:
                 continue
             try:
-                _validate_outbound_structure(unwrapped_candidate, value, path)
+                _validate_model_instances(unwrapped_candidate, value, path)
             except TypeError as exception:
                 errors.append(exception)
             else:
@@ -239,22 +240,9 @@ def _validate_outbound_structure(  # noqa: C901, PLR0911, PLR0912
         if not isinstance(value, Mapping):
             return
         annotations = annotation.__annotations__
-        required_keys = getattr(annotation, "__required_keys__", frozenset())
-        missing = [
-            key for key in annotations if key in required_keys and key not in value
-        ]
-        if missing:
-            msg = f"Missing required Discord REST fields at {path}: {missing!r}"
-            raise TypeError(msg)
-        unknown = sorted(
-            (key for key in value if key not in annotations), key=_stable_key
-        )
-        if unknown:
-            msg = f"Unknown Discord REST fields at {path}: {unknown!r}"
-            raise TypeError(msg)
         for key, field_annotation in annotations.items():
             if key in value:
-                _validate_outbound_structure(
+                _validate_model_instances(
                     field_annotation,
                     value[key],
                     f"{path}.{key}" if key.isidentifier() else f"{path}[{key!r}]",
@@ -275,22 +263,22 @@ def _validate_outbound_structure(  # noqa: C901, PLR0911, PLR0912
     if origin is list and isinstance(value, list):
         if args:
             for index, item in enumerate(value):
-                _validate_outbound_structure(args[0], item, f"{path}[{index}]")
+                _validate_model_instances(args[0], item, f"{path}[{index}]")
         return
     if origin is tuple and isinstance(value, tuple):
         if len(args) == _PAIR_ARGUMENT_COUNT and args[1] is Ellipsis:
             for index, item in enumerate(value):
-                _validate_outbound_structure(args[0], item, f"{path}[{index}]")
+                _validate_model_instances(args[0], item, f"{path}[{index}]")
         else:
             for index, (item, item_annotation) in enumerate(
                 zip(value, args, strict=False)
             ):
-                _validate_outbound_structure(item_annotation, item, f"{path}[{index}]")
+                _validate_model_instances(item_annotation, item, f"{path}[{index}]")
         return
     if origin in (set, frozenset, AbstractSet) and isinstance(value, (set, frozenset)):
         if args:
             for index, item in enumerate(sorted(value, key=_stable_key)):
-                _validate_outbound_structure(args[0], item, f"{path}[{index}]")
+                _validate_model_instances(args[0], item, f"{path}[{index}]")
         return
     if (
         origin in (dict, Mapping)
@@ -303,19 +291,19 @@ def _validate_outbound_structure(  # noqa: C901, PLR0911, PLR0912
                 if isinstance(key, str) and key.isidentifier()
                 else f"{path}[{key!r}]"
             )
-            _validate_outbound_structure(args[1], item, item_path)
+            _validate_model_instances(args[1], item, item_path)
 
 
 @cache
-def _outbound_adapter(annotation: object) -> Any:  # noqa: ANN401
-    return TypeAdapter(annotation)
+def _outbound_adapter(annotation: object) -> TypeAdapter[object]:
+    return TypeAdapter[object](annotation)
 
 
 def validate_outbound_value(annotation: object, value: T) -> T:
     """Validate outbound structure without replacing the caller's value."""
     reject_unset_values(value)
-    _validate_outbound_structure(annotation, value, "$")
-    _outbound_adapter(annotation).validate_python(value, strict=True)
+    _validate_model_instances(annotation, value, "$")
+    _outbound_adapter(annotation).validate_python(value, strict=True, extra="forbid")
     return value
 
 

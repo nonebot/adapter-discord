@@ -17,6 +17,7 @@ from nonebot.adapters.discord.domains.models import (
 )
 from nonebot.adapters.discord.event import ApplicationCommandInteractionEvent
 from nonebot.adapters.discord.exception import ActionFailed, NetworkError
+from nonebot.adapters.discord.message import MessageSegment
 from tests.fake.doubles import DummyBot
 
 from nonebot.compat import type_validate_python
@@ -101,6 +102,24 @@ def _responder(bot: RecordingBot) -> InteractionResponder:
         application_id=11,
         interaction_token=INTERACTION_TOKEN,
     )
+
+
+@pytest.mark.asyncio
+async def test_message_compilation_failure_keeps_initial_response_retryable() -> None:
+    bot = RecordingBot()
+    responder = _responder(bot)
+    attachment = MessageSegment.attachment(
+        "remote.txt", url="https://cdn.discordapp.com/attachments/1/2/remote.txt"
+    )
+
+    with pytest.raises(ValueError, match=r"bot\.fetch_attachments"):
+        await responder.respond(attachment)
+
+    assert responder.state is InteractionState.NEW
+    assert bot.calls == []
+    assert await responder.respond("corrected message") is bot.original
+    assert responder.state is InteractionState.RESPONDED
+    assert [name for name, _ in bot.calls] == ["callback", "original"]
 
 
 @pytest.mark.asyncio
