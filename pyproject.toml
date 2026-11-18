@@ -25,6 +25,7 @@ dev = [
 ]
 scripts = ["loguru>=0.7.3", "rich>=14.3.3", "richuru>=0.1.1"]
 test = [
+    "nonebot2[websockets]>=2.5.0",
     "nonebug>=0.4.0,<0.5.0",
     "pytest>=7.0.0,<10.0.0",
     "pytest-asyncio>=1.1.0,<2.0.0",

@@ -61,6 +61,7 @@ class Reconnect(Payload):
 
 class InvalidSession(Payload):
     opcode: Literal[Opcode.INVALID_SESSION] = Field(Opcode.INVALID_SESSION, alias="op")
+    data: bool = Field(alias="d")
 
 
 class Hello(Payload):
