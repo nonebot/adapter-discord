@@ -78,8 +78,7 @@ message_edited = on_notice()
 
 
 @message_edited.handle()
-async def handle_message_edit(event: MessageUpdateEvent) -> None:
-    ...
+async def handle_message_edit(event: MessageUpdateEvent) -> None: ...
 ```
 
 `MessageUpdateEvent` 包括服务器和私信里的编辑。只想要服务器里的，换成 `GuildMessageUpdateEvent`。
