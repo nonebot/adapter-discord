@@ -130,6 +130,7 @@ class Bot(BaseBot, ApiClient):
         self._session_id: str | None = None
         self._self_info: User | None = None
         self._sequence: int | None = None
+        self.resume_gateway_url: URL | None = None
 
     @override
     def __repr__(self) -> str:
@@ -187,6 +188,7 @@ class Bot(BaseBot, ApiClient):
     def clear(self) -> None:
         self._session_id = None
         self._sequence = None
+        self.resume_gateway_url = None
 
     async def handle_event(self, event: Event) -> None:
         if isinstance(event, MessageEvent):

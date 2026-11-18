@@ -21,7 +21,14 @@ from .api.model import GatewayBot, User
 from .bot import Bot
 from .commands import sync_application_command
 from .config import BotInfo, Config
-from .event import Event, EventType, MessageEvent, ReadyEvent, event_classes
+from .event import (
+    Event,
+    EventType,
+    MessageEvent,
+    ReadyEvent,
+    ResumedEvent,
+    event_classes,
+)
 from .exception import ApiNotAvailable
 from .payload import (
     Dispatch,
@@ -39,6 +46,8 @@ from .serialization import encode_model_json_text
 from .utils import decompress_data, log
 
 RECONNECT_INTERVAL = 3.0
+# Codes 1000 and 1001 invalidate the Discord session.
+RESUMABLE_CLOSE_CODE = 4000
 
 
 @lru_cache(maxsize=256)
@@ -179,18 +188,6 @@ class Adapter(BaseAdapter, HandleMixin):
         }
         if self.discord_config.discord_compress:
             params["compress"] = "zlib-stream"
-        request = Request(
-            method="GET",
-            url=ws_url,
-            headers=headers,
-            params=params,
-            timeout=Timeout(
-                connect=self.discord_config.discord_api_timeout,
-                read=None,
-                close=10.0,
-            ),
-            proxy=self.discord_config.discord_proxy,
-        )
         heartbeat_task: asyncio.Task | None = None
         bot: Bot | None = None
         while True:
@@ -198,11 +195,23 @@ class Adapter(BaseAdapter, HandleMixin):
                 if bot is None:
                     user = await self._get_bot_user(bot_info)
                     bot = Bot(self, str(user.id), bot_info)
+                request = Request(
+                    method="GET",
+                    url=bot.resume_gateway_url or ws_url,
+                    headers=headers,
+                    params=params,
+                    timeout=Timeout(
+                        connect=self.discord_config.discord_api_timeout,
+                        read=None,
+                        close=10.0,
+                    ),
+                    proxy=self.discord_config.discord_proxy,
+                )
                 async with self.websocket(request) as ws:
                     log(
                         "DEBUG",
                         "WebSocket Connection to"
-                        f" {escape_tag(str(ws_url))} established",
+                        f" {escape_tag(str(request.url))} established",
                     )
                     try:
                         # 接收hello事件
@@ -226,8 +235,7 @@ class Adapter(BaseAdapter, HandleMixin):
                         )
 
                         # 进行identify和resume
-                        result = await self._authenticate(bot, ws, shard)
-                        if not result:
+                        if not await self._authenticate(bot, ws, shard):
                             await asyncio.sleep(RECONNECT_INTERVAL)
                             continue
 
@@ -274,6 +282,9 @@ class Adapter(BaseAdapter, HandleMixin):
             if isinstance(payload, Hello):
                 log("DEBUG", f"Received hello: {payload}")
                 return payload.data.heartbeat_interval
+            if isinstance(payload, Reconnect):
+                await ws.close(RESUMABLE_CLOSE_CODE)
+                return None
             msg = f"Received unexpected payload: {payload!r}"
             raise ValueError(msg)  # noqa: TRY301
         except Exception as e:
@@ -313,8 +324,8 @@ class Adapter(BaseAdapter, HandleMixin):
 
     async def _authenticate(
         self, bot: Bot, ws: WebSocket, shard: tuple[int, int]
-    ) -> bool | None:
-        """鉴权连接"""
+    ) -> bool:
+        """发送 Identify 或 Resume。"""
         if not bot.ready:
             payload = type_validate_python(
                 Identify,
@@ -358,46 +369,11 @@ class Adapter(BaseAdapter, HandleMixin):
                 + " event</bg #f8bbd0></r>",
                 e,
             )
-            return None
-
-        ready_event = None
-        if not bot.ready:
-            # https://discord.com/developers/docs/topics/gateway#ready-event
-            # 鉴权成功之后, 后台会下发一个 Ready Event
-            payload = await self.receive_payload(ws)
-            if isinstance(payload, HeartbeatAck):
-                log(
-                    "WARNING", "Received unexpected HeartbeatAck event when identifying"
-                )
-                payload = await self.receive_payload(ws)
-            if not isinstance(payload, Dispatch):
-                msg = f"Received unexpected payload: {payload!r}"
-                raise ValueError(msg)
-            bot.sequence = payload.sequence
-            ready_event = self.payload_to_event(payload)
-            if not isinstance(ready_event, ReadyEvent):
-                msg = f"Received unexpected event: {ready_event!r}"
-                raise ValueError(msg)
-            ws.request.url = URL(ready_event.resume_gateway_url)
-            bot.session_id = ready_event.session_id
-            bot.self_info = ready_event.user
-
-        # only connect for single shard
-        if bot.self_id not in self.bots:
-            self.bot_connect(bot)
-            log(
-                "INFO",
-                f"<y>Bot {escape_tag(bot.self_id)}</y> connected",
-            )
-
-        if ready_event:
-            task = asyncio.create_task(bot.handle_event(ready_event))
-            task.add_done_callback(self.tasks.discard)
-            self.tasks.add(task)
+            return False
 
         return True
 
-    async def _loop(self, bot: Bot, ws: WebSocket) -> None:
+    async def _loop(self, bot: Bot, ws: WebSocket) -> None:  # noqa: C901
         """接收并处理事件"""
         while True:
             payload = await self.receive_payload(ws)
@@ -410,41 +386,47 @@ class Adapter(BaseAdapter, HandleMixin):
                 try:
                     event = self.payload_to_event(payload)
                 except Exception as e:
+                    if payload.type == EventType.READY:
+                        raise
                     log(
                         "WARNING",
                         f"Failed to parse event {escape_tag(repr(payload))}",
                         e,
                     )
-                else:
-                    if not (
-                        isinstance(event, MessageEvent)
-                        and event.get_user_id() == bot.self_id
-                        and not self.discord_config.discord_handle_self_message
-                    ):
-                        task = asyncio.create_task(bot.handle_event(event))
-                        task.add_done_callback(self.tasks.discard)
-                        self.tasks.add(task)
+                    continue
+                if isinstance(event, ReadyEvent):
+                    bot.resume_gateway_url = URL(event.resume_gateway_url)
+                    bot.session_id = event.session_id
+                    bot.self_info = event.user
+                if (
+                    isinstance(event, (ReadyEvent, ResumedEvent))
+                    and bot.self_id not in self.bots
+                ):
+                    self.bot_connect(bot)
+                    log("INFO", f"<y>Bot {escape_tag(bot.self_id)}</y> connected")
+                if (
+                    isinstance(event, MessageEvent)
+                    and event.get_user_id() == bot.self_id
+                    and not self.discord_config.discord_handle_self_message
+                ):
+                    continue
+                task = asyncio.create_task(bot.handle_event(event))
+                task.add_done_callback(self.tasks.discard)
+                self.tasks.add(task)
             elif isinstance(payload, Heartbeat):
                 # 当接受到心跳payload时, 需要立即发送一次心跳见 https://discord.com/developers/docs/topics/gateway#heartbeat-requests
                 await self._heartbeat(ws, bot)
-
-            elif isinstance(payload, HeartbeatAck):
-                log("TRACE", "Heartbeat ACK")
-                continue
-            elif isinstance(payload, Reconnect):
+            elif isinstance(payload, (Reconnect, InvalidSession)):
                 log(
                     "WARNING",
-                    "Received reconnect event from server. Try to reconnect...",
+                    f"Received {type(payload).__name__} from server. Try to reconnect...",
                 )
+                if isinstance(payload, InvalidSession) and not payload.data:
+                    bot.clear()
+                else:
+                    await ws.close(RESUMABLE_CLOSE_CODE)
                 break
-            elif isinstance(payload, InvalidSession):
-                bot.clear()
-                log(
-                    "ERROR",
-                    "Received invalid session event from server. Try to reconnect...",
-                )
-                break
-            else:
+            elif not isinstance(payload, HeartbeatAck):
                 log(
                     "WARNING",
                     f"Unknown payload from server: {escape_tag(repr(payload))}",
