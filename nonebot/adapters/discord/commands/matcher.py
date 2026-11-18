@@ -271,7 +271,7 @@ class UserMessageCommandMatcher(ApplicationCommandMatcher):
     pass
 
 
-def on_slash_command(  # noqa: PLR0913
+def on_slash_command(  # noqa: PLR0913, PLR0917
     name: str,
     description: str,
     options: Missing[Sequence[AnyCommandOption]] = UNSET,
