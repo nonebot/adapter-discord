@@ -1,5 +1,5 @@
 import base64
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Annotated
 from typing_extensions import Unpack
 
@@ -698,9 +698,9 @@ class ChannelEndpointMixin:
         if params["before"]:
             before_utc = params["before"]
             if before_utc.tzinfo is None:
-                before_utc = before_utc.replace(tzinfo=timezone.utc)
+                before_utc = before_utc.replace(tzinfo=UTC)
             else:
-                before_utc = before_utc.astimezone(timezone.utc)
+                before_utc = before_utc.astimezone(UTC)
             params["before"] = before_utc.isoformat(timespec="milliseconds").replace(
                 "+00:00", "Z"
             )
@@ -730,9 +730,9 @@ class ChannelEndpointMixin:
         if params["before"]:
             before_utc = params["before"]
             if before_utc.tzinfo is None:
-                before_utc = before_utc.replace(tzinfo=timezone.utc)
+                before_utc = before_utc.replace(tzinfo=UTC)
             else:
-                before_utc = before_utc.astimezone(timezone.utc)
+                before_utc = before_utc.astimezone(UTC)
             params["before"] = before_utc.isoformat(timespec="milliseconds").replace(
                 "+00:00", "Z"
             )

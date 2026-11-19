@@ -109,7 +109,7 @@ from .protocol import UNSET, Missing, Snowflake, is_unset
 from .utils import log, model_dump
 
 
-class EventType(str, Enum):
+class EventType(str, Enum):  # noqa: UP042 - preserve str(EventType.READY)
     """Event Type
 
     see https://discord.com/developers/docs/topics/gateway-events#receive-events"""

@@ -1,7 +1,6 @@
 """Canonical guild.write models."""
 
-from typing import TYPE_CHECKING
-from typing_extensions import Required
+from typing import TYPE_CHECKING, Required
 
 from .._model_support import OutboundTypedDict
 

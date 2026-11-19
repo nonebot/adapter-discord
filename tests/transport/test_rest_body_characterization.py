@@ -1,13 +1,22 @@
 import base64
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 import enum
 import inspect
 import json
 from pathlib import Path
 import types
-from typing import Annotated, Literal, NoReturn, Union, get_args, get_origin
-from typing_extensions import NotRequired, Required, Unpack, is_typeddict
+from typing import (
+    Annotated,
+    Literal,
+    NoReturn,
+    NotRequired,
+    Required,
+    Union,
+    get_args,
+    get_origin,
+)
+from typing_extensions import Unpack, is_typeddict
 
 from nonebot.adapters.discord.api.model import File, Snowflake
 from nonebot.adapters.discord.api.types import TriggerType
@@ -67,7 +76,7 @@ def _sample(  # noqa: C901, PLR0911, PLR0912
     if annotation is float:
         return 1.0
     if annotation is datetime:
-        return datetime(2026, 1, 1, tzinfo=timezone.utc)
+        return datetime(2026, 1, 1, tzinfo=UTC)
     if annotation is File:
         return File(content=b"x", filename="file.txt")
     if annotation is Snowflake:

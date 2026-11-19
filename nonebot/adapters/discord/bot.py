@@ -224,7 +224,7 @@ class Bot(BaseBot, ApiClient):
         *,
         allowed_hosts: set[str] | None = None,
         require_https: bool = True,
-        timeout: float | None = None,
+        timeout: float | None = None,  # noqa: ASYNC109 - HTTP driver timeout
         max_bytes: int | None = None,
         prefer_proxy_url: bool = True,
         on_error: AttachmentFetchOnError = "raise",
@@ -325,7 +325,7 @@ class Bot(BaseBot, ApiClient):
         self,
         url: str,
         *,
-        timeout: float | None,
+        timeout: float | None,  # noqa: ASYNC109 - HTTP driver timeout
         max_bytes: int | None,
     ) -> bytes | None:
         try:

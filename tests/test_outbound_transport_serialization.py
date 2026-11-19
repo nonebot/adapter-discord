@@ -1,6 +1,6 @@
 import asyncio
 from collections.abc import Awaitable, Sequence
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 import json
 from typing import Any
 from typing_extensions import override
@@ -78,7 +78,7 @@ def _payload_json_text(
 
 
 def _assert_transport_datetime(actual: str, expected: datetime) -> None:
-    assert datetime.fromisoformat(actual.replace("Z", "+00:00")) == expected
+    assert datetime.fromisoformat(actual) == expected
 
 
 @pytest.mark.asyncio
@@ -87,7 +87,7 @@ async def test_create_message_request_uses_transport_payload_json(
 ) -> None:
     adapter = DummyAdapter()
     bot = DummyBot(adapter=adapter)
-    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=timezone.utc)
+    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=UTC)
 
     request = await _capture_request(
         monkeypatch,
@@ -113,7 +113,7 @@ async def test_forum_thread_request_keeps_nested_message_payload(
 ) -> None:
     adapter = DummyAdapter()
     bot = DummyBot(adapter=adapter)
-    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=timezone.utc)
+    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=UTC)
 
     request = await _capture_request(
         monkeypatch,
@@ -141,7 +141,7 @@ async def test_interaction_response_request_keeps_nested_data_payload(
 ) -> None:
     adapter = DummyAdapter()
     bot = DummyBot(adapter=adapter)
-    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=timezone.utc)
+    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=UTC)
     interaction_token = f"interaction-{timestamp.timestamp()}"
 
     request = await _capture_request(
@@ -174,7 +174,7 @@ async def test_modify_guild_member_request_serializes_datetime(
 ) -> None:
     adapter = DummyAdapter()
     bot = DummyBot(adapter=adapter)
-    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=timezone.utc)
+    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=UTC)
 
     request = await _capture_request(
         monkeypatch,
@@ -199,7 +199,7 @@ async def test_modify_current_user_voice_state_request_serializes_datetime(
 ) -> None:
     adapter = DummyAdapter()
     bot = DummyBot(adapter=adapter)
-    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=timezone.utc)
+    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=UTC)
 
     request = await _capture_request(
         monkeypatch,
@@ -223,7 +223,7 @@ async def test_create_guild_schedule_event_request_serializes_recurrence_rule(
 ) -> None:
     adapter = DummyAdapter()
     bot = DummyBot(adapter=adapter)
-    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=timezone.utc)
+    timestamp = datetime(2026, 3, 14, 12, 0, tzinfo=UTC)
 
     request = await _capture_request(
         monkeypatch,

@@ -12,8 +12,12 @@ authors = [
 license = "MIT"
 readme = "README.md"
 keywords = ["nonebot", "discord", "bot"]
-requires-python = ">=3.10,<4.0.0"
-dependencies = ["nonebot2>=2.5.0", "pydantic>=2.12.0,<3.0.0"]
+requires-python = ">=3.11,<4.0.0"
+dependencies = [
+    "nonebot2>=2.5.0",
+    "pydantic>=2.12.0,<3.0.0; python_version < '3.15'",
+    "pydantic>=2.14.0,<3.0.0; python_version >= '3.15'",
+]
 
 [dependency-groups]
 dev = [
@@ -43,7 +47,7 @@ module-root = ""
 
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = [
@@ -133,7 +137,7 @@ section-order = [
 ]
 
 [tool.pyright]
-pythonVersion = "3.10"
+pythonVersion = "3.11"
 pythonPlatform = "All"
 typeCheckingMode = "standard"
 reportExplicitAny = 'hint'

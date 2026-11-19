@@ -6,9 +6,10 @@ from importlib import import_module
 import re
 from typing import (
     Any,
+    Self,
     overload,
 )
-from typing_extensions import Self, deprecated, override
+from typing_extensions import deprecated, override
 
 from nonebot.adapters import (
     Message as BaseMessage,

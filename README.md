@@ -238,6 +238,8 @@ async def handle_admin_ban(user: CommandOption[User]):
 
 ## 1.x 迁移与弃用
 
+升级到 2.0 前，请先升级到 Python 3.11 或更新版本。
+
 新代码应传递 `Message`/`MessageSegment` 给 `Bot.send` 或 `Bot.send_to`，并为斜杠命令注入 `CommandResponse`。以下 1.x 兼容接口仍然保留，但 removal target 是 **2.0**：
 
 - `nonebot.adapters.discord.message.parse_message`；

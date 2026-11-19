@@ -1,7 +1,6 @@
 """Canonical application.write models."""
 
-from typing import TYPE_CHECKING, Literal
-from typing_extensions import Required
+from typing import TYPE_CHECKING, Literal, Required
 
 from .._model_support import OutboundTypedDict
 

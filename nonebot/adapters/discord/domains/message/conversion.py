@@ -1,8 +1,8 @@
 """Pure conversion from NoneBot message segments to canonical Discord requests."""
 
 from dataclasses import dataclass
-from typing import Any
-from typing_extensions import NotRequired, TypedDict, Unpack
+from typing import Any, NotRequired
+from typing_extensions import TypedDict, Unpack
 
 from ._attachment_errors import get_unsendable_attachment_message
 from ..models import (

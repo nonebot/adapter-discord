@@ -3,7 +3,7 @@
 from enum import Enum
 
 
-class StrEnum(str, Enum):
+class StrEnum(str, Enum):  # noqa: UP042 - preserve qualified member names in str()
     """String enum."""
 
 

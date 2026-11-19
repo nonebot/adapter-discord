@@ -1,6 +1,5 @@
 import datetime
-from typing import Any, TypeAlias, final
-from typing_extensions import Self
+from typing import Any, Self, TypeAlias, final
 
 from pydantic import GetCoreSchemaHandler
 from pydantic_core import CoreSchema, core_schema
@@ -44,9 +43,7 @@ class Snowflake(int):
 
     @property
     def create_at(self) -> datetime.datetime:
-        return datetime.datetime.fromtimestamp(
-            self.timestamp / 1000, datetime.timezone.utc
-        )
+        return datetime.datetime.fromtimestamp(self.timestamp / 1000, datetime.UTC)
 
     @property
     def internal_worker_id(self) -> int:

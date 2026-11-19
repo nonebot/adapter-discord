@@ -1,6 +1,6 @@
 """Canonical lobby.write models."""
 
-from typing_extensions import Required
+from typing import Required
 
 from .._model_support import LobbyMemberFlags, OutboundTypedDict, Snowflake
 

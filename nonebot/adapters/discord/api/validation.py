@@ -3,8 +3,17 @@ from dataclasses import dataclass
 from functools import cache, wraps
 import inspect
 import types
-from typing import Annotated, Any, TypeVar, Union, get_args, get_origin
-from typing_extensions import NotRequired, Required, is_typeddict
+from typing import (
+    Annotated,
+    Any,
+    NotRequired,
+    Required,
+    TypeVar,
+    Union,
+    get_args,
+    get_origin,
+)
+from typing_extensions import is_typeddict
 
 from nonebot.compat import type_validate_python
 from pydantic import BaseModel, TypeAdapter, ValidationError

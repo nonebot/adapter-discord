@@ -1,6 +1,6 @@
 """Canonical emoji.write models."""
 
-from typing_extensions import Required
+from typing import Required
 
 from .._model_support import OutboundTypedDict, Snowflake
 from ...protocol import SnowflakeType

@@ -1,6 +1,6 @@
 import re
-from typing import Annotated, cast
-from typing_extensions import NotRequired, Required, TypedDict
+from typing import Annotated, NotRequired, Required, cast
+from typing_extensions import TypedDict
 
 from nonebot.adapters.discord.api.types import UNSET
 from nonebot.adapters.discord.api.validation import validate_outbound_value
